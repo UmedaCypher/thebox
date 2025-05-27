@@ -1,0 +1,426 @@
+/* client/src/pages/UserProfilePage/UserProfilePage.module.css */
+.profilePageContainer {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: clamp(30px, 5vh, 50px) clamp(15px, 3vw, 30px);
+  box-sizing: border-box;
+  font-family: var(--font-main);
+  color: var(--text-color);
+}
+
+.pageTitle {
+  font-family: var(--font-headings-primary);
+  font-style: italic;
+  font-weight: var(--font-weight-bold);
+  font-size: clamp(2rem, 4.5vw, 2.8rem);
+  color: var(--brand-grey-text);
+  text-align: center;
+  margin-bottom: clamp(30px, 5vh, 40px);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.profileLayout {
+  display: flex;
+  gap: clamp(20px, 3vw, 40px);
+}
+
+.sideNav {
+  flex: 0 0 220px;
+  background-color: var(--brand-beige-card-bg);
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  align-self: flex-start; /* S'assure qu'il ne s'étire pas en hauteur si contentArea est plus grand */
+}
+
+.navButton {
+  display: block; /* Par défaut pour desktop, chaque bouton prend sa ligne */
+  width: 100%;
+  padding: 12px 15px;
+  margin-bottom: 8px;
+  text-align: left;
+  font-family: var(--font-main);
+  font-size: 0.9rem;
+  font-weight: var(--font-weight-medium);
+  color: var(--brand-grey-text);
+  background-color: transparent;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.navButton:hover {
+  background-color: color-mix(in srgb, var(--brand-blue) 10%, transparent);
+  color: var(--brand-blue);
+}
+
+.navButtonActive {
+  background-color: var(--primary-color);
+  color: var(--white);
+  font-weight: var(--font-weight-semibold);
+}
+.navButtonActive:hover {
+  background-color: var(--secondary-color);
+  color: var(--white);
+}
+
+
+.contentArea {
+  flex-grow: 1;
+  min-width: 0; /* Important pour le flex-grow dans certains navigateurs */
+}
+
+.profileContentSection {
+  background-color: var(--brand-beige-card-bg);
+  padding: clamp(25px, 3.5vw, 35px);
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+}
+
+.sectionTitle {
+  font-family: var(--font-headings-section);
+  font-style: italic;
+  font-weight: var(--font-weight-semibold);
+  font-size: clamp(1.3rem, 2.5vw, 1.6rem);
+  color: var(--brand-grey-text);
+  padding-bottom: 15px;
+  margin-bottom: 25px;
+  border-bottom: 1px solid var(--border-color);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.formGroup {
+  margin-bottom: 22px;
+  display: flex;
+  flex-direction: column;
+}
+
+.formGroup label {
+  font-family: var(--font-main);
+  font-weight: var(--font-weight-medium);
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+  color: var(--brand-grey-text);
+}
+
+.inputField,
+.selectField {
+  font-family: var(--font-main);
+  font-weight: var(--font-weight-regular);
+  font-size: clamp(0.9rem, 1.9vw, 1rem);
+  padding: 12px 16px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background-color: var(--white);
+  color: var(--text-color);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.selectField {
+  appearance: none;
+  background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2220%22%20height%3D%2220%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M5%208l5%205%205-5z%22%20fill%3D%22%23333333%22%2F%3E%3C%2Fsvg%3E');
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  background-size: 16px;
+  padding-right: 40px;
+}
+
+
+.inputField:focus,
+.selectField:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary-color) 15%, transparent);
+}
+
+.inputField[readonly],
+.inputField:disabled {
+  background-color: var(--brand-beige-bg);
+  cursor: not-allowed;
+  opacity: 0.7;
+  border-color: var(--border-color-light);
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-family: var(--font-main);
+  font-weight: var(--font-weight-regular);
+  margin-bottom: 0;
+  color: var(--brand-grey-text);
+}
+.checkboxInput {
+  width: auto;
+  margin-right: 10px;
+  transform: scale(1.1);
+  vertical-align: middle;
+  accent-color: var(--primary-color);
+}
+
+
+.avatarPreview {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 15px;
+  border: 2px solid var(--border-color);
+}
+
+.avatarPlaceholder {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background-color: var(--brand-beige-card-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-color-light);
+  font-size: 0.9rem;
+  border: 1px dashed var(--border-color);
+  margin-bottom: 15px;
+}
+
+.fileInput {
+  font-family: var(--font-main);
+  font-size: 0.9rem;
+  padding: 8px 0;
+  display: block;
+  margin-top: 10px;
+  max-width: 300px;
+  color: var(--text-color);
+}
+.inputHelp {
+  font-family: var(--font-main);
+  font-weight: var(--font-weight-regular);
+  font-size: 0.8rem;
+  color: var(--text-color-light);
+  display: block;
+  margin-top: 5px;
+}
+
+
+.submitButton,
+.actionButton { 
+  font-family: var(--font-main);
+  background-color: var(--primary-color);
+  color: var(--white);
+  padding: 10px 22px;
+  font-size: 0.9rem;
+  font-weight: var(--font-weight-bold);
+  text-decoration: none;
+  border-radius: 4px;
+  border: 1px solid var(--primary-color);
+  transition: background-color 0.2s ease, transform 0.15s ease, color 0.2s ease, border-color 0.2s ease;
+  cursor: pointer;
+  display: inline-block; /* Important pour que margin-right fonctionne correctement */
+  margin-right: 10px;
+  margin-top: 10px;
+}
+.submitButton { /* Peut avoir un padding légèrement différent */
+  padding: 12px 28px;
+  font-size: 0.95rem;
+}
+
+.submitButton:hover:not(:disabled),
+.actionButton:hover:not(:disabled) {
+  background-color: var(--secondary-color);
+  border-color: var(--secondary-color);
+  transform: translateY(-1px);
+}
+.submitButton:disabled,
+.actionButton:disabled {
+  background-color: var(--text-color-light) !important;
+  border-color: var(--text-color-light) !important;
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+
+.dangerButton {
+  background-color: var(--brand-red);
+  border-color: var(--brand-red);
+}
+.dangerButton:hover:not(:disabled) {
+  background-color: color-mix(in srgb, var(--brand-red) 85%, black);
+  border-color: color-mix(in srgb, var(--brand-red) 85%, black);
+}
+
+.emailVerification {
+  margin-top: 10px;
+  font-size: 0.85rem;
+  padding: 10px 15px;
+  background-color: var(--brand-beige-card-bg); /* Cohérent avec le fond des sections */
+  border-radius: 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid var(--border-color);
+  font-family: var(--font-main);
+}
+.notVerified {
+  color: var(--brand-grey-text);
+  font-weight: var(--font-weight-medium);
+}
+.linkButton {
+  background: none;
+  border: none;
+  color: var(--primary-color);
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+  font-family: var(--font-main);
+  font-size: 0.85rem;
+  font-weight: var(--font-weight-bold);
+}
+.linkButton:hover {
+  color: var(--secondary-color);
+}
+.linkButton:disabled {
+  color: var(--text-color-light);
+  text-decoration: none;
+  cursor: not-allowed;
+}
+
+.inputWithButton {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.inputWithButton input.inputField {
+  flex-grow: 1;
+  margin-bottom: 0; /* Retirer la marge du bas si à l'intérieur de ce groupe */
+}
+.inputWithButton .inlineButton {
+  padding: 12px 18px; /* Hauteur cohérente avec inputField */
+  font-size: 0.9rem;
+  flex-shrink: 0;
+  /* height: auto; -> laissons le padding définir la hauteur */
+  /* line-height: normal; */
+  margin-top: 0; /* Retirer les marges si déjà géré par le parent .formGroup */
+  margin-bottom: 0;
+  background-color: var(--brand-grey-text);
+  border-color: var(--brand-grey-text);
+  color: var(--white);
+  font-weight: var(--font-weight-bold);
+}
+.inputWithButton .inlineButton:hover:not(:disabled) {
+  background-color: var(--brand-black);
+  border-color: var(--brand-black);
+}
+
+
+.todoText {
+  font-family: var(--font-main);
+  font-style: italic;
+  color: var(--text-color-light);
+  margin-top: 15px;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  font-weight: var(--font-weight-regular);
+}
+.inlineLink {
+  color: var(--brand-blue);
+  text-decoration: underline;
+  font-weight: var(--font-weight-bold);
+}
+.inlineLink:hover {
+  color: var(--secondary-color);
+}
+
+/* Messages globaux (déplacés de UserProfilePage.module.css vers un endroit plus global si nécessaire) */
+/* Sinon, laissez-les ici si spécifiques à cette page */
+.message, .errorMessage, .successMessage {
+  padding: 12px 18px;
+  border-radius: 6px;
+  margin-bottom: 20px; /* Assurer un espacement sous le message */
+  font-size: 0.9rem;
+  text-align: left;
+  font-family: var(--font-main);
+}
+.errorMessage {
+  background-color: var(--error-bg, #FFF0F0);
+  color: var(--error-text, #D8000C);
+  border: 1px solid var(--error-border, #FFBABA);
+}
+.successMessage {
+  background-color: var(--success-bg, #F0FFF0);
+  color: var(--success-text, #006400);
+  border: 1px solid var(--success-border, #B0EAB0);
+}
+.pageLoading, .pageError { /* Styles de base pour les états de page */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px; /* Ou la hauteur que vous souhaitez */
+  font-family: var(--font-main);
+  color: var(--text-color-light);
+  font-size: 1.1rem;
+  font-style: italic;
+}
+.pageError {
+  color: var(--error-text, #D8000C); /* Utiliser la couleur d'erreur */
+}
+
+
+
+@media (max-width: 850px) {
+  .profileLayout {
+    flex-direction: column;
+  }
+  .sideNav {
+    flex: 0 0 auto; /* Ne pas grandir, ne pas rétrécir, base sur le contenu */
+    width: 100%;
+    margin-bottom: 25px;
+    display: flex;
+    overflow-x: auto; /* Permet le défilement horizontal */
+    /* Ajout pour une meilleure apparence de la scrollbar si visible */
+    -webkit-overflow-scrolling: touch; /* Pour un scroll plus fluide sur iOS */
+    scrollbar-width: thin; /* Pour Firefox */
+    scrollbar-color: var(--text-color-light) transparent; /* Couleur de la scrollbar pour Firefox */
+    padding: 5px 0; /* Padding vertical pour aérer, pas de padding horizontal pour ne pas couper les bords */
+  }
+  /* Cacher la scrollbar par défaut, elle apparaît au scroll */
+  .sideNav::-webkit-scrollbar {
+    height: 6px; /* Hauteur de la scrollbar */
+  }
+  .sideNav::-webkit-scrollbar-thumb {
+    background-color: var(--text-color-light);
+    border-radius: 3px;
+  }
+  .sideNav::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+
+  .navButton {
+    display: inline-block; /* CHANGEMENT CLÉ: Permet aux boutons d'être sur la même ligne */
+    width: auto;           /* CHANGEMENT CLÉ: La largeur s'adapte au contenu */
+    flex-shrink: 0;        /* Important pour que les boutons ne soient pas compressés */
+    margin-bottom: 0;      /* Plus de marge en bas car ils sont en ligne */
+    margin-right: 10px;     /* Espace entre les boutons */
+    padding: 10px 15px;    /* Padding ajusté pour un look "onglet" */
+    font-size: 0.85rem;    /* Police légèrement réduite pour mobile */
+    white-space: nowrap;   /* Empêche le texte du bouton de passer à la ligne */
+  }
+  .navButton:last-child {
+    margin-right: 0; /* Pas de marge à droite pour le dernier bouton */
+  }
+
+  .contentArea {
+    width: 100%;
+  }
+
+  /* Ajustement pour les messages d'erreur/succès sur mobile si besoin */
+  .message, .errorMessage, .successMessage {
+    font-size: 0.85rem;
+  }
+}

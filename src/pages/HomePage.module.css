@@ -1,0 +1,291 @@
+/* client/src/pages/HomePage/HomePage.module.css */
+
+.homePage {
+  width: 100%;
+  overflow-x: hidden;
+  background-color: var(--body-bg-color);
+}
+
+.heroSectionNew {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: clamp(30px, 6vh, 60px) 0 clamp(60px, 10vh, 100px) 0;
+  text-align: center;
+  width: 100%;
+  min-height: 80vh;
+  box-sizing: border-box;
+  position: relative;
+  background-color: var(--body-bg-color);
+}
+
+.heroImageGridTop,
+.heroImageGridBottom {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: clamp(15px, 2vw, 25px);
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 clamp(15px, 3vw, 30px);
+  box-sizing: border-box;
+}
+.heroImageGridTop {
+  margin-bottom: clamp(20px, 3vh, 30px);
+}
+.heroImageGridBottom {
+  margin-top: clamp(20px, 3vh, 30px);
+}
+
+.heroWatchImageContainer {
+  background-color: var(--brand-beige-card-bg);
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  width: clamp(80px, 12vw, 160px);
+  aspect-ratio: 3 / 4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s ease, border-color 0.3s ease;
+}
+.heroWatchImageContainer:hover {
+  transform: scale(1.05);
+  border-color: var(--brand-grey-text);
+}
+
+.heroWatchImageContainer img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 4px;
+}
+
+.heroTitle {
+  font-family: var(--font-headings-primary);
+  font-style: italic;
+  font-weight: var(--font-weight-bold);
+  font-size: clamp(4rem, 13vw, 10rem);
+  color: var(--brand-black); /* Titre principal en noir pour impact maximal */
+  margin: 0;
+  line-height: 0.9;
+  letter-spacing: -0.03em;
+  padding: clamp(10px, 2vh, 20px) 0;
+}
+
+.heroSloganContainer {
+  margin-top: clamp(30px, 5vh, 50px);
+  max-width: 600px;
+  padding: 0 20px;
+}
+
+.heroSubtitle {
+  font-family: var(--font-headings-primary);
+  font-style: italic;
+  font-weight: var(--font-weight-regular);
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  color: var(--brand-grey-text);
+  margin-bottom: 15px;
+  line-height: 1.3;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.heroDescription {
+  font-family: var(--font-main);
+  font-weight: var(--font-weight-regular);
+  font-size: clamp(0.9rem, 1.8vw, 1.05rem);
+  color: var(--text-color-light);
+  margin-bottom: clamp(30px, 4vh, 40px);
+  line-height: 1.7;
+}
+
+.ctaButton {
+  font-family: var(--font-main);
+  font-weight: var(--font-weight-bold);
+  text-decoration: none;
+  border-radius: 4px;
+  transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+  display: inline-block;
+  cursor: pointer;
+  text-align: center;
+}
+
+.ctaButtonHero { /* Style de .button-secondary de index.css */
+  background-color: transparent;
+  color: var(--primary-color); /* Deviendra gris foncé */
+  border: 2px solid var(--primary-color); /* Deviendra gris foncé */
+  padding: 0.7em 2.2em;
+  font-size: clamp(0.85rem, 1.7vw, 0.95rem);
+}
+.ctaButtonHero:hover {
+  background-color: var(--brand-beige-card-bg); /* Fond beige au survol */
+  color: var(--primary-color); /* Texte reste gris foncé */
+  /* transform: translateY(-2px); /* Optionnel */
+}
+
+.sectionContainer {
+  width: 100%;
+  max-width: 1140px;
+  margin: 0 auto;
+  padding: 0 clamp(20px, 4vw, 40px);
+  box-sizing: border-box;
+}
+
+.sectionTitle {
+  font-family: var(--font-headings-section);
+  font-style: italic;
+  font-weight: var(--font-weight-bold);
+  font-size: clamp(2rem, 5vw, 2.8rem);
+  color: var(--brand-grey-text);
+  text-align: center;
+  margin-bottom: clamp(40px, 6vh, 60px);
+  position: relative;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.countersSection {
+  padding: clamp(60px, 10vh, 100px) 0;
+  background-color: var(--brand-beige-card-bg);
+  width: 100%;
+}
+
+.countersGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: clamp(30px, 4vw, 40px);
+}
+
+.counterCard {
+  background-color: transparent;
+  padding: 20px;
+  text-align: center;
+}
+
+.counterValue {
+  font-family: var(--font-headings-primary);
+  font-style: italic;
+  font-weight: var(--font-weight-bold);
+  font-size: clamp(3.5rem, 9vw, 6rem);
+  color: var(--brand-black); /* CHANGÉ: Bleu -> Noir pour forte distinction */
+  line-height: 1;
+  margin-bottom: 10px;
+  display: block;
+}
+
+.counterLabel {
+  font-family: var(--font-titles-decorative);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: clamp(0.9rem, 1.8vw, 1.1rem);
+  color: var(--brand-grey-text);
+  margin-bottom: 10px;
+}
+
+.counterDescription {
+  font-family: var(--font-main);
+  font-weight: var(--font-weight-regular);
+  font-size: clamp(0.85rem, 1.7vw, 0.95rem);
+  color: var(--text-color-light);
+  line-height: 1.6;
+}
+
+.contentSection {
+  padding: clamp(70px, 12vh, 120px) 0;
+  width: 100%;
+  text-align: center;
+}
+.contentSection.ctaSection {
+  background-color: var(--body-bg-color);
+}
+.contentSection.testimonialsSection {
+  background-color: var(--brand-beige-card-bg);
+}
+
+.sectionDescription {
+  font-family: var(--font-main);
+  font-weight: var(--font-weight-regular);
+  font-size: clamp(1rem, 2vw, 1.15rem);
+  color: var(--brand-grey-text);
+  line-height: 1.7;
+  max-width: 650px;
+  margin: 0 auto clamp(35px, 5vh, 45px) auto;
+}
+
+.ctaButtonLarge { /* Hérite des styles de .button-like de index.css via --primary-color et --secondary-color */
+  /* background-color: var(--primary-color); -- Sera gris foncé */
+  /* color: var(--white); */
+  border: 2px solid var(--primary-color); /* Sera gris foncé */
+  padding: 0.8em 2.8em;
+  font-size: clamp(0.9rem, 1.8vw, 1rem);
+  font-family: var(--font-main);
+  font-weight: var(--font-weight-bold);
+  text-decoration: none;
+  border-radius: 4px;
+  /* transition, display, cursor, text-align, etc. sont dans index.css pour .button-like */
+}
+/* .ctaButtonLarge:hover géré par .button-like:hover dans index.css (fond noir) */
+
+
+.testimonialsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: clamp(25px, 3vw, 35px);
+  margin-top: 30px;
+}
+
+.testimonialCard {
+  background-color: var(--white);
+  padding: clamp(25px, 3vw, 35px);
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  transition: border-color 0.3s ease;
+}
+.testimonialCard:hover {
+  border-color: var(--brand-grey-text);
+}
+
+.testimonialQuote {
+  font-family: var(--font-main);
+  font-weight: var(--font-weight-regular);
+  font-size: clamp(0.9rem, 1.8vw, 1rem);
+  color: var(--brand-grey-text);
+  line-height: 1.7;
+  margin-bottom: 20px;
+  font-style: normal;
+  flex-grow: 1;
+}
+.testimonialQuote::before {
+  content: '“';
+  color: var(--brand-grey-text); /* CHANGÉ: Bleu -> Gris Foncé */
+  font-family: var(--font-headings-primary);
+  font-style: italic;
+  font-size: 2.5em;
+  font-weight: var(--font-weight-regular);
+  line-height: 0;
+  display: block;
+  margin-bottom: 5px;
+  opacity: 0.8;
+}
+
+.testimonialAuthor {
+  font-family: var(--font-main);
+  font-weight: var(--font-weight-semibold);
+  font-size: 0.9rem;
+  color: var(--brand-black); /* CHANGÉ: Bleu -> Noir pour l'auteur */
+  margin-top: auto;
+}
+.testimonialDate {
+  font-family: var(--font-main);
+  font-weight: var(--font-weight-regular);
+  color: var(--text-color-light);
+  font-size: 0.8rem;
+  margin-left: 8px;
+}

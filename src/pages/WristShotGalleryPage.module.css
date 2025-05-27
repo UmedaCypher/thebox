@@ -1,0 +1,255 @@
+/* client/src/pages/WristShotGalleryPage/WristShotGalleryPage.module.css */
+.galleryPageContainer {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: clamp(20px, 4vw, 40px) clamp(15px, 3vw, 30px);
+  box-sizing: border-box;
+  font-family: var(--font-main); /* Changé pour --font-main */
+}
+
+.pageHeader {
+  margin-bottom: clamp(25px, 4vh, 35px);
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.pageTitle {
+  font-family: var(--font-headings-primary); /* Libre Bodoni */
+  font-style: italic;
+  font-weight: var(--font-weight-bold); /* Bold */
+  font-size: clamp(2rem, 4.5vw, 2.8rem);
+  color: var(--brand-grey-text);
+  text-align: center;
+  margin: 0 0 20px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.filtersContainer {
+  background-color: var(--brand-beige-card-bg);
+  padding: 20px clamp(15px, 3vw, 30px);
+  border-radius: 8px;
+  margin-bottom: 30px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px 30px;
+  align-items: flex-end;
+  border: 1px solid var(--border-color);
+}
+
+.filterGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex-grow: 1;
+  min-width: 180px;
+}
+
+.filterLabel {
+  font-family: var(--font-main); /* Inter */
+  font-size: 0.9rem;
+  color: var(--brand-grey-text);
+  font-weight: var(--font-weight-medium); /* Inter Medium */
+}
+
+.filterSelect,
+.filterInput {
+  font-family: var(--font-main);
+  padding: 10px 14px;
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+  background-color: var(--white);
+  color: var(--text-color);
+  font-size: 0.9rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+.filterSelect:focus,
+.filterInput:focus {
+  outline: none;
+  border-color: var(--brand-blue);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--brand-blue) 15%, transparent);
+}
+
+.rangeInputContainer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.rangeInputContainer span {
+  color: var(--text-color-light); /* Changé pour --text-color-light */
+}
+.rangeInputContainer .filterInput {
+  width: 80px;
+  text-align: center;
+}
+.filterInput[type=number]::-webkit-inner-spin-button,
+.filterInput[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.filterInput[type=number] {
+  -moz-appearance: textfield;
+}
+
+.filterActions {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  margin-left: auto;
+}
+
+.resetButton {
+  font-family: var(--font-main);
+  background-color: transparent;
+  color: var(--brand-grey-text);
+  border: 1px solid var(--brand-grey-text);
+  padding: 10px 15px;
+  font-size: 0.85rem;
+  font-weight: var(--font-weight-semibold); /* Inter SemiBold */
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+.resetButton:hover:not(:disabled) {
+  background-color: var(--brand-red);
+  color: var(--white);
+  border: 1px solid var(--brand-red);
+}
+.resetButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Utilisation des classes globales pour les messages */
+/* .loadingMessage, .emptyMessage sont remplacés par .message-global.message-info */
+/* .errorMessage est remplacé par .message-global.message-error */
+
+.photosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: clamp(20px, 3vw, 30px);
+}
+
+.photoCard {
+  background-color: var(--brand-beige-card-bg);
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: border-color 0.2s ease-out, transform 0.2s ease-out;
+}
+.photoCard:hover {
+  transform: translateY(-3px);
+  border-color: var(--brand-grey-text);
+}
+.photoCard a {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+
+.photoImage {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  display: block;
+  background-color: var(--white);
+}
+
+.photoPlaceholder {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--brand-beige-bg);
+  font-size: 3rem;
+  color: var(--border-color);
+}
+
+.photoInfo {
+  padding: 12px 15px;
+  text-align: left;
+  background-color: var(--brand-beige-card-bg);
+}
+
+.watchName {
+  font-family: var(--font-headings-section); /* Libre Bodoni */
+  font-style: italic;
+  font-weight: var(--font-weight-semibold); /* SemiBold Italic */
+  font-size: 1rem;
+  color: var(--brand-grey-text);
+  margin: 0 0 5px 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.userInfo {
+  font-family: var(--font-main); /* Inter */
+  font-size: 0.8rem;
+  color: var(--text-color-light);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: var(--font-weight-regular); /* Assurer Inter Regular */
+}
+
+.loadMoreContainer {
+  text-align: center;
+  margin-top: 30px;
+  margin-bottom: 20px;
+}
+
+.loadMoreButton { /* Devrait hériter de button ou .button-like de index.css */
+  font-family: var(--font-main);
+  background-color: var(--brand-grey-text);
+  color: var(--white);
+  padding: 10px 25px;
+  font-size: 0.9rem;
+  font-weight: var(--font-weight-bold); /* Inter Bold */
+  text-decoration: none;
+  border-radius: 4px;
+  border: 1px solid var(--brand-grey-text);
+  transition: background-color 0.2s ease, transform 0.15s ease, border-color 0.2s ease;
+  cursor: pointer;
+}
+.loadMoreButton:hover:not(:disabled) {
+  background-color: var(--secondary-color);
+  border-color: var(--secondary-color);
+  transform: translateY(-1px);
+}
+.loadMoreButton:disabled {
+  background-color: var(--text-color-light);
+  border-color: var(--text-color-light);
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+
+.userInfo {
+  font-family: var(--font-main); /* Inter */
+  font-size: 0.8rem;
+  color: var(--text-color-light);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: var(--font-weight-regular); /* Assurer Inter Regular */
+}
+
+/* Nouveau style pour le lien du profil */
+.profileLink {
+  color: var(--primary-color); /* Ou une autre couleur de lien que vous préférez */
+  text-decoration: none;
+  font-weight: var(--font-weight-medium); /* Un peu plus en évidence */
+}
+
+.profileLink:hover {
+  text-decoration: underline;
+  color: var(--secondary-color); /* Ou la couleur de survol de vos liens */
+}

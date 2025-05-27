@@ -1,0 +1,147 @@
+/* client/src/components/DetailedFeatureSection/DetailedFeatureSection.module.css */
+
+/* Import des variables globales si elles ne sont pas héritées ou si vous voulez les redéfinir/utiliser ici.
+   Normalement, les variables de :root dans index.css sont accessibles.
+*/
+/* :root { ... } */
+
+.detailedFeatureSection {
+  padding: clamp(60px, 10vh, 90px) 0;
+  overflow: hidden;
+  width: 100%; /* Assure que la section prend toute la largeur */
+  box-sizing: border-box;
+}
+
+.detailedFeatureSection.bgLightDetailed {
+  background-color: var(--bg-section-alt, #f4f6f8); /* Fond alterné, avec fallback */
+}
+
+.detailedFeatureSection.firstDetailedFeature {
+  padding-top: clamp(70px, 12vh, 110px); /* Plus de padding pour la première */
+}
+
+/* Le .container est importé implicitement ou défini globalement.
+   Si ce n'est pas le cas, vous pouvez le redéfinir ici ou l'importer.
+   Pour cet exemple, on assume qu'il est global ou que .detailedFeatureContent le remplace.
+*/
+.container { /* Style de base du conteneur, s'il est utilisé directement ici */
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 clamp(20px, 4vw, 50px);
+  box-sizing: border-box;
+}
+
+.detailedFeatureContent {
+  /* Si .container n'est pas utilisé comme parent direct de cette div dans le composant,
+     alors .detailedFeatureContent doit prendre ses propriétés pour centrer le contenu. */
+  width: 100%;
+  max-width: 1180px; /* Correspond à .container */
+  margin: 0 auto; /* Correspond à .container */
+  padding: 0 clamp(20px, 4vw, 50px); /* Correspond à .container */
+  box-sizing: border-box; /* Correspond à .container */
+
+  display: flex;
+  align-items: center;
+  gap: clamp(40px, 6vw, 90px);
+}
+
+.detailedFeatureImageContainer {
+  flex: 1;
+  min-width: 0; /* Pour flexbox et images responsives */
+}
+
+.detailedFeatureImage {
+  background-color: #e9ecef; /* Placeholder neutre */
+  width: 100%;
+  aspect-ratio: 5/4;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-style: italic;
+  color: var(--light-text-color, #6c757d);
+  font-size: 1rem;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.07);
+  /* Pour une vraie image :
+  img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; display: block; }
+  */
+}
+
+.detailedFeatureTextContainer {
+  flex: 1;
+  text-align: left;
+  padding: 10px 0;
+}
+
+.detailedFeatureSubtitle {
+  display: block;
+  font-size: clamp(0.9rem, 1.8vw, 1rem);
+  color: var(--secondary-color, #3A7CA5);
+  font-weight: 600;
+  margin-bottom: 8px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.detailedFeatureTitle {
+  font-family: var(--font-headings, 'Playfair Display', serif);
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  color: var(--primary-color, #1A2E4C);
+  margin-bottom: 20px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.detailedFeatureDescription {
+  font-size: clamp(1rem, 2vw, 1.1rem);
+  color: var(--light-text-color, #495057);
+  line-height: 1.8;
+  margin-bottom: 25px;
+}
+
+.learnMoreLink {
+  display: inline-flex;
+  align-items: center;
+  color: var(--primary-color, #1A2E4C);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: clamp(0.95rem, 1.9vw, 1.05rem);
+  transition: color 0.2s ease;
+}
+.learnMoreLink:hover {
+  color: var(--secondary-color, #3A7CA5);
+}
+.learnMoreLink .arrowIcon {
+  margin-left: 8px;
+  transition: transform 0.2s ease;
+}
+.learnMoreLink:hover .arrowIcon {
+  transform: translateX(4px);
+}
+
+/* Alternance de la disposition image/texte */
+.detailedFeatureContent.layoutImageRight {
+  flex-direction: row-reverse;
+}
+
+/* Responsive pour les sections de fonctionnalités détaillées */
+@media (max-width: 900px) {
+  .detailedFeatureContent {
+    flex-direction: column !important;
+    text-align: center;
+  }
+  .detailedFeatureTextContainer {
+    text-align: center;
+    margin-top: 40px;
+  }
+  .detailedFeatureImage {
+    aspect-ratio: 16/9;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .detailedFeatureSubtitle { /* Assurer le centrage du sous-titre */
+    text-align: center;
+  }
+}

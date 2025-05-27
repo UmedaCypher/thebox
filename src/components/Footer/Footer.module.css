@@ -1,0 +1,154 @@
+/* client/src/components/Footer/Footer.module.css (Version Simplifiée) */
+
+.footer {
+  background-color: var(--brand-black);
+  color: var(--brand-beige-card-bg); /* Couleur de texte par défaut pour le footer */
+  font-family: var(--font-main);
+  font-size: 0.9rem;
+  padding: clamp(2.5rem, 6vw, 4rem) clamp(1rem, 4vw, 2rem);
+  margin-top: auto; /* Assure que le footer est en bas */
+  line-height: 1.6;
+}
+
+.contentWrapper { /* Gère la largeur max et le centrage du contenu global du footer */
+  max-width: 1140px;
+  margin: 0 auto;
+}
+
+.mainSection { /* Contient le logo et la navigation des liens */
+  display: flex;
+  flex-wrap: wrap; /* Permet aux éléments de passer à la ligne sur petits écrans */
+  align-items: flex-start; /* Aligne le haut du logo avec le haut des titres de colonnes */
+  gap: clamp(2rem, 4vw, 3.5rem); /* Espace entre logo et liens, et si les éléments wrappent */
+  margin-bottom: 2.5rem; /* Espace avant la barre du bas (copyright) */
+}
+
+.logoContainer {
+  flex: 0 1 auto; /* Le logo peut rétrécir si besoin mais ne grandit pas, prend sa taille de contenu */
+  /* Optionnel: min-width: 150px; pour assurer un espace minimum */
+}
+
+.logoText {
+  font-family: var(--font-headings-primary);
+  font-weight: var(--font-weight-bold);
+  font-style: italic;
+  font-size: clamp(1.8rem, 4vw, 2.2rem);
+  color: var(--white);
+  text-decoration: none;
+  letter-spacing: 0.5px;
+  display: inline-block; /* Nécessaire pour que le lien se comporte bien */
+  transition: color 0.2s ease, opacity 0.2s ease;
+}
+.logoText:hover,
+.logoText:focus {
+  color: var(--brand-beige-bg);
+  opacity: 0.85;
+}
+
+.linksNav { /* La grille des colonnes de liens */
+  flex: 1 1 65%; /* Grandit pour prendre l'espace, peut rétrécir, base de 65% (ajustable) */
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); /* Colonnes responsives */
+  gap: 1.5rem 2rem; /* Espace vertical et horizontal entre les colonnes */
+  text-align: left;
+}
+
+.linkColumn h4 { /* Titre de chaque colonne de liens */
+  font-weight: var(--font-weight-semibold); /* Inter SemiBold */
+  color: var(--white);
+  font-size: 1rem;
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.linkColumn ul {
+  list-style: none; 
+  padding: 0; /* Assurez-vous que le padding est à 0 */
+  margin: 0;  /* Assurez-vous que la marge est à 0 */
+}
+
+.linkColumn li {
+  margin-bottom: 0.6rem; /* Espace entre les liens */
+}
+
+.link { /* Style pour les <Link> de react-router-dom */
+  color: var(--brand-beige-bg);
+  text-decoration: none;
+  font-weight: var(--font-weight-regular); /* Inter Regular */
+  transition: color 0.2s ease;
+}
+.link:hover,
+.link:focus {
+  color: var(--white);
+  text-decoration: underline;
+}
+
+.bottomBar { /* Section copyright et branding MAHE */
+  border-top: 1px solid var(--brand-grey-text); /* Séparateur fin */
+  padding-top: 1.5rem;
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--brand-beige-bg);
+}
+
+.copyright {
+  margin-bottom: 0.5rem;
+}
+
+.maheBranding a {
+  color: var(--brand-beige-bg); 
+  font-weight: var(--font-weight-semibold); 
+  text-decoration: underline;
+  transition: color 0.2s ease;
+}
+.maheBranding a:hover,
+.maheBranding a:focus {
+  color: var(--white);
+}
+
+/* --- Responsive --- */
+@media (max-width: 768px) { /* Tablette et mobile : empilement du logo et des liens */
+  .mainSection {
+    flex-direction: column; /* Empilement vertical */
+    align-items: center;     /* Centrage des éléments empilés */
+    text-align: center;      /* Centrage du texte pour le logoContainer */
+    gap: 2.5rem;             /* Ajustement de l'espace pour l'empilement */
+  }
+  .logoContainer {
+      margin-bottom: 0; /* Le 'gap' du parent gère l'espacement */
+  }
+  .linksNav {
+    width: 100%; /* La grille de liens prend toute la largeur */
+    text-align: center; /* Pour centrer les titres des colonnes si elles ne prennent pas toute la largeur */
+  }
+  .linkColumn h4 {
+    text-align: center; /* Assure que les titres sont centrés */
+  }
+  .linkColumn ul {
+    display: inline-block; /* Permet aux listes <ul> d'être centrées sous leur titre */
+    text-align: left;     /* Garde le texte des liens <li> aligné à gauche */
+  }
+}
+
+@media (max-width: 480px) { /* Pour les très petits écrans */
+  .linksNav {
+    grid-template-columns: 1fr; /* Une seule colonne pour les liens */
+  }
+  .linkColumn {
+    margin-bottom: 1.5rem; /* Espace entre les groupes de liens lorsqu'ils sont en une seule colonne */
+  }
+  .linkColumn:last-child {
+    margin-bottom: 0;
+  }
+  .logoText {
+    font-size: clamp(1.6rem, 5vw, 2rem); /* Taille du logo légèrement réduite */
+  }
+}
+
+/* Cacher le Footer sur les écrans mobiles */
+@media (max-width: 850px) { /* Utilisez le même breakpoint que pour le header mobile */
+  .footer { /* Cible directement la classe .footer utilisée dans votre composant Footer.tsx */
+    display: none !important; /* Ajout de !important pour forcer la règle si nécessaire */
+  }
+}

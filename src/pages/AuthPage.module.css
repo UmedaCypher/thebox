@@ -1,0 +1,146 @@
+/* client/src/pages/AuthPage.module.css */
+/* (Placez ce fichier à côté de LoginPage.tsx et SignupPage.tsx si elles sont dans le même dossier,
+   ou dans un dossier 'Auth' partagé, et ajustez les imports) */
+
+.authPageContainer {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start; /* Aligne en haut pour les pages plus longues */
+  min-height: calc(100vh - 150px); /* Ajustez selon la hauteur de votre header/footer */
+  padding: clamp(30px, 8vh, 60px) 20px;
+  background-color: var(--bg-light, #F9FAFB);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.authFormCard {
+  background-color: var(--white, #FFFFFF);
+  padding: clamp(30px, 5vw, 50px);
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+  width: 100%;
+  max-width: 450px; /* Largeur maximale pour le formulaire */
+  border: 1px solid var(--border-color, #E5E7EB);
+}
+
+.authTitle {
+  font-family: var(--font-headings, 'Playfair Display', serif);
+  font-size: clamp(1.8rem, 4vw, 2.4rem);
+  color: var(--primary-color, #1A2E4C);
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.authForm {
+  display: flex;
+  flex-direction: column;
+  gap: 20px; /* Espace entre les groupes d'input */
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+}
+
+.inputLabel {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--light-text-color, #57606F);
+  margin-bottom: 8px;
+  text-align: left;
+}
+
+.inputField {
+  width: 100%;
+  padding: 12px 15px;
+  font-size: 1rem;
+  border: 1px solid var(--border-color, #E5E7EB);
+  border-radius: 6px;
+  background-color: var(--white, #fff);
+  color: var(--text-color, #2F3542);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  box-sizing: border-box; /* Important pour que le padding ne dépasse pas */
+}
+.inputField:focus {
+  outline: none;
+  border-color: var(--primary-color, #1A2E4C);
+  box-shadow: 0 0 0 2px rgba(var(--primary-color-rgb, 26,46,76), 0.2); /* Simule un outline avec box-shadow */
+  /* Vous devrez définir --primary-color-rgb dans votre :root si vous utilisez cette ombre, ex: --primary-color-rgb: 26,46,76; */
+}
+.inputField:disabled {
+  background-color: var(--bg-light, #F9FAFB);
+  cursor: not-allowed;
+}
+
+.authButton {
+  background-color: var(--primary-color, #1A2E4C);
+  color: var(--white, #fff);
+  padding: 14px 20px;
+  font-size: 1.05rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.15s ease;
+  margin-top: 10px; /* Espace au-dessus du bouton */
+}
+.authButton:hover {
+  background-color: var(--secondary-color, #3A7CA5);
+  transform: translateY(-1px);
+}
+.authButton:disabled {
+  background-color: var(--light-text-color, #57606F);
+  cursor: not-allowed;
+}
+
+.errorMessage {
+  background-color: rgba(255, 0, 0, 0.05);
+  color: #D8000C; /* Rouge foncé pour erreurs */
+  border: 1px solid rgba(216, 0, 12, 0.2);
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.successMessage {
+  background-color: rgba(0, 128, 0, 0.05);
+  color: #006400; /* Vert foncé pour succès */
+  border: 1px solid rgba(0, 100, 0, 0.2);
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.redirectLink {
+  text-align: center;
+  margin-top: 25px;
+  font-size: 0.9rem;
+  color: var(--light-text-color, #57606F);
+}
+.redirectLink a {
+  color: var(--primary-color, #1A2E4C);
+  font-weight: 600;
+  text-decoration: none;
+}
+.redirectLink a:hover {
+  text-decoration: underline;
+}
+
+/* Styles pour le lien mot de passe oublié (optionnel) */
+.forgotPasswordLinkContainer {
+  text-align: right;
+  margin-top: -10px; /* Pour le rapprocher du champ mot de passe */
+  margin-bottom: 15px;
+}
+.forgotPasswordLink {
+  font-size: 0.85rem;
+  color: var(--secondary-color, #3A7CA5);
+  text-decoration: none;
+}
+.forgotPasswordLink:hover {
+  text-decoration: underline;
+}

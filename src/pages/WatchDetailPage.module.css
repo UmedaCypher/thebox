@@ -1,0 +1,283 @@
+/* client/src/pages/WatchDetailPage/WatchDetailPage.module.css */
+
+.watchDetailPageContainer {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: clamp(20px, 4vh, 40px) clamp(20px, 4vw, 40px);
+  box-sizing: border-box;
+  min-height: calc(100vh - 150px); /* Ajuster 150px si hauteur header/footer change */
+  font-family: var(--font-main); /* Application de la police principale */
+}
+
+.backLink {
+  display: inline-block;
+  margin-bottom: 25px;
+  color: var(--secondary-color);
+  text-decoration: none;
+  font-weight: var(--font-weight-bold); /* Inter Bold */
+  font-size: 0.95rem;
+  font-family: var(--font-main); /* Inter */
+  transition: color 0.2s ease;
+}
+.backLink:hover {
+  color: var(--primary-color);
+  text-decoration: underline;
+}
+
+.watchHeader {
+  text-align: center;
+  margin-bottom: clamp(30px, 5vh, 50px);
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.watchTitle {
+  font-family: var(--font-headings-primary); /* Libre Bodoni */
+  font-style: italic;
+  font-weight: var(--font-weight-bold); /* Bold */
+  font-size: clamp(2.2rem, 5vw, 3.2rem);
+  color: var(--primary-color);
+  margin: 0 0 5px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.watchReference {
+  font-family: var(--font-main); /* Inter */
+  font-weight: var(--font-weight-regular); /* Inter Regular */
+  font-size: clamp(1rem, 2vw, 1.1rem);
+  color: var(--text-color-light);
+  margin: 0;
+  font-style: italic;
+}
+
+.watchContentGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(30px, 5vw, 50px);
+  margin-bottom: 40px;
+}
+
+@media (min-width: 768px) {
+  .watchContentGrid {
+    grid-template-columns: 1fr 1.5fr; /* Image à gauche (flex 1), détails à droite (flex 1.5) */
+  }
+}
+
+.watchImageSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Styles pour l'image principale et la photo au poignet */
+.mainImage,
+.wristShotImage {
+  width: 100%; /* L'image prendra la largeur de son conteneur parent (.watchImageSection) */
+  max-width: 450px; /* Limite la largeur maximale de l'image, comme le placeholder */
+  height: auto; /* Maintient le ratio de l'image */
+  display: block; /* Empêche l'espace supplémentaire en dessous des images en ligne */
+  border-radius: 10px; /* Cohérence avec le placeholder */
+  border: 1px solid var(--border-color); /* Bordure cohérente */
+  object-fit: contain; /* S'assure que toute l'image est visible, sans la déformer, en s'adaptant aux dimensions */
+  margin-bottom: 15px; /* Espace en dessous de l'image principale */
+}
+
+/* Si vous voulez un ratio spécifique pour l'image principale (comme le placeholder qui est 1/1) */
+/* .mainImage { */
+/* aspect-ratio: 1/1; */ /* Décommentez si un ratio carré est strictement nécessaire */
+/* } */
+
+.wristShotImage {
+  margin-top: 10px; /* Espace supplémentaire si une photo au poignet est affichée sous l'image principale */
+}
+
+
+.mainImagePlaceholder { /* Styles pour le placeholder si aucune image n'est disponible */
+  width: 100%;
+  max-width: 450px;
+  aspect-ratio: 1/1;
+  background-color: var(--brand-beige-card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 4rem; 
+  color: var(--text-color-light);
+  margin-bottom: 15px;
+}
+.mainImagePlaceholder p { 
+  font-family: var(--font-main); 
+  font-weight: var(--font-weight-regular); 
+  font-size: 0.9rem;
+  margin-top: 5px;
+  color: var(--text-color-light);
+}
+
+.watchDetailsSection {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.detailBlock {
+  background-color: var(--white);
+  padding: 20px 25px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+}
+
+.sectionTitle { 
+  font-family: var(--font-headings-section); 
+  font-style: italic;
+  font-weight: var(--font-weight-semibold); 
+  font-size: clamp(1.3rem, 2.8vw, 1.6rem);
+  color: var(--secondary-color); 
+  margin: 0 0 15px 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border-color);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.detailItem {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  font-family: var(--font-main); 
+  font-size: clamp(0.95rem, 1.9vw, 1.05rem);
+  border-bottom: 1px dotted var(--border-color-light); 
+}
+.detailItem:last-child {
+  border-bottom: none;
+}
+
+.detailLabel {
+  font-weight: var(--font-weight-medium); 
+  color: var(--text-color);
+  margin-right: 10px;
+  white-space: nowrap;
+}
+
+.detailValue {
+  font-weight: var(--font-weight-regular); 
+  color: var(--text-color-light);
+  text-align: right;
+}
+
+.notesSection {
+  margin-top: 20px;
+  grid-column: 1 / -1; /* S'assure que cette section prend toute la largeur si elle est dans la grille principale */
+}
+.notesText {
+  font-family: var(--font-main); 
+  font-weight: var(--font-weight-regular); 
+  font-size: clamp(0.95rem, 1.9vw, 1.05rem);
+  color: var(--text-color-light);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  background-color: var(--brand-beige-card-bg);
+  padding: 15px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color-light);
+}
+
+.actionsContainer {
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  gap: 15px;
+  /* S'assurer que les actions sont bien positionnées, par exemple sous la section des détails */
+  grid-column: 1 / -1; /* Si .watchContentGrid est le parent direct */
+}
+
+/* S'assurer que les boutons ont des styles de base s'ils n'héritent pas de styles globaux */
+.editButton, /* Si vous avez une classe spécifique pour le bouton modifier */
+.actionButton { 
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-weight: var(--font-weight-bold); 
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  text-decoration: none; /* Pour les Link agissant comme des boutons */
+  display: inline-block;
+  text-align: center;
+  background-color: var(--primary-color); /* Exemple de couleur de fond */
+  color: var(--text-color-on-primary); /* Exemple de couleur de texte */
+  border: 1px solid var(--primary-color); /* Exemple de bordure */
+}
+.editButton:hover,
+.actionButton:hover {
+  background-color: var(--secondary-color); /* Exemple de couleur au survol */
+  border-color: var(--secondary-color);
+}
+
+.actionButton.deleteButton { 
+  background-color: var(--brand-red);
+  border-color: var(--brand-red);
+  color: var(--white);
+}
+.actionButton.deleteButton:hover {
+  background-color: color-mix(in srgb, var(--brand-red) 85%, black);
+  border-color: color-mix(in srgb, var(--brand-red) 85%, black);
+}
+
+.pageStateContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+  font-size: 1.1rem;
+  color: var(--text-color-light);
+  font-style: italic;
+  font-family: var(--font-main); 
+}
+.pageStateContainer .errorMessage { /* Si vous avez une classe spécifique pour les messages d'erreur */
+    color: var(--brand-red); /* Ou votre variable de couleur d'erreur */
+    font-weight: var(--font-weight-medium);
+}
+.pageStateContainer .message-global { 
+  margin-bottom: 20px;
+}
+
+/* client/src/pages/WatchDetailPage/WatchDetailPage.module.css */
+
+/* ... (tous les styles existants) ... */
+
+.watchHeader {
+  text-align: center;
+  margin-bottom: clamp(30px, 5vh, 50px);
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border-color);
+  position: relative; /* Pour positionner les badges de statut si nécessaire */
+}
+
+/* ... (styles existants pour .watchTitle, .watchReference) ... */
+
+.statusBadgeForSale,
+.statusBadgeForTrade {
+  display: inline-block; /* Changé pour inline-block ou block selon le design souhaité */
+  padding: 6px 12px;
+  font-size: 0.85rem;
+  font-weight: var(--font-weight-bold);
+  color: var(--white);
+  border-radius: 4px;
+  margin-top: 10px; /* Espace par rapport au titre/référence */
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.statusBadgeForSale {
+  background-color: var(--brand-green, #4CAF50); /* Définir --brand-green ou utiliser une couleur existante */
+}
+
+.statusBadgeForTrade {
+  background-color: var(--brand-blue, #2196F3); /* Définir --brand-blue ou utiliser une couleur existante */
+}
+
+/* ... (le reste des styles) ... */

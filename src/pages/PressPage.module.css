@@ -1,0 +1,123 @@
+```css
+/* client/src/pages/PressPage.module.css */
+/* Styles pour PressPage - Similaires à CguPage.module.css pour la cohérence, avec quelques ajouts */
+.staticPageContainer {
+  padding: clamp(20px, 5vh, 40px) var(--page-padding-x, clamp(20px, 4vw, 60px));
+  background-color: var(--body-bg-color);
+  min-height: calc(100vh - var(--header-height, 60px) - var(--footer-height, 100px));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.staticPageContent {
+  padding: clamp(30px, 4vw, 50px);       /* Inner padding for the text, etc. */
+  width: 100%;                           /* Responsive width */
+  max-width: var(--static-page-max-width, 900px); /* Max width of the content box */
+  margin-left: auto;                     /* Center the box horizontally */
+  margin-right: auto;                    /* Center the box horizontally */
+  box-sizing: border-box;
+}
+
+.staticPageHeader {
+  text-align: center;
+  margin-bottom: clamp(25px, 4vh, 40px);
+  padding-bottom: 15px;
+  border-bottom: 1px solid var(--border-color, #ccc);
+}
+
+.staticPageHeader h1 {
+  font-family: var(--font-headings-primary, 'Libre Bodoni', serif);
+  font-size: clamp(1.8rem, 4vw, 2.5rem);
+  color: var(--primary-color, #333);
+  font-weight: var(--font-weight-bold, 700);
+  margin: 0;
+}
+
+.staticPageSection h2 { /* Titre principal de la section "Bienvenue..." */
+  font-family: var(--font-headings-section, 'Libre Bodoni', serif);
+  font-size: clamp(1.4rem, 3vw, 1.8rem);
+  color: var(--text-color, #333);
+  margin-top: 0; /* Premier h2 n'a pas de marge haute */
+  margin-bottom: 15px;
+  font-weight: var(--font-weight-semibold, 600);
+}
+
+.staticPageSection p {
+  font-family: var(--font-main, 'Inter', sans-serif);
+  font-size: clamp(0.95rem, 2vw, 1.05rem);
+  line-height: 1.7;
+  color: var(--text-color-light, #555);
+  margin-bottom: 1em;
+}
+
+.pressSectionItem {
+  margin-top: clamp(25px, 4vh, 35px);
+  padding-bottom: 15px;
+  border-bottom: 1px solid var(--border-color-extralight, #f0f0f0);
+}
+.pressSectionItem:last-of-type {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+
+.pressSectionItem h3 {
+  font-family: var(--font-main, 'Inter', sans-serif);
+  font-size: clamp(1.1rem, 2.5vw, 1.3rem);
+  color: var(--text-color, #333);
+  margin-top: 0; /* Le h3 dans pressSectionItem */
+  margin-bottom: 10px;
+  font-weight: var(--font-weight-medium, 500);
+}
+
+.downloadButton {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 10px 20px;
+  background-color: var(--primary-color, #007bff);
+  color: var(--text-color-on-primary, #fff);
+  text-decoration: none;
+  border-radius: var(--border-radius-medium, 4px);
+  font-weight: var(--font-weight-medium, 500);
+  transition: background-color 0.2s ease;
+}
+
+.downloadButton:hover {
+  background-color: var(--secondary-color, #0056b3);
+}
+
+.pressRelease {
+  margin-top: 15px;
+  padding-left: 15px;
+  border-left: 3px solid var(--border-color-light, #eee);
+}
+
+.pressRelease h4 {
+  font-family: var(--font-main, 'Inter', sans-serif);
+  font-size: clamp(1rem, 2.2vw, 1.15rem);
+  color: var(--text-color, #333);
+  margin-top: 0;
+  margin-bottom: 8px;
+  font-weight: var(--font-weight-medium, 500);
+}
+
+.readMoreLink, .emailLink {
+  color: var(--brand-blue, #007bff);
+  text-decoration: none;
+  font-weight: var(--font-weight-medium, 500);
+}
+
+.readMoreLink:hover, .emailLink:hover {
+  text-decoration: underline;
+  color: var(--secondary-color, #0056b3);
+}
+
+.legalDisclaimer {
+  margin-top: 30px;
+  padding: 15px;
+  background-color: var(--brand-beige-light, #f9f9f9);
+  border-left: 4px solid var(--primary-color-light, #007bff);
+  font-size: 0.9rem;
+  color: var(--text-color-light, #555);
+}

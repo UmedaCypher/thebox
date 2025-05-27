@@ -1,0 +1,169 @@
+/* client/src/pages/FaqPage.module.css */
+
+.faqPageWrapper {
+  width: 100%;
+  background-color: var(--brand-beige-card-bg); /* Fond légèrement différent du body */
+  padding: clamp(40px, 8vh, 80px) 0;
+}
+
+.container {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 clamp(20px, 4vw, 40px);
+  box-sizing: border-box;
+}
+
+.faqHeader {
+  text-align: center;
+  margin-bottom: clamp(40px, 6vh, 60px);
+}
+
+.pageTitle { /* Si c'est un H1, il héritera. Sinon, styles ci-dessous */
+  font-family: var(--font-headings-primary);
+  font-style: italic;
+  font-weight: var(--font-weight-bold);
+  font-size: clamp(2.2rem, 5vw, 3rem);
+  color: var(--primary-color);
+  margin-bottom: 15px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.pageSubtitle {
+  font-family: var(--font-main);
+  font-size: clamp(1rem, 2.2vw, 1.2rem);
+  color: var(--text-color-light);
+  max-width: 700px;
+  margin: 0 auto;
+  font-weight: var(--font-weight-extralight); /* Inter ExtraLight (ou 300) */
+}
+
+.faqList {
+  background-color: var(--white);
+  border-radius: 8px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.07);
+  overflow: hidden;
+  border: 1px solid var(--border-color-light);
+}
+
+.faqItem {
+  border-bottom: 1px solid var(--border-color);
+}
+.faqItem:last-child {
+  border-bottom: none;
+}
+
+.faqQuestion {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 20px 25px;
+  text-align: left;
+  font-family: var(--font-main);
+  font-size: clamp(1.05rem, 2.2vw, 1.2rem);
+  font-weight: var(--font-weight-medium); /* Inter Medium */
+  color: var(--text-color);
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.faqQuestion:hover {
+  background-color: color-mix(in srgb, var(--brand-blue) 5%, transparent); /* Léger fond au survol */
+}
+
+.faqQuestion.active {
+  color: var(--primary-color);
+  font-weight: var(--font-weight-semibold); /* Inter SemiBold */
+}
+
+.accordionIcon {
+  font-size: 1.4rem;
+  font-weight: bold; /* Garder bold pour l'icône pour visibilité */
+  color: var(--secondary-color);
+  transition: transform 0.3s ease-in-out;
+}
+
+.faqQuestion.active .accordionIcon {
+  transform: rotate(45deg);
+}
+
+.faqAnswer {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s cubic-bezier(0.25, 0.1, 0.25, 1), padding 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);
+  padding: 0 25px;
+  background-color: transparent;
+}
+
+.faqAnswer.open {
+  max-height: 500px;
+  padding: 5px 25px 25px 25px;
+}
+
+.faqAnswer p {
+  margin: 0;
+  font-family: var(--font-main);
+  font-size: clamp(0.95rem, 2vw, 1.05rem);
+  color: var(--text-color-light);
+  line-height: 1.7;
+  font-weight: var(--font-weight-regular); /* Inter Regular */
+}
+
+/* Section Contact Support */
+.contactSupport {
+  margin-top: clamp(50px, 8vh, 70px);
+  padding: clamp(30px, 5vh, 50px);
+  text-align: center;
+  background-color: var(--white);
+  border-radius: 8px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.05);
+  border: 1px solid var(--border-color-light);
+}
+
+.contactTitle { /* Si c'est un H2/H3, il héritera. Sinon, styles ci-dessous */
+  font-family: var(--font-headings-section);
+  font-style: italic;
+  font-weight: var(--font-weight-semibold); /* Libre Bodoni SemiBold Italic */
+  font-size: clamp(1.5rem, 3vw, 1.8rem);
+  color: var(--primary-color);
+  margin-bottom: 10px;
+  text-transform: uppercase;
+}
+
+.contactText {
+  font-family: var(--font-main);
+  font-size: clamp(0.95rem, 2vw, 1.1rem);
+  color: var(--text-color-light);
+  max-width: 600px;
+  margin: 0 auto 25px auto;
+  font-weight: var(--font-weight-regular);
+}
+
+.contactButton { /* Hérite de .button-like ou button de index.css */
+  /* Peut nécessiter des surcharges spécifiques si différent du style global */
+  /* Exemple de surcharge si ce bouton doit être --secondary-color */
+  /* background-color: var(--secondary-color); */
+  /* border-color: var(--secondary-color); */
+  /* font-weight: var(--font-weight-bold); Inter Bold */
+}
+.contactButton:hover {
+  /* background-color: var(--primary-color); */
+}
+
+@media (max-width: 600px) {
+  .faqQuestion, .faqAnswer.open {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+  .faqAnswer.open {
+    padding-top: 5px;
+    padding-bottom: 20px;
+  }
+  .contactSupport {
+    padding: 30px 20px;
+  }
+}

@@ -1,0 +1,307 @@
+/* client/src/pages/MessagingPage.module.css */
+
+.messagingPageContainer {
+  display: flex; /* Par défaut pour desktop: sidebar et chat côte à côte */
+  height: calc(100vh - 120px); /* Ajustez HAUTEUR_HEADER + HAUTEUR_FOOTER_GLOBAL */
+  max-width: 1200px;
+  margin: 20px auto;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow: hidden; 
+  background-color: var(--white);
+  font-family: var(--font-main);
+}
+
+/* Quand la classe mobileLayoutActive est appliquée au conteneur principal sur mobile */
+.messagingPageContainer.mobileLayoutActive {
+  display: block; 
+  height: 100%; /* Prend 100% de la hauteur de <main> (qui a flex-grow:1) */
+  margin: 0; 
+  border: none; 
+  border-radius: 0; 
+  max-width: 100%; 
+  overflow: hidden; 
+}
+
+.sidebar {
+  width: 320px; 
+  min-width: 280px; 
+  border-right: 1px solid var(--border-color);
+  display: flex; 
+  flex-direction: column;
+  background-color: var(--brand-beige-bg); 
+  height: 100%; 
+}
+
+.chatArea {
+  flex-grow: 1; 
+  display: flex; 
+  flex-direction: column;
+  background-color: var(--white); 
+  height: 100%; 
+  overflow: hidden; 
+}
+
+/* Styles pour la vue plein écran sur mobile */
+.sidebar.fullViewMobile,
+.chatArea.fullViewMobile {
+  width: 100% !important; 
+  height: 100% !important; 
+  border-right: none !important; 
+  min-width: 0 !important; 
+  display: flex !important; 
+  flex-direction: column !important;
+}
+
+@media (max-width: 850px) {
+  .messagingPageContainer.mobileLayoutActive > .sidebar:not(.fullViewMobile) {
+    display: none;
+  }
+  .messagingPageContainer.mobileLayoutActive > .chatArea:not(.fullViewMobile) {
+    display: none;
+  }
+}
+
+
+.sidebarTitle {
+  font-family: var(--font-headings-section);
+  font-style: italic;
+  font-size: 1.3rem;
+  padding: 18px 20px; 
+  margin: 0;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--brand-grey-text);
+  flex-shrink: 0; 
+}
+
+.conversationList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  overflow-y: auto; 
+  flex-grow: 1; 
+}
+
+.conversationItem {
+  display: flex;
+  align-items: center;
+  padding: 15px 18px; /* Augmenté un peu le padding vertical */
+  cursor: pointer;
+  border-bottom: 1px solid var(--border-color-light);
+  transition: background-color 0.2s ease;
+}
+
+.conversationItem:hover {
+  background-color: var(--brand-beige-card-bg);
+}
+
+.conversationItem.selected {
+  background-color: color-mix(in srgb, var(--primary-color) 12%, transparent);
+}
+.conversationItem.selected .conversationUser {
+    color: var(--primary-color);
+    font-weight: var(--font-weight-bold);
+}
+
+.conversationAvatar {
+  width: 50px;   /* --- MODIFIÉ : Agrandissement --- */
+  height: 50px;  /* --- MODIFIÉ : Agrandissement --- */
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 15px; /* --- MODIFIÉ : Plus d'espace --- */
+  background-color: var(--border-color); 
+  flex-shrink: 0;
+}
+
+.conversationInfo {
+  flex-grow: 1;
+  overflow: hidden; 
+  padding-right: 5px; 
+}
+
+.conversationUser {
+  display: block;
+  font-weight: var(--font-weight-semibold);
+  font-size: 1.1rem; /* --- MODIFIÉ : Agrandissement --- */
+  color: var(--text-color);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 4px; /* --- MODIFIÉ : Plus d'espace --- */
+}
+
+.conversationLastMessage {
+  display: block;
+  font-size: 0.9rem; /* --- MODIFIÉ : Agrandissement --- */
+  color: var(--text-color-light);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.messageYouPrefix {
+    font-style: italic;
+    margin-right: 3px;
+}
+.italicPlaceholder {
+    font-style: italic;
+    color: var(--text-color-light);
+}
+
+.conversationTimestamp {
+    font-size: 0.75rem; /* --- MODIFIÉ : Légèrement plus grand --- */
+    color: var(--text-color-light);
+    margin-left: auto; 
+    white-space: nowrap;
+    padding-left: 8px;
+    flex-shrink: 0; 
+    align-self: center; /* --- MODIFIÉ : Mieux aligné verticalement avec les textes agrandis --- */
+    /* padding-top: 2px; -> Remplacé par align-self */
+}
+
+.chatHeader {
+  padding: 10px 15px;
+  border-bottom: 1px solid var(--border-color);
+  background-color: var(--brand-beige-bg);
+  display: flex;
+  align-items: center; 
+  flex-shrink: 0;  
+  position: relative; 
+}
+.chatHeader h3 {
+  margin: 0;
+  font-family: var(--font-headings-section);
+  font-size: 1.1rem; 
+  color: var(--brand-grey-text);
+  flex-grow: 1; 
+  text-align: center; 
+  padding-left: 30px;  
+  padding-right: 80px; 
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.backButtonMobile {
+  background: none; border: none; color: var(--primary-color); 
+  padding: 8px; margin-right: 5px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; position: absolute; left: 10px;
+  top: 50%; transform: translateY(-50%);
+}
+.backButtonMobile svg { width: 24px; height: 24px; }
+
+.profileLinkInChat {
+    font-size: 0.8rem; color: var(--primary-color); text-decoration: none;
+    font-weight: var(--font-weight-medium); position: absolute; 
+    right: 15px; top: 50%; transform: translateY(-50%);
+    white-space: nowrap; 
+}
+.profileLinkInChat:hover { text-decoration: underline; }
+
+.messagesContainer { 
+  flex-grow: 1; /* Crucial pour pousser le formulaire en bas */
+  padding: 20px; 
+  overflow-y: auto; 
+  display: flex; 
+  flex-direction: column; 
+  gap: 12px; 
+}
+
+.messageItem { display: flex; max-width: 78%; }
+.messageItem.sent { margin-left: auto; }
+.messageItem.sent .messageBubble { background-color: var(--primary-color); color: var(--text-color-on-primary); border-radius: 18px 18px 5px 18px; }
+.messageItem.sent .messageTextAndTimestamp { width: 100%; }
+.messageItem.sent .messageTimestamp { color: color-mix(in srgb, var(--text-color-on-primary) 75%, transparent); }
+.messageItem.received { margin-right: auto; }
+.messageItem.received .messageBubble { background-color: var(--brand-beige-card-bg); color: var(--text-color); border: 1px solid var(--border-color); border-radius: 18px 18px 18px 5px; display: flex; align-items: flex-start; gap: 10px; }
+.messageBubble { padding: 10px 15px; line-height: 1.45; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+.messageAvatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; flex-shrink: 0; margin-top: 1px; background-color: var(--border-color-light); }
+.messageTextAndTimestamp { display: flex; flex-direction: column; flex-grow: 1; min-width: 0; }
+.messageContent { margin: 0; white-space: pre-wrap; word-break: break-word; text-align: left; font-size: 0.9rem; }
+.messageTimestamp { display: block; font-size: 0.7rem; text-align: right; color: var(--text-color-light); margin-top: 5px; }
+
+.messageForm { 
+  display: flex; 
+  align-items: flex-end; 
+  padding: 15px 20px; 
+  border-top: 1px solid var(--border-color); 
+  background-color: var(--brand-beige-bg); 
+  flex-shrink: 0; /* Important: le formulaire ne doit pas rétrécir */
+}
+.messageInput { 
+  flex-grow: 1; padding: 10px 16px; border: 1px solid var(--border-color); 
+  border-radius: 20px; margin-right: 10px; font-size: 0.95rem; 
+  font-family: var(--font-main); resize: none; overflow-y: auto; 
+  min-height: 40px; max-height: 100px; line-height: 1.4; 
+  box-sizing: border-box; 
+}
+.messageInput:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary-color) 15%, transparent); }
+.sendMessageButtonInForm { 
+  padding: 10px 22px; background-color: var(--primary-color); 
+  color: var(--text-color-on-primary); border: none; border-radius: 20px; 
+  cursor: pointer; font-weight: var(--font-weight-bold); 
+  transition: background-color 0.2s ease; font-size: 0.9rem; 
+  height: 40px; 
+  line-height: 1; 
+  flex-shrink: 0; 
+}
+.sendMessageButtonInForm:hover:not(:disabled) { background-color: var(--secondary-color); }
+.sendMessageButtonInForm:disabled { background-color: var(--text-color-light); cursor: not-allowed; }
+
+.noConversationSelected { 
+  flex-grow: 1; display: flex; flex-direction: column; 
+  align-items: center; justify-content: center; text-align: center; 
+  padding: 20px; color: var(--text-color-light); 
+}
+.noConversationSelected p { max-width: 350px; font-style: italic; line-height: 1.5; }
+.errorMessageSmall { 
+  font-size: 0.9rem; color: var(--error-text); background-color: var(--error-bg); 
+  border: 1px solid var(--error-border); padding: 8px 12px; 
+  border-radius: 6px; margin-top: 10px; 
+}
+.loadingState, .emptyState { 
+  padding: 15px; text-align: center; color: var(--text-color-light); font-style: italic; 
+}
+.centeredError { text-align: center; margin: 10px; }
+.pageStateContainer { 
+  display: flex; justify-content: center; align-items: center; 
+  padding: 30px; text-align: center; font-style: italic; 
+  color: var(--text-color-light);
+}
+
+/* Ajustements spécifiques pour le mobile via Media Query */
+@media (max-width: 850px) {
+  .messagingPageContainer.mobileLayoutActive > .sidebar:not(.fullViewMobile) {
+    display: none;
+  }
+  .messagingPageContainer.mobileLayoutActive > .chatArea:not(.fullViewMobile) {
+    display: none;
+  }
+
+  .chatHeader h3 {
+    font-size: 1rem; 
+    padding-left: 40px; 
+    padding-right: 85px; 
+  }
+  .profileLinkInChat {
+    font-size: 0.75rem;
+  }
+
+  /* Ajustement pour la liste des conversations sur mobile pour une meilleure lisibilité */
+  .sidebar.fullViewMobile .conversationAvatar {
+    width: 50px;   /* Déjà augmenté, on garde */
+    height: 50px;  /* Déjà augmenté, on garde */
+    margin-right: 15px;
+  }
+  .sidebar.fullViewMobile .conversationUser {
+    font-size: 1.1rem; /* Déjà augmenté, on garde */
+    margin-bottom: 4px;
+  }
+  .sidebar.fullViewMobile .conversationLastMessage {
+    font-size: 0.9rem; /* Déjà augmenté, on garde */
+  }
+  .sidebar.fullViewMobile .conversationTimestamp {
+    font-size: 0.75rem; /* Déjà augmenté, on garde */
+    align-self: center;
+  }
+}

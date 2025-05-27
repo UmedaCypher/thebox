@@ -1,0 +1,75 @@
+/* client/src/components/BottomNavigationBar/BottomNavigationBar.module.css */
+
+.bottomNavContainer {
+  display: none; /* Caché par défaut, affiché par media query pour mobile */
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: 60px; /* Hauteur typique pour une barre de navigation basse */
+  background-color: var(--brand-beige-bg); /* Ou votre couleur de fond préférée pour la nav */
+  border-top: 1px solid var(--border-color);
+  box-shadow: 0 -2px 5px rgba(0,0,0,0.05);
+  z-index: 1000; /* Au-dessus du contenu de la page */
+  padding: 0 clamp(5px, 2vw, 10px); /* Padding horizontal léger */
+  box-sizing: border-box;
+
+  /* display: flex; -> Sera activé par la media query */
+  justify-content: space-around; /* Répartit l'espace entre les éléments */
+  align-items: stretch; /* Pour que les NavItem prennent toute la hauteur */
+}
+
+.navItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-grow: 1; /* Pour que chaque item prenne une part égale de l'espace */
+  padding: 6px 4px; /* Padding interne pour l'icône et le label */
+  text-decoration: none;
+  color: var(--text-color-light); /* Couleur par défaut pour les items inactifs */
+  font-family: var(--font-main);
+  text-align: center;
+  border-radius: 6px; /* Optionnel, pour un effet de survol */
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* Style pour les icônes SVG dans les items de navigation */
+/* La classe .navIcon est ajoutée aux composants SVG dans le JSX */
+.navItem svg, 
+.navIcon { 
+    width: 24px; /* Taille par défaut de vos SVGs */
+    height: 24px;
+    margin-bottom: 3px; /* Espace entre icône et label */
+    transition: color 0.2s ease; /* Pour une transition de couleur douce de l'icône */
+    /* La couleur de l'icône sera héritée (currentColor) */
+}
+
+.navLabel {
+  display: block;
+  line-height: 1.2;
+  white-space: nowrap; /* Empêcher le retour à la ligne du label */
+  font-size: 0.65rem; /* Labels un peu plus petits pour aller avec les icônes */
+  transition: font-weight 0.2s ease; /* Transition pour le changement de graisse */
+}
+
+.navItem:hover {
+  background-color: rgba(0,0,0,0.03); /* Léger fond au survol */
+  color: var(--text-color); /* Couleur un peu plus foncée au survol pour l'icône et le label */
+}
+
+.navItem.active {
+  color: var(--primary-color); /* Couleur pour l'item actif (s'applique à l'icône et au label) */
+}
+
+.navItem.active .navLabel { 
+    font-weight: var(--font-weight-semibold); /* Label de l'item actif plus en évidence */
+}
+
+/* Afficher la barre de navigation basse uniquement sur mobile */
+@media (max-width: 850px) { /* Utilisez le même breakpoint que pour cacher la nav desktop */
+  .bottomNavContainer {
+    display: flex; /* Afficher la barre */
+  }
+}

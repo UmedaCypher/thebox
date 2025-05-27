@@ -1,0 +1,167 @@
+/* client/src/pages/WatchNewsPage/WatchNewsPage.module.css */
+.newsPageContainer {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: clamp(20px, 4vw, 40px) clamp(15px, 3vw, 30px);
+  box-sizing: border-box;
+  font-family: var(--font-main); /* Changé pour --font-main */
+}
+
+.pageHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: clamp(25px, 4vh, 35px);
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border-color);
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.pageTitle {
+  font-family: var(--font-headings-primary); /* Libre Bodoni */
+  font-style: italic;
+  font-weight: var(--font-weight-bold); /* Bold */
+  font-size: clamp(1.8rem, 4vw, 2.5rem);
+  color: var(--primary-color);
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.feedSelectorContainer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.feedSelectorLabel {
+  font-family: var(--font-main); /* Inter */
+  font-size: 0.9rem;
+  color: var(--text-color);
+  font-weight: var(--font-weight-medium); /* Inter Medium */
+}
+
+.feedSelector {
+  font-family: var(--font-main); /* Inter */
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  background-color: var(--white);
+  color: var(--text-color);
+  min-width: 180px;
+  font-size: 0.9rem;
+  font-weight: var(--font-weight-regular); /* Inter Regular */
+}
+.feedSelector:focus {
+  outline: none;
+  border-color: var(--accent-color); /* Utilisation de accent-color pour le focus ici */
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent-color) 20%, transparent);
+}
+
+/* Utilisation des classes globales pour les messages */
+/* .loadingMessage, .emptyMessage sont remplacés par .message-global.message-info */
+/* .errorMessage est remplacé par .message-global.message-error */
+
+.newsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: clamp(20px, 3vw, 30px);
+}
+
+.newsCard {
+  background-color: var(--white);
+  border-radius: 8px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.07);
+  overflow: hidden;
+  text-decoration: none;
+  color: var(--text-color);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+  border: 1px solid var(--border-color-light); /* Ajout d'une bordure subtile */
+}
+.newsCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  border-color: var(--border-color);
+}
+
+.cardImageContainer {
+  width: 100%;
+  padding-top: 56.25%; /* Ratio 16:9 */
+  position: relative;
+  background-color: var(--brand-beige-card-bg); /* Fond pour image en chargement */
+}
+.cardImage {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cardContent {
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.cardTitle {
+  font-family: var(--font-headings-section); /* Libre Bodoni */
+  font-style: italic;
+  font-weight: var(--font-weight-semibold); /* SemiBold Italic */
+  font-size: clamp(1.1rem, 2vw, 1.3rem);
+  color: var(--primary-color);
+  margin: 0 0 10px 0;
+  line-height: 1.3;
+  /* Pas de text-transform: uppercase ici pour une variation, ou ajoutez si désiré */
+}
+
+.cardSnippet {
+  font-family: var(--font-main); /* Inter */
+  font-weight: var(--font-weight-regular); /* Inter Regular */
+  font-size: 0.9rem;
+  color: var(--text-color);
+  line-height: 1.5;
+  margin-bottom: 15px;
+  flex-grow: 1;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cardMeta {
+  font-family: var(--font-main); /* Inter */
+  font-weight: var(--font-weight-regular); /* Inter Regular */
+  font-size: 0.8rem;
+  color: var(--text-color-light);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border-color);
+  margin-top: auto;
+}
+
+.cardCreator,
+.cardDate,
+.cardSource {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cardSource {
+    font-style: italic;
+    font-size: 0.75rem;
+    width: 100%;
+    text-align: right;
+    margin-top: 5px;
+}

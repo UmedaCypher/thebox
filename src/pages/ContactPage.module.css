@@ -1,0 +1,173 @@
+```css
+/* client/src/pages/ContactPage.module.css */
+/* Styles pour ContactPage - Similaires à CguPage.module.css pour la base, avec ajouts pour le formulaire */
+.staticPageContainer {
+  padding: clamp(20px, 5vh, 40px) var(--page-padding-x, clamp(20px, 4vw, 60px));
+  background-color: var(--body-bg-color);
+  min-height: calc(100vh - var(--header-height, 60px) - var(--footer-height, 100px));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.staticPageContent {
+  padding: clamp(30px, 4vw, 50px);       /* Inner padding for the text, etc. */
+  width: 100%;                           /* Responsive width */
+  max-width: var(--static-page-max-width, 900px); /* Max width of the content box */
+  margin-left: auto;                     /* Center the box horizontally */
+  margin-right: auto;                    /* Center the box horizontally */
+  box-sizing: border-box;
+}
+
+.staticPageHeader {
+  text-align: center;
+  margin-bottom: clamp(25px, 4vh, 40px);
+  padding-bottom: 15px;
+  border-bottom: 1px solid var(--border-color, #ccc);
+}
+
+.staticPageHeader h1 {
+  font-family: var(--font-headings-primary, 'Libre Bodoni', serif);
+  font-size: clamp(1.8rem, 4vw, 2.5rem);
+  color: var(--primary-color, #333);
+  font-weight: var(--font-weight-bold, 700);
+  margin: 0;
+}
+
+.staticPageSection p {
+  font-family: var(--font-main, 'Inter', sans-serif);
+  font-size: clamp(0.95rem, 2vw, 1.05rem);
+  line-height: 1.7;
+  color: var(--text-color-light, #555);
+  margin-bottom: 1em;
+}
+
+.inlineLink {
+  color: var(--brand-blue, #007bff);
+  text-decoration: none;
+  font-weight: var(--font-weight-medium, 500);
+}
+
+.inlineLink:hover {
+  text-decoration: underline;
+  color: var(--secondary-color, #0056b3);
+}
+
+/* Form Styles */
+.contactForm {
+  margin-top: 30px;
+  margin-bottom: 40px;
+}
+
+.formGroup {
+  margin-bottom: 20px;
+}
+
+.formGroup label {
+  display: block;
+  font-family: var(--font-main, 'Inter', sans-serif);
+  font-weight: var(--font-weight-medium, 500);
+  color: var(--text-color, #333);
+  margin-bottom: 8px;
+  font-size: 0.95rem;
+}
+
+.inputField,
+.textareaField {
+  width: 100%;
+  padding: 12px 15px;
+  font-family: var(--font-main, 'Inter', sans-serif);
+  font-size: 1rem;
+  border: 1px solid var(--border-color, #ccc);
+  border-radius: var(--border-radius-medium, 4px);
+  box-sizing: border-box;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  background-color: var(--input-bg-color, #fff);
+  color: var(--input-text-color, #333);
+}
+
+.inputField:focus,
+.textareaField:focus {
+  outline: none;
+  border-color: var(--primary-color, #007bff);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary-color, #007bff) 20%, transparent);
+}
+
+.textareaField {
+  resize: vertical;
+  min-height: 120px;
+}
+
+.submitButton {
+  display: inline-block;
+  padding: 12px 25px;
+  background-color: var(--primary-color, #007bff);
+  color: var(--text-color-on-primary, #fff);
+  border: none;
+  border-radius: var(--border-radius-medium, 4px);
+  font-family: var(--font-main, 'Inter', sans-serif);
+  font-size: 1rem;
+  font-weight: var(--font-weight-semibold, 600);
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.submitButton:hover {
+  background-color: var(--secondary-color, #0056b3);
+}
+.submitButton:active {
+  transform: translateY(1px);
+}
+.submitButton:disabled {
+  background-color: var(--disabled-bg-color, #ccc);
+  cursor: not-allowed;
+}
+
+.formMessageSuccess {
+  padding: 15px;
+  background-color: color-mix(in srgb, var(--success-color, #28a745) 15%, transparent);
+  border: 1px solid var(--success-color, #28a745);
+  color: var(--success-text-color, #155724);
+  border-radius: var(--border-radius-medium, 4px);
+  margin: 20px 0;
+  text-align: center;
+}
+
+.formMessageError {
+  padding: 15px;
+  background-color: color-mix(in srgb, var(--danger-color, #dc3545) 15%, transparent);
+  border: 1px solid var(--danger-color, #dc3545);
+  color: var(--danger-text-color, #721c24);
+  border-radius: var(--border-radius-medium, 4px);
+  margin: 20px 0;
+  text-align: center;
+}
+
+
+/* Alternative Contact Section */
+.alternativeContact {
+  margin-top: 40px;
+  padding-top: 30px;
+  border-top: 1px solid var(--border-color-light, #eee);
+}
+
+.alternativeContact h2 {
+  font-family: var(--font-headings-section, 'Libre Bodoni', serif);
+  font-size: clamp(1.3rem, 2.8vw, 1.6rem);
+  color: var(--text-color, #333);
+  margin-bottom: 15px;
+  font-weight: var(--font-weight-semibold, 600);
+}
+
+.alternativeContact p {
+  margin-bottom: 0.8em;
+}
+
+.legalDisclaimer {
+  margin-top: 30px;
+  padding: 15px;
+  background-color: var(--brand-beige-light, #f9f9f9);
+  border-left: 4px solid var(--primary-color-light, #007bff);
+  font-size: 0.9rem;
+  color: var(--text-color-light, #555);
+}

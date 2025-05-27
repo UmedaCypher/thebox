@@ -1,0 +1,359 @@
+/* client/src/pages/MyCollectionPage.module.css */
+
+.myCollectionPageContainer {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: clamp(30px, 5vh, 50px) clamp(15px, 3vw, 30px);
+  box-sizing: border-box;
+  font-family: var(--font-main);
+}
+
+.pageHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.pageTitle {
+  font-family: var(--font-headings-primary);
+  font-style: italic;
+  font-weight: var(--font-weight-bold);
+  font-size: clamp(2rem, 4.5vw, 2.8rem);
+  color: var(--brand-grey-text);
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.addWatchButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-main);
+  background-color: var(--primary-color);
+  color: var(--text-color-on-primary);
+  padding: 12px 22px;
+  font-size: 0.95rem;
+  font-weight: var(--font-weight-bold);
+  text-decoration: none;
+  border-radius: 4px;
+  border: 1px solid var(--primary-color);
+  transition: background-color 0.2s ease, transform 0.15s ease, border-color 0.2s ease;
+  margin-bottom: clamp(30px, 5vh, 40px);
+}
+.addWatchButton:hover {
+  background-color: var(--secondary-color);
+  border-color: var(--secondary-color);
+  color: var(--text-color-on-primary);
+  text-decoration: none;
+  transform: translateY(-1px);
+}
+
+.collectionSummary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: clamp(20px, 3vw, 30px);
+  margin-bottom: clamp(35px, 6vh, 50px);
+}
+
+.summaryItem {
+  background-color: var(--brand-beige-card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: clamp(20px, 3vw, 30px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transition: border-color 0.3s ease-out;
+}
+.summaryItem:hover {
+  border-color: var(--brand-grey-text);
+}
+
+.summaryValue {
+  font-family: var(--font-headings-primary);
+  font-style: italic;
+  font-weight: var(--font-weight-bold);
+  font-size: clamp(1.8rem, 3.5vw, 2.5rem);
+  color: var(--brand-black);
+  line-height: 1.2;
+  margin-bottom: 5px;
+}
+
+.summaryLabel {
+  font-family: var(--font-main);
+  font-size: 0.9rem;
+  color: var(--brand-grey-text);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.4;
+}
+
+.watchesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: clamp(20px, 3vw, 30px);
+}
+
+.watchCard {
+  background-color: var(--brand-beige-card-bg);
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.3s ease-out, transform 0.3s ease-out;
+  position: relative;
+}
+.watchCard:hover {
+  transform: translateY(-4px);
+  border-color: var(--brand-grey-text);
+}
+
+.watchCardLink {
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.deleteWatchButtonCard {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background-color: rgba(51, 51, 51, 0.7);
+  color: var(--white);
+  border: none;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  font-size: 16px;
+  line-height: 28px;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-main);
+}
+.deleteWatchButtonCard:hover:not(:disabled) {
+  background-color: var(--brand-red);
+  transform: scale(1.1);
+}
+.deleteWatchButtonCard:disabled {
+  background-color: var(--text-color-light);
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.watchImageContainer {
+  width: 100%;
+  padding-top: 75%;
+  position: relative;
+  background-color: var(--body-bg-color);
+}
+
+.watchImage {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.watchImagePlaceholder {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-color-light);
+  background-color: var(--brand-beige-card-bg);
+  font-family: var(--font-main);
+}
+.watchImagePlaceholder span {
+  font-size: 2.5rem;
+}
+
+.imageLoadErrorPlaceholder span {
+  font-size: 2rem;
+  color: var(--brand-red);
+}
+.imageLoadErrorPlaceholder p {
+  font-family: var(--font-main);
+  font-size: 0.7rem;
+  color: var(--brand-red);
+  margin-top: 5px;
+  text-align: center;
+}
+
+.watchInfo {
+  padding: 18px 20px;
+  text-align: left;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--brand-beige-card-bg);
+}
+
+.watchBrandModel {
+  font-family: var(--font-headings-section);
+  font-style: italic;
+  font-weight: var(--font-weight-semibold);
+  font-size: clamp(1.1rem, 2vw, 1.25rem);
+  color: var(--brand-grey-text);
+  margin-bottom: 3px;
+}
+
+.watchModelName {
+  font-family: var(--font-main);
+  font-size: clamp(0.9rem, 1.7vw, 1rem);
+  color: var(--brand-grey-text);
+  margin-bottom: 10px;
+  font-weight: var(--font-weight-regular);
+  line-height: 1.4;
+}
+
+.watchDetail {
+  font-family: var(--font-main);
+  font-size: 0.8rem;
+  color: var(--text-color-light);
+  margin-bottom: 4px;
+  line-height: 1.5;
+  font-weight: var(--font-weight-regular);
+}
+.watchDetail:last-child {
+  margin-bottom: 0;
+}
+
+.emptyCollection {
+  text-align: center;
+  padding: 60px 20px;
+  font-family: var(--font-main);
+}
+.emptyCollection p {
+  font-size: 1.15rem;
+  color: var(--text-color-light);
+  margin-bottom: 20px;
+  font-weight: var(--font-weight-regular);
+}
+.emptyCollection a {
+  font-weight: var(--font-weight-bold);
+  text-decoration: underline;
+}
+
+.pageStateContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+  font-family: var(--font-main);
+  color: var(--text-color-light);
+  text-align: center;
+  padding: 20px;
+}
+.errorMessage {
+  color: var(--error-text);
+  background-color: var(--error-bg);
+  padding: 15px 25px;
+  border-radius: 8px;
+  border: 1px solid var(--error-border);
+  max-width: 500px;
+  font-weight: var(--font-weight-regular);
+}
+.retryButton {
+  padding: 12px 25px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  margin-top: 20px;
+  font-family: var(--font-main);
+  font-weight: var(--font-weight-bold);
+}
+
+.cardStatusIndicatorSale,
+.cardStatusIndicatorTrade {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  padding: 5px 8px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: var(--font-weight-bold);
+  color: var(--white);
+  z-index: 5;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  line-height: 1;
+}
+
+.cardStatusIndicatorSale {
+  background-color: var(--brand-green, #4CAF50);
+}
+
+.cardStatusIndicatorTrade {
+  background-color: var(--brand-blue, #2196F3);
+}
+
+
+/* ======================================= */
+/* ====== NOUVEAUX STYLES POUR MOBILE ==== */
+/* ======================================= */
+
+@media (max-width: 768px) {
+  
+  .pageHeader {
+    justify-content: center;
+    text-align: center;
+    border-bottom: none;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+  }
+
+  .pageTitle {
+    font-size: clamp(1.8rem, 8vw, 2.2rem);
+  }
+
+  .addWatchButton {
+    width: 100%;
+  }
+
+  .collectionSummary {
+    display: flex;
+    justify-content: space-around;
+    gap: 10px;
+  }
+
+  .summaryItem {
+    flex: 1;
+    padding: 15px 10px;
+  }
+
+  .summaryValue {
+    font-size: clamp(1.3rem, 5vw, 1.6rem);
+  }
+
+  .summaryLabel {
+    font-size: 0.75rem;
+  }
+
+  .watchesGrid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}

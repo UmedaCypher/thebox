@@ -1,0 +1,247 @@
+/* client/src/components/Header/Header.module.css */
+
+.header {
+  position: sticky; 
+  top: 0;
+  left: 0; 
+  right: 0; 
+  z-index: 1000; 
+  width: 100%;
+  background-color: rgba(241, 241, 239, 0.85); 
+  backdrop-filter: blur(12px) saturate(160%);
+  -webkit-backdrop-filter: blur(12px) saturate(160%);
+  border-bottom: 1px solid rgba(202, 200, 195, 0.5); 
+  box-sizing: border-box;
+}
+
+.headerContentWrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.8rem clamp(20px, 4vw, 40px); 
+  max-width: 1320px; 
+  margin: 0 auto; 
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.logo a {
+  font-family: var(--font-headings-primary); 
+  font-weight: 700; 
+  font-style: italic; 
+  font-size: clamp(1.5rem, 3vw, 1.8rem); 
+  color: var(--brand-black); 
+  text-decoration: none;
+  letter-spacing: 0.5px;
+}
+
+.navDesktop { 
+  display: flex;
+  justify-content: center; 
+  margin: 0 auto; 
+}
+.navDesktop ul {
+  list-style: none; padding: 0; margin: 0; display: flex;
+  align-items: center; gap: clamp(18px, 2.2vw, 30px); 
+}
+.navDesktop a { 
+  text-decoration: none; font-family: var(--font-main); font-weight: 500; 
+  font-size: clamp(0.8rem, 1.6vw, 0.9rem); color: var(--text-color); 
+  padding: 0.3em 0; position: relative; transition: color 0.2s ease-in-out; display: block; 
+}
+.navDesktop a:hover { color: var(--brand-black); }
+
+.navLinkWithIconContainer {
+  position: relative; display: flex; align-items: center; justify-content: center; 
+  padding: 8px 10px; color: var(--text-color); text-decoration: none; 
+}
+.navLinkWithIconContainer:hover {
+  color: var(--brand-black); background-color: rgba(0,0,0,0.04); border-radius: 4px; 
+}
+.messageSvgIcon { width: 22px; height: 22px; }
+
+.notificationBadge, .notificationBadgeLoading {
+  position: absolute; top: 0px; right: -2px; background-color: var(--brand-red, #D8000C); 
+  color: white; border-radius: 50%; padding: 0px 4px; font-size: 0.6rem; 
+  font-weight: bold; line-height: 12px; min-width: 12px; height: 12px; 
+  text-align: center; pointer-events: none; border: 1px solid var(--white); 
+  box-sizing: content-box; display: flex; align-items: center; justify-content: center;
+}
+.notificationBadgeLoading { background-color: var(--text-color-light); padding: 2px 4px; 
+  line-height: normal; width: auto; height: auto; min-width: 12px;
+}
+
+.controlsContainer { 
+  display: flex; align-items: center; gap: clamp(10px, 1.5vw, 15px); 
+}
+.authButtonsDesktop { 
+  display: flex; align-items: center; gap: clamp(8px, 1.5vw, 12px); 
+}
+.authButtonsDesktop a, .authButtonsDesktop button {
+  text-decoration: none; padding: 0.5em 1em; border-radius: 4px; 
+  font-family: var(--font-main); font-weight: 600; 
+  font-size: clamp(0.75rem, 1.5vw, 0.85rem); 
+  transition: background-color 0.2s ease, color 0.2s ease, opacity 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+  cursor: pointer; white-space: nowrap; border: 1px solid transparent; 
+}
+.loginButton, .profileLink { 
+  color: var(--brand-grey-text); background-color: transparent; border: 1px solid var(--brand-grey-text); 
+}
+.loginButton:hover, .profileLink:hover {
+  background-color: var(--brand-grey-text); color: var(--brand-beige-card-bg); border-color: var(--brand-grey-text);
+}
+.logoutButton { 
+  color: var(--brand-beige-card-bg); background-color: var(--brand-black); border-color: var(--brand-black);
+}
+.logoutButton:hover {
+  background-color: var(--brand-grey-text); border-color: var(--brand-grey-text); opacity: 0.9;
+}
+.loadingState {
+  font-size: clamp(0.8rem, 1.6vw, 0.9rem); color: var(--text-color-light); font-style: italic;
+}
+
+/* --- Styles pour Mobile --- */
+.mobileMenuButton {
+  display: none; background: none; border: none; color: var(--text-color);
+  padding: 8px; cursor: pointer; z-index: 1002; 
+}
+.mobileMenuButton svg { width: 28px; height: 28px; }
+
+/* Conteneur principal du menu mobile, porte l'effet de verre dépoli */
+.mobileMenu {
+  position: fixed; 
+  top: 0; 
+  left: 0; 
+  width: 100%; 
+  height: 100vh; 
+  
+  background-color: rgba(241, 241, 239, 0.9); /* Fond global du menu, semi-transparent pour l'effet verre */
+  backdrop-filter: blur(10px) saturate(130%);  
+  -webkit-backdrop-filter: blur(10px) saturate(130%);
+
+  z-index: 1001; 
+  box-sizing: border-box;
+  /* overflow-y: auto; -- Déplacé vers .mobileMenuScrollContainer */
+}
+
+/* Nouveau conteneur pour le scroll et le padding pour le header */
+.mobileMenuScrollContainer {
+  height: 100%; /* Prend toute la hauteur de .mobileMenu */
+  padding-top: 70px; /* Espace pour le header sticky. AJUSTEZ À LA HAUTEUR DE VOTRE HEADER */
+  box-sizing: border-box;
+  overflow-y: auto; /* C'est LUI qui scrolle maintenant */
+  /* Son fond est transparent par défaut, ce qui est bien pour voir le backdrop-filter de .mobileMenu */
+}
+
+.mobileMenuNav { 
+  min-height: 100%; /* S'assure que la nav essaie de prendre au moins la hauteur de son parent scrollable */
+  display: flex; 
+  flex-direction: column;
+  /* Fond transparent par défaut */
+}
+
+.mobileMenuList {
+  list-style: none; padding: 0; margin: 0;
+  display: flex; flex-direction: column;
+  flex-grow: 1; 
+  /* Fond transparent par défaut */
+}
+
+.mobileMenuTopGroup {
+  /* Fond transparent par défaut, les LI enfants gèrent leur fond */
+}
+
+.mobileMenuBottomGroup {
+  margin-top: auto; 
+  width: 100%; 
+  padding-bottom: 80px; /* Espace pour la BottomNavigationBar en bas du contenu scrollable */
+  /* Fond transparent par défaut, les LI enfants gèrent leur fond */
+  border-top: 1px solid rgba(100,100,100,0.2); 
+}
+
+.mobileMenu nav li { 
+  width: 100%; box-sizing: border-box;
+}
+
+.mobileMenu nav li a,
+.mobileMenu nav li button {
+  display: flex; 
+  align-items: center; 
+  text-decoration: none; font-family: var(--font-main);
+  transition: background-color 0.2s ease, color 0.2s ease;
+  width: 100%; box-sizing: border-box; text-align: left; 
+}
+
+/* Styles pour les liens type "Header" (beige semi-transparent, typo grande) */
+.mobileMenuItemHeaderType { 
+  background-color: rgba(241, 241, 239, 0.8); /* Beige semi-transparent */
+}
+.mobileMenuItemHeaderType a,
+.mobileMenuItemHeaderType button { 
+  color: var(--brand-black); 
+  padding: 15px 25px; 
+  font-size: 1.4rem;  
+  font-weight: 700;
+}
+.mobileMenuItemHeaderType a:hover,
+.mobileMenuItemHeaderType button:hover {
+  background-color: rgba(225, 225, 220, 0.85); 
+}
+
+.mobileMenuUserProfile a { 
+  gap: 15px; 
+}
+.mobileMenuProfileAvatar {
+  width: 36px; 
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  background-color: var(--text-color-light); 
+  color: var(--brand-beige-bg); 
+  flex-shrink: 0;
+  border: 1px solid var(--border-color); 
+}
+.mobileMenuProfileUsername {
+  font-weight: 600; 
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 1.05rem; 
+}
+
+/* Styles pour les liens type "Footer" (noir PLUS opaque, typo petite) */
+.mobileMenuItemFooterType { 
+  background-color: rgba(20, 20, 20, 0.92); /* Noir semi-transparent (opacité 0.92 - PLUS opaque) */
+}
+.mobileMenuItemFooterType a { 
+  color: var(--white); padding: 12px 25px; 
+  font-size: 0.9rem; font-weight: 400;
+}
+.mobileMenuItemFooterType a:hover {
+  background-color: rgba(0, 0, 0, 0.98); /* Noir presque opaque au survol */
+}
+
+.mobileMenuSectionTitleCustom {
+  color: var(--text-color-light) !important; 
+  padding: 15px 25px 8px 25px !important; 
+  font-size: 0.75rem !important; 
+  font-weight: var(--font-weight-semibold) !important;
+  text-transform: uppercase; letter-spacing: 0.05em;
+}
+
+.mobileLogoutButton { 
+    background-color: transparent; 
+    border: none; 
+    padding: 18px 25px; 
+    color: var(--brand-black); 
+    font-size: 1.1rem;
+    font-weight: 500;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+}
+
+@media (max-width: 850px) { 
+  .navDesktop, .authButtonsDesktop { display: none; }
+  .mobileMenuButton { display: flex; align-items: center; }
+}

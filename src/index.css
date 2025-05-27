@@ -1,0 +1,319 @@
+/* client/src/index.css */
+
+/* 1. Importation des polices depuis Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Libre+Bodoni:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap');
+
+/* 2. Définition des variables CSS globales */
+:root {
+  /* Palette de Couleurs */
+  --brand-red: #FC2727;
+  --brand-blue: #063E7A; /* Le bleu n'est plus la couleur primaire active */
+  --brand-beige-bg: #F1F1EF; /* avant : F1F1EF */
+  --brand-beige-card-bg: #F1F1EF; 
+  --brand-grey-text: #333333; /* Gris foncé principal */
+  --brand-black: #000000;     /* Noir pour contraste et états hover */
+
+  /* Application aux variables de thème sémantiques */
+  --primary-color: var(--brand-grey-text); /* CHANGÉ: Bleu -> Gris Foncé */
+  --secondary-color: var(--brand-black);   /* CHANGÉ: Bleu clair -> Noir (pour hover/secondaire sobre) */
+  --accent-color: var(--brand-red);        /* Le rouge reste l'accent */
+
+  --text-color: var(--brand-grey-text);    /* Texte par défaut déjà gris foncé */
+  --text-color-light: #5a5a5a;
+  --text-color-on-primary: #FFFFFF;      /* Texte blanc sur fond gris foncé/noir fonctionnera bien */
+  --text-color-on-dark: var(--brand-beige-card-bg);
+
+  --body-bg-color: var(--brand-beige-bg);
+  --card-bg-color: var(--brand-beige-card-bg);
+  --section-bg-alt: var(--brand-beige-card-bg);
+
+  --border-color: #cac8c3;
+  --border-color-light: #dcdad5;
+
+  --white: #FFFFFF;
+  --black: var(--brand-black);
+
+  /* Polices */
+  --font-main: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-headings-primary: 'Libre Bodoni', 'Georgia', serif;
+  --font-headings-section: 'Libre Bodoni', 'Georgia', serif;
+  --font-titles-decorative: 'Inter', sans-serif;
+
+  /* Poids de police spécifiques */
+  --font-weight-extralight: 200;
+  --font-weight-light: 300;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-extrabold: 800;
+
+  /* Variables pour les messages et notifications */
+  --error-bg: #ffebee;
+  --error-text: var(--brand-red);
+  --error-border: #f7cac9;
+
+  --success-bg: #e6f7f0;
+  --success-text: #00695c;
+  --success-border: #a3e0c7;
+
+  --info-bg: var(--brand-beige-card-bg);
+  --info-text: var(--text-color-light);
+  --info-border: var(--border-color-light);
+
+  color-scheme: light;
+}
+
+/* Thème Sombre (Laissé tel quel pour l'instant, le focus est sur le thème clair) */
+html[data-theme="dark"] :root {
+  --primary-color: #888888; /* CHANGÉ: Bleu -> Gris moyen pour thème sombre */
+  --secondary-color: #aaaaaa; /* CHANGÉ: Bleu clair -> Gris plus clair pour thème sombre */
+  --accent-color: #ff8a8a;
+
+  --text-color: var(--brand-beige-bg);
+  --text-color-light: #b0b0b0;
+  --text-color-on-primary: var(--brand-black); /* Texte noir sur gris moyen */
+
+  --body-bg-color: #1a1a1a;
+  --card-bg-color: #2c2c2c;
+  --section-bg-alt: #2c2c2c;
+
+  --border-color: #4a4a4a;
+  --border-color-light: #3a3a3a;
+
+  --error-bg: #522323;
+  --error-text: #ff8a8a;
+  --error-border: #794545;
+
+  --success-bg: #1e463f;
+  --success-text: #a3e0c7;
+  --success-border: #436b5c;
+
+  --info-bg: var(--card-bg-color);
+  --info-text: var(--text-color-light);
+  --info-border: var(--border-color);
+
+  color-scheme: dark;
+}
+
+
+/* 3. Styles de base pour HTML et Body */
+html {
+  height: 100%; /* <-- AJOUTEZ CETTE LIGNE */
+  box-sizing: border-box;
+  font-size: 16px;
+  scroll-behavior: smooth;
+  background-color: var(--body-bg-color);
+}
+
+*, *:before, *:after {
+  box-sizing: inherit;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-main);
+  color: var(--text-color);
+  background-color: var(--body-bg-color);
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  font-weight: var(--font-weight-regular);
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* 4. Styles pour #root */
+#root {
+  width: 100%;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 5. Styles Génériques Typographiques et Éléments */
+a {
+  font-weight: var(--font-weight-bold);
+  color: var(--primary-color); /* Deviendra gris foncé */
+  text-decoration: none;
+  transition: color 0.2s ease-in-out, opacity 0.2s ease-in-out;
+}
+a:hover, a:focus {
+  color: var(--secondary-color); /* Deviendra noir */
+  text-decoration: underline;
+}
+
+/* Titres */
+h1, h2, h3, h4, h5, h6 { /* La couleur est déjà --brand-grey-text ou --text-color, donc pas de changement direct ici */
+  /* Styles de police et de structure restent les mêmes */
+}
+h1 {
+  font-family: var(--font-headings-primary);
+  font-style: italic;
+  font-weight: var(--font-weight-bold);
+  font-size: clamp(2.2rem, 5vw, 3.2rem);
+  color: var(--brand-grey-text);
+  line-height: 1.2;
+  margin-bottom: 0.75em;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+h2 {
+  font-family: var(--font-headings-section);
+  font-style: italic;
+  font-weight: var(--font-weight-bold);
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  color: var(--brand-grey-text);
+  line-height: 1.25;
+  margin-bottom: 0.65em;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+h3 {
+  font-family: var(--font-headings-section);
+  font-style: italic;
+  font-weight: var(--font-weight-semibold);
+  font-size: clamp(1.5rem, 3.5vw, 2rem);
+  color: var(--brand-grey-text);
+  line-height: 1.3;
+  margin-bottom: 0.6em;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+h4, h5, h6 {
+  font-family: var(--font-main);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-color);
+  margin-bottom: 0.5em;
+  line-height: 1.4;
+}
+h4 { font-size: clamp(1.2rem, 2.5vw, 1.5rem); }
+h5 { font-size: clamp(1.1rem, 2.2vw, 1.3rem); }
+h6 { font-size: clamp(1rem, 2vw, 1.1rem); }
+
+
+.title-inter-extralight {
+  font-family: var(--font-titles-decorative);
+  font-weight: var(--font-weight-extralight);
+  color: var(--brand-grey-text); /* CHANGÉ: Bleu -> Gris Foncé */
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  line-height: 1.3;
+}
+
+button, .button-like {
+  display: inline-block;
+  padding: 0.7em 1.8em;
+  font-family: var(--font-main);
+  font-size: 0.9rem;
+  font-weight: var(--font-weight-bold);
+  color: var(--text-color-on-primary); /* Blanc */
+  background-color: var(--primary-color); /* Gris Foncé */
+  border: 1px solid var(--primary-color); /* Gris Foncé */
+  border-radius: 4px;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.15s ease;
+}
+button:hover, .button-like:hover {
+  background-color: var(--secondary-color); /* Noir */
+  border-color: var(--secondary-color); /* Noir */
+}
+button:focus, button:focus-visible,
+.button-like:focus, .button-like:focus-visible {
+  outline: 2px solid var(--primary-color); /* Outline Gris Foncé */
+  outline-offset: 2px;
+}
+button:disabled, .button-like:disabled {
+  background-color: var(--text-color-light) !important;
+  border-color: var(--text-color-light) !important;
+  color: var(--body-bg-color) !important;
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.button-secondary {
+  background-color: transparent;
+  color: var(--primary-color); /* Gris Foncé */
+  border: 1px solid var(--primary-color); /* Gris Foncé */
+}
+.button-secondary:hover, .button-secondary:focus {
+  background-color: var(--brand-beige-card-bg); /* Fond beige clair au survol */
+  color: var(--primary-color); /* Texte reste gris foncé */
+  /* border-color: var(--secondary-color); /* Option: bordure noire au survol */
+}
+.button-secondary:disabled {
+  background-color: transparent !important;
+  border-color: var(--text-color-light) !important;
+  color: var(--text-color-light) !important;
+}
+
+input, textarea, select {
+  font-family: var(--font-main);
+  font-weight: var(--font-weight-regular);
+  padding: 0.8em 1em;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 0.95rem;
+  color: var(--text-color);
+  background-color: var(--white);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  width: 100%;
+  box-sizing: border-box;
+}
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: var(--primary-color); /* Gris Foncé */
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-color) 15%, transparent); /* Ombre Gris Foncé pâle */
+}
+input::placeholder, textarea::placeholder {
+  color: var(--text-color-light);
+  opacity: 0.8;
+}
+
+html[data-theme="dark"] input,
+html[data-theme="dark"] textarea,
+html[data-theme="dark"] select {
+    background-color: var(--card-bg-color);
+    color: var(--text-color);
+    border-color: var(--border-color);
+}
+html[data-theme="dark"] input::placeholder,
+html[data-theme="dark"] textarea::placeholder {
+  color: var(--text-color-light);
+  opacity: 0.7;
+}
+
+.message-global {
+  padding: 12px 18px;
+  border-radius: 6px;
+  margin: 20px auto;
+  font-size: 0.95rem;
+  text-align: center;
+  max-width: 600px;
+  border: 1px solid;
+  line-height: 1.5;
+}
+.message-error {
+  background-color: var(--error-bg);
+  color: var(--error-text);
+  border-color: var(--error-border);
+}
+.message-success {
+  background-color: var(--success-bg);
+  color: var(--success-text);
+  border-color: var(--success-border);
+}
+.message-info, .loading-message, .empty-message {
+  background-color: var(--info-bg);
+  color: var(--info-text);
+  border-color: var(--info-border);
+}

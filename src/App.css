@@ -1,0 +1,65 @@
+/* client/src/App.css */
+
+/*
+  SUPPRIMEZ OU COMMANDEZ CE BLOC EN ENTIER :
+
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+*/
+/* client/src/App.css */
+
+.appContainer {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* ou height: 100% si la chaîne parentale est parfaite */
+}
+
+.mainContent {
+  flex-grow: 1; /* Fait grandir le contenu principal */
+  display: flex; /* Permet à son enfant (la page) de s'étirer en hauteur */
+  flex-direction: column;
+  
+  /* Ajouté pour ne pas que la barre de navigation du bas cache le contenu */
+  /* Ajustez la valeur si la hauteur de votre BottomNavigationBar change */
+  padding-bottom: 70px;
+}
+/* Conservez le reste de vos styles App.css s'ils sont toujours pertinents */
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
+}
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+.card {
+  padding: 2em;
+}
+
+.read-the-docs {
+  color: #888;
+}

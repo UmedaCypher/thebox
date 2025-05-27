@@ -1,0 +1,130 @@
+```css
+/* client/src/pages/CguPage.module.css */
+/* Common styles for static pages like CGU, CGV, Privacy, etc. */
+
+.staticPageContainer {
+  width: 100%;
+  background-color: var(--body-bg-color); /* Site's main background color */
+  padding-top: clamp(30px, 6vh, 60px); /* Space above the content box */
+  padding-bottom: clamp(40px, 8vh, 80px); /* Space below the content box */
+  min-height: calc(100vh - var(--header-height, 60px) - var(--footer-height, 100px)); /* Ensure it fills viewport height */
+  box-sizing: border-box;
+}
+
+.staticPageContent {
+  padding: clamp(30px, 4vw, 50px);       /* Inner padding for the text, etc. */
+  width: 100%;                           /* Responsive width */
+  max-width: var(--static-page-max-width, 900px); /* Max width of the content box */
+  margin-left: auto;                     /* Center the box horizontally */
+  margin-right: auto;                    /* Center the box horizontally */
+  box-sizing: border-box;
+}
+
+.staticPageHeader {
+  text-align: center;
+  margin-bottom: clamp(25px, 4vh, 40px);
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border-color, #d1d5db); /* Slightly more visible border */
+}
+
+.staticPageHeader h1 {
+  font-family: var(--font-headings-primary, 'Libre Bodoni', serif);
+  font-size: clamp(2rem, 5vw, 2.8rem); /* Slightly larger H1 */
+  color: var(--primary-color, #2d3748); /* Using a primary text color variable */
+  font-weight: var(--font-weight-bold, 700);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.staticPageSection h2 {
+  font-family: var(--font-headings-section, 'Libre Bodoni', serif);
+  font-size: clamp(1.5rem, 3.5vw, 2rem); /* Slightly larger H2 */
+  color: var(--text-color-headings, #374151); /* Variable for heading text color */
+  margin-top: clamp(30px, 5vh, 45px);
+  margin-bottom: 20px;
+  font-weight: var(--font-weight-semibold, 600);
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border-color-light, #e5e7eb);
+  line-height: 1.3;
+}
+.staticPageSection h2:first-of-type { /* Use first-of-type for better targeting */
+  margin-top: 0;
+}
+
+.staticPageSection h3 {
+  font-family: var(--font-main, 'Inter', sans-serif);
+  font-size: clamp(1.2rem, 2.8vw, 1.5rem);
+  color: var(--text-color-headings, #374151);
+  margin-top: 25px;
+  margin-bottom: 12px;
+  font-weight: var(--font-weight-medium, 500);
+  line-height: 1.4;
+}
+
+.staticPageSection p,
+.staticPageSection ul,
+.staticPageSection ol {
+  font-family: var(--font-main, 'Inter', sans-serif);
+  font-size: clamp(0.95rem, 2vw, 1.05rem);
+  line-height: 1.8; /* Increased line height for readability */
+  color: var(--text-color-paragraph, #4b5563); /* Variable for paragraph text */
+  margin-bottom: 1.2em; /* Slightly more space after paragraphs */
+}
+
+.staticPageSection ul,
+.staticPageSection ol {
+  padding-left: 30px; /* More indentation for lists */
+}
+
+.staticPageSection ul li,
+.staticPageSection ol li {
+  margin-bottom: 0.6em;
+}
+
+.staticPageSection strong {
+  font-weight: var(--font-weight-semibold, 600);
+  color: var(--text-color-strong, #1f2937); /* Variable for strong text */
+}
+
+.staticPageSection em {
+  font-style: italic;
+  color: var(--text-color-emphasis, #4b5563); /* Variable for emphasized text */
+}
+
+.inlineLink {
+  color: var(--brand-blue, #2563eb); /* Using a brand blue variable */
+  text-decoration: none;
+  font-weight: var(--font-weight-medium, 500);
+  transition: color 0.2s ease;
+}
+
+.inlineLink:hover {
+  text-decoration: underline;
+  color: var(--brand-blue-dark, #1d4ed8); /* Darker shade on hover */
+}
+
+.legalDisclaimer {
+  margin-top: 35px;
+  padding: 20px;
+  background-color: var(--brand-beige-extralight, #fdfbf7); /* Very light beige */
+  border-left: 5px solid var(--primary-color-light, #60a5fa); /* Lighter brand blue for border */
+  font-size: clamp(0.85rem, 1.8vw, 0.95rem);
+  color: var(--text-color-subtle, #52525b); /* Subtle text color */
+  border-radius: 0 var(--border-radius-medium, 4px) var(--border-radius-medium, 4px) 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .staticPageContent {
+    padding: clamp(20px, 3vw, 35px); /* Adjust padding for smaller screens */
+  }
+  .staticPageHeader h1 {
+    font-size: clamp(1.8rem, 6vw, 2.2rem);
+  }
+  .staticPageSection h2 {
+    font-size: clamp(1.4rem, 4.5vw, 1.7rem);
+  }
+  .staticPageSection h3 {
+    font-size: clamp(1.1rem, 3.5vw, 1.3rem);
+  }
+}

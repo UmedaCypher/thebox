@@ -1,0 +1,384 @@
+/* client/src/pages/WatchEditorPage/WatchEditorPage.module.css */
+
+/* RAPPEL IMPORTANT :
+  Les variables CSS (comme --primary-color, --font-headings, etc.) 
+  utilisées dans ce fichier sont supposées être DÉFINIES GLOBALEMENT 
+  dans un fichier comme index.css ou un fichier de thème principal.
+
+  Exemple de définition globale (à placer dans votre index.css ou équivalent) :
+  :root {
+    --primary-color: #1A2E4C; 
+    --secondary-color: #3A7CA5; 
+    --accent-color: #D4AF37; 
+    --text-color: #2F3542; 
+    --light-text-color: #57606F; 
+    --bg-light: #F9FAFB; 
+    --white: #FFFFFF;
+    --border-color: #E5E7EB; 
+    --error-bg: #FFF0F0;
+    --error-text: #D8000C;
+    --error-border: #FFBABA;
+    --success-bg: #F0FFF0;
+    --success-text: #006400;
+    --success-border: #B0EAB0;
+
+    --font-headings: 'Playfair Display', serif;
+    --font-body: 'Inter', sans-serif; 
+    --font-monospace: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+  }
+*/
+
+.pageContainer {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start; /* Aligne la carte en haut si le contenu est plus petit que la fenêtre */
+  min-height: calc(100vh - 120px); /* Ajuster en fonction de la hauteur de votre Header/Footer */
+  padding: clamp(30px, 5vh, 60px) 20px; /* Espacement vertical et horizontal responsive */
+  background-color: var(--bg-light, #F9FAFB);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.formCard {
+  background-color: var(--white, #FFFFFF);
+  padding: clamp(30px, 4vw, 50px); /* Augmentation du padding interne */
+  border-radius: 12px; /* Coins légèrement plus arrondis */
+  box-shadow: 0 15px 40px rgba(0,0,0,0.07); /* Ombre plus douce et diffuse */
+  width: 100%;
+  max-width: 900px; /* Légère augmentation de la largeur max pour plus d'aisance */
+  border: 1px solid var(--border-color, #E5E7EB);
+}
+
+.pageTitle {
+  font-family: var(--font-headings, 'Playfair Display', serif);
+  font-size: clamp(2rem, 4.5vw, 2.8rem); /* Taille de titre plus affirmée */
+  color: var(--primary-color, #1A2E4C);
+  text-align: center;
+  margin-bottom: clamp(30px, 5vh, 50px); /* Espacement accru sous le titre */
+  font-weight: 700;
+}
+.pageTitle::after { /* Petit soulignement décoratif */
+  content: '';
+  display: block;
+  width: 60px;
+  height: 2px;
+  background-color: var(--accent-color, #D4AF37);
+  margin: 15px auto 0;
+  border-radius: 1px;
+}
+
+/* --- Styles du Formulaire --- */
+.watchForm {
+  display: flex;
+  flex-direction: column;
+  gap: 35px; /* Espacement principal entre les sections et éléments du formulaire */
+}
+
+.formSectionTitle {
+  font-family: var(--font-headings, 'Playfair Display', serif);
+  font-size: clamp(1.3rem, 2.5vw, 1.6rem);
+  color: var(--primary-color, #1A2E4C);
+  padding-bottom: 12px;
+  margin-bottom: 20px; /* Espacement sous le titre de section */
+  border-bottom: 1px solid var(--border-color, #E5E7EB);
+  font-weight: 600;
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); /* Responsive grid */
+  gap: 25px 30px; /* Espacement vertical et horizontal dans la grille */
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px; /* Espacement entre le label et l'input */
+}
+.inputGroup.fullWidth { /* Pour les textareas ou éléments prenant toute la largeur */
+  grid-column: 1 / -1;
+}
+
+.inputLabel {
+  font-family: var(--font-body, 'Inter', sans-serif);
+  font-size: clamp(0.85rem, 1.8vw, 0.95rem);
+  color: var(--text-color, #2F3542);
+  font-weight: 500; /* Labels légèrement plus présents */
+}
+.inputLabel::after { /* Indique les champs requis de manière subtile */
+ content: attr(data-required); /* Utilise l'attribut data-required pour afficher '*' */
+ color: var(--accent-color, #D4AF37); /* Couleur de l'accent pour l'astérisque */
+ margin-left: 4px;
+ font-weight: 600;
+}
+
+.inputField,
+.selectField,
+.textareaField {
+  font-family: var(--font-body, 'Inter', sans-serif);
+  font-size: clamp(0.9rem, 1.9vw, 1rem);
+  padding: 12px 16px; /* Padding plus généreux */
+  border: 1px solid var(--border-color, #E5E7EB);
+  border-radius: 6px; /* Coins arrondis cohérents */
+  background-color: var(--white, #FFFFFF);
+  color: var(--text-color, #2F3542);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  width: 100%;
+  box-sizing: border-box; /* S'assure que padding et border n'augmentent pas la taille totale */
+}
+.inputField::placeholder,
+.textareaField::placeholder {
+  color: var(--light-text-color, #57606F);
+  opacity: 0.7;
+}
+.inputField:focus,
+.selectField:focus,
+.textareaField:focus {
+  outline: none;
+  border-color: var(--accent-color, #D4AF37); /* Bordure couleur accent au focus */
+  box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.2); /* Ombre de focus subtile couleur accent */
+}
+.inputField:disabled,
+.selectField:disabled,
+.textareaField:disabled {
+  background-color: var(--bg-light, #F9FAFB); /* Fond différent pour les champs désactivés */
+  color: var(--light-text-color, #57606F);
+  cursor: not-allowed;
+}
+
+.selectField {
+  appearance: none; /* Supprime le style par défaut du navigateur pour le select */
+  background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2220%22%20height%3D%2220%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M5%208l5%205%205-5z%22%20fill%3D%22%2357606F%22%2F%3E%3C%2Fsvg%3E'); /* Icône de flèche personnalisée (SVG encodé) */
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  background-size: 16px;
+  padding-right: 40px; /* Espace pour l'icône de flèche */
+}
+
+.textareaField {
+  min-height: 120px; /* Hauteur minimale pour la zone de texte */
+  resize: vertical; /* Permet le redimensionnement vertical uniquement */
+}
+
+/* --- Dropzone (Zone de téléversement) --- */
+.photoUploadGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  gap: 30px;
+}
+
+.dropzoneContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px; /* Espacement entre le label et la dropzone */
+}
+
+.dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 30px;
+  border: 2px dashed var(--border-color, #E5E7EB); /* Bordure en pointillés */
+  border-radius: 8px;
+  background-color: var(--bg-light, #F9FAFB);
+  color: var(--light-text-color, #57606F);
+  cursor: pointer;
+  transition: border-color 0.3s ease, background-color 0.3s ease;
+  text-align: center;
+  min-height: 180px; /* Hauteur minimale pour la dropzone */
+}
+.dropzone:hover,
+.dropzoneActive { /* Style au survol ou quand un fichier est glissé dessus */
+  border-color: var(--accent-color, #D4AF37);
+  background-color: var(--white, #FFFFFF); /* Changement de fond léger */
+}
+
+.dropzoneIcon { /* Placeholder pour une icône SVG ou Font Icon */
+  display: block;
+  width: 40px;
+  height: 40px;
+  background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg xmlns="http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg" viewBox="0 0 24 24" fill="%2357606F"%3E%3Cpath d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"%2F%3E%3C%2Fsvg%3E');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  margin-bottom: 15px;
+  opacity: 0.7;
+  transition: opacity 0.3s ease;
+}
+.dropzone:hover .dropzoneIcon,
+.dropzoneActive .dropzoneIcon {
+  opacity: 1;
+}
+
+.dropzoneText {
+  font-family: var(--font-body, 'Inter', sans-serif);
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--text-color, #2F3542);
+  margin-bottom: 5px;
+}
+.dropzoneTextSmall {
+  font-size: 0.8rem;
+  color: var(--light-text-color, #57606F);
+}
+
+.previewContainer {
+  position: relative; /* Pour positionner le bouton de suppression */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: 100%; /* S'assure que le conteneur prend la largeur de la dropzone */
+}
+.imagePreview {
+  max-width: 100%;
+  max-height: 120px; /* Limite la hauteur de l'aperçu */
+  border-radius: 6px;
+  object-fit: cover; /* S'assure que l'image couvre bien sans se déformer */
+  border: 1px solid var(--border-color, #E5E7EB);
+}
+.fileName {
+  font-size: 0.8rem;
+  color: var(--light-text-color, #57606F);
+  word-break: break-all; /* Coupe les noms de fichiers longs pour éviter le débordement */
+  text-align: center;
+  max-width: 90%; /* Empêche le nom de fichier d'être trop large */
+}
+.removeFileButton {
+  position: absolute;
+  top: -10px; /* Positionnement du bouton de suppression */
+  right: -10px;
+  background-color: var(--error-text, #D8000C); /* Couleur d'erreur pour le bouton */
+  color: var(--white, #FFFFFF);
+  border: none;
+  border-radius: 50%; /* Bouton rond */
+  width: 24px;
+  height: 24px;
+  font-size: 14px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+.removeFileButton:hover {
+  background-color: #a70000; /* Plus foncé au survol */
+  transform: scale(1.1); /* Léger agrandissement au survol */
+}
+
+
+/* --- Messages & Boutons --- */
+.infoText {
+  font-family: var(--font-body, 'Inter', sans-serif);
+  font-size: 0.85rem;
+  color: var(--light-text-color, #57606F);
+  text-align: right; /* Alignement à droite pour les infos type "* Champs obligatoires" */
+  margin-top: 0; /* Le gap du formulaire parent s'en charge */
+}
+
+.submitButton {
+  font-family: var(--font-body, 'Inter', sans-serif);
+  background-color: var(--primary-color, #1A2E4C); /* Couleur primaire pour le bouton principal */
+  color: var(--white, #fff);
+  padding: 14px 35px; /* Padding équilibré */
+  font-size: clamp(1rem, 2vw, 1.1rem);
+  font-weight: 600; /* Plus affirmé */
+  text-decoration: none;
+  border-radius: 8px; /* Cohérent avec les autres boutons */
+  border: 1px solid transparent;
+  transition: background-color 0.3s ease, transform 0.2s ease-out, box-shadow 0.3s ease;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  align-self: flex-end; /* Aligne le bouton à droite dans le flex column du formulaire */
+  min-width: 200px; /* Largeur minimale pour une bonne présence */
+  text-align: center;
+}
+.submitButton:hover:not(:disabled) {
+  background-color: var(--secondary-color, #3A7CA5); /* Couleur secondaire au survol */
+  transform: translateY(-2px); /* Léger effet de soulèvement */
+  box-shadow: 0 8px 20px rgba(26, 46, 76, 0.15); /* Ombre plus prononcée au survol */
+}
+.submitButton:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(58, 124, 165, 0.4); /* Ombre de focus pour l'accessibilité */
+}
+.submitButton:disabled {
+  background-color: var(--light-text-color, #57606F); /* Style pour le bouton désactivé */
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+
+.errorMessage,
+.successMessage {
+  padding: 14px 18px; /* Padding légèrement augmenté */
+  border-radius: 8px; /* Coins arrondis cohérents */
+  margin-bottom: 0; /* Le gap du formulaire parent s'en charge */
+  font-size: 0.95rem;
+  font-family: var(--font-body, 'Inter', sans-serif);
+  text-align: left; /* Alignement à gauche pour une meilleure lisibilité */
+  display: flex; /* Pour aligner une icône potentielle */
+  align-items: center;
+  gap: 10px; /* Espacement si vous ajoutez une icône */
+}
+/* Exemple d'ajout d'icône (à décommenter et adapter si besoin) */
+/* .errorMessage::before { 
+  content: '⚠️'; 
+  font-size: 1.2em;
+} 
+.successMessage::before { 
+  content: '✅';
+  font-size: 1.2em;
+} */
+
+.errorMessage {
+  background-color: var(--error-bg, #FFF0F0);
+  color: var(--error-text, #D8000C);
+  border: 1px solid var(--error-border, #FFBABA);
+}
+.successMessage {
+  background-color: var(--success-bg, #F0FFF0);
+  color: var(--success-text, #006400);
+  border: 1px solid var(--success-border, #B0EAB0);
+}
+
+.pageLoading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(80vh - 150px);
+  font-family: var(--font-body, 'Inter', sans-serif);
+  font-size: 1.3rem;
+  color: var(--light-text-color, #57606F);
+}
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 768px) {
+  .formCard {
+    padding: clamp(20px, 5vw, 30px); /* Moins de padding sur petits écrans */
+  }
+  .pageTitle {
+    font-size: clamp(1.6rem, 6vw, 2rem);
+    margin-bottom: 30px;
+  }
+  .formSectionTitle {
+    font-size: clamp(1.1rem, 3vw, 1.3rem);
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+  }
+  .formGrid {
+    gap: 20px; /* Réduire l'espacement sur petits écrans */
+  }
+  .photoUploadGrid {
+    gap: 20px;
+  }
+  .submitButton {
+    align-self: stretch; /* Bouton pleine largeur sur mobile pour accessibilité */
+    padding: 14px 25px;
+  }
+}
