@@ -1,5 +1,5 @@
 // client/src/pages/AppPage.tsx
-import React from 'react';
+// import React from 'react';
 import { Link } from 'react-router-dom';
 import Slider from 'react-slick';
 import styles from './AppPage.module.css';

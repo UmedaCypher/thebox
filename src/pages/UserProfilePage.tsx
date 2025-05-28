@@ -1,9 +1,13 @@
 // client/src/pages/UserProfilePage.tsx
-import React, { useState, useEffect, ChangeEvent } from 'react';
+// --- CORRECTION 1: Imports ---
+// "React" n'est plus importé par défaut.
+// "ChangeEvent" et "FC" sont importés en tant que types pour satisfaire "verbatimModuleSyntax".
+import { useState, useEffect } from 'react';
+import type { FC, ChangeEvent, FormEvent } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from '../contexts/AuthContext';
-import styles from './UserProfilePage.module.css'; // Assurez-vous que le chemin est correct
+import styles from './UserProfilePage.module.css';
 
 interface ProfileData {
   id: string;

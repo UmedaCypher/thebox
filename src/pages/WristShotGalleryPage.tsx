@@ -1,18 +1,21 @@
 // client/src/pages/WristShotGalleryPage/WristShotGalleryPage.tsx
-import React, { useState, useEffect, useCallback } from 'react';
-import { Link } from 'react-router-dom'; // Assurez-vous que Link est importé
-import { supabase } from '../lib/supabaseClient';
+
+// Correction mineure des imports pour la cohérence
+import { useState, useEffect, useCallback } from 'react';
+import type { FC } from 'react'; // FC (Functional Component) est un type
+import { Link } from 'react-router-dom';
+import { supabase } from '../lib/supabaseClient'; // Assurez-vous que ce chemin est correct
 import styles from './WristShotGalleryPage.module.css';
 
 interface GalleryPhoto {
   id: string; // Correspond à photo_id de la RPC
   storage_path: string; // Correspond à photo_storage_path
-  publicUrl?: string;
-  watch_id: string; 
-  watch_brand?: string;
-  watch_model?: string;
+  publicUrl?: string; // Optionnel car on filtre les URL nulles après récupération
+  watch_id: string;
+  watch_brand?: string; // Peut être indéfini si non retourné par la RPC ou si la montre n'a pas de marque
+  watch_model?: string; // Peut être indéfini
   user_username?: string | null; // Peut être null si l'username n'est pas défini
-  user_wrist_size_cm?: number | null;
+  user_wrist_size_cm?: number | null; // Peut être null
 }
 
 interface BrandFromRpc { // Type pour le retour de get_gallery_available_brands
@@ -29,8 +32,7 @@ interface RpcPhotoData { // Type pour les données brutes de la RPC get_public_w
   user_wrist_size_cm: number | null;
 }
 
-
-const WristShotGalleryPage: React.FC = () => {
+const WristShotGalleryPage: FC = () => {
   const [photos, setPhotos] = useState<GalleryPhoto[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -45,6 +47,7 @@ const WristShotGalleryPage: React.FC = () => {
   const [photosPerPage] = useState(20); // Nombre de photos par page
   const [hasMorePhotos, setHasMorePhotos] = useState(true);
 
+  // Effet pour récupérer les options de filtre (marques)
   useEffect(() => {
     const fetchFilterOptions = async () => {
       setLoadingFilters(true);
@@ -53,132 +56,144 @@ const WristShotGalleryPage: React.FC = () => {
 
         if (brandsError) {
           console.error("Erreur RPC get_gallery_available_brands:", brandsError);
-          throw brandsError;
+          throw brandsError; // Propage l'erreur pour être attrapée par le catch
         }
         
         if (brandsData) {
+          // S'assurer que brandsData est traité comme un tableau de BrandFromRpc
           const uniqueBrands = (brandsData as BrandFromRpc[]).map(item => item.brand).sort();
           setAvailableBrands(uniqueBrands);
         } else {
-          setAvailableBrands([]);
+          setAvailableBrands([]); // Initialiser avec un tableau vide si pas de données
         }
       } catch (err: any) {
         console.error("Erreur dans fetchFilterOptions:", err);
-        setAvailableBrands([]); 
+        setError("Impossible de charger les options de filtre."); // Message d'erreur pour l'utilisateur
+        setAvailableBrands([]); // Assurer un état cohérent en cas d'erreur
       } finally {
         setLoadingFilters(false);
       }
     };
     fetchFilterOptions();
-  }, []);
+  }, []); // Dépendance vide pour exécuter une seule fois au montage
 
-  const fetchWristShots = useCallback(async (pageToFetch = 1, resetPhotos = false) => {
-    if (resetPhotos) {
-        setPhotos([]); // Vider les photos existantes si resetPhotos est vrai
-        setCurrentPage(1); // Réinitialiser la page actuelle
-        setHasMorePhotos(true); // S'attendre à plus de photos
+  // Fonction pour récupérer les photos de la galerie avec pagination et filtres
+  const fetchWristShots = useCallback(async (pageToFetch = 1, resetPhotosList = false) => {
+    if (resetPhotosList) {
+      setPhotos([]); // Vider les photos existantes si resetPhotosList est vrai
+      setCurrentPage(1); // Réinitialiser la page actuelle à 1
+      setHasMorePhotos(true); // S'attendre à ce qu'il y ait plus de photos
     }
-    setLoading(true);
-    setError(null); 
+    setLoading(true); // Indiquer le début du chargement
+    setError(null); // Réinitialiser les erreurs précédentes
 
     try {
-      const rpcParams = {
+      const rpcParams: { [key: string]: any } = { // Typage plus flexible pour les paramètres RPC
         selected_brand_filter: selectedBrand === '' ? null : selectedBrand,
         min_wrist_filter: wristSizeMinInput === '' ? null : parseFloat(wristSizeMinInput),
         max_wrist_filter: wristSizeMaxInput === '' ? null : parseFloat(wristSizeMaxInput),
         page_limit: photosPerPage,
-        page_offset: (pageToFetch - 1) * photosPerPage
+        page_offset: (pageToFetch - 1) * photosPerPage // Calcul de l'offset pour la pagination
       };
 
-      // Assurer que les valeurs numériques sont bien des nombres ou null
+      // Assurer que les valeurs numériques sont bien des nombres ou null avant l'appel RPC
       if (isNaN(rpcParams.min_wrist_filter as number)) rpcParams.min_wrist_filter = null;
       if (isNaN(rpcParams.max_wrist_filter as number)) rpcParams.max_wrist_filter = null;
       
-      console.log("Appel RPC get_public_wrist_shots avec params:", rpcParams);
-
+      // Appel à la fonction RPC Supabase
       const { data: rpcData, error: rpcError } = await supabase.rpc('get_public_wrist_shots', rpcParams);
 
       if (rpcError) {
         console.error("Erreur RPC get_public_wrist_shots:", rpcError);
         setError(rpcError.message || "Erreur lors de la récupération des données de la galerie.");
-        setPhotos([]); // Vider en cas d'erreur
-        setHasMorePhotos(false);
-        return; // Arrêter si la RPC échoue
+        if (resetPhotosList || pageToFetch === 1) setPhotos([]); // Vider en cas d'erreur sur le premier chargement/reset
+        setHasMorePhotos(false); // Indiquer qu'il n'y a plus de photos à charger
+        return; // Arrêter l'exécution si la RPC échoue
       }
 
-      console.log("Données brutes reçues de la RPC get_public_wrist_shots:", rpcData);
-
       if (rpcData && Array.isArray(rpcData)) {
-        const newPhotos = (rpcData as RpcPhotoData[]).map((item) => {
-          let publicUrl: string | null = null;
+        // Transformation des données RPC en type GalleryPhoto
+        // Ajout du type de retour explicite ': GalleryPhoto' à la fonction map
+        const newPhotosTransformed = (rpcData as RpcPhotoData[]).map((item): GalleryPhoto => {
+          let photoPublicUrl: string | undefined = undefined; // Utiliser undefined pour la cohérence avec publicUrl?
           if (item.photo_storage_path) {
             const { data: urlData } = supabase.storage
-              .from('watch.images') // Assurez-vous que 'watch.images' est le nom de votre bucket
+              .from('watch.images') // Assurez-vous que 'watch.images' est le nom correct de votre bucket
               .getPublicUrl(item.photo_storage_path);
-            publicUrl = urlData?.publicUrl || null;
+            photoPublicUrl = urlData?.publicUrl || undefined; // undefined si pas d'URL
           }
           return {
             id: item.photo_id,
             storage_path: item.photo_storage_path,
-            publicUrl: publicUrl,
+            publicUrl: photoPublicUrl, // Peut être undefined ici
             watch_id: item.watch_id,
             watch_brand: item.watch_brand,
             watch_model: item.watch_model,
             user_username: item.user_username || null, // Garder null si l'username n'est pas défini
             user_wrist_size_cm: item.user_wrist_size_cm,
           };
-        }).filter(photo => photo.publicUrl); // Garder uniquement celles avec une URL valide
+        })
+        .filter(photo => photo.publicUrl); // Garder uniquement les photos avec une URL publique valide
 
-        if (resetPhotos || pageToFetch === 1) {
-            setPhotos(newPhotos);
+        // Mise à jour de l'état des photos
+        if (resetPhotosList || pageToFetch === 1) {
+          setPhotos(newPhotosTransformed);
         } else {
-            setPhotos(prevPhotos => [...prevPhotos, ...newPhotos]);
+            // Ajout des nouvelles photos à la liste existante pour la pagination "infinite scroll"
+          setPhotos(prevPhotos => [...prevPhotos, ...newPhotosTransformed]);
         }
         
-        if (newPhotos.length < photosPerPage) {
-            setHasMorePhotos(false);
+        // Vérifier s'il y a plus de photos à charger pour la pagination
+        if (newPhotosTransformed.length < photosPerPage) {
+          setHasMorePhotos(false); // Moins de photos que la limite, donc fin de la liste
         } else {
-            setHasMorePhotos(true); // Il pourrait y en avoir plus
+          setHasMorePhotos(true); // Potentiellement plus de photos
         }
-        setCurrentPage(pageToFetch);
+        setCurrentPage(pageToFetch); // Mettre à jour la page actuelle
 
       } else {
-        if (resetPhotos || pageToFetch === 1) setPhotos([]);
+        // Si rpcData est null ou n'est pas un tableau
+        if (resetPhotosList || pageToFetch === 1) setPhotos([]);
         setHasMorePhotos(false);
       }
     } catch (err: any) {
       console.error("Erreur dans fetchWristShots (catch global):", err);
       setError(err.message || "Impossible de charger la galerie.");
-      if (resetPhotos || pageToFetch === 1) setPhotos([]); 
+      if (resetPhotosList || pageToFetch === 1) setPhotos([]); 
+      setHasMorePhotos(false);
     } finally {
-      setLoading(false);
+      setLoading(false); // Indiquer la fin du chargement
     }
-  }, [selectedBrand, wristSizeMinInput, wristSizeMaxInput, photosPerPage]); 
+  }, [selectedBrand, wristSizeMinInput, wristSizeMaxInput, photosPerPage]); // Dépendances de useCallback
 
-  // useEffect pour charger les photos initialement et lors du changement de filtres
+  // Effet pour charger les photos initialement et lors du changement de filtres
   useEffect(() => {
     fetchWristShots(1, true); // Charger la première page et réinitialiser les photos
-  }, [selectedBrand, wristSizeMinInput, wristSizeMaxInput, fetchWristShots]); // fetchWristShots est une dépendance
+  }, [fetchWristShots]); // fetchWristShots est maintenant stable grâce à useCallback
 
+  // Gestionnaire pour réinitialiser les filtres
   const handleResetFilters = () => {
     setSelectedBrand('');
     setWristSizeMinInput('');
     setWristSizeMaxInput('');
-    // Le useEffect ci-dessus s'occupera de re-fetcher avec la page 1 et resetPhotos=true
+    // Le useEffect dépendant de fetchWristShots (qui dépend des filtres) se chargera de re-fetcher
   };
 
+  // Gestionnaire pour charger plus de photos (pagination)
   const loadMorePhotos = () => {
-    if (!loading && hasMorePhotos) {
-      fetchWristShots(currentPage + 1, false); // Ne pas réinitialiser les photos, ajouter à la suite
+    if (!loading && hasMorePhotos) { // Charger uniquement si pas déjà en chargement et s'il y a plus de photos
+      fetchWristShots(currentPage + 1, false); // Charger la page suivante, ne pas réinitialiser
     }
   };
 
+  // Rendu du composant
   return (
     <div className={styles.galleryPageContainer}>
       <header className={styles.pageHeader}>
         <h1 className={styles.pageTitle}>Galerie au Poignet</h1>
       </header>
 
+      {/* Section des filtres */}
       <div className={styles.filtersContainer}>
         <div className={styles.filterGroup}>
           <label htmlFor="brandFilter" className={styles.filterLabel}>Marque :</label>
@@ -187,7 +202,7 @@ const WristShotGalleryPage: React.FC = () => {
             value={selectedBrand} 
             onChange={(e) => setSelectedBrand(e.target.value)}
             className={styles.filterSelect}
-            disabled={loadingFilters || loading}
+            disabled={loadingFilters || loading} // Désactiver pendant le chargement des filtres ou des photos
           >
             <option value="">Toutes les marques</option>
             {availableBrands.map(brand => (
@@ -206,8 +221,8 @@ const WristShotGalleryPage: React.FC = () => {
               onChange={(e) => setWristSizeMinInput(e.target.value)}
               placeholder="Min."
               className={styles.filterInput}
-              disabled={loading}
-              step="0.5"
+              disabled={loading} // Désactiver pendant le chargement des photos
+              step="0.5" // Pas de 0.5 pour la taille du poignet
             />
             <span>-</span>
             <input 
@@ -217,7 +232,7 @@ const WristShotGalleryPage: React.FC = () => {
               onChange={(e) => setWristSizeMaxInput(e.target.value)}
               placeholder="Max."
               className={styles.filterInput}
-              disabled={loading}
+              disabled={loading} // Désactiver pendant le chargement des photos
               step="0.5"
             />
           </div>
@@ -230,40 +245,40 @@ const WristShotGalleryPage: React.FC = () => {
         </div>
       </div>
 
+      {/* Messages de chargement, d'erreur ou de galerie vide */}
       {loading && photos.length === 0 && !error && <div className={styles.loadingMessage}>Chargement de la galerie...</div>}
       {error && <div className={`${styles.message} ${styles.errorMessage}`}>Erreur : {error}</div>}
-
       {!loading && !error && photos.length === 0 && (
-        <div className={styles.emptyMessage}>Aucune photo ne correspond à vos critères de recherche.</div>
+        <div className={`${styles.message} ${styles.emptyMessage}`}>Aucune photo ne correspond à vos critères de recherche.</div>
       )}
 
+      {/* Grille des photos */}
       {photos.length > 0 && ( 
         <div className={styles.photosGrid}>
           {photos.map((photo) => (
             <div key={photo.id} className={styles.photoCard}>
-              <Link to={`/montre/${photo.watch_id}`}> 
+              <Link to={`/montre/${photo.watch_id}`} title={`Voir détails de ${photo.watch_brand} ${photo.watch_model}`}> 
                 {photo.publicUrl ? (
                   <img 
                     src={photo.publicUrl} 
-                    alt={`Montre ${photo.watch_brand} ${photo.watch_model} au poignet`} 
+                    alt={`Montre ${photo.watch_brand || ''} ${photo.watch_model || ''} au poignet`} 
                     className={styles.photoImage}
+                    loading="lazy" // Ajout du lazy loading pour les images
                   />
                 ) : (
-                  <div className={styles.photoPlaceholder}>📷</div>
+                  <div className={styles.photoPlaceholder}>📷 <span className={styles.srOnly}>Image non disponible</span></div>
                 )}
               </Link>
               <div className={styles.photoInfo}>
                 <p className={styles.watchName}>{photo.watch_brand} {photo.watch_model}</p>
                 <p className={styles.userInfo}>
                   Par: 
-                  {/* MODIFICATION ICI : Lien vers le profil public si user_username existe */}
                   {photo.user_username ? (
-                    <Link to={`/profil/${photo.user_username}`} className={styles.profileLink}>
+                    <Link to={`/profil/${photo.user_username}`} className={styles.profileLink} title={`Voir le profil de ${photo.user_username}`}>
                       {' '}{photo.user_username}
                     </Link>
                   ) : (
-                    // Fallback si pas de username, vous pouvez ajuster ce texte
-                    ' Utilisateur anonyme' 
+                    <span className={styles.anonymousUser}> Utilisateur anonyme</span> 
                   )}
                   {photo.user_wrist_size_cm && ` | Poignet: ${String(photo.user_wrist_size_cm).replace('.',',')} cm`}
                 </p>
@@ -273,10 +288,11 @@ const WristShotGalleryPage: React.FC = () => {
         </div>
       )}
       
+      {/* Bouton pour charger plus de photos */}
       {!loading && hasMorePhotos && photos.length > 0 && (
         <div className={styles.loadMoreContainer}>
-          <button onClick={loadMorePhotos} className={styles.loadMoreButton}>
-            Charger plus
+          <button onClick={loadMorePhotos} className={styles.loadMoreButton} disabled={loading}>
+            {loading ? 'Chargement...' : 'Charger plus'}
           </button>
         </div>
       )}
