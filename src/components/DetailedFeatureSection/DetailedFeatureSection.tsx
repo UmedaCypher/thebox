@@ -1,6 +1,6 @@
 // client/src/components/DetailedFeatureSection/DetailedFeatureSection.tsx
 import React from 'react';
-import { Link } from 'react-router-dom'; // Optionnel, si vous avez des liens "En savoir plus"
+// import { Link } from 'react-router-dom'; // Optionnel, si vous avez des liens "En savoir plus"
 import styles from './DetailedFeatureSection.module.css';
 
 interface DetailedFeatureSectionProps {

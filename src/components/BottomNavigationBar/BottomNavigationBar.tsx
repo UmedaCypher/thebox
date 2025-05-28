@@ -1,6 +1,6 @@
 // client/src/components/BottomNavigationBar/BottomNavigationBar.tsx
 import React from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import styles from './BottomNavigationBar.module.css';
 

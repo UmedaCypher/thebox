@@ -1,6 +1,6 @@
 // client/src/App.tsx (Mis à jour pour utiliser des classes CSS pour le layout)
 
-import React from 'react';
+// import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 
 // Styles globaux et de layout

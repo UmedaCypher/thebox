@@ -1,5 +1,5 @@
 // client/src/pages/PublicProfilePage.tsx
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react'; // <---  useMemo supprimé car innutilisé
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from '../contexts/AuthContext'; // Pour savoir qui est l'utilisateur connecté

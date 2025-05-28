@@ -1,6 +1,6 @@
 // client/src/pages/SignupPage.tsx
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom'; // <--- useNavigate supprimé car innutilisé
 import { supabase } from '../lib/supabaseClient'; // Assurez-vous que ce chemin est correct
 import styles from './AuthPage.module.css'; // Fichier CSS module partagé
 

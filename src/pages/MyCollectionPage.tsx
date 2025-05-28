@@ -1,4 +1,4 @@
-// client/src/pages/MyCollectionPage.tsx
+// client/src/pages/MyCollectionPage.tsx (Corrigé et à jour)
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -133,7 +133,8 @@ const MyCollectionPage: React.FC = () => {
       setLoadingWatches(false);
       setWatches([]);
     }
-  }, [user, authLoading, session, fetchWatches]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, authLoading, session, fetchWatches]); // session est inclus dans les dépendances pour le cas où elle affecte user/authLoading
 
   const collectionStats = useMemo((): CollectionStats => {
     const totalWatches = watches.length;
@@ -174,6 +175,7 @@ const MyCollectionPage: React.FC = () => {
           .remove(photoPaths);
         if (storageError) {
           console.error("Erreur lors de la suppression des fichiers du stockage:", storageError);
+          // On continue même si la suppression du stockage échoue pour ne pas bloquer la suppression en base
         }
       }
 
@@ -215,7 +217,7 @@ const MyCollectionPage: React.FC = () => {
     );
   }
 
-  if (loadingWatches && !error && watches.length === 0) {
+  if (loadingWatches && !error && watches.length === 0 && user) { // Ajout de user pour éviter le flash si déconnecté
     return (
       <div className={styles.pageStateContainer}>
         <p>Chargement de votre collection...</p>
@@ -238,6 +240,7 @@ const MyCollectionPage: React.FC = () => {
         <h1 className={styles.pageTitle}>Ma Collection</h1>
       </header>
 
+      {/* Le bouton est en dehors du header, comme modifié pour le mobile */}
       <Link to="/ajouter-montre" className={styles.addWatchButton}>
         Ajouter une Montre
       </Link>
@@ -262,7 +265,7 @@ const MyCollectionPage: React.FC = () => {
       )}
 
 
-      {watches.length === 0 && !loadingWatches ? (
+      {watches.length === 0 && !loadingWatches && user ? ( // Ajout de user pour un message pertinent
         <div className={styles.emptyCollection}>
           <p>Votre collection est actuellement vide.</p>
           <p>Commencez par <Link to="/ajouter-montre">ajouter votre première pièce</Link> !</p>
@@ -286,7 +289,7 @@ const MyCollectionPage: React.FC = () => {
                   )}
 
                   <button
-                    onClick={(e) => {
+                    onClick={() => { // Correction : 'e' supprimé car non utilisé
                       handleDeleteWatch(watch.id, watch.photos);
                     }}
                     className={styles.deleteWatchButtonCard}

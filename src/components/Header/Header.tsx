@@ -97,7 +97,7 @@ function Header() {
       .channel('public-header-listeners-all-v9') // Nom de canal unique
       .on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, () => fetchUnreadMessagesCount())
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'conversation_participants', filter: `user_id=eq.${user.id}` }, () => fetchUnreadMessagesCount())
-      .subscribe((status, err) => {
+      .subscribe((_status, err) => { // <---  'status' remplacé par '_status' pour eviter erreur car non utilisé
         if (err) console.error('Header subscription error:', err);
       });
 

@@ -1,7 +1,8 @@
 // client/src/components/ProtectedRoute/ProtectedRoute.tsx
 // ASSUREZ-VOUS QUE CE FICHIER EST BIEN À CET EMPLACEMENT
 
-import React, { ReactElement } from 'react';
+//import React, { ReactElement } from 'react';
+import type { ReactElement } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 // Le chemin vers AuthContext dépend de l'endroit où vous avez placé AuthContext.tsx
 // Si AuthContext.tsx est dans src/contexts/AuthContext.tsx, alors :
