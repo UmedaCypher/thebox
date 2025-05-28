@@ -1,5 +1,5 @@
 // client/src/components/Footer/Footer.tsx
-import React from 'react';
+import React from 'react'; // React doit être importé pour utiliser React.FC et React.ReactElement
 import { Link } from 'react-router-dom';
 import styles from './Footer.module.css'; // Assurez-vous que le nom du fichier CSS est correct
 
@@ -14,20 +14,19 @@ const Footer: React.FC = () => {
 
   const navLinks: FooterLinkItem[] = [
     { label: 'Accueil', path: '/' },
-    { label: 'Application', path: '/app-details' }, // Ajout du lien vers la page de détails de l'app
-    { label: 'Actualités', path: '/actualites' }, // Corrigé de /watch-news vers /actualites si c'est le bon path
-    { label: 'Galerie', path: '/galerie-poignet' }, // Corrigé de /wristshot-gallery vers /galerie-poignet
+    { label: 'Application', path: '/app-details' },
+    { label: 'Actualités', path: '/actualites' },
+    { label: 'Galerie', path: '/galerie-poignet' },
   ];
 
   const accountLinks: FooterLinkItem[] = [
-    { label: 'Mon Compte', path: '/profil' }, // Corrigé de /profile vers /profil
-    // { label: 'Mes Favoris', path: '/favorites' }, // Ce lien n'existe pas dans App.tsx, commenté
-    { label: 'Ajouter une Montre', path: '/ajouter-montre' }, // Corrigé de /add-watch vers /ajouter-montre
-    { label: 'Ma Collection', path: '/ma-collection' }, // Déplacé ici pour cohérence avec "Mon Espace"
+    { label: 'Mon Compte', path: '/profil' },
+    { label: 'Ajouter une Montre', path: '/ajouter-montre' },
+    { label: 'Ma Collection', path: '/ma-collection' },
   ];
 
   const companyLinks: FooterLinkItem[] = [
-    { label: 'À Propos', path: '/a-propos' }, // Mis à jour pour correspondre à App.tsx
+    { label: 'À Propos', path: '/a-propos' },
     { label: 'Contact', path: '/contact' },
     { label: 'Presse', path: '/presse' },
     { label: 'FAQ', path: '/faq' },
@@ -36,11 +35,12 @@ const Footer: React.FC = () => {
   const legalLinks: FooterLinkItem[] = [
     { label: "CGU", path: '/cgu' },
     { label: 'CGV', path: '/cgv' },
-    { label: 'Confidentialité', path: '/confidentialite' }, // Mis à jour pour correspondre à App.tsx
+    { label: 'Confidentialité', path: '/confidentialite' },
     { label: 'Mentions Légales', path: '/mentions-legales' },
   ];
 
-  const renderLinkList = (links: FooterLinkItem[]): JSX.Element => (
+  // CORRECTION: Changement de JSX.Element à React.ReactElement
+  const renderLinkList = (links: FooterLinkItem[]): React.ReactElement => (
     <ul>
       {links.map((link: FooterLinkItem) => (
         <li key={link.label}>

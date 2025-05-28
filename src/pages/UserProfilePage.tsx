@@ -1,13 +1,11 @@
 // client/src/pages/UserProfilePage.tsx
-// --- CORRECTION 1: Imports ---
-// "React" n'est plus importé par défaut.
-// "ChangeEvent" et "FC" sont importés en tant que types pour satisfaire "verbatimModuleSyntax".
 import { useState, useEffect } from 'react';
+// CORRECTION: FC et FormEvent sont utilisés, donc ils restent.
 import type { FC, ChangeEvent, FormEvent } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from '../contexts/AuthContext';
-import styles from './UserProfilePage.module.css';
+import styles from './UserProfilePage.module.css'; // Assurez-vous que le chemin est correct
 
 interface ProfileData {
   id: string;
@@ -15,14 +13,13 @@ interface ProfileData {
   full_name: string | null;
   profile_picture_url: string | null;
   wrist_size_cm: number | null;
-  is_public: boolean; // Vous l'aviez déjà, c'est bien
+  is_public: boolean;
   phone_number: string | null;
   preferred_language: string | null;
   time_zone: string | null;
   theme_preference: string | null;
   updated_at: string | null;
   created_at?: string;
-  // Nouvelle propriété pour les messages privés
   allow_private_messages?: boolean;
 }
 
@@ -53,8 +50,8 @@ const timeZoneOptions = [
   { value: 'Asia/Tokyo', label: 'Asia/Tokyo' },
 ];
 
-
-const UserProfilePage: React.FC = () => {
+// CORRECTION: Le composant est typé avec FC
+const UserProfilePage: FC = () => {
   const { user, loading: authLoading, refreshUser } = useAuth();
   const navigate = useNavigate();
 
@@ -71,7 +68,6 @@ const UserProfilePage: React.FC = () => {
   const [phoneNumberInput, setPhoneNumberInput] = useState('');
   const [preferredLanguageInput, setPreferredLanguageInput] = useState('');
   const [timeZoneInput, setTimeZoneInput] = useState('');
-  // Nouvel état pour allow_private_messages, initialisé à true par défaut
   const [allowPrivateMessagesInput, setAllowPrivateMessagesInput] = useState(true);
 
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
@@ -97,14 +93,14 @@ const UserProfilePage: React.FC = () => {
       setError(null);
       setSuccessMessage(null);
       try {
-        const { data, error: profileError } = await supabase
+        const { data: profileResult, error: profileError } = await supabase // Renommé 'data' en 'profileResult' pour éviter conflit si 'data' est réutilisé
           .from('profiles')
-          .select('*') // Ceci récupérera toutes les colonnes, y compris allow_private_messages
+          .select('*')
           .eq('id', user.id)
           .single();
 
         if (profileError) {
-          if (profileError.code === 'PGRST116') { // No rows found
+          if (profileError.code === 'PGRST116') {
             console.warn('Aucun profil trouvé pour cet utilisateur. Un profil par défaut va être utilisé/créé.');
             const defaultProfile: ProfileData = {
               id: user.id,
@@ -112,17 +108,16 @@ const UserProfilePage: React.FC = () => {
               full_name: user.user_metadata?.full_name || '',
               profile_picture_url: user.user_metadata?.avatar_url || null,
               wrist_size_cm: null,
-              is_public: false, // Par défaut, profil non public
+              is_public: false,
               phone_number: user.phone || null,
               preferred_language: 'fr-FR',
               time_zone: typeof Intl !== 'undefined' ? Intl.DateTimeFormat().resolvedOptions().timeZone : 'Europe/Paris',
               theme_preference: localStorage.getItem('app-theme') || 'system',
               updated_at: null,
               created_at: user.created_at,
-              allow_private_messages: true, // Par défaut, autorise les messages
+              allow_private_messages: true,
             };
             setProfileData(defaultProfile);
-            // Initialiser les états des inputs avec les valeurs par défaut
             setFullNameInput(defaultProfile.full_name || '');
             setUsernameInput(defaultProfile.username || '');
             setWristSizeCmInput(defaultProfile.wrist_size_cm !== null ? String(defaultProfile.wrist_size_cm) : '');
@@ -131,23 +126,21 @@ const UserProfilePage: React.FC = () => {
             setPreferredLanguageInput(defaultProfile.preferred_language || 'fr-FR');
             setTimeZoneInput(defaultProfile.time_zone || 'Europe/Paris');
             setAvatarPreview(defaultProfile.profile_picture_url);
-            setAllowPrivateMessagesInput(defaultProfile.allow_private_messages ?? true); // ?? true au cas où
+            setAllowPrivateMessagesInput(defaultProfile.allow_private_messages ?? true);
           } else {
             throw profileError;
           }
-        } else if (data) {
-          setProfileData(data);
-          setFullNameInput(data.full_name || '');
-          setUsernameInput(data.username || '');
-          setWristSizeCmInput(data.wrist_size_cm !== null ? String(data.wrist_size_cm) : '');
-          setIsPublicInput(data.is_public || false); // Assurer un booléen
-          setPhoneNumberInput(data.phone_number || '');
-          setPreferredLanguageInput(data.preferred_language || '');
-          setTimeZoneInput(data.time_zone || '');
-          setAvatarPreview(data.profile_picture_url);
-          // Initialiser l'état pour allow_private_messages
-          // Si la colonne n'existe pas encore dans la BDD pour cet user ou est null, on met true par défaut
-          setAllowPrivateMessagesInput(data.allow_private_messages === null || data.allow_private_messages === undefined ? true : data.allow_private_messages);
+        } else if (profileResult) { // Utilisation de profileResult
+          setProfileData(profileResult);
+          setFullNameInput(profileResult.full_name || '');
+          setUsernameInput(profileResult.username || '');
+          setWristSizeCmInput(profileResult.wrist_size_cm !== null ? String(profileResult.wrist_size_cm) : '');
+          setIsPublicInput(profileResult.is_public || false);
+          setPhoneNumberInput(profileResult.phone_number || '');
+          setPreferredLanguageInput(profileResult.preferred_language || '');
+          setTimeZoneInput(profileResult.time_zone || '');
+          setAvatarPreview(profileResult.profile_picture_url);
+          setAllowPrivateMessagesInput(profileResult.allow_private_messages ?? true);
         }
       } catch (err: any) {
         console.error("Erreur lors de la récupération du profil:", err);
@@ -160,12 +153,13 @@ const UserProfilePage: React.FC = () => {
     if (user && user.id && !authLoading) {
       fetchProfileData();
     }
-  }, [user, authLoading]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, authLoading]); // navigate n'est pas nécessaire ici si fetchProfileData ne l'utilise pas directement
 
   const handleAvatarChange = (event: ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
       const file = event.target.files[0];
-      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+      if (file.size > 5 * 1024 * 1024) {
         setError("Le fichier est trop volumineux (max 5MB).");
         setSuccessMessage(null);
         return;
@@ -185,12 +179,12 @@ const UserProfilePage: React.FC = () => {
       reader.readAsDataURL(file);
     } else {
       setAvatarFile(null);
-      // Remettre l'avatar existant s'il y en avait un et que l'utilisateur annule la sélection
       setAvatarPreview(profileData?.profile_picture_url || null);
     }
   };
 
-  const handleUpdateProfile = async (event: React.FormEvent) => {
+  // CORRECTION: event est typé avec FormEvent
+  const handleUpdateProfile = async (event: FormEvent) => {
     event.preventDefault();
     if (!user) return;
     setError(null);
@@ -201,11 +195,11 @@ const UserProfilePage: React.FC = () => {
 
     if (avatarFile) {
       const fileExt = avatarFile.name.split('.').pop();
-      const fileName = `avatar_${Date.now()}.${fileExt}`; // Ensure unique file name
+      const fileName = `avatar_${Date.now()}.${fileExt}`;
       const filePath = `${user.id}/${fileName}`;
 
       const { error: uploadError } = await supabase.storage
-        .from('avatars') // Assurez-vous que ce bucket existe et a les bonnes policies
+        .from('avatars')
         .upload(filePath, avatarFile, { upsert: true });
 
       if (uploadError) {
@@ -215,10 +209,10 @@ const UserProfilePage: React.FC = () => {
         return;
       }
 
-      const { data: urlData } = supabase.storage
+      const { data: urlDataResult } = supabase.storage // Renommé 'data' en 'urlDataResult'
         .from('avatars')
         .getPublicUrl(filePath);
-      newAvatarUrl = urlData?.publicUrl ? `${urlData.publicUrl}?t=${new Date().getTime()}` : null; //Force refresh cache
+      newAvatarUrl = urlDataResult?.publicUrl ? `${urlDataResult.publicUrl}?t=${new Date().getTime()}` : null;
     }
 
     const updates = {
@@ -231,24 +225,18 @@ const UserProfilePage: React.FC = () => {
       time_zone: timeZoneInput === '' ? null : timeZoneInput,
       profile_picture_url: newAvatarUrl,
       updated_at: new Date().toISOString(),
-      // Ajout de allow_private_messages à l'objet de mise à jour
       allow_private_messages: allowPrivateMessagesInput,
     };
 
-    // Vérifier si un profil existe déjà (par exemple, en se basant sur profileData.created_at ou un autre champ)
-    // Si profileData vient d'un profil par défaut (ex: profileData.created_at est null), on fait un insert.
-    // Sinon, on fait un update.
-    const query = (profileData && profileData.created_at) // Si created_at est rempli, le profil existe
-                  ? supabase.from('profiles').update(updates).eq('id', user.id)
-                  : supabase.from('profiles').insert({ ...updates, id: user.id, theme_preference: profileData?.theme_preference || 'system' });
-
+    const query = (profileData && profileData.created_at)
+      ? supabase.from('profiles').update(updates).eq('id', user.id)
+      : supabase.from('profiles').insert({ ...updates, id: user.id, theme_preference: profileData?.theme_preference || 'system' });
 
     const { error: updateError } = await query;
 
     setIsSubmittingProfile(false);
     if (updateError) {
       console.error("Erreur lors de la mise à jour/création du profil:", updateError);
-      // Gestion spécifique de l'erreur d'unicité du username
       if (updateError.message.includes('duplicate key value violates unique constraint') && updateError.message.includes('profiles_username_key')) {
         setError("Ce nom d'utilisateur est déjà pris. Veuillez en choisir un autre.");
       } else {
@@ -256,14 +244,12 @@ const UserProfilePage: React.FC = () => {
       }
     } else {
       console.log("Profil mis à jour/créé avec succès !");
-      // Mettre à jour profileData localement pour refléter les changements sans re-fetch immédiat
       setProfileData(prev => ({
-        ...(prev || { id: user.id, created_at: user.created_at, theme_preference: 'system' } as ProfileData), // Fournir un prev minimal
+        ...(prev || { id: user.id, created_at: user.created_at, theme_preference: 'system' } as ProfileData),
         ...updates
       }));
-      setAvatarFile(null); // Important pour ne pas retenter l'upload si l'utilisateur resubmit
+      setAvatarFile(null);
       setSuccessMessage("Profil mis à jour avec succès !");
-      // Optionnel: rafraîchir les données utilisateur dans le contexte d'authentification si nécessaire
       if (refreshUser) refreshUser();
     }
   };
@@ -283,7 +269,8 @@ const UserProfilePage: React.FC = () => {
     setSuccessMessage(null);
     setIsSendingEmail(true);
 
-    const { data, error: emailChangeError } = await supabase.auth.updateUser({ email: newEmail });
+    // CORRECTION: 'data' est préfixé par '_' car non utilisé.
+    const { data: _emailUpdateData, error: emailChangeError } = await supabase.auth.updateUser({ email: newEmail });
 
     setIsSendingEmail(false);
     if (emailChangeError) {
@@ -304,8 +291,8 @@ const UserProfilePage: React.FC = () => {
     }
     setError(null);
     setSuccessMessage(null);
-    setIsSendingEmail(true); // Peut utiliser un autre état si vous voulez des indicateurs différents
-    const redirectTo = `${window.location.origin}/mettre-a-jour-mot-de-passe`; // Assurez-vous que cette route existe pour la màj de mdp
+    setIsSendingEmail(true);
+    const redirectTo = `${window.location.origin}/mettre-a-jour-mot-de-passe`;
 
     const { error: resetError } = await supabase.auth.resetPasswordForEmail(user.email, {
       redirectTo,
@@ -330,10 +317,10 @@ const UserProfilePage: React.FC = () => {
     setIsSendingEmail(true);
 
     const { error: resendError } = await supabase.auth.resend({
-        type: 'signup', // ou 'email_change' si applicable
+        type: 'signup',
         email: user.email,
         options: {
-            emailRedirectTo: `${window.location.origin}/login` // ou une autre page de confirmation
+            emailRedirectTo: `${window.location.origin}/login`
         }
     });
 
@@ -349,13 +336,10 @@ const UserProfilePage: React.FC = () => {
   const handleDeleteAccount = async () => {
     setError(null);
     setSuccessMessage(null);
-    // eslint-disable-next-line no-restricted-globals
-    if (confirm("Êtes-vous absolument sûr de vouloir supprimer votre compte ? Toutes vos données (collection, profil, etc.) seront définitivement perdues. Cette action est irréversible.")) {
-      // eslint-disable-next-line no-restricted-globals
-      const confirmationText = prompt("Pour confirmer, veuillez taper 'SUPPRIMER MON COMPTE' ci-dessous :");
+    // Remplacer window.confirm et window.prompt par des modales personnalisées si possible
+    if (window.confirm("Êtes-vous absolument sûr de vouloir supprimer votre compte ? Toutes vos données (collection, profil, etc.) seront définitivement perdues. Cette action est irréversible.")) {
+      const confirmationText = window.prompt("Pour confirmer, veuillez taper 'SUPPRIMER MON COMPTE' ci-dessous :");
       if (confirmationText === "SUPPRIMER MON COMPTE") {
-        // TODO: Mettre en place la logique de suppression sécurisée via une Edge Function Supabase
-        // Pour l'instant, affiche un message
         setSuccessMessage("Fonction de suppression de compte à implémenter via une Edge Function pour des raisons de sécurité.");
         console.warn("TODO: Appeler une Edge Function Supabase pour la suppression complète et sécurisée du compte utilisateur et de ses données associées (watches, photos, etc.).");
       } else {
@@ -364,17 +348,14 @@ const UserProfilePage: React.FC = () => {
     }
   };
 
-
-  if (authLoading || (loadingProfile && !profileData)) { // Amélioration de la condition de chargement
-    return <div className={styles.pageLoading}>Chargement du profil...</div>; // Utilisez vos classes globales si disponibles
+  if (authLoading || (loadingProfile && !profileData)) {
+    return <div className={styles.pageLoading}>Chargement du profil...</div>;
   }
 
-  // Si une erreur survient et qu'aucun profil n'est chargé (même pas le défaut)
   if (error && !profileData && !loadingProfile) {
-    return <div className={styles.pageError}>Erreur lors du chargement du profil: {error}</div>; // Utilisez vos classes globales
+    return <div className={styles.pageError}>Erreur lors du chargement du profil: {error}</div>;
   }
 
-  // Si pas de profil du tout après chargement (cas peu probable si on gère le profil par défaut)
   if (!profileData && !loadingProfile) {
     return <div className={styles.pageLoading}>Impossible de charger les données du profil. Veuillez réessayer.</div>;
   }
@@ -387,7 +368,7 @@ const UserProfilePage: React.FC = () => {
         return (
           <section className={styles.profileContentSection}>
             <h2 className={styles.sectionTitle}>Informations Personnelles & Préférences</h2>
-            {user && profileData && ( // Assurer que profileData est non null
+            {user && profileData && (
               <form onSubmit={handleUpdateProfile}>
                 <div className={styles.formGroup}>
                   <label htmlFor="avatarUpload">Photo de profil:</label>
@@ -467,7 +448,7 @@ const UserProfilePage: React.FC = () => {
                     className={styles.inputField}
                     aria-describedby="usernameHelp"
                   />
-                   <small id="usernameHelp" className={styles.inputHelp}>Sera utilisé pour votre page de profil publique. Doit être unique.</small>
+                    <small id="usernameHelp" className={styles.inputHelp}>Sera utilisé pour votre page de profil publique. Doit être unique.</small>
                 </div>
 
                 <div className={styles.formGroup}>
@@ -543,7 +524,6 @@ const UserProfilePage: React.FC = () => {
                   </label>
                 </div>
 
-                {/* Nouvelle case à cocher pour allow_private_messages */}
                 <div className={styles.formGroup}>
                   <label htmlFor="allowPrivateMessages" className={styles.checkboxLabel}>
                     <input
@@ -580,8 +560,8 @@ const UserProfilePage: React.FC = () => {
             <button onClick={handleDeleteAccount} className={`${styles.actionButton} ${styles.dangerButton}`} disabled={isSubmittingProfile}>
               Supprimer mon compte
             </button>
-             {user && !isEmailVerified && ( // Afficher aussi ici si l'email n'est pas vérifié
-                <div className={`${styles.formGroup} ${styles.emailVerification}`}> {/* Assurez-vous que .emailVerification est stylé */}
+              {user && !isEmailVerified && (
+                <div className={`${styles.formGroup} ${styles.emailVerification}`}>
                   <span className={styles.notVerified}>Votre adresse e-mail n'est pas vérifiée.</span>
                   <button
                     type="button"
@@ -621,11 +601,8 @@ const UserProfilePage: React.FC = () => {
     <div className={styles.profilePageContainer}>
       <h1 className={styles.pageTitle}>Mon Compte</h1>
 
-      {/* Remplacer par vos composants de message globaux si vous en avez */}
-      {/* Ou styler directement .errorMessage et .successMessage dans UserProfilePage.module.css */}
       {error && <div className={`${styles.profileContentSection} ${styles.errorMessage}`}>{error}</div>}
       {successMessage && <div className={`${styles.profileContentSection} ${styles.successMessage}`}>{successMessage}</div>}
-
 
       <div className={styles.profileLayout}>
         <nav className={styles.sideNav}>
