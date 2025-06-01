@@ -1,12 +1,12 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import { VitePWA } from 'vite-plugin-pwa'; // Ajout de l'import pour VitePWA
+import { VitePWA } from 'vite-plugin-pwa';
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
     react(),
-    VitePWA({ // Début de la configuration VitePWA
+    VitePWA({
       registerType: 'autoUpdate',
       manifest: {
         name: 'THE BOX - Votre Écrin Numérique',
@@ -16,81 +16,22 @@ export default defineConfig({
         start_url: '/',
         display: 'standalone',
         background_color: '#ffffff',
-        theme_color: '#000000', // Couleur principale de votre application
+        theme_color: '#000000',
         orientation: 'portrait-primary',
         icons: [
-          {
-            src: 'icons/icon-72x72.png', // Chemin relatif au dossier public
-            sizes: '72x72',
-            type: 'image/png',
-            purpose: 'any maskable'
-          },
-          {
-            src: 'icons/icon-96x96.png',
-            sizes: '96x96',
-            type: 'image/png',
-            purpose: 'any maskable'
-          },
-          {
-            src: 'icons/icon-128x128.png',
-            sizes: '128x128',
-            type: 'image/png',
-            purpose: 'any maskable'
-          },
-          {
-            src: 'icons/icon-144x144.png',
-            sizes: '144x144',
-            type: 'image/png',
-            purpose: 'any maskable'
-          },
-          {
-            src: 'icons/icon-152x152.png',
-            sizes: '152x152',
-            type: 'image/png',
-            purpose: 'any maskable'
-          },
-          {
-            src: 'icons/icon-192x192.png',
-            sizes: '192x192',
-            type: 'image/png',
-            purpose: 'any maskable'
-          },
-          {
-            src: 'icons/icon-384x384.png',
-            sizes: '384x384',
-            type: 'image/png',
-            purpose: 'any maskable'
-          },
-          {
-            src: 'icons/icon-512x512.png',
-            sizes: '512x512',
-            type: 'image/png',
-            purpose: 'any maskable'
-          }
+          { src: 'icons/icon-72x72.png', sizes: '72x72', type: 'image/png', purpose: 'any maskable' },
+          { src: 'icons/icon-96x96.png', sizes: '96x96', type: 'image/png', purpose: 'any maskable' },
+          { src: 'icons/icon-128x128.png', sizes: '128x128', type: 'image/png', purpose: 'any maskable' },
+          { src: 'icons/icon-144x144.png', sizes: '144x144', type: 'image/png', purpose: 'any maskable' },
+          { src: 'icons/icon-152x152.png', sizes: '152x152', type: 'image/png', purpose: 'any maskable' },
+          { src: 'icons/icon-192x192.png', sizes: '192x192', type: 'image/png', purpose: 'any maskable' },
+          { src: 'icons/icon-384x384.png', sizes: '384x384', type: 'image/png', purpose: 'any maskable' },
+          { src: 'icons/icon-512x512.png', sizes: '512x512', type: 'image/png', purpose: 'any maskable' }
         ],
-        // CORRECTION: Mise à jour de la section screenshots
         screenshots: [
-          {
-            src: "screenshots/screenshot1.png", // Assurez-vous que ce fichier existe dans public/screenshots/
-            sizes: "1080x1920", // Mettez la taille réelle de votre image
-            type: "image/png",
-            form_factor: "narrow",
-            label: "Ma collection de montres"
-          },
-          {
-            src: "screenshots/screenshot2.png", // Assurez-vous que ce fichier existe dans public/screenshots/
-            sizes: "1080x1920", // Mettez la taille réelle de votre image
-            type: "image/png",
-            form_factor: "narrow",
-            label: "Actualités horlogères"
-          },
-          {
-            src: "screenshots/screenshot3.png", // Assurez-vous que ce fichier existe dans public/screenshots/
-            sizes: "1080x1920", // Mettez la taille réelle de votre image
-            type: "image/png",
-            form_factor: "narrow",
-            label: "Galerie de photos de montres (triable)"
-          }
+          { src: "screenshots/screenshot1.png", sizes: "1080x1920", type: "image/png", form_factor: "narrow", label: "Ma collection de montres" },
+          { src: "screenshots/screenshot2.png", sizes: "1080x1920", type: "image/png", form_factor: "narrow", label: "Actualités horlogères" },
+          { src: "screenshots/screenshot3.png", sizes: "1080x1920", type: "image/png", form_factor: "narrow", label: "Galerie de photos de montres (triable)" }
         ],
         categories: ["lifestyle", "utilities", "productivity"],
         prefer_related_applications: false
@@ -103,13 +44,8 @@ export default defineConfig({
             handler: 'CacheFirst',
             options: {
               cacheName: 'google-fonts-cache',
-              expiration: {
-                maxEntries: 10,
-                maxAgeSeconds: 60 * 60 * 24 * 365 // 1 an
-              },
-              cacheableResponse: {
-                statuses: [0, 200]
-              }
+              expiration: { maxEntries: 10, maxAgeSeconds: 60 * 60 * 24 * 365 }, // 1 an
+              cacheableResponse: { statuses: [0, 200] }
             }
           },
           {
@@ -117,25 +53,18 @@ export default defineConfig({
             handler: 'CacheFirst',
             options: {
               cacheName: 'gstatic-fonts-cache',
-              expiration: {
-                maxEntries: 10,
-                maxAgeSeconds: 60 * 60 * 24 * 365 // 1 an
-              },
-              cacheableResponse: {
-                statuses: [0, 200]
-              }
+              expiration: { maxEntries: 10, maxAgeSeconds: 60 * 60 * 24 * 365 }, // 1 an
+              cacheableResponse: { statuses: [0, 200] }
             }
           },
           {
-            // Adaptez 'your-supabase-project-id' et 'your-bucket-name'
-            // Exemple : /^https:\/\/xyzabc\.supabase\.co\/storage\/v1\/object\/public\/avatars\/.*/i
-            // Assurez-vous que your-bucket-name est le nom de votre bucket principal pour les images publiques, ou ajoutez plusieurs règles si nécessaire.
-            urlPattern: /^https:\/\/your-supabase-project-id\.supabase\.co\/storage\/v1\/object\/public\/your-bucket-name\/.*/i,
+            urlPattern: /^https:\/\/gwotvurtiyeaslmxnqcw\.supabase\.co\/storage\/v1\/object\/public\/avatars\/.*/i,
             handler: 'CacheFirst',
             options: {
-              cacheName: 'supabase-images-cache',
+              // Suggestion: Nom de cache unique
+              cacheName: 'supabase-avatars-cache',
               expiration: {
-                maxEntries: 60, // Nombre maximum d'images à mettre en cache
+                maxEntries: 60,
                 maxAgeSeconds: 60 * 60 * 24 * 30 // 30 jours
               },
               cacheableResponse: {
@@ -144,34 +73,40 @@ export default defineConfig({
             }
           },
           {
-            // Adaptez 'your-supabase-project-id'
-            // Exemple : /^https:\/\/xyzabc\.supabase\.co\/rest\/v1\/.*/i
-            urlPattern: /^https:\/\/your-supabase-project-id\.supabase\.co\/rest\/v1\/.*/i,
-            handler: 'NetworkFirst', // Essaye le réseau d'abord, puis le cache si hors ligne ou échec réseau
+            urlPattern: /^https:\/\/gwotvurtiyeaslmxnqcw\.supabase\.co\/storage\/v1\/object\/public\/watch\.images\/.*/i,
+            handler: 'CacheFirst',
             options: {
-              cacheName: 'api-cache',
-              networkTimeoutSeconds: 10, // Temps avant de basculer sur le cache
+              // Suggestion: Nom de cache unique
+              cacheName: 'supabase-watch-images-cache',
+              expiration: {
+                maxEntries: 100, // Ajusté pour potentiellement plus d'images de montres
+                maxAgeSeconds: 60 * 60 * 24 * 30 // 30 jours
+              },
+              cacheableResponse: {
+                statuses: [0, 200]
+              }
+            }
+          },
+          {
+            urlPattern: /^https:\/\/gwotvurtiyeaslmxnqcw\.supabase\.co\/rest\/v1\/.*/i,
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'supabase-api-cache', // Nom de cache unique pour l'API
+              networkTimeoutSeconds: 10,
               expiration: {
                 maxEntries: 50,
                 maxAgeSeconds: 60 * 60 * 24 // 1 jour
               },
               cacheableResponse: {
-                statuses: [0, 200] // Met en cache uniquement les réponses valides
+                statuses: [0, 200]
               }
             }
           }
         ]
       },
       devOptions: {
-        enabled: true // Utile pour tester en développement, peut être mis à false en production
+        enabled: true
       }
-    }) // Fin de la configuration VitePWA
+    })
   ],
-  // Potentielles autres configurations de Vite (server, build, etc.)
-  // server: {
-  //   port: 3000,
-  // },
-  // build: {
-  //   outDir: 'dist',
-  // },
 })
