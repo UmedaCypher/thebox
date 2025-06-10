@@ -7,13 +7,20 @@
   left: 0;
   right: 0;
   width: 100%;
-  height: 60px; /* Hauteur typique pour une barre de navigation basse */
+  /* La hauteur s'adapte à la zone de sécurité */
+  height: calc(60px + env(safe-area-inset-bottom, 0px)); 
   background-color: var(--brand-beige-bg); /* Ou votre couleur de fond préférée pour la nav */
   border-top: 1px solid var(--border-color);
   box-shadow: 0 -2px 5px rgba(0,0,0,0.05);
   z-index: 1000; /* Au-dessus du contenu de la page */
-  padding: 0 clamp(5px, 2vw, 10px); /* Padding horizontal léger */
+   /* Le padding horizontal est conservé, le padding du bas s'adapte */
+  padding: 0 clamp(5px, 2vw, 10px) env(safe-area-inset-bottom, 0px) clamp(5px, 2vw, 10px);
   box-sizing: border-box;
+  /* Effet de verre dépoli ajouté */
+  background-color: rgba(241, 241, 239, 0.8); 
+  backdrop-filter: blur(10px) saturate(160%);
+  -webkit-backdrop-filter: blur(10px) saturate(160%);
+  border-top: 1px solid rgba(202, 200, 195, 0.5); /* Bordure adoucie pour l'effet */
 
   /* display: flex; -> Sera activé par la media query */
   justify-content: space-around; /* Répartit l'espace entre les éléments */
