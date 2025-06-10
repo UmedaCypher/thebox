@@ -4,22 +4,22 @@ import { NavLink } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import styles from './BottomNavigationBar.module.css';
 
-// --- NOUVELLES ICÔNES SVG ---
+// --- ICÔNES SVG EXISTANTES ---
 
 const NewsIcon: React.FC<{ className?: string }> = ({ className }) => (
   <svg 
-    className={className} // Permet de styler via CSS Modules si besoin
+    className={className}
     width="24" 
     height="24" 
     fill="none" 
     viewBox="0 0 24 24" 
-    stroke="currentColor" // Hérite la couleur du parent
+    stroke="currentColor"
     xmlns="http://www.w3.org/2000/svg"
   >
     <path 
       strokeLinecap="round" 
       strokeLinejoin="round" 
-      strokeWidth="2" // Utilisation de la stroke-width des paths originaux
+      strokeWidth="2" 
       d="M19 7h1v12a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h11.5M7 14h6m-6 3h6m0-10h.5m-.5 3h.5M7 7h3v3H7V7Z"
     />
   </svg>
@@ -82,17 +82,29 @@ const MessagesIcon: React.FC<{ className?: string }> = ({ className }) => (
   </svg>
 );
 
-// --- FIN DES NOUVELLES ICÔNES SVG ---
+// --- NOUVELLE ICÔNE PROFIL AJOUTÉE ---
+const ProfileIcon: React.FC<{ className?: string }> = ({ className }) => (
+  <svg 
+    className={className} 
+    aria-hidden="true" 
+    xmlns="http://www.w3.org/2000/svg" 
+    width="24" 
+    height="24" 
+    fill="currentColor" 
+    viewBox="0 0 24 24"
+  >
+    <path fillRule="evenodd" d="M12 20a7.966 7.966 0 0 1-5.002-1.756l.002.001v-.683c0-1.794 1.492-3.25 3.333-3.25h3.334c1.84 0 3.333 1.456 3.333 3.25v.683A7.966 7.966 0 0 1 12 20ZM2 12C2 6.477 6.477 2 12 2s10 4.477 10 10c0 5.5-4.44 9.963-9.932 10h-.138C6.438 21.962 2 17.5 2 12Zm10-5c-1.84 0-3.333 1.455-3.333 3.25S10.159 13.5 12 13.5c1.84 0 3.333-1.455 3.333-3.25S13.841 7 12 7Z" clipRule="evenodd"/>
+  </svg>
+);
+// --- FIN DE L'AJOUT DE L'ICÔNE ---
 
 interface NavItemProps {
   to: string;
-  icon: React.FC<{ className?: string }>; // L'icône est un composant React
+  icon: React.FC<{ className?: string }>;
   label: string;
 }
 
 const NavItem: React.FC<NavItemProps> = ({ to, icon: IconComponent, label }) => {
-  // NavLink gère la classe 'active' automatiquement.
-  // Le style de l'icône active sera géré par CSS en ciblant .navItem.active svg
   return (
     <NavLink 
       to={to}
@@ -100,7 +112,7 @@ const NavItem: React.FC<NavItemProps> = ({ to, icon: IconComponent, label }) => 
         isActive ? `${styles.navItem} ${styles.active}` : styles.navItem
       }
     >
-      <IconComponent className={styles.navIcon} /> {/* Appliquer une classe pour un style ciblé si besoin */}
+      <IconComponent className={styles.navIcon} />
       <span className={styles.navLabel}>{label}</span>
     </NavLink>
   );
@@ -117,6 +129,8 @@ const BottomNavigationBar: React.FC = () => {
         <>
           <NavItem to="/ma-collection" icon={CollectionIcon} label="Collection" />
           <NavItem to="/messagerie" icon={MessagesIcon} label="Messages" />
+          {/* --- LIEN PROFIL AJOUTÉ ICI --- */}
+          <NavItem to="/profil" icon={ProfileIcon} label="Profil" />
         </>
       )}
     </nav>

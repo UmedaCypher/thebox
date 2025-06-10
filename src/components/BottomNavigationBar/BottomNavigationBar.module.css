@@ -32,14 +32,17 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  flex-grow: 1; /* Pour que chaque item prenne une part égale de l'espace */
-  padding: 6px 4px; /* Padding interne pour l'icône et le label */
+  flex-grow: 1;
+  padding: 6px 4px 10px 4px; /* On augmente le padding en bas pour faire de la place */
   text-decoration: none;
-  color: var(--text-color-light); /* Couleur par défaut pour les items inactifs */
+  color: var(--text-color-light);
   font-family: var(--font-main);
   text-align: center;
-  border-radius: 6px; /* Optionnel, pour un effet de survol */
+  border-radius: 6px;
   transition: background-color 0.2s ease, color 0.2s ease;
+
+  /* Ligne importante à ajouter : */
+  position: relative; /* Nécessaire pour positionner l'indicateur */
 }
 
 /* Style pour les icônes SVG dans les items de navigation */
@@ -68,10 +71,25 @@
 
 .navItem.active {
   color: var(--primary-color); /* Couleur pour l'item actif (s'applique à l'icône et au label) */
+  text-decoration: none;
+  background-color: rgba(0,0,0,0.08);
 }
 
 .navItem.active .navLabel { 
     font-weight: var(--font-weight-semibold); /* Label de l'item actif plus en évidence */
+}
+
+/* L'indicateur visuel (la petite barre en dessous) */
+.navItem.active::after {
+  content: '';
+  position: absolute;
+  bottom: 2px; /* Position verticale de l'indicateur */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 24px; /* Largeur de l'indicateur */
+  height: 3px; /* Épaisseur de l'indicateur */
+  background-color: var(--brand-black); /* Couleur de l'indicateur */
+  border-radius: 2px;
 }
 
 /* Afficher la barre de navigation basse uniquement sur mobile */
