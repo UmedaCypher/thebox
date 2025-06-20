@@ -1,8 +1,8 @@
 // client/src/pages/PublicProfilePage.tsx
-import React, { useState, useEffect } from 'react'; // <---  useMemo supprimé car innutilisé
+import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
-import { useAuth } from '../contexts/AuthContext'; // Pour savoir qui est l'utilisateur connecté
+import { useAuth } from '../contexts/AuthContext'; // Assurez-vous que le chemin est correct
 import styles from './PublicProfilePage.module.css';
 
 interface ProfileInfo {
@@ -28,7 +28,8 @@ interface PublicWatch {
   reference_number?: string | null;
   year_of_production?: number | null;
   main_photo_url?: string | null;
-  status?: 'for_sale' | 'for_trade' | null;
+  // MODIFICATION ICI : 'current_status' utilise les valeurs ENUM universelles
+  current_status?: 'in_collection' | 'for_sale' | 'for_exchange' | 'consignment' | 'in_repair' | 'for_expertise' | 'sold_by_pro' | 'purchased_by_pro' | 'returned' | null;
   sale_price?: number | null;
 }
 
@@ -92,7 +93,7 @@ const PublicProfilePage: React.FC = () => {
               model,
               reference_number,
               year_of_production,
-              status, 
+              current_status, 
               sale_price,
               photos (
                 storage_path,
@@ -209,7 +210,8 @@ const PublicProfilePage: React.FC = () => {
             <div className={styles.watchesGrid}>
               {watches.map((watch) => (
                 <div key={watch.id} className={styles.watchCard}>
-                  {watch.status === 'for_sale' && (
+                  {/* MODIFICATION ICI : 'current_status' pour l'affichage public */}
+                  {watch.current_status === 'for_sale' && (
                     <div 
                         className={styles.cardStatusIndicatorSale} 
                         title={watch.sale_price ? `À vendre : ${watch.sale_price.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}` : 'À vendre'}
@@ -218,11 +220,20 @@ const PublicProfilePage: React.FC = () => {
                       {watch.sale_price ? ` ${watch.sale_price.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR', minimumFractionDigits:0, maximumFractionDigits:0 })}` : ' À VENDRE'}
                     </div>
                   )}
-                  {watch.status === 'for_trade' && (
+                  {watch.current_status === 'for_exchange' && (
                     <div className={styles.cardStatusIndicatorTrade} title="À échanger">
                       🔄 À ÉCHANGER
                     </div>
                   )}
+                  {/* Si vous voulez afficher d'autres statuts pro sur la page publique, ajoutez des conditions ici */}
+                  {/* Par exemple, si une montre est en dépôt-vente (consignment) mais que le pro la rend visible publiquement */}
+                  {/*
+                  {watch.current_status === 'consignment' && (
+                    <div className={`${styles.cardStatusIndicatorSale} !bg-purple-500`}>
+                      EN DÉPÔT-VENTE
+                    </div>
+                  )}
+                  */}
                   <Link to={`/montre/${watch.id}`} className={styles.watchCardLink}>
                     <div className={styles.watchImageContainer}>
                       {watch.main_photo_url ? (

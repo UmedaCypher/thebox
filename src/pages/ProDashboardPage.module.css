@@ -1,0 +1,191 @@
+/*
+  Fichier de style final pour le tableau de bord.
+  Contient la palette de couleurs et les media queries pour le responsive design.
+*/
+
+/* 1. PALETTE DE COULEURS */
+:root {
+  --card-bg: #f5f5f5;
+  --card-border-color: #e9ebf0;
+  --card-shadow: 0 2px 6px 0 rgba(136, 148, 171, 0.2), 0 10px 15px -10px rgba(71, 82, 107, 0.1);
+  --card-border-radius: 30px;
+  --text-primary: #1f1c2e;
+  --text-secondary: #4A4A4A;
+  --accent-blue-bg: #e0e8ff;
+  --accent-blue-text: #1e40af;
+  --accent-green-bg: #dcfce7;
+  --accent-green-text: #166534;
+  --accent-yellow-bg: #fef9c3;
+  --accent-yellow-text: #854d0e;
+  --accent-black-bg: #1f2937;
+  --accent-black-text: #f9fafb;
+}
+
+/* 2. STYLE GLOBAL DE LA PAGE */
+.dashboard-page-container {
+  background-color: var(--font-main);
+  font-family: 'DM Sans', sans-serif;
+  padding: 24px;
+  min-height: 100vh;
+}
+
+.contentWrapper {
+  padding: 30px;
+  background-color: #fff;
+  border-radius: 50px;
+}
+
+/* 3. STYLE DES CARTES "BENTO" */
+.bento-card {
+  background-color: var(--card-bg);
+  border-radius: var(--card-border-radius);
+  padding: 24px;
+  transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+  display: flex;
+  flex-direction: column;
+}
+
+
+/* 4. CARTES SPÉCIALES AVEC FOND COLORÉ (pour les KPIs) */
+.bento-card.accent-blue {
+  background-color: var(--accent-blue-bg);
+}
+.bento-card.accent-green {
+  background-color: var(--accent-green-bg);
+}
+.bento-card.accent-yellow {
+  background-color: var(--accent-yellow-bg);
+}
+.bento-card.accent-black {
+  background-color: var(--accent-black-bg);
+  color: var(--accent-black-text);
+}
+
+/* 5. TYPOGRAPHIE DANS LES CARTES */
+.card-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 16px 0;
+}
+
+.kpi-value {
+  font-size: 2.25rem; /* 36px */
+  font-weight: 700;
+  line-height: 1.2;
+}
+.bento-card.accent-blue .kpi-value { color: var(--accent-blue-text); }
+.bento-card.accent-green .kpi-value { color: var(--accent-green-text); }
+.bento-card.accent-yellow .kpi-value { color: var(--accent-yellow-text); }
+.bento-card.accent-black .kpi-value { color: var(--accent-black-text); }
+
+.kpi-label {
+  font-size: 0.875rem; /* 14px */
+  color: var(--text-secondary);
+}
+.bento-card.accent-black .kpi-label {
+  color: #d1d5db;
+}
+
+/* 6. BOUTONS ET ÉLÉMENTS D'UI */
+.action-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-weight: 500;
+  color: #fff;
+  border: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  margin: 8px 0px;
+}
+
+.action-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+/* 7. AJUSTEMENTS RESPONSIVES (MEDIA QUERIES) */
+
+/* Pour les tablettes et écrans intermédiaires */
+@media (max-width: 1024px) {
+  .dashboard-page-container {
+    padding: 20px;
+  }
+  .kpi-value {
+    font-size: 1.875rem; /* 30px */
+  }
+  .card-title {
+    font-size: 18px;
+  }
+}
+
+/* 8. AMÉLIORATIONS POUR UN STYLE PLUS BENTO UI */
+
+.bento-grid {
+  display: grid;
+  gap: 24px;
+}
+
+.grid-1-4 {
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  margin-bottom: 24px;
+}
+
+.grid-1-3 {
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  margin-bottom: 24px;
+}
+
+/* Uniformiser les icônes dans les listes */
+.card-list li svg {
+  flex-shrink: 0;
+  color: var(--text-secondary);
+}
+
+/* Pour recentrer verticalement les éléments dans les cartes */
+.card-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #ffffff;
+  padding: 8px 16px;
+  border-radius: 16px;
+  margin: 8px 0px;
+}
+
+
+
+/* Améliorer la cohérence de l’espacement interne */
+.bento-card .kpi-value,
+.bento-card .kpi-label {
+  text-align: center;
+}
+
+.bento-card .kpi-label {
+  margin-top: 8px;
+}
+
+
+/* Pour les mobiles */
+@media (max-width: 767px) {
+  .dashboard-page-container {
+    padding: 16px;
+  }
+  .bento-card {
+    padding: 16px;
+    border-radius: 20px; /* Coins légèrement moins arrondis sur mobile */
+  }
+  .kpi-value {
+    font-size: 1.75rem; /* 28px */
+  }
+  .kpi-label {
+    font-size: 0.75rem; /* 12px */
+  }
+  .action-button {
+    padding: 14px 12px; /* Plus haut pour un meilleur confort tactile */
+    font-size: 14px;
+  }
+}

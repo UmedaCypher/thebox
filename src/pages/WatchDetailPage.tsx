@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../contexts/AuthContext'; // Assurez-vous que le chemin est correct
 import styles from './WatchDetailPage.module.css';
 
 interface PhotoDetail {
@@ -38,8 +38,8 @@ interface WatchDetails {
   created_at: string;
   updated_at: string;
   photos: PhotoDetail[] | null;
-  // Ajouts pour le statut
-  status?: 'for_sale' | 'for_trade' | null;
+  // MODIFICATION ICI : 'current_status' utilise les valeurs ENUM universelles
+  current_status?: 'in_collection' | 'for_sale' | 'for_exchange' | 'consignment' | 'in_repair' | 'for_expertise' | 'sold_by_pro' | 'purchased_by_pro' | 'returned' | null;
   sale_price?: number | null;
 }
 
@@ -96,7 +96,7 @@ const WatchDetailPage: React.FC = () => {
         }
 
         if (data) {
-          setWatchDetails(data as WatchDetails); // Cast avec les nouveaux champs
+          setWatchDetails(data as WatchDetails); 
           if (data.photos && data.photos.length > 0) {
             const mainPhotoInfo = data.photos.find(
               (p: PhotoDetail) => p.is_main_photo && p.photo_type === 'watch_only'
@@ -210,18 +210,30 @@ const WatchDetailPage: React.FC = () => {
       <header className={styles.watchHeader}>
         <h1 className={styles.watchTitle}>{watchDetails.brand} - {watchDetails.model}</h1>
         {watchDetails.reference_number && <p className={styles.watchReference}>Réf : {watchDetails.reference_number}</p>}
-         {/* Affichage du statut */}
-         {watchDetails.status === 'for_sale' && (
+         {/* MODIFICATION ICI : Affichage du statut avec 'current_status' et les nouvelles valeurs ENUM universelles */}
+         {watchDetails.current_status === 'for_sale' && (
           <div className={styles.statusBadgeForSale}>
             À VENDRE
             {watchDetails.sale_price ? ` - ${watchDetails.sale_price.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}` : ''}
           </div>
         )}
-        {watchDetails.status === 'for_trade' && (
+        {watchDetails.current_status === 'for_exchange' && (
           <div className={styles.statusBadgeForTrade}>
             À ÉCHANGER
           </div>
         )}
+        {/* Vous pouvez ajouter d'autres badges ici pour les statuts pro si vous le souhaitez sur cette page */}
+        {watchDetails.current_status === 'in_repair' && (
+          <div className={`${styles.statusBadgeForTrade} !bg-yellow-500`}> {/* Exemple de style rapide */}
+            EN RÉPARATION
+          </div>
+        )}
+        {watchDetails.current_status === 'consignment' && (
+          <div className={`${styles.statusBadgeForSale} !bg-purple-500`}> {/* Exemple de style rapide */}
+            EN DÉPÔT-VENTE
+          </div>
+        )}
+        {/* etc. pour les autres statuts pro que vous souhaitez visualiser ici */}
       </header>
 
       <div className={styles.watchContentGrid}>

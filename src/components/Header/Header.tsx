@@ -5,34 +5,11 @@ import { useAuth } from '../../contexts/AuthContext';
 import { supabase } from '../../lib/supabaseClient';
 import styles from './Header.module.css';
 
-// ... (vos icônes SVG restent les mêmes) ...
-const EnvelopeIcon: React.FC<{ className?: string }> = ({ className }) => (
-  <svg 
-    width="24px" height="24px" strokeWidth="1.5" viewBox="0 0 24 24" 
-    fill="none" xmlns="http://www.w3.org/2000/svg" color="currentColor" className={className}
-  >
-    <path d="M7 9L12 12.5L17 9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"></path>
-    <path d="M2 17V7C2 5.89543 2.89543 5 4 5H20C21.1046 5 22 5.89543 22 7V17C22 18.1046 21.1046 19 20 19H4C2.89543 19 2 18.1046 2 17Z" stroke="currentColor" strokeWidth="1.5"></path>
-  </svg>
-);
-
-const BurgerIcon: React.FC = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line>
-  </svg>
-);
-
-const CloseIcon: React.FC = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>
-  </svg>
-);
-
-const DefaultAvatarIcon: React.FC<{ className?: string }> = ({ className }) => (
-  <svg className={className} width="24" height="24" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-  </svg>
-);
+// --- Icônes (inchangées) ---
+const EnvelopeIcon: React.FC<{ className?: string }> = ({ className }) => ( <svg width="24px" height="24px" strokeWidth="1.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" color="currentColor" className={className}> <path d="M7 9L12 12.5L17 9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"></path> <path d="M2 17V7C2 5.89543 2.89543 5 4 5H20C21.1046 5 22 5.89543 22 7V17C22 18.1046 21.1046 19 20 19H4C2.89543 19 2 18.1046 2 17Z" stroke="currentColor" strokeWidth="1.5"></path> </svg> );
+const BurgerIcon: React.FC = () => ( <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"> <line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line> </svg> );
+const CloseIcon: React.FC = () => ( <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"> <line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line> </svg> );
+const DefaultAvatarIcon: React.FC<{ className?: string }> = ({ className }) => ( <svg className={className} width="24" height="24" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"> <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/> </svg> );
 
 
 function Header() {
@@ -58,15 +35,12 @@ function Header() {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
-  // Ferme le menu quand la route change
   useEffect(() => {
     if (isMobileMenuOpen) {
       setIsMobileMenuOpen(false);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location]);
 
-  // ... (le reste de votre logique, comme fetchUnreadMessagesCount et les useEffects, reste identique) ...
   const fetchUnreadMessagesCount = useCallback(async () => {
     if (user) {
       setLoadingUnreadCount(true);
@@ -94,10 +68,10 @@ function Header() {
     if (!user) return; 
 
     const changesChannel = supabase
-      .channel('public-header-listeners-all-v9') // Nom de canal unique
+      .channel('public-header-listeners-all-v9')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, () => fetchUnreadMessagesCount())
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'conversation_participants', filter: `user_id=eq.${user.id}` }, () => fetchUnreadMessagesCount())
-      .subscribe((_status, err) => { // <---  'status' remplacé par '_status' pour eviter erreur car non utilisé
+      .subscribe((_status, err) => {
         if (err) console.error('Header subscription error:', err);
       });
 
@@ -121,7 +95,6 @@ function Header() {
   return (
     <header className={styles.header}>
       <div className={styles.headerContentWrapper}>
-        {/* ... (votre .headerContentWrapper reste identique) ... */}
         <div className={styles.logo}>
           <Link to="/">THE BOX</Link>
         </div>
@@ -134,6 +107,8 @@ function Header() {
             <li><Link to="/actualites">Actualités</Link></li>
             {user && (
               <>
+                {/* MODIFICATION : Ajout du lien vers le tableau de bord pour les utilisateurs connectés */}
+                <li><Link to="/pro-dashboard">Tableau de bord</Link></li>
                 <li><Link to="/ma-collection">Ma Collection</Link></li>
                 <li>
                   <Link to="/messagerie" className={styles.navLinkWithIconContainer}>
@@ -173,10 +148,8 @@ function Header() {
         </div>
       </div>
 
-      {/* Menu Mobile Déroulant/Superposé */}
       {isMobileMenuOpen && (
         <div className={styles.mobileMenu}>
-          {/* La structure avec .mobileMenuScrollContainer reste la même */}
           <div className={styles.mobileMenuScrollContainer}> 
             <nav className={styles.mobileMenuNav}>
               <ul className={styles.mobileMenuList}> 
@@ -184,7 +157,6 @@ function Header() {
                   {user ? (
                     <li className={`${styles.mobileMenuItemHeaderType} ${styles.mobileMenuUserProfile}`}>
                       <Link to="/profil" onClick={toggleMobileMenu}>
-                        {/* ... (logique avatar) ... */}
                         {user.user_metadata?.profile_picture_url ? (
                           <img src={user.user_metadata.profile_picture_url} alt="Avatar" className={styles.mobileMenuProfileAvatar} />
                         ) : (
@@ -205,13 +177,16 @@ function Header() {
                   <li className={styles.mobileMenuItemHeaderType}><Link to="/" onClick={toggleMobileMenu}>Accueil</Link></li>
                   <li className={styles.mobileMenuItemHeaderType}><Link to="/app-details" onClick={toggleMobileMenu}>Application</Link></li>
                   
-                  {/**************************************/}
-                  {/* NOUVEAUX LIENS ICI          */}
-                  {/**************************************/}
+                  {user && (
+                      <>
+                        {/* MODIFICATION : Ajout du lien vers le tableau de bord dans le menu mobile */}
+                        <li className={styles.mobileMenuItemHeaderType}><Link to="/pro-dashboard" onClick={toggleMobileMenu}>Tableau de bord</Link></li>
+                        <li className={styles.mobileMenuItemHeaderType}><Link to="/ma-collection" onClick={toggleMobileMenu}>Ma Collection</Link></li>
+                      </>
+                  )}
+                  
                   <li className={styles.mobileMenuItemHeaderType}><Link to="/galerie-poignet" onClick={toggleMobileMenu}>Galerie</Link></li>
                   <li className={styles.mobileMenuItemHeaderType}><Link to="/actualites" onClick={toggleMobileMenu}>Actualités</Link></li>
-                  {/**************************************/}
-
                   <li className={styles.mobileMenuItemHeaderType}><Link to="/faq" onClick={toggleMobileMenu}>FAQ</Link></li>
                   
                   {user && (
@@ -222,17 +197,12 @@ function Header() {
                 </div>
 
                 <div className={styles.mobileMenuBottomGroup}>
-                  {/* ... (votre groupe de liens du bas reste identique) ... */}
-                  <li className={`${styles.mobileMenuItemFooterType} ${styles.mobileMenuSectionTitleCustom}`}>
-                    Informations
-                  </li>
+                  <li className={`${styles.mobileMenuItemFooterType} ${styles.mobileMenuSectionTitleCustom}`}>Informations</li>
                   <li className={styles.mobileMenuItemFooterType}><Link to="/a-propos" onClick={toggleMobileMenu}>À Propos</Link></li>
                   <li className={styles.mobileMenuItemFooterType}><Link to="/contact" onClick={toggleMobileMenu}>Contact</Link></li>
                   <li className={styles.mobileMenuItemFooterType}><Link to="/presse" onClick={toggleMobileMenu}>Presse</Link></li>
                   
-                  <li className={`${styles.mobileMenuItemFooterType} ${styles.mobileMenuSectionTitleCustom}`}>
-                    Légal
-                  </li>
+                  <li className={`${styles.mobileMenuItemFooterType} ${styles.mobileMenuSectionTitleCustom}`}>Légal</li>
                   <li className={styles.mobileMenuItemFooterType}><Link to="/cgu" onClick={toggleMobileMenu}>CGU</Link></li>
                   <li className={styles.mobileMenuItemFooterType}><Link to="/cgv" onClick={toggleMobileMenu}>CGV</Link></li>
                   <li className={styles.mobileMenuItemFooterType}><Link to="/confidentialite" onClick={toggleMobileMenu}>Politique de confidentialité</Link></li>

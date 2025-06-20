@@ -33,6 +33,9 @@ import LegalMentionsPage from './pages/LegalMentionsPage';
 import PressPage from './pages/PressPage';
 import ContactPage from './pages/ContactPage';
 import AboutPage from './pages/AboutPage';
+// Import du nouveau composant Dashboard Professionnel
+// CORRECTION ICI : Le chemin direct vers le fichier dans 'pages'
+import ProDashboardPage from './pages/ProDashboardPage'; 
 
 // Composant de protection de routes
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
@@ -78,6 +81,10 @@ function App() {
             <Route path="/montre/:watchId/modifier" element={<ProtectedRoute><WatchEditorPage /></ProtectedRoute>} />
             <Route path="/profil" element={<ProtectedRoute><UserProfilePage /></ProtectedRoute>} />
             <Route path="/profil/:username" element={<PublicProfilePage />} />
+
+            {/* NOUVELLE ROUTE : Dashboard Professionnel */}
+            {/* Protégée, car elle nécessite une authentification et un type de compte spécifique géré à l'intérieur du composant */}
+            <Route path="/dashboard-pro" element={<ProtectedRoute><ProDashboardPage /></ProtectedRoute>} />
 
             {/* ROUTES POUR LA MESSAGERIE */}
             <Route path="/messagerie" element={<ProtectedRoute><MessagingPage /></ProtectedRoute>} />

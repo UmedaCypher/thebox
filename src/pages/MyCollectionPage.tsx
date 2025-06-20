@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../contexts/AuthContext'; // Correction du chemin d'importation
 import styles from './MyCollectionPage.module.css';
 
 interface PhotoInfo {
@@ -23,9 +23,8 @@ interface Watch {
   condition?: string | null;
   current_estimated_value?: number | '' | null;
   last_service_date?: string | null;
-  photos: PhotoInfo[] | null;
-  main_photo_url?: string | null;
-  status?: 'for_sale' | 'for_trade' | null;
+  // MODIFICATION ICI : 'current_status' utilise les valeurs ENUM universelles
+  current_status?: 'in_collection' | 'for_sale' | 'for_exchange' | 'consignment' | 'in_repair' | 'for_expertise' | 'sold_by_pro' | 'purchased_by_pro' | 'returned' | null;
   sale_price?: number | null;
 }
 
@@ -70,8 +69,8 @@ const MyCollectionPage: React.FC = () => {
           condition,
           current_estimated_value,
           last_service_date,
-          status, 
-          sale_price, 
+          current_status, 
+          sale_price,
           photos (
             id,
             storage_path,
@@ -134,7 +133,7 @@ const MyCollectionPage: React.FC = () => {
       setWatches([]);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, authLoading, session, fetchWatches]); // session est inclus dans les dépendances pour le cas où elle affecte user/authLoading
+  }, [user, authLoading, session, fetchWatches]);
 
   const collectionStats = useMemo((): CollectionStats => {
     const totalWatches = watches.length;
@@ -168,6 +167,14 @@ const MyCollectionPage: React.FC = () => {
     setError(null);
 
     try {
+      // Suppression des entrées dans les tables enfants liées à la montre
+      // IMPORTANT : Ces suppressions DOIVENT être effectuées avant la suppression de la montre elle-même
+      // si les clés étrangères n'ont pas de CASCADE DELETE configuré sur la BDD.
+      // Assurez-vous que l'utilisateur a les permissions RLS appropriées pour ces tables.
+      await supabase.from('watch_service_history').delete().eq('watch_id', watchId);
+      await supabase.from('documents').delete().eq('watch_id', watchId);
+      await supabase.from('invoice_items').delete().eq('watch_id', watchId); // Si invoice_items peut lier directement à watch_id
+
       if (photosToDelete && photosToDelete.length > 0) {
         const photoPaths = photosToDelete.map(p => p.storage_path);
         const { error: storageError } = await supabase.storage
@@ -217,7 +224,7 @@ const MyCollectionPage: React.FC = () => {
     );
   }
 
-  if (loadingWatches && !error && watches.length === 0 && user) { // Ajout de user pour éviter le flash si déconnecté
+  if (loadingWatches && !error && watches.length === 0 && user) {
     return (
       <div className={styles.pageStateContainer}>
         <p>Chargement de votre collection...</p>
@@ -240,7 +247,6 @@ const MyCollectionPage: React.FC = () => {
         <h1 className={styles.pageTitle}>Ma Collection</h1>
       </header>
 
-      {/* Le bouton est en dehors du header, comme modifié pour le mobile */}
       <Link to="/ajouter-montre" className={styles.addWatchButton}>
         Ajouter une Montre
       </Link>
@@ -265,7 +271,7 @@ const MyCollectionPage: React.FC = () => {
       )}
 
 
-      {watches.length === 0 && !loadingWatches && user ? ( // Ajout de user pour un message pertinent
+      {watches.length === 0 && !loadingWatches && user ? (
         <div className={styles.emptyCollection}>
           <p>Votre collection est actuellement vide.</p>
           <p>Commencez par <Link to="/ajouter-montre">ajouter votre première pièce</Link> !</p>
@@ -277,19 +283,21 @@ const MyCollectionPage: React.FC = () => {
               const isCurrentlyDeleting = deletingWatchId === watch.id;
               return (
                 <div key={watch.id} className={styles.watchCard}>
-                  {watch.status === 'for_sale' && (
+                  {/* MODIFICATION ICI : Utiliser watch.current_status universel */}
+                  {watch.current_status === 'for_sale' && (
                     <div className={styles.cardStatusIndicatorSale} title={watch.sale_price ? `À vendre : ${watch.sale_price.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}` : 'À vendre'}>
                       💰 {watch.sale_price ? `${watch.sale_price.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR', minimumFractionDigits:0, maximumFractionDigits:0 })}` : ''}
                     </div>
                   )}
-                  {watch.status === 'for_trade' && (
+                  {/* MODIFICATION ICI : Utiliser watch.current_status universel */}
+                  {watch.current_status === 'for_exchange' && (
                     <div className={styles.cardStatusIndicatorTrade} title="À échanger">
                       🔄 À échanger
                     </div>
                   )}
 
                   <button
-                    onClick={() => { // Correction : 'e' supprimé car non utilisé
+                    onClick={() => {
                       handleDeleteWatch(watch.id, watch.photos);
                     }}
                     className={styles.deleteWatchButtonCard}

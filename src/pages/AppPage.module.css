@@ -190,15 +190,17 @@
 }
 
 .detailedFeatureTitle { /* S'il s'agit d'un H3, il héritera */
-  font-family: var(--font-headings-section);
-  font-style: italic;
-  font-weight: var(--font-weight-semibold); /* Libre Bodoni SemiBold Italic */
+
   font-size: clamp(1.6rem, 3.5vw, 2.3rem);
-  color: var(--brand-grey-text);
-  margin-bottom: 20px;
-  line-height: 1.25;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  font-family: var(--font-headings-primary);
+  font-style: italic;
+  font-weight: var(--font-weight-bold);
+  color: var(--brand-black); /* Titre principal en noir pour impact maximal */
+  margin: 0;
+  line-height: 0.9;
+  letter-spacing: -0.03em;
+  padding: clamp(10px, 2vh, 20px) 0;
+
 }
 .detailedFeatureTitle::after {
   display: none;

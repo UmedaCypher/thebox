@@ -1,11 +1,10 @@
 // client/src/pages/UserProfilePage.tsx
 import { useState, useEffect } from 'react';
-// CORRECTION: FC et FormEvent sont utilisés, donc ils restent.
 import type { FC, ChangeEvent, FormEvent } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from '../contexts/AuthContext';
-import styles from './UserProfilePage.module.css'; // Assurez-vous que le chemin est correct
+import styles from './UserProfilePage.module.css';
 
 interface ProfileData {
   id: string;
@@ -21,9 +20,11 @@ interface ProfileData {
   updated_at: string | null;
   created_at?: string;
   allow_private_messages?: boolean;
+  // MODIFICATION ICI : Ajout de 'account_type'
+  account_type?: 'free' | 'pro_basic' | 'pro_premium' | 'admin' | null;
 }
 
-type ProfileSection = 'info' | 'security' | 'data' | 'support';
+type ProfileSection = 'info' | 'security' | 'data' | 'support' | 'account_status'; // Ajout d'une section pour le statut du compte
 
 const generateWristSizeOptions = (start: number, end: number, step: number): { value: string; label: string }[] => {
   const options: { value: string; label: string }[] = [{ value: '', label: 'Sélectionnez...' }];
@@ -50,7 +51,6 @@ const timeZoneOptions = [
   { value: 'Asia/Tokyo', label: 'Asia/Tokyo' },
 ];
 
-// CORRECTION: Le composant est typé avec FC
 const UserProfilePage: FC = () => {
   const { user, loading: authLoading, refreshUser } = useAuth();
   const navigate = useNavigate();
@@ -69,6 +69,8 @@ const UserProfilePage: FC = () => {
   const [preferredLanguageInput, setPreferredLanguageInput] = useState('');
   const [timeZoneInput, setTimeZoneInput] = useState('');
   const [allowPrivateMessagesInput, setAllowPrivateMessagesInput] = useState(true);
+  // MODIFICATION ICI : État pour le type de compte
+  const [accountType, setAccountType] = useState<'free' | 'pro_basic' | 'pro_premium' | 'admin' | null>(null);
 
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
@@ -93,9 +95,10 @@ const UserProfilePage: FC = () => {
       setError(null);
       setSuccessMessage(null);
       try {
-        const { data: profileResult, error: profileError } = await supabase // Renommé 'data' en 'profileResult' pour éviter conflit si 'data' est réutilisé
+        const { data: profileResult, error: profileError } = await supabase
           .from('profiles')
-          .select('*')
+          // MODIFICATION ICI : Sélectionner 'account_type'
+          .select('*, account_type') 
           .eq('id', user.id)
           .single();
 
@@ -116,6 +119,7 @@ const UserProfilePage: FC = () => {
               updated_at: null,
               created_at: user.created_at,
               allow_private_messages: true,
+              account_type: 'free', // MODIFICATION ICI : Définir le type de compte par défaut
             };
             setProfileData(defaultProfile);
             setFullNameInput(defaultProfile.full_name || '');
@@ -127,10 +131,11 @@ const UserProfilePage: FC = () => {
             setTimeZoneInput(defaultProfile.time_zone || 'Europe/Paris');
             setAvatarPreview(defaultProfile.profile_picture_url);
             setAllowPrivateMessagesInput(defaultProfile.allow_private_messages ?? true);
+            setAccountType(defaultProfile.account_type); // MODIFICATION ICI : Initialiser l'état du type de compte
           } else {
             throw profileError;
           }
-        } else if (profileResult) { // Utilisation de profileResult
+        } else if (profileResult) {
           setProfileData(profileResult);
           setFullNameInput(profileResult.full_name || '');
           setUsernameInput(profileResult.username || '');
@@ -141,6 +146,7 @@ const UserProfilePage: FC = () => {
           setTimeZoneInput(profileResult.time_zone || '');
           setAvatarPreview(profileResult.profile_picture_url);
           setAllowPrivateMessagesInput(profileResult.allow_private_messages ?? true);
+          setAccountType(profileResult.account_type || 'free'); // MODIFICATION ICI : Initialiser l'état du type de compte
         }
       } catch (err: any) {
         console.error("Erreur lors de la récupération du profil:", err);
@@ -153,8 +159,7 @@ const UserProfilePage: FC = () => {
     if (user && user.id && !authLoading) {
       fetchProfileData();
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, authLoading]); // navigate n'est pas nécessaire ici si fetchProfileData ne l'utilise pas directement
+  }, [user, authLoading]);
 
   const handleAvatarChange = (event: ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
@@ -183,7 +188,6 @@ const UserProfilePage: FC = () => {
     }
   };
 
-  // CORRECTION: event est typé avec FormEvent
   const handleUpdateProfile = async (event: FormEvent) => {
     event.preventDefault();
     if (!user) return;
@@ -209,7 +213,7 @@ const UserProfilePage: FC = () => {
         return;
       }
 
-      const { data: urlDataResult } = supabase.storage // Renommé 'data' en 'urlDataResult'
+      const { data: urlDataResult } = supabase.storage
         .from('avatars')
         .getPublicUrl(filePath);
       newAvatarUrl = urlDataResult?.publicUrl ? `${urlDataResult.publicUrl}?t=${new Date().getTime()}` : null;
@@ -226,11 +230,13 @@ const UserProfilePage: FC = () => {
       profile_picture_url: newAvatarUrl,
       updated_at: new Date().toISOString(),
       allow_private_messages: allowPrivateMessagesInput,
+      // MODIFICATION ICI : Ne pas permettre de changer account_type via ce formulaire standard
+      // account_type: accountType, // Ne pas inclure ici, la gestion des plans est séparée
     };
 
     const query = (profileData && profileData.created_at)
       ? supabase.from('profiles').update(updates).eq('id', user.id)
-      : supabase.from('profiles').insert({ ...updates, id: user.id, theme_preference: profileData?.theme_preference || 'system' });
+      : supabase.from('profiles').insert({ ...updates, id: user.id, theme_preference: profileData?.theme_preference || 'system', account_type: 'free' }); // S'assurer que le type de compte par défaut est défini à la création
 
     const { error: updateError } = await query;
 
@@ -245,7 +251,7 @@ const UserProfilePage: FC = () => {
     } else {
       console.log("Profil mis à jour/créé avec succès !");
       setProfileData(prev => ({
-        ...(prev || { id: user.id, created_at: user.created_at, theme_preference: 'system' } as ProfileData),
+        ...(prev || { id: user.id, created_at: user.created_at, theme_preference: 'system', account_type: 'free' } as ProfileData),
         ...updates
       }));
       setAvatarFile(null);
@@ -269,7 +275,6 @@ const UserProfilePage: FC = () => {
     setSuccessMessage(null);
     setIsSendingEmail(true);
 
-    // CORRECTION: 'data' est préfixé par '_' car non utilisé.
     const { data: _emailUpdateData, error: emailChangeError } = await supabase.auth.updateUser({ email: newEmail });
 
     setIsSendingEmail(false);
@@ -336,7 +341,6 @@ const UserProfilePage: FC = () => {
   const handleDeleteAccount = async () => {
     setError(null);
     setSuccessMessage(null);
-    // Remplacer window.confirm et window.prompt par des modales personnalisées si possible
     if (window.confirm("Êtes-vous absolument sûr de vouloir supprimer votre compte ? Toutes vos données (collection, profil, etc.) seront définitivement perdues. Cette action est irréversible.")) {
       const confirmationText = window.prompt("Pour confirmer, veuillez taper 'SUPPRIMER MON COMPTE' ci-dessous :");
       if (confirmationText === "SUPPRIMER MON COMPTE") {
@@ -584,6 +588,29 @@ const UserProfilePage: FC = () => {
             <p><Link to="/conditions-generales" className={styles.inlineLink}>Conditions Générales d'Utilisation</Link></p>
           </section>
         );
+      case 'account_status': // Nouvelle section pour le statut du compte
+        return (
+          <section className={styles.profileContentSection}>
+            <h2 className={styles.sectionTitle}>Statut du Compte</h2>
+            {profileData && (
+              <div className={styles.accountStatusInfo}>
+                <p>Votre statut de compte actuel est : **{accountType?.toUpperCase() || 'FREE'}**.</p>
+                {accountType === 'free' && (
+                  <>
+                    <p>Passez au compte professionnel pour débloquer des fonctionnalités avancées de gestion de stock, de CRM et d'analyse de marché.</p>
+                    {/* Placeholder pour un bouton de mise à niveau */}
+                    <button className={styles.actionButton} onClick={() => alert("Fonctionnalité de mise à niveau à implémenter prochainement !")}>
+                      Passer au compte Professionnel
+                    </button>
+                  </>
+                )}
+                {(accountType === 'pro_basic' || accountType === 'pro_premium') && (
+                  <p>Vous avez accès aux outils professionnels.</p>
+                )}
+              </div>
+            )}
+          </section>
+        );
       case 'support':
         return (
           <section className={styles.profileContentSection}>
@@ -623,6 +650,13 @@ const UserProfilePage: FC = () => {
             className={`${styles.navButton} ${activeSection === 'data' ? styles.navButtonActive : ''}`}
           >
             Données & Confidentialité
+          </button>
+          {/* MODIFICATION ICI : Ajout du bouton pour la section Statut du Compte */}
+          <button
+            onClick={() => setActiveSection('account_status')}
+            className={`${styles.navButton} ${activeSection === 'account_status' ? styles.navButtonActive : ''}`}
+          >
+            Statut du Compte
           </button>
           <button
             onClick={() => setActiveSection('support')}

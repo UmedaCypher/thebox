@@ -1,7 +1,7 @@
 // client/src/components/Footer/Footer.tsx
-import React from 'react'; // React doit être importé pour utiliser React.FC et React.ReactElement
+import React from 'react';
 import { Link } from 'react-router-dom';
-import styles from './Footer.module.css'; // Assurez-vous que le nom du fichier CSS est correct
+import styles from './Footer.module.css';
 
 interface FooterLinkItem {
   label: string;
@@ -10,7 +10,7 @@ interface FooterLinkItem {
 
 const Footer: React.FC = () => {
   const currentYear: number = new Date().getFullYear();
-  const appName: string = "THE BOX"; // Harmonisation du nom de l'application
+  const appName: string = "THE BOX";
 
   const navLinks: FooterLinkItem[] = [
     { label: 'Accueil', path: '/' },
@@ -20,6 +20,8 @@ const Footer: React.FC = () => {
   ];
 
   const accountLinks: FooterLinkItem[] = [
+    // MODIFICATION : Ajout du lien vers le tableau de bord
+    { label: 'Tableau de Bord', path: '/pro-dashboard' },
     { label: 'Mon Compte', path: '/profil' },
     { label: 'Ajouter une Montre', path: '/ajouter-montre' },
     { label: 'Ma Collection', path: '/ma-collection' },
@@ -39,7 +41,6 @@ const Footer: React.FC = () => {
     { label: 'Mentions Légales', path: '/mentions-legales' },
   ];
 
-  // CORRECTION: Changement de JSX.Element à React.ReactElement
   const renderLinkList = (links: FooterLinkItem[]): React.ReactElement => (
     <ul>
       {links.map((link: FooterLinkItem) => (
@@ -52,13 +53,12 @@ const Footer: React.FC = () => {
 
   return (
     <footer className={styles.footer}>
-      <div className={styles.contentWrapper}> {/* Conteneur général pour la largeur max */}
-        <div className={styles.mainSection}> {/* Logo et grille de liens */}
+      <div className={styles.contentWrapper}>
+        <div className={styles.mainSection}>
           <div className={styles.logoContainer}>
             <Link to="/" className={styles.logoText}>THE BOX</Link>
-            {/* <p className={styles.logoTagline}>Votre écrin numérique.</p> */}
           </div>
-          <nav className={styles.linksNav}> {/* Grille de liens encapsulée dans nav */}
+          <nav className={styles.linksNav}>
             <div className={styles.linkColumn}>
               <h4>Navigation</h4>
               {renderLinkList(navLinks)}
@@ -78,7 +78,7 @@ const Footer: React.FC = () => {
           </nav>
         </div>
 
-        <div className={styles.bottomBar}> {/* Copyright et branding MAHE */}
+        <div className={styles.bottomBar}>
           <p className={styles.copyright}>
             &copy; {currentYear} {appName}. Tous droits réservés.
           </p>

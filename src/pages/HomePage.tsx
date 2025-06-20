@@ -36,21 +36,9 @@ const HomePage: React.FC = () => {
     <div className={styles.homePage}>
       {/* Section Hero principale (Nouveau Design) */}
       <section className={styles.heroSectionNew}> {/* Renommé pour éviter conflit avec ancien .heroSection */}
-        <div className={styles.heroImageGridTop}>
-          {placeholderHeroWatches.slice(0, 5).map(watch => (
-            <div key={watch.id} className={styles.heroWatchImageContainer}>
-              <img src={watch.imageUrl} alt={watch.alt} />
-            </div>
-          ))}
-        </div>
-        <h1 className={styles.heroTitle}>THE BOX</h1>
-        <div className={styles.heroImageGridBottom}>
-          {placeholderHeroWatches.slice(5, 10).map(watch => (
-            <div key={watch.id} className={styles.heroWatchImageContainer}>
-              <img src={watch.imageUrl} alt={watch.alt} />
-            </div>
-          ))}
-        </div>
+        
+        
+       
         
         <div className={styles.heroSloganContainer}>
           <h2 className={styles.heroSubtitle}>L'ÉCRIN NUMÉRIQUE DE<br/>VOTRE PASSION</h2>
@@ -62,6 +50,15 @@ const HomePage: React.FC = () => {
             Découvrir l'expérience
           </Link>
         </div>
+
+         <div className={styles.heroImageGridBottom}>
+          {placeholderHeroWatches.slice(5, 10).map(watch => (
+            <div key={watch.id} className={styles.heroWatchImageContainer}>
+              <img src={watch.imageUrl} alt={watch.alt} />
+            </div>
+          ))}
+        </div>
+
       </section>
 
       {/* Section Compteurs (Ancienne section, à styliser) */}

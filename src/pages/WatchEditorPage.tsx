@@ -29,8 +29,8 @@ export interface WatchFormData {
   purchase_location: string | null;
   current_estimated_value: number | '' | null;
   last_service_date?: string | null;
-  // Ajouts pour le statut de la montre
-  status: 'for_sale' | 'for_trade' | '' | null;
+  // MODIFICATION ICI : Statuts 'for_sale' et 'for_exchange' sont universels
+  current_status: 'in_collection' | 'for_sale' | 'for_exchange' | 'consignment' | 'in_repair' | 'for_expertise' | 'sold_by_pro' | 'purchased_by_pro' | 'returned' | null;
   sale_price: number | '' | null;
 }
 
@@ -79,10 +79,9 @@ const WatchEditorPage: React.FC = () => {
   const [currentEstimatedValue, setCurrentEstimatedValue] = useState<number | ''>('');
   const [lastServiceDate, setLastServiceDate] = useState<string | null>('');
 
-  // Nouveaux états pour le statut et le prix de vente
-  const [status, setStatus] = useState<'for_sale' | 'for_trade' | '' | null>('');
+  // MODIFICATION ICI : Statuts 'for_sale' et 'for_exchange' sont universels
+  const [currentStatus, setCurrentStatus] = useState<'in_collection' | 'for_sale' | 'for_exchange' | 'consignment' | 'in_repair' | 'for_expertise' | 'sold_by_pro' | 'purchased_by_pro' | 'returned' | null>(null);
   const [salePrice, setSalePrice] = useState<number | ''>('');
-
 
   const [watchOnlyFile, setWatchOnlyFile] = useState<UploadableFile | null>(null);
   const [wristShotFile, setWristShotFile] = useState<UploadableFile | null>(null);
@@ -99,11 +98,46 @@ const WatchEditorPage: React.FC = () => {
   const [formError, setFormError] = useState<string | null>(null);
   const [formSuccessMessage, setFormSuccessMessage] = useState<string | null>(null);
 
+  // NOUVEL ÉTAT pour le type de compte du profil
+  const [userAccountType, setUserAccountType] = useState<'free' | 'pro_basic' | 'pro_premium' | 'admin' | null>(null);
+
+
   useEffect(() => {
     if (!authLoading && !user) {
       navigate('/login');
     }
   }, [user, authLoading, navigate]);
+
+  // NOUVEAU useEffect pour récupérer le type de compte
+  useEffect(() => {
+    const fetchUserAccountType = async () => {
+      if (user) {
+        try {
+          const { data: profileData, error: profileError } = await supabase
+            .from('profiles')
+            .select('account_type')
+            .eq('id', user.id)
+            .single();
+
+          if (profileError) {
+            console.error("Error fetching profile account type:", profileError);
+            setUserAccountType('free'); // Fallback to free if error or not found
+          } else if (profileData) {
+            setUserAccountType(profileData.account_type);
+          } else {
+            setUserAccountType('free'); // Default if no profile found
+          }
+        } catch (err) {
+          console.error("Unexpected error fetching account type:", err);
+          setUserAccountType('free');
+        }
+      }
+    };
+    if (!authLoading) { // Fetch only after auth status is known
+      fetchUserAccountType();
+    }
+  }, [user, authLoading]);
+
 
   useEffect(() => {
     if (isEditMode && user && watchId) {
@@ -112,7 +146,7 @@ const WatchEditorPage: React.FC = () => {
         try {
           const { data, error } = await supabase
             .from('watches')
-            .select('*') // Assurez-vous que status et sale_price sont bien récupérés
+            .select('*') 
             .eq('id', watchId)
             .eq('user_id', user.id)
             .single();
@@ -143,9 +177,8 @@ const WatchEditorPage: React.FC = () => {
             setLugWidthMm(String(data.lug_width_mm || ''));
             setBoxPapersStatus(data.box_papers_status || '');
             setLastServiceDate(data.last_service_date || '');
-            // Initialiser le statut et le prix de vente
-            setStatus(data.status || ''); // data.status doit correspondre au nom de la colonne
-            setSalePrice(data.sale_price === null ? '' : data.sale_price); // data.sale_price doit correspondre
+            setCurrentStatus(data.current_status || null); 
+            setSalePrice(data.sale_price === null ? '' : data.sale_price); 
           } else if (!error) {
             setFormError("Aucune donnée trouvée pour cette montre ou accès non autorisé.");
           }
@@ -165,8 +198,7 @@ const WatchEditorPage: React.FC = () => {
         setCurrentEstimatedValue(''); setBraceletType(''); setCondition('');
         setLugToLugMm(''); setLugWidthMm(''); setBoxPapersStatus('');
         setLastServiceDate('');
-        // Réinitialiser statut et prix
-        setStatus('');
+        setCurrentStatus(null);
         setSalePrice('');
         setWatchOnlyFile(null); setWristShotFile(null);
         setPageLoading(false);
@@ -266,13 +298,11 @@ const WatchEditorPage: React.FC = () => {
       purchase_price: purchasePrice, purchase_date: purchaseDate, purchase_location: purchaseLocation,
       current_estimated_value: currentEstimatedValue,
       last_service_date: lastServiceDate,
-      // Inclure statut et prix de vente
-      status: status,
+      current_status: currentStatus, 
       sale_price: salePrice,
     };
 
     const watchDataForDb = {
-      // Ne pas inclure directement currentFormData ici pour éviter des champs non désirés si l'interface évolue différemment
       user_id: user.id,
       brand: currentFormData.brand,
       model: currentFormData.model,
@@ -294,9 +324,9 @@ const WatchEditorPage: React.FC = () => {
       lug_width_mm: currentFormData.lug_width_mm === '' || currentFormData.lug_width_mm === null ? null : parseFloat(currentFormData.lug_width_mm),
       box_papers_status: currentFormData.box_papers_status,
       last_service_date: currentFormData.last_service_date === '' ? null : currentFormData.last_service_date,
-      // Préparer statut et prix de vente pour la BDD
-      status: currentFormData.status === '' ? null : currentFormData.status,
-      sale_price: currentFormData.status === 'for_sale' && currentFormData.sale_price !== '' && currentFormData.sale_price !== null ? Number(currentFormData.sale_price) : null,
+      current_status: currentFormData.current_status, 
+      // MODIFICATION ICI : La condition pour sale_price est simplifiée à 'for_sale'
+      sale_price: currentFormData.current_status === 'for_sale' && currentFormData.sale_price !== '' && currentFormData.sale_price !== null ? Number(currentFormData.sale_price) : null,
     };
 
     try {
@@ -317,7 +347,7 @@ const WatchEditorPage: React.FC = () => {
       } else {
         const { data: watchInsertData, error: insertError } = await supabase
           .from('watches')
-          .insert([{ ...watchDataForDb }]) // Mettre l'objet dans un tableau
+          .insert([{ ...watchDataForDb }]) 
           .select()
           .single();
 
@@ -354,8 +384,8 @@ const WatchEditorPage: React.FC = () => {
         setCurrentEstimatedValue(''); setBraceletType(''); setCondition('');
         setLugToLugMm(''); setLugWidthMm(''); setBoxPapersStatus('');
         setLastServiceDate('');
-        setStatus(''); // Réinitialiser
-        setSalePrice(''); // Réinitialiser
+        setCurrentStatus(null); 
+        setSalePrice('');
         removeWatchOnlyFile();
         removeWristShotFile();
       } else if (currentWatchIdForOp) {
@@ -375,9 +405,35 @@ const WatchEditorPage: React.FC = () => {
     return <div className={styles.pageLoading}>Chargement...</div>;
   }
 
-  if (isEditMode && watchId && formError && !brand) { // Si erreur de chargement et pas de données
+  if (isEditMode && watchId && formError && !brand) {
      return <div className={styles.pageContainer}><p className={styles.errorMessage}>{formError}</p></div>;
   }
+
+  // Fonction pour obtenir les options de statut en fonction du type de compte
+  const getStatusOptions = () => {
+    // Statuts de base, toujours disponibles pour tous
+    const baseOptions = [
+      { value: 'in_collection', label: 'Collection privée (aucun statut spécial)' },
+      { value: 'for_sale', label: 'À vendre' },
+      { value: 'for_exchange', label: 'À échanger' },
+    ];
+
+    // Si l'utilisateur est un compte Pro ou Admin, ajoutez les statuts professionnels
+    if (userAccountType === 'pro_basic' || userAccountType === 'pro_premium' || userAccountType === 'admin') {
+      return [
+        ...baseOptions, // On garde les statuts de base
+        { value: 'consignment', label: 'En dépôt-vente (Pro)' },
+        { value: 'in_repair', label: 'En réparation (Pro)' },
+        { value: 'for_expertise', label: 'En expertise (Pro)' },
+        { value: 'purchased_by_pro', label: 'Achetée (en stock Pro)' },
+        { value: 'sold_by_pro', label: 'Vendue (par le Pro)' },
+        { value: 'returned', label: 'Retournée (client Pro)' },
+        // Ajoutez d'autres statuts pro si nécessaire
+      ];
+    }
+    // Pour les utilisateurs 'free' ou si le type de compte n'est pas encore chargé
+    return baseOptions;
+  };
 
   return (
     <div className={styles.pageContainer}>
@@ -509,29 +565,32 @@ const WatchEditorPage: React.FC = () => {
                 disabled={isSubmitting}
               />
             </div>
-             {/* Champ pour le statut de la montre */}
+             {/* MODIFICATION ICI : Champ pour le statut de la montre avec les options dynamiques */}
             <div className={styles.inputGroup}>
-                <label htmlFor="status" className={styles.inputLabel}>Statut de la montre :</label>
+                <label htmlFor="current_status" className={styles.inputLabel}>Statut de la montre :</label>
                 <select
-                    id="status"
-                    value={status ?? ''}
+                    id="current_status"
+                    value={currentStatus ?? ''}
                     onChange={(e) => {
-                        const newStatus = e.target.value as 'for_sale' | 'for_trade' | '';
-                        setStatus(newStatus);
+                        const newStatus = e.target.value as WatchFormData['current_status'];
+                        setCurrentStatus(newStatus === '' ? null : newStatus);
+                        // Réinitialiser le prix si le statut n'est plus 'for_sale'
                         if (newStatus !== 'for_sale') {
-                            setSalePrice(''); // Réinitialiser le prix si pas "à vendre"
+                            setSalePrice('');
                         }
                     }}
                     className={styles.selectField}
                     disabled={isSubmitting}
                 >
-                    <option value="">Aucun (collection privée)</option>
-                    <option value="for_sale">À vendre</option>
-                    <option value="for_trade">À échanger</option>
+                    {getStatusOptions().map(option => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
                 </select>
             </div>
-            {/* Champ conditionnel pour le prix de vente */}
-            {status === 'for_sale' && (
+            {/* MODIFICATION ICI : Champ conditionnel pour le prix de vente basé sur le statut 'for_sale' */}
+            {currentStatus === 'for_sale' && (
                 <div className={styles.inputGroup}>
                     <label htmlFor="salePrice" className={styles.inputLabel}>Prix de vente (€) (optionnel) :</label>
                     <input
