@@ -1,21 +1,34 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+// client/src/pages/ProDashboardPage.tsx
+import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabaseClient';
 import {
   DollarSign, Users, Package, Wrench, FileText,
-  TrendingUp, Mail, PlusCircle, Search, MapPin
-} from 'lucide-react';
+  TrendingUp, Mail, PlusCircle, Search, MapPin, MessageCircle, Clock
+} from 'lucide-react'; // Added MessageCircle and Clock icons
 import styles from './ProDashboardPage.module.css';
 
 interface DashboardStats {
   totalSalesMonth: number;
-  averageMargin: number;
+  averageMargin: number; // Percentage
   watchesForSale: number;
   watchesInRepair: number;
+  watchesInExpertise: number; // Added from hardcoded value
   newClientsMonth: number;
-  unreadMessages: number;
+  unreadMessagesCount: number; // Renamed to avoid conflict, better clarity
   totalInventoryValue: number;
+}
+
+interface UserConversationForDashboard {
+  conversation_id: string;
+  other_user_id: string;
+  other_username: string | null;
+  other_profile_picture_url: string | null;
+  last_message_content: string | null;
+  last_message_created_at: string | null;
+  last_message_sender_id: string | null;
+  is_unread_by_current_user: boolean; // New field to indicate unread status
 }
 
 const ProDashboardPage: React.FC = () => {
@@ -24,70 +37,169 @@ const ProDashboardPage: React.FC = () => {
   const [loadingDashboard, setLoadingDashboard] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [dashboardStats, setDashboardStats] = useState<DashboardStats | null>(null);
+  const [latestMessages, setLatestMessages] = useState<UserConversationForDashboard[]>([]);
   const [userAccountType, setUserAccountType] = useState<'free' | 'pro_basic' | 'pro_premium' | 'admin' | null>(null);
 
-  useEffect(() => {
-    if (!authLoading) {
-      if (!user) {
-        navigate('/login');
+  // Helper to format date for messages
+  const formatMessageDate = (dateString: string | null | undefined) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffTime = Math.abs(now.getTime() - date.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays <= 1) return date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+    if (diffDays <= 7) return date.toLocaleDateString('fr-FR', { weekday: 'short' });
+    return date.toLocaleDateString('fr-FR');
+  };
+
+  const fetchDashboardData = useCallback(async () => {
+    if (!user?.id) return;
+
+    setLoadingDashboard(true);
+    setError(null);
+
+    try {
+      // Fetch profile account type
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('account_type')
+        .eq('id', user.id)
+        .single();
+
+      if (profileError) throw profileError;
+      setUserAccountType(profileData.account_type);
+
+      if (profileData.account_type === 'free') {
+        setError("Accès refusé. Cette page est réservée aux comptes professionnels.");
+        setLoadingDashboard(false);
         return;
       }
-      const fetchAccountType = async () => {
-        try {
-          const { data: profileData, error: profileError } = await supabase
-            .from('profiles')
-            .select('account_type')
-            .eq('id', user.id)
-            .single();
 
-          if (profileError) {
-            setError("Impossible de charger les informations du profil.");
-            setUserAccountType('free');
-          } else if (profileData) {
-            setUserAccountType(profileData.account_type);
-            if (profileData.account_type === 'free') {
-              setError("Accès refusé. Cette page est réservée aux comptes professionnels.");
+      // --- Fetching Dashboard Statistics ---
+
+      // Total Sales (Last 30 Days)
+      const { data: salesData, error: salesError } = await supabase
+        .from('invoices')
+        .select('total_amount')
+        .eq('pro_id', user.id)
+        .eq('status', 'paid') // Assuming 'paid' status based on schema's 'invoice_status_type'
+        .gte('invoice_date', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]); // Last 30 days
+      if (salesError) console.error("Error fetching sales:", salesError);
+      const totalSalesMonth = salesData?.reduce((sum, invoice) => sum + (invoice.total_amount || 0), 0) || 0;
+
+      // Average Margin - Placeholder for more complex calculation
+      // This often requires linking sales (invoice_items) to watch purchase prices.
+      // For a real implementation, you'd calculate this based on sales and purchase prices.
+      // For now, it's a static value or needs a dedicated RPC/view.
+      const averageMargin = 22.5; // Keeping mocked for complexity.
+
+      // Watches For Sale
+      const { count: watchesForSale, error: forSaleError } = await supabase
+        .from('watches')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+        .eq('current_status', 'for_sale'); //
+      if (forSaleError) console.error("Error fetching watches for sale:", forSaleError);
+
+      // Watches In Repair
+      const { count: watchesInRepair, error: inRepairError } = await supabase
+        .from('watches')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+        .eq('current_status', 'in_repair'); //
+      if (inRepairError) console.error("Error fetching watches in repair:", inRepairError);
+
+      // Watches In Expertise (Hardcoded in original, now fetched if status exists)
+      const { count: watchesInExpertise, error: inExpertiseError } = await supabase
+        .from('watches')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+        .eq('current_status', 'for_expertise'); // Assuming 'for_expertise' is a status
+      if (inExpertiseError) console.error("Error fetching watches in expertise:", inExpertiseError);
+
+
+      // New Clients (Last 30 Days)
+      const { count: newClientsMonth, error: clientsError } = await supabase
+        .from('external_clients')
+        .select('*', { count: 'exact', head: true })
+        .eq('pro_id', user.id) //
+        .gte('created_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()); //
+      if (clientsError) console.error("Error fetching new clients:", clientsError);
+
+      // Total Inventory Value
+      const { data: inventoryValueData, error: inventoryError } = await supabase
+        .from('watches')
+        .select('current_estimated_value') //
+        .eq('user_id', user.id) //
+        .in('current_status', ['in_collection', 'for_sale', 'for_exchange', 'consignment']); //
+      if (inventoryError) console.error("Error fetching inventory value:", inventoryError);
+      const totalInventoryValue = inventoryValueData?.reduce((sum, watch) => sum + (watch.current_estimated_value || 0), 0) || 0;
+
+      // --- Fetching Latest Messages ---
+      const { data: conversationsData, error: convError } = await supabase.rpc('get_user_conversations'); //
+      if (convError) console.error("Error fetching conversations for messages:", convError);
+
+      let unreadMessagesCount = 0;
+      const fetchedLatestMessages: UserConversationForDashboard[] = [];
+
+      if (conversationsData) {
+        conversationsData.forEach((conv: any) => {
+            const lastMessageDate = new Date(conv.last_message_created_at || conv.conversation_updated_at); //
+            const lastReadDate = conv.last_read_at ? new Date(conv.last_read_at) : new Date(0); // If never read, assume very old date
+
+            const isUnread = lastMessageDate > lastReadDate && conv.last_message_sender_id !== user.id; //
+            if (isUnread) {
+                unreadMessagesCount++;
             }
-          } else {
-            setError("Profil introuvable. Accès refusé.");
-            setUserAccountType('free');
-          }
-        } catch (err: any) {
-          setError(err.message || "Une erreur inattendue est survenue.");
-          setUserAccountType('free');
-        } finally {
-          setLoadingDashboard(false);
-        }
-      };
-      fetchAccountType();
-    }
-  }, [user, authLoading, navigate]);
 
-  useEffect(() => {
-    if (userAccountType && ['pro_basic', 'pro_premium', 'admin'].includes(userAccountType)) {
-      setLoadingDashboard(true);
-      const timer = setTimeout(() => {
-        setDashboardStats({
-          totalSalesMonth: 12500,
-          averageMargin: 22.5,
-          watchesForSale: 15,
-          watchesInRepair: 3,
-          newClientsMonth: 7,
-          unreadMessages: 2,
-          totalInventoryValue: 150000,
+            fetchedLatestMessages.push({
+                conversation_id: conv.conversation_id,
+                other_user_id: conv.other_user_id,
+                other_username: conv.other_username,
+                other_profile_picture_url: conv.other_profile_picture_url,
+                last_message_content: conv.last_message_content,
+                last_message_created_at: conv.last_message_created_at,
+                last_message_sender_id: conv.last_message_sender_id,
+                is_unread_by_current_user: isUnread,
+            });
         });
-        setLoadingDashboard(false);
-      }, 500);
-      return () => clearTimeout(timer);
-    } else if (userAccountType === 'free') {
+        // Sort messages by last message date, newest first
+        fetchedLatestMessages.sort((a, b) => new Date(b.last_message_created_at || '').getTime() - new Date(a.last_message_created_at || '').getTime());
+        setLatestMessages(fetchedLatestMessages.slice(0, 5)); // Show only top 5 latest messages
+      }
+
+      setDashboardStats({
+        totalSalesMonth,
+        averageMargin,
+        watchesForSale: watchesForSale || 0,
+        watchesInRepair: watchesInRepair || 0,
+        watchesInExpertise: watchesInExpertise || 0,
+        newClientsMonth: newClientsMonth || 0,
+        unreadMessagesCount,
+        totalInventoryValue,
+      });
+
+    } catch (err: any) {
+      console.error("Error fetching dashboard data:", err);
+      setError(err.message || "Impossible de charger les données du tableau de bord.");
+    } finally {
       setLoadingDashboard(false);
     }
-  }, [userAccountType]);
+  }, [user]); // Depend on user to refetch when user changes
+
+  useEffect(() => {
+    if (!authLoading && user) {
+      fetchDashboardData();
+    } else if (!authLoading && !user) {
+      navigate('/login');
+    }
+  }, [user, authLoading, navigate, fetchDashboardData]);
 
   if (authLoading || loadingDashboard) {
     return <div className="flex items-center justify-center min-h-screen">Chargement...</div>;
   }
-  if (error) {
+  if (error && userAccountType !== 'free') { // Show error if not a free account but something went wrong
     return <div className="flex items-center justify-center min-h-screen p-4 text-red-700">{error}</div>;
   }
   if (userAccountType === 'free') {
@@ -133,7 +245,7 @@ const ProDashboardPage: React.FC = () => {
           </div>
           <div className={`${styles['bento-card']} ${styles['accent-black']} items-center text-center`}>
             <p className={styles['kpi-label']}>Messages non lus</p>
-            <p className={styles['kpi-value']}>{dashboardStats?.unreadMessages}</p>
+            <p className={styles['kpi-value']}>{dashboardStats?.unreadMessagesCount}</p>
           </div>
         </div>
 
@@ -182,7 +294,7 @@ const ProDashboardPage: React.FC = () => {
                   En expertise
                 </div>
                 <span className="font-bold" style={{ color: 'var(--text-primary)' }}>
-                  2
+                  {dashboardStats?.watchesInExpertise} {/* Now dynamic */}
                 </span>
               </li>
             </ul>
@@ -192,24 +304,64 @@ const ProDashboardPage: React.FC = () => {
           <div className={styles['bento-card']}>
             <h2 className={styles['card-title']}>Actions Rapides</h2>
             <div className="flex flex-col space-y-3 my-auto">
-              <button className={styles['action-button']}>
+              <button onClick={() => navigate('/ajouter-montre')} className={`${styles['action-button']} bg-blue-500 hover:bg-blue-600`}>
                 <PlusCircle className="mr-2" size={18} />
                 Ajouter une montre
               </button>
-              <button className={styles['action-button']}>
+              <button onClick={() => navigate('/creer-facture')} className={`${styles['action-button']} bg-green-500 hover:bg-green-600`}>
                 <FileText className="mr-2" size={18} />
                 Créer une facture
               </button>
-              <button className={styles['action-button']}>
-                <Search className="mr-2" size={18} />
-                Recherche de prix
+             <button onClick={() => navigate('/marche')} className={`${styles['action-button']} bg-purple-500 hover:bg-purple-600`}>
+             <TrendingUp className="mr-2" size={18} />
+             Recherche de prix
               </button>
-              <button className={styles['action-button']}>
+              <button onClick={() => navigate('/gerer-lieux')} className={`${styles['action-button']} bg-orange-500 hover:bg-orange-600`}>
                 <MapPin className="mr-2" size={18} />
                 Gérer les lieux
               </button>
+              <button onClick={() => navigate('/clients')} className={`${styles['action-button']} bg-green-500 hover:bg-green-600`}>
+                <Users className="mr-2" size={18} />
+                  Gérer mes clients
+              </button>
             </div>
           </div>
+           {/* Section Derniers Messages Reçus */}
+           <div className={`${styles['bento-card']} ${styles['full-width-card']}`}> {/* Added a new style for wider card */}
+            <h2 className={styles['card-title']}>Derniers Messages</h2>
+            {latestMessages.length === 0 ? (
+                <p className="text-gray-500 italic">Aucun nouveau message pour le moment.</p>
+            ) : (
+                <ul className={styles['card-list']}>
+                {latestMessages.map(conv => (
+                    <li key={conv.conversation_id} className={conv.is_unread_by_current_user ? styles['unread-message-item'] : ''}>
+                        <div className="flex items-center flex-grow">
+                            <img
+                                src={conv.other_profile_picture_url || `https://api.dicebear.com/8.x/initials/svg?seed=${conv.other_username || 'U'}`}
+                                alt={conv.other_username || 'Utilisateur'}
+                                className={styles.messageAvatarSmall}
+                            />
+                            <div className="flex flex-col ml-3">
+                                <Link to={`/messagerie/${conv.conversation_id}`} className="font-semibold text-blue-700 hover:underline">
+                                    {conv.other_username || 'Utilisateur Inconnu'}
+                                </Link>
+                                <span className="text-sm text-gray-600 truncate max-w-[200px] md:max-w-none">
+                                    {conv.last_message_sender_id === user?.id && "Vous : "}
+                                    {conv.last_message_content || "Aucun message."}
+                                </span>
+                            </div>
+                        </div>
+                        <span className="text-xs text-gray-500 ml-2">
+                            {formatMessageDate(conv.last_message_created_at)}
+                        </span>
+                    </li>
+                ))}
+                </ul>
+            )}
+            <div className="text-center mt-4">
+                <Link to="/messagerie" className="text-blue-600 hover:underline">Voir toutes les conversations</Link>
+            </div>
+        </div>
         </div>
       </div>
     </div>

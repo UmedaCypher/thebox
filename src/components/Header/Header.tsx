@@ -108,7 +108,7 @@ function Header() {
             {user && (
               <>
                 {/* MODIFICATION : Ajout du lien vers le tableau de bord pour les utilisateurs connectés */}
-                <li><Link to="/pro-dashboard">Tableau de bord</Link></li>
+                <li><Link to="/dashboard-pro">Tableau de bord</Link></li>
                 <li><Link to="/ma-collection">Ma Collection</Link></li>
                 <li>
                   <Link to="/messagerie" className={styles.navLinkWithIconContainer}>
@@ -180,7 +180,7 @@ function Header() {
                   {user && (
                       <>
                         {/* MODIFICATION : Ajout du lien vers le tableau de bord dans le menu mobile */}
-                        <li className={styles.mobileMenuItemHeaderType}><Link to="/pro-dashboard" onClick={toggleMobileMenu}>Tableau de bord</Link></li>
+                        <li className={styles.mobileMenuItemHeaderType}><Link to="/dashboard-pro" onClick={toggleMobileMenu}>Tableau de bord</Link></li>
                         <li className={styles.mobileMenuItemHeaderType}><Link to="/ma-collection" onClick={toggleMobileMenu}>Ma Collection</Link></li>
                       </>
                   )}

@@ -28,10 +28,10 @@
 
 .sideNav {
   flex: 0 0 220px;
-  background-color: var(--brand-beige-card-bg);
+  background-color: var(--white);
   padding: 20px;
-  border-radius: 8px;
-  border: 1px solid var(--border-color);
+  border-radius: 30px;
+  border: 0px solid var(--border-color);
   align-self: flex-start; /* S'assure qu'il ne s'étire pas en hauteur si contentArea est plus grand */
 }
 
@@ -74,10 +74,10 @@
 }
 
 .profileContentSection {
-  background-color: var(--brand-beige-card-bg);
+  background-color: var(--white);
   padding: clamp(25px, 3.5vw, 35px);
-  border-radius: 8px;
-  border: 1px solid var(--border-color);
+  border-radius: 30px;
+  border: 0px solid var(--border-color);
 }
 
 .sectionTitle {
@@ -376,6 +376,19 @@
   .profileLayout {
     flex-direction: column;
   }
+
+  .profilePageContainer {
+  padding: clamp(20px, 3vh, 50px) clamp(15px, 3vw, 30px);
+}
+
+.pageTitle {
+
+  font-size: clamp(1.4rem, 5.8vw, 2.8rem);
+      margin-bottom: clamp(20px, 5vh, 20px);
+}
+
+
+
   .sideNav {
     flex: 0 0 auto; /* Ne pas grandir, ne pas rétrécir, base sur le contenu */
     width: 100%;
@@ -414,6 +427,10 @@
   .navButton:last-child {
     margin-right: 0; /* Pas de marge à droite pour le dernier bouton */
   }
+
+.navButtonActive {
+  border-radius: 30px;
+}
 
   .contentArea {
     width: 100%;

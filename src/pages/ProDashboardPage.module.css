@@ -168,6 +168,68 @@
   margin-top: 8px;
 }
 
+/* NOUVEAUX STYLES AJOUTÉS POUR LES MESSAGES ET BOUTONS */
+
+/* Nouvelle classe pour une carte plus large si nécessaire */
+.full-width-card {
+  grid-column: 1 / -1; /* Prend toute la largeur de la grille */
+}
+
+.messageAvatarSmall {
+  width: 28px; /* Taille de l'avatar des messages, ajusté */
+  height: 28px; /* Taille de l'avatar des messages, ajusté */
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.unread-message-item {
+  background-color: var(--accent-blue-bg); /* Couleur de fond pour les messages non lus */
+  font-weight: 600;
+  border-left: 5px solid var(--accent-blue-text); /* Barre latérale pour non lu */
+}
+
+.unread-message-item span {
+    color: var(--accent-blue-text); /* Couleur du texte dans les messages non lus */
+}
+
+/* Améliorations visuelles pour les liens dans les messages */
+.card-list li a {
+    text-decoration: none;
+}
+
+.card-list li a:hover {
+    text-decoration: underline;
+}
+
+/* Styles pour les actions rapides (plus visuels) */
+.action-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-weight: 500;
+  color: #fff;
+  border: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+  margin: 8px 0px;
+}
+
+/* Couleurs spécifiques pour les boutons d'action rapide */
+.action-button.bg-blue-500 { background-color: #3b82f6; }
+.action-button.bg-blue-500:hover { background-color: #2563eb; }
+
+.action-button.bg-green-500 { background-color: #22c55e; }
+.action-button.bg-green-500:hover { background-color: #16a34a; }
+
+.action-button.bg-purple-500 { background-color: #a855f7; }
+.action-button.bg-purple-500:hover { background-color: #9333ea; }
+
+.action-button.bg-orange-500 { background-color: #f97316; }
+.action-button.bg-orange-500:hover { background-color: #ea580c; }
+
 
 /* Pour les mobiles */
 @media (max-width: 767px) {
@@ -187,5 +249,8 @@
   .action-button {
     padding: 14px 12px; /* Plus haut pour un meilleur confort tactile */
     font-size: 14px;
+  }
+  .full-width-card {
+      grid-column: auto; /* Annule le full width sur mobile pour un meilleur empilement */
   }
 }

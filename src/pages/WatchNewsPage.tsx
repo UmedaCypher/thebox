@@ -79,8 +79,6 @@ const WatchNewsPage: React.FC = () => {
         year: 'numeric',
         month: 'long',
         day: 'numeric',
-        // hour: '2-digit',
-        // minute: '2-digit',
       });
     } catch (e) {
       return dateString; // Retourner la chaîne originale si le formatage échoue
@@ -88,7 +86,7 @@ const WatchNewsPage: React.FC = () => {
   };
 
   return (
-    <div className={styles.newsPageContainer}>
+    <div className="page-container">
       <header className={styles.pageHeader}>
         <h1 className={styles.pageTitle}>Actualités Horlogères</h1>
         <div className={styles.feedSelectorContainer}>
@@ -108,15 +106,15 @@ const WatchNewsPage: React.FC = () => {
         </div>
       </header>
 
-      {loading && <div className={styles.loadingMessage}>Chargement des actualités...</div>}
-      {error && <div className={`${styles.message} ${styles.errorMessage}`}>Erreur : {error}</div>}
+      {loading && <div className="message-global message-info">Chargement des actualités...</div>}
+      {error && <div className="message-global message-error">Erreur : {error}</div>}
 
       {!loading && !error && newsItems.length === 0 && (
-        <div className={styles.emptyMessage}>Aucune actualité trouvée pour cette source.</div>
+        <div className="message-global message-info">Aucune actualité trouvée pour cette source.</div>
       )}
 
       {!loading && newsItems.length > 0 && (
-        <div className={styles.newsGrid}>
+        <div className="grid-container grid-autofit-300">
           {newsItems.map((item, index) => (
             <a 
               key={item.link || index} 
@@ -131,7 +129,7 @@ const WatchNewsPage: React.FC = () => {
                     src={item.imageUrl} 
                     alt={`Image pour ${item.title}`} 
                     className={styles.cardImage} 
-                    onError={(e) => (e.currentTarget.style.display = 'none')} // Cacher si l'image ne se charge pas
+                    onError={(e) => (e.currentTarget.style.display = 'none')}
                   />
                 </div>
               )}

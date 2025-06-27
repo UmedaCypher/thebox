@@ -1,0 +1,145 @@
+/* client/src/pages/LocationManagerPage.module.css */
+.pageContainer {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 2rem;
+  font-family: sans-serif;
+}
+
+.pageHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid #e0e0e0;
+  padding-bottom: 1rem;
+}
+
+.pageHeader h1 {
+  font-size: 2rem;
+  color: #333;
+}
+
+.primaryButton, .secondaryButton, .editButton, .deleteButton {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.primaryButton {
+  background-color: #007bff;
+  color: white;
+}
+.primaryButton:hover { background-color: #0056b3; }
+
+.secondaryButton {
+  background-color: #f0f0f0;
+  color: #333;
+}
+.secondaryButton:hover { background-color: #d0d0d0; }
+
+.editButton { background-color: #ffc107; color: #333; }
+.editButton:hover { background-color: #d39e00; }
+
+.deleteButton { background-color: #dc3545; color: white; }
+.deleteButton:hover { background-color: #b02a37; }
+
+
+.locationList {
+  list-style: none;
+  padding: 0;
+}
+
+.locationItem {
+  background-color: #f9f9f9;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 1rem 1.5rem;
+  margin-bottom: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.locationName {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.locationAddress {
+  font-size: 1rem;
+  color: #666;
+  margin: 0.25rem 0 0 0;
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* Modal Styles */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modalContent {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 500px;
+}
+
+.modalContent h2 {
+  margin-top: 0;
+}
+
+.formGroup {
+  margin-bottom: 1rem;
+}
+
+.formGroup label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #555;
+}
+
+.formGroup input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.modalActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.pageStateContainer {
+  text-align: center;
+  margin-top: 4rem;
+  font-size: 1.2rem;
+  color: #666;
+}
+
+.error {
+  color: #dc3545;
+}

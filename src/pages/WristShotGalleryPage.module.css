@@ -9,9 +9,9 @@
 }
 
 .pageHeader {
-  margin-bottom: clamp(25px, 4vh, 35px);
+ /* margin-bottom: clamp(25px, 4vh, 35px); */
   padding-bottom: 20px;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 0px solid var(--border-color);
 }
 
 .pageTitle {
@@ -27,15 +27,15 @@
 }
 
 .filtersContainer {
-  background-color: var(--brand-beige-card-bg);
+  background-color: var(--white);
   padding: 20px clamp(15px, 3vw, 30px);
-  border-radius: 8px;
+  border-radius: 30px;
   margin-bottom: 30px;
   display: flex;
   flex-wrap: wrap;
   gap: 20px 30px;
   align-items: flex-end;
-  border: 1px solid var(--border-color);
+  border: 0px solid var(--border-color);
 }
 
 .filterGroup {
@@ -57,9 +57,9 @@
 .filterInput {
   font-family: var(--font-main);
   padding: 10px 14px;
-  border-radius: 4px;
-  border: 1px solid var(--border-color);
-  background-color: var(--white);
+  border-radius: 40px;
+  border: 0px solid var(--border-color);
+  background-color: var(--card-bg);
   color: var(--text-color);
   font-size: 0.9rem;
   width: 100%;
@@ -134,8 +134,8 @@
 
 .photoCard {
   background-color: var(--brand-beige-card-bg);
-  border-radius: 8px;
-  border: 1px solid var(--border-color);
+  border-radius: 30px;
+  border: 0px solid var(--border-color);
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -173,7 +173,7 @@
 .photoInfo {
   padding: 12px 15px;
   text-align: left;
-  background-color: var(--brand-beige-card-bg);
+  background-color: var(--white);
 }
 
 .watchName {
@@ -252,4 +252,12 @@
 .profileLink:hover {
   text-decoration: underline;
   color: var(--secondary-color); /* Ou la couleur de survol de vos liens */
+}
+
+/* Ajustement pour les vues mobiles */
+@media (max-width: 768px) {
+  .pageTitle {
+    /* Nouvelle taille de police pour les écrans plus petits */
+    font-size: clamp(1.4rem, 4.5vw, 2.8rem);
+  }
 }

@@ -59,11 +59,7 @@
   margin-bottom: 40px;
 }
 
-@media (min-width: 768px) {
-  .watchContentGrid {
-    grid-template-columns: 1fr 1.5fr; /* Image à gauche (flex 1), détails à droite (flex 1.5) */
-  }
-}
+
 
 .watchImageSection {
   display: flex;
@@ -126,8 +122,8 @@
 .detailBlock {
   background-color: var(--white);
   padding: 20px 25px;
-  border-radius: 8px;
-  border: 1px solid var(--border-color);
+  border-radius: 30px;
+  border: 0px solid var(--border-color);
 }
 
 .sectionTitle { 
@@ -280,4 +276,16 @@
   background-color: var(--brand-blue, #2196F3); /* Définir --brand-blue ou utiliser une couleur existante */
 }
 
-/* ... (le reste des styles) ... */
+
+
+@media (min-width: 768px) {
+  .watchContentGrid {
+    grid-template-columns: 1fr 1.5fr; /* Image à gauche (flex 1), détails à droite (flex 1.5) */
+  }
+
+  .pageTitle {
+    /* Nouvelle taille de police pour les écrans plus petits */
+    font-size: clamp(1.4rem, 4.5vw, 2.8rem);
+
+}
+}

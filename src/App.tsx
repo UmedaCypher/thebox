@@ -1,10 +1,9 @@
-// client/src/App.tsx (Mis à jour pour utiliser des classes CSS pour le layout)
+// client/src/App.tsx (Mis à jour pour inclure les routes du CRM)
 
-// import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 
 // Styles globaux et de layout
-import './App.css'; // ON IMPORTE NOTRE FICHIER DE LAYOUT MIS À JOUR
+import './App.css'; 
 
 // Composants de layout
 import Header from './components/Header/Header';
@@ -33,9 +32,15 @@ import LegalMentionsPage from './pages/LegalMentionsPage';
 import PressPage from './pages/PressPage';
 import ContactPage from './pages/ContactPage';
 import AboutPage from './pages/AboutPage';
-// Import du nouveau composant Dashboard Professionnel
-// CORRECTION ICI : Le chemin direct vers le fichier dans 'pages'
+
+// Pages Professionnelles
 import ProDashboardPage from './pages/ProDashboardPage'; 
+import LocationManagerPage from './pages/LocationManagerPage';
+import InvoiceEditorPage from './pages/InvoiceEditorPage';
+import MarketplacePage from './pages/MarketplacePage';
+import ClientListPage from './pages/ClientListPage';
+import ClientDetailPage from './pages/ClientDetailPage';
+
 
 // Composant de protection de routes
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
@@ -44,18 +49,12 @@ import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
 function App() {
   return (
     <Router>
-      {/* Le style en ligne a été remplacé par une classe CSS pour la clarté et la maintenance.
-        La logique reste la même : un conteneur flex vertical.
-      */}
       <div className="appContainer">
         <Header />
         
-        {/* La classe "mainContent" gère maintenant le flex-grow et le padding */}
         <main className="mainContent">
           <Routes>
-            {/* --- Toutes vos routes restent identiques --- */}
-            
-            {/* Routes Publiques */}
+            {/* --- Routes Publiques --- */}
             <Route path="/" element={<HomePage />} />
             <Route path="/app-details" element={<AppPage />} />
             <Route path="/pricing" element={<PricingPage />} />
@@ -64,8 +63,10 @@ function App() {
             <Route path="/faq" element={<FaqPage />} />
             <Route path="/actualites" element={<WatchNewsPage />} />
             <Route path="/galerie-poignet" element={<WristShotGalleryPage />} />
+            <Route path="/marche" element={<MarketplacePage />} />
+            <Route path="/profil/:username" element={<PublicProfilePage />} />
 
-            {/* Routes Publiques Statiques */}
+            {/* --- Routes Publiques Statiques (Footer) --- */}
             <Route path="/cgu" element={<CguPage />} />
             <Route path="/cgv" element={<CgvPage />} />
             <Route path="/confidentialite" element={<PrivacyPolicyPage />} />
@@ -74,23 +75,24 @@ function App() {
             <Route path="/contact" element={<ContactPage />} />
             <Route path="/a-propos" element={<AboutPage />} />
 
-            {/* Routes Protégées */}
+            {/* --- Routes Utilisateur Protégées --- */}
             <Route path="/ma-collection" element={<ProtectedRoute><MyCollectionPage /></ProtectedRoute>} />
             <Route path="/montre/:watchId" element={<ProtectedRoute><WatchDetailPage /></ProtectedRoute>} />
             <Route path="/ajouter-montre" element={<ProtectedRoute><WatchEditorPage /></ProtectedRoute>} />
             <Route path="/montre/:watchId/modifier" element={<ProtectedRoute><WatchEditorPage /></ProtectedRoute>} />
             <Route path="/profil" element={<ProtectedRoute><UserProfilePage /></ProtectedRoute>} />
-            <Route path="/profil/:username" element={<PublicProfilePage />} />
-
-            {/* NOUVELLE ROUTE : Dashboard Professionnel */}
-            {/* Protégée, car elle nécessite une authentification et un type de compte spécifique géré à l'intérieur du composant */}
-            <Route path="/dashboard-pro" element={<ProtectedRoute><ProDashboardPage /></ProtectedRoute>} />
-
-            {/* ROUTES POUR LA MESSAGERIE */}
             <Route path="/messagerie" element={<ProtectedRoute><MessagingPage /></ProtectedRoute>} />
             <Route path="/messagerie/nouvelle/:targetUserId" element={<ProtectedRoute><MessagingPage /></ProtectedRoute>} />
+
+            {/* --- Routes Professionnelles (Protégées) --- */}
+            <Route path="/dashboard-pro" element={<ProtectedRoute><ProDashboardPage /></ProtectedRoute>} />
+            <Route path="/gerer-lieux" element={<ProtectedRoute><LocationManagerPage /></ProtectedRoute>} />
+            <Route path="/creer-facture" element={<ProtectedRoute><InvoiceEditorPage /></ProtectedRoute>} />
+            <Route path="/clients" element={<ProtectedRoute><ClientListPage /></ProtectedRoute>} />
+            <Route path="/clients/nouveau" element={<ProtectedRoute><ClientDetailPage /></ProtectedRoute>} />
+            <Route path="/clients/:clientId" element={<ProtectedRoute><ClientDetailPage /></ProtectedRoute>} />
             
-            {/* Page 404 */}
+            {/* --- Page 404 --- */}
             <Route path="*" element={
               <div style={{ textAlign: 'center', padding: '50px' }}>
                 <h2>404 - Page non trouvée</h2>

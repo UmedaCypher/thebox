@@ -1,13 +1,4 @@
 /* client/src/pages/WatchNewsPage/WatchNewsPage.module.css */
-.newsPageContainer {
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: clamp(20px, 4vw, 40px) clamp(15px, 3vw, 30px);
-  box-sizing: border-box;
-  font-family: var(--font-main); /* Changé pour --font-main */
-}
-
 .pageHeader {
   display: flex;
   justify-content: space-between;
@@ -60,27 +51,16 @@
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent-color) 20%, transparent);
 }
 
-/* Utilisation des classes globales pour les messages */
-/* .loadingMessage, .emptyMessage sont remplacés par .message-global.message-info */
-/* .errorMessage est remplacé par .message-global.message-error */
-
-.newsGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: clamp(20px, 3vw, 30px);
-}
-
 .newsCard {
   background-color: var(--white);
-  border-radius: 8px;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.07);
+  border-radius: 30px;
   overflow: hidden;
   text-decoration: none;
   color: var(--text-color);
   display: flex;
   flex-direction: column;
   transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
-  border: 1px solid var(--border-color-light); /* Ajout d'une bordure subtile */
+  border: 0px solid var(--border-color-light); /* Ajout d'une bordure subtile */
 }
 .newsCard:hover {
   transform: translateY(-4px);
@@ -164,4 +144,12 @@
     width: 100%;
     text-align: right;
     margin-top: 5px;
+}
+
+/* Ajustement pour les vues mobiles */
+@media (max-width: 768px) {
+  .pageTitle {
+    /* Nouvelle taille de police pour les écrans plus petits */
+    font-size: clamp(1.4rem, 4.5vw, 2.8rem);
+  }
 }

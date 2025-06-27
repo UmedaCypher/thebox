@@ -1,0 +1,241 @@
+/* client/src/pages/MarketplacePage.module.css */
+
+.marketplacePageContainer {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: clamp(30px, 5vh, 50px) clamp(15px, 3vw, 30px);
+  box-sizing: border-box;
+  font-family: var(--font-main);
+}
+
+.pageHeader {
+  text-align: center;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.pageTitle {
+  font-family: var(--font-headings-primary);
+  font-style: italic;
+  font-weight: var(--font-weight-bold);
+  font-size: clamp(2rem, 4.5vw, 2.8rem);
+  color: var(--brand-grey-text);
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Filters */
+.filtersContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 1.5rem;
+  background-color: var(--brand-beige-card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  margin-bottom: 2rem;
+  justify-content: center;
+  align-items: center;
+}
+.filtersContainer input,
+.filtersContainer select {
+  padding: 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-family: var(--font-main);
+  flex-grow: 1;
+  flex-basis: 160px;
+}
+.searchInput {
+  flex-grow: 2;
+  flex-basis: 250px;
+}
+.filterButton {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  background-color: var(--primary-color);
+  color: var(--text-color-on-primary);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: var(--font-weight-bold);
+  transition: background-color 0.2s;
+  flex-grow: 0;
+  flex-shrink: 0;
+}
+.filterButton:hover {
+  background-color: var(--secondary-color);
+}
+.filterButton:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+/* Status Messages */
+.statusMessage {
+  text-align: center;
+  padding: 3rem;
+  font-size: 1.2rem;
+  color: #555;
+}
+.errorMessage {
+  color: var(--error-text);
+}
+
+/* Watches Grid */
+.watchesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: clamp(20px, 3vw, 30px);
+}
+
+.watchCard {
+  background-color: var(--brand-beige-card-bg);
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.3s ease-out, transform 0.3s ease-out;
+  position: relative;
+}
+.watchCard:hover {
+  transform: translateY(-4px);
+  border-color: var(--brand-grey-text);
+}
+
+.watchCardLink {
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.watchImageContainer {
+  width: 100%;
+  padding-top: 75%;
+  position: relative;
+  background-color: var(--body-bg-color);
+}
+
+.watchImage {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.watchImagePlaceholder {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--text-color-light);
+  background-color: var(--brand-beige-card-bg);
+}
+.watchImagePlaceholder span {
+  font-size: 2.5rem;
+}
+
+.watchInfo {
+  padding: 18px 20px;
+  text-align: left;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.watchBrandModel {
+  font-family: var(--font-headings-section);
+  font-style: italic;
+  font-weight: var(--font-weight-semibold);
+  font-size: clamp(1.1rem, 2vw, 1.25rem);
+  color: var(--brand-grey-text);
+  margin-bottom: 3px;
+}
+
+.watchModelName {
+  font-family: var(--font-main);
+  font-size: clamp(0.9rem, 1.7vw, 1rem);
+  color: var(--brand-grey-text);
+  margin-bottom: 10px;
+  font-weight: var(--font-weight-regular);
+  line-height: 1.4;
+}
+
+.sellerInfo {
+  font-size: 0.9rem;
+  margin-top: auto;
+  padding-top: 10px;
+  color: #777;
+  border-top: 1px solid var(--border-color);
+}
+.sellerLink {
+    color: var(--primary-color);
+    font-weight: var(--font-weight-medium);
+    text-decoration: none;
+}
+.sellerLink:hover {
+    text-decoration: underline;
+}
+
+.cardStatusIndicatorSale,
+.cardStatusIndicatorTrade {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: var(--font-weight-bold);
+  color: var(--white);
+  z-index: 5;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  line-height: 1.2;
+}
+
+.cardStatusIndicatorSale {
+  background-color: var(--brand-green, #4CAF50);
+}
+
+.cardStatusIndicatorTrade {
+  background-color: var(--brand-blue, #2196F3);
+}
+
+/* Load More */
+.loadMoreContainer {
+  text-align: center;
+  margin-top: 2rem;
+}
+.loadMoreButton {
+  padding: 0.8rem 2rem;
+  font-size: 1rem;
+  background-color: var(--primary-color);
+  color: var(--text-color-on-primary);
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: var(--font-weight-bold);
+  transition: background-color 0.2s;
+}
+.loadMoreButton:hover {
+  background-color: var(--secondary-color);
+}
+.loadMoreButton:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}

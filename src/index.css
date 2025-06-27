@@ -8,25 +8,24 @@
 :root {
   /* Palette de Couleurs */
   --brand-red: #FC2727;
-  --brand-blue: #063E7A; /* Le bleu n'est plus la couleur primaire active */
-  --brand-beige-bg: #F1F1EF; /* avant : F1F1EF */
-  --brand-beige-card-bg: #F1F1EF; 
-  --brand-grey-text: #333333; /* Gris foncé principal */
-  --brand-black: #000000;     /* Noir pour contraste et états hover */
+  --brand-blue: #063E7A;
+  --brand-beige-bg: #F1F1EF;
+  --brand-grey-text: #333333;
+  --brand-black: #000000;
 
   /* Application aux variables de thème sémantiques */
-  --primary-color: var(--brand-grey-text); /* CHANGÉ: Bleu -> Gris Foncé */
-  --secondary-color: var(--brand-black);   /* CHANGÉ: Bleu clair -> Noir (pour hover/secondaire sobre) */
-  --accent-color: var(--brand-red);        /* Le rouge reste l'accent */
+  --primary-color: var(--brand-grey-text);
+  --secondary-color: var(--brand-black);
+  --accent-color: var(--brand-red);
 
-  --text-color: var(--brand-grey-text);    /* Texte par défaut déjà gris foncé */
+  --text-color: var(--brand-grey-text);
   --text-color-light: #5a5a5a;
-  --text-color-on-primary: #FFFFFF;      /* Texte blanc sur fond gris foncé/noir fonctionnera bien */
-  --text-color-on-dark: var(--brand-beige-card-bg);
+  --text-color-on-primary: #FFFFFF;
+  --text-color-on-dark: var(--brand-beige-bg);
 
   --body-bg-color: var(--brand-beige-bg);
-  --card-bg-color: var(--brand-beige-card-bg);
-  --section-bg-alt: var(--brand-beige-card-bg);
+  --card-bg-color: var(--white); /* CHANGÉ: Le fond des cartes est blanc par défaut */
+  --section-bg-alt: #F1F1EF;
 
   --border-color: #cac8c3;
   --border-color-light: #dcdad5;
@@ -58,25 +57,25 @@
   --success-text: #00695c;
   --success-border: #a3e0c7;
 
-  --info-bg: var(--brand-beige-card-bg);
+  --info-bg: #F1F1EF;
   --info-text: var(--text-color-light);
   --info-border: var(--border-color-light);
 
   color-scheme: light;
 }
 
-/* Thème Sombre (Laissé tel quel pour l'instant, le focus est sur le thème clair) */
+/* Thème Sombre */
 html[data-theme="dark"] :root {
-  --primary-color: #888888; /* CHANGÉ: Bleu -> Gris moyen pour thème sombre */
-  --secondary-color: #aaaaaa; /* CHANGÉ: Bleu clair -> Gris plus clair pour thème sombre */
+  --primary-color: #888888;
+  --secondary-color: #aaaaaa;
   --accent-color: #ff8a8a;
 
   --text-color: var(--brand-beige-bg);
   --text-color-light: #b0b0b0;
-  --text-color-on-primary: var(--brand-black); /* Texte noir sur gris moyen */
+  --text-color-on-primary: var(--brand-black);
 
   --body-bg-color: #1a1a1a;
-  --card-bg-color: #2c2c2c;
+  --card-bg-color: #2c2c2c; /* Le fond des cartes sera sombre en thème sombre */
   --section-bg-alt: #2c2c2c;
 
   --border-color: #4a4a4a;
@@ -100,7 +99,7 @@ html[data-theme="dark"] :root {
 
 /* 3. Styles de base pour HTML et Body */
 html {
-  height: 100%; /* <-- AJOUTEZ CETTE LIGNE */
+  height: 100%;
   box-sizing: border-box;
   font-size: 16px;
   scroll-behavior: smooth;
@@ -140,19 +139,16 @@ body {
 /* 5. Styles Génériques Typographiques et Éléments */
 a {
   font-weight: var(--font-weight-bold);
-  color: var(--primary-color); /* Deviendra gris foncé */
+  color: var(--primary-color);
   text-decoration: none;
   transition: color 0.2s ease-in-out, opacity 0.2s ease-in-out;
 }
 a:hover, a:focus {
-  color: var(--secondary-color); /* Deviendra noir */
+  color: var(--secondary-color);
   text-decoration: underline;
 }
 
 /* Titres */
-h1, h2, h3, h4, h5, h6 { /* La couleur est déjà --brand-grey-text ou --text-color, donc pas de changement direct ici */
-  /* Styles de police et de structure restent les mêmes */
-}
 h1 {
   font-family: var(--font-headings-primary);
   font-style: italic;
@@ -197,11 +193,10 @@ h4 { font-size: clamp(1.2rem, 2.5vw, 1.5rem); }
 h5 { font-size: clamp(1.1rem, 2.2vw, 1.3rem); }
 h6 { font-size: clamp(1rem, 2vw, 1.1rem); }
 
-
 .title-inter-extralight {
   font-family: var(--font-titles-decorative);
   font-weight: var(--font-weight-extralight);
-  color: var(--brand-grey-text); /* CHANGÉ: Bleu -> Gris Foncé */
+  color: var(--brand-grey-text);
   text-transform: uppercase;
   letter-spacing: 0.04em;
   line-height: 1.3;
@@ -213,9 +208,9 @@ button, .button-like {
   font-family: var(--font-main);
   font-size: 0.9rem;
   font-weight: var(--font-weight-bold);
-  color: var(--text-color-on-primary); /* Blanc */
-  background-color: var(--primary-color); /* Gris Foncé */
-  border: 1px solid var(--primary-color); /* Gris Foncé */
+  color: var(--text-color-on-primary);
+  background-color: var(--primary-color);
+  border: 1px solid var(--primary-color);
   border-radius: 4px;
   text-align: center;
   text-decoration: none;
@@ -223,13 +218,8 @@ button, .button-like {
   transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.15s ease;
 }
 button:hover, .button-like:hover {
-  background-color: var(--secondary-color); /* Noir */
-  border-color: var(--secondary-color); /* Noir */
-}
-button:focus, button:focus-visible,
-.button-like:focus, .button-like:focus-visible {
-  outline: 2px solid var(--primary-color); /* Outline Gris Foncé */
-  outline-offset: 2px;
+  background-color: var(--secondary-color);
+  border-color: var(--secondary-color);
 }
 button:disabled, .button-like:disabled {
   background-color: var(--text-color-light) !important;
@@ -242,18 +232,12 @@ button:disabled, .button-like:disabled {
 
 .button-secondary {
   background-color: transparent;
-  color: var(--primary-color); /* Gris Foncé */
-  border: 1px solid var(--primary-color); /* Gris Foncé */
+  color: var(--primary-color);
+  border: 1px solid var(--primary-color);
 }
 .button-secondary:hover, .button-secondary:focus {
-  background-color: var(--brand-beige-card-bg); /* Fond beige clair au survol */
-  color: var(--primary-color); /* Texte reste gris foncé */
-  /* border-color: var(--secondary-color); /* Option: bordure noire au survol */
-}
-.button-secondary:disabled {
-  background-color: transparent !important;
-  border-color: var(--text-color-light) !important;
-  color: var(--text-color-light) !important;
+  background-color: #F1F1EF;
+  color: var(--primary-color);
 }
 
 input, textarea, select {
@@ -271,8 +255,8 @@ input, textarea, select {
 }
 input:focus, textarea:focus, select:focus {
   outline: none;
-  border-color: var(--primary-color); /* Gris Foncé */
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-color) 15%, transparent); /* Ombre Gris Foncé pâle */
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-color) 15%, transparent);
 }
 input::placeholder, textarea::placeholder {
   color: var(--text-color-light);
@@ -318,6 +302,71 @@ html[data-theme="dark"] textarea::placeholder {
   border-color: var(--info-border);
 }
 
+/* ==================================================== */
+/* === NOUVELLES CLASSES UTILITAIRES GLOBALES (AJOUTÉES) === */
+/* ==================================================== */
+
+/* --- Conteneurs de page --- */
+.page-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: clamp(30px, 5vh, 50px) clamp(15px, 3vw, 30px);
+  box-sizing: border-box;
+}
+
+/* --- Typographie Générique --- */
+.pageTitle {
+  font-family: var(--font-headings-primary);
+  font-style: italic;
+  font-weight: var(--font-weight-bold);
+  font-size: clamp(2rem, 4.5vw, 2.8rem);
+  color: var(--brand-grey-text);
+  text-align: center;
+  margin: 0 auto clamp(30px, 5vh, 40px) auto;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.section-title {
+  font-family: var(--font-headings-section);
+  font-style: italic;
+  font-weight: var(--font-weight-semibold);
+  font-size: clamp(1.3rem, 2.5vw, 1.6rem);
+  color: var(--brand-grey-text);
+  padding-bottom: 15px;
+  margin-bottom: 25px;
+  border-bottom: 1px solid var(--border-color);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* --- Style de Carte Unifié --- */
+.card {
+  background-color: var(--card-bg-color);
+  border-radius: 30px;
+  border: none;
+  box-shadow: none;
+  overflow: hidden;
+  transition: transform 0.2s ease-out;
+}
+.card:hover {
+  transform: translateY(-4px);
+}
+
+/* --- Grilles Génériques --- */
+.grid-container {
+  display: grid;
+  gap: clamp(20px, 3vw, 30px);
+}
+.grid-autofit-300 {
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+.grid-autofit-280 {
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+/* --- Classe .glasscard (conservée de l'original) --- */
 .glasscard {
   width: 240px;
   height: 360px;
@@ -326,7 +375,7 @@ html[data-theme="dark"] textarea::placeholder {
   -webkit-backdrop-filter: blur(20px);
   border-radius: 20px;
   border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 
+  box-shadow:
     0 8px 32px rgba(0, 0, 0, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 0.5),
     inset 0 -1px 0 rgba(255, 255, 255, 0.1),
@@ -363,4 +412,15 @@ html[data-theme="dark"] textarea::placeholder {
     transparent,
     rgba(255, 255, 255, 0.3)
   );
+}
+
+
+@media (max-width: 768px) {
+.page-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: clamp(20px, 3vh, 50px) clamp(15px, 3vw, 30px);
+  box-sizing: border-box;
+}
 }
