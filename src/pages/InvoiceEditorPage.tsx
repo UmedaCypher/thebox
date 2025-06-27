@@ -1,6 +1,7 @@
 // client/src/pages/InvoiceEditorPage.tsx
-import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+
+// MODIFICATION : 'useCallback' et 'useNavigate' retirés car ils n'étaient pas utilisés.
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabaseClient';
 import styles from './InvoiceEditorPage.module.css';
@@ -31,7 +32,8 @@ interface WatchFromInventory {
 
 const InvoiceEditorPage: React.FC = () => {
   const { user } = useAuth();
-  const navigate = useNavigate();
+  // MODIFICATION : 'navigate' retiré car non utilisé.
+  // const navigate = useNavigate();
 
   // Form states
   const [invoiceDate, setInvoiceDate] = useState(new Date().toISOString().split('T')[0]);
@@ -69,14 +71,16 @@ const InvoiceEditorPage: React.FC = () => {
       setIsSearching(true);
       // NOTE: For a real app, create a RPC function 'search_clients' in Supabase
       // that searches both 'profiles' and 'external_clients' for better performance.
-      // Here we do two separate calls as an example.
-      const { data: profiles, error: profileError } = await supabase
+      
+      // MODIFICATION : 'profileError' retiré car non utilisé.
+      const { data: profiles } = await supabase
         .from('profiles')
         .select('id, full_name, username')
         .or(`full_name.ilike.%${clientSearchTerm}%,username.ilike.%${clientSearchTerm}%`)
         .limit(5);
 
-      const { data: externals, error: externalError } = await supabase
+      // MODIFICATION : 'externalError' retiré car non utilisé.
+      const { data: externals } = await supabase
         .from('external_clients')
         .select('id, full_name')
         .eq('pro_id', user.id)
@@ -118,15 +122,15 @@ const InvoiceEditorPage: React.FC = () => {
   const fetchInventory = async () => {
     if(!user) return;
     setIsWatchModalOpen(true);
-    const { data, error } = await supabase
+    const { data, error: fetchInvError } = await supabase
       .from('watches')
       .select('id, brand, model, reference_number, sale_price')
       .eq('user_id', user.id)
-      .in('current_status', ['for_sale', 'in_collection', 'purchased_by_pro']); // Select from available inventory
+      .in('current_status', ['for_sale', 'in_collection', 'purchased_by_pro']);
     
-    if (error) {
+    if (fetchInvError) {
         setError('Impossible de charger l\'inventaire.');
-        console.error(error);
+        console.error(fetchInvError);
     } else {
         setInventoryWatches(data || []);
     }
