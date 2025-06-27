@@ -6,7 +6,7 @@ import { supabase } from '../lib/supabaseClient';
 import {
   // MODIFICATION : Icônes non utilisées (DollarSign, Mail, etc.) retirées pour corriger les erreurs de build
   Users, Package, Wrench, FileText,
-  TrendingUp, PlusCircle, Search, MapPin
+  TrendingUp, PlusCircle, MapPin
 } from 'lucide-react';
 import styles from './ProDashboardPage.module.css';
 

@@ -128,7 +128,7 @@ const UserProfilePage: FC = () => {
             setTimeZoneInput(defaultProfile.time_zone || 'Europe/Paris');
             setAvatarPreview(defaultProfile.profile_picture_url);
             setAllowPrivateMessagesInput(defaultProfile.allow_private_messages ?? true);
-            setAccountType(defaultProfile.account_type);
+            setAccountType(profileResult.account_type || 'free');
           } else {
             throw profileError;
           }

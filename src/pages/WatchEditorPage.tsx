@@ -572,13 +572,17 @@ const WatchEditorPage: React.FC = () => {
                     id="current_status"
                     value={currentStatus ?? ''}
                     onChange={(e) => {
-                        const newStatus = e.target.value as WatchFormData['current_status'];
-                        setCurrentStatus(newStatus === '' ? null : newStatus);
-                        // Réinitialiser le prix si le statut n'est plus 'for_sale'
-                        if (newStatus !== 'for_sale') {
-                            setSalePrice('');
-                        }
-                    }}
+                      const value = e.target.value; // On récupère la valeur brute (qui peut être "")
+                      
+                      // On met à jour l'état : si la valeur est "", on met null, sinon on la type.
+                      const newStatus = value === '' ? null : (value as WatchFormData['current_status']);
+                      setCurrentStatus(newStatus);
+
+                      // La logique de réinitialisation du prix reste la même
+                      if (newStatus !== 'for_sale') {
+                          setSalePrice('');
+                      }
+                  }}
                     className={styles.selectField}
                     disabled={isSubmitting}
                 >
