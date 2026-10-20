@@ -55,3 +55,11 @@
 .dayRowText span { color: var(--text-3); font-size: var(--fs-sm); }
 .dayRowCheck { width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--line-strong); display: grid; place-items: center; flex: none; }
 .dayRow[aria-pressed='true'] .dayRowCheck { background: var(--brass); color: var(--brass-ink); border-color: var(--brass); }
+
+/* Grand écran : le calendrier à gauche, le bilan du mois à droite. */
+@media (min-width: 1000px) {
+  .month { max-width: none; display: grid; grid-template-columns: minmax(0, 560px) minmax(0, 1fr); column-gap: var(--sp-8); }
+  .monthHead, .calendar { grid-column: 1; }
+  .monthFoot { grid-column: 2; grid-row: 1 / span 2; margin-top: 56px; align-self: start; }
+  .monthStats { flex-direction: column; gap: var(--sp-5); }
+}
