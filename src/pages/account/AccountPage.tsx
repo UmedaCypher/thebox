@@ -4,9 +4,10 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Camera } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTheme } from '../../hooks/useTheme';
-import { saveProfile, uploadAvatar } from '../../lib/api';
+import { getSubscription, openBillingPortal, saveProfile, uploadAvatar } from '../../lib/api';
+import { useLoad } from '../../hooks/useLoad';
 import { supabase } from '../../lib/supabaseClient';
-import { FREE_WATCH_LIMIT } from '../../lib/features';
+import { FREE_WATCH_LIMIT, PAYMENTS_ENABLED } from '../../lib/features';
 import { formatDate } from '../../lib/format';
 import { Button, LinkButton, Notice, PageHeader, PremiumTag, Segmented, TextField, Toggle } from '../../components/ui';
 import s from './AccountPage.module.css';
@@ -23,6 +24,14 @@ export default function AccountPage() {
   const [avatarBusy, setAvatarBusy] = useState(false);
   const [newEmail, setNewEmail] = useState('');
   const [accountMsg, setAccountMsg] = useState<{ tone: 'ok' | 'error'; text: string } | null>(null);
+  const sub = useLoad(() => getSubscription(uid), [uid], PAYMENTS_ENABLED);
+  const [portalBusy, setPortalBusy] = useState(false);
+  const [portalError, setPortalError] = useState<string | null>(null);
+
+  const manage = async () => {
+    setPortalBusy(true); setPortalError(null);
+    try { await openBillingPortal(); } catch (e) { setPortalError(e instanceof Error ? e.message : 'Indisponible.'); setPortalBusy(false); }
+  };
 
   useEffect(() => {
     setF({
@@ -126,6 +135,19 @@ export default function AccountPage() {
 
       <section className={s.section}>
         <h2 className={s.h}>Offre</h2>
+        {isPremium && sub.data && (
+          <p className={s.muted}>
+            {sub.data.cancel_at_period_end
+              ? `Abonnement résilié : Premium reste actif jusqu'au ${formatDate(sub.data.current_period_end)}.`
+              : sub.data.status === 'past_due'
+                ? 'Le dernier paiement a échoué. Mettez à jour votre carte pour garder Premium.'
+                : `Abonnement annuel, prochain renouvellement le ${formatDate(sub.data.current_period_end)}.`}
+          </p>
+        )}
+        {portalError && <Notice tone="error">{portalError}</Notice>}
+        {isPremium && sub.data && (
+          <div><Button variant="secondary" onClick={manage} disabled={portalBusy}>{portalBusy ? 'Ouverture…' : 'Gérer mon abonnement'}</Button></div>
+        )}
         {isPremium ? (
           <ul className={s.links}>
             <li><Link to="/stats">Statistiques de portage</Link></li>

@@ -16,8 +16,15 @@ export const FREE_WATCH_LIMIT = 6;
  */
 export const LAUNCH_MODE: 'waitlist' | 'open' = 'waitlist';
 
-/** Prix envisagé, affiché sur la page Premium comme une indication. */
-export const PREMIUM_PRICE_HINT = 'environ 39 € par an';
+/**
+ * Paiement Stripe actif. false : la page Premium propose la liste d'attente.
+ * Passer à true une fois les fonctions et secrets Stripe en place (voir docs/stripe.md).
+ */
+export const PAYMENTS_ENABLED = false;
+
+/** Prix affiché. Le vrai prix est celui défini dans Stripe : garder les deux identiques. */
+export const PREMIUM_PRICE = { amount: '39 €', period: 'par an' };
+export const PREMIUM_PRICE_LABEL = `${PREMIUM_PRICE.amount} ${PREMIUM_PRICE.period}`;
 
 /**
  * Adresse affichée sur la page Contact (lien mailto).

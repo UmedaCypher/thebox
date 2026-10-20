@@ -1,7 +1,10 @@
+import { useEffect, useState } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { FREE_WATCH_LIMIT, PREMIUM_PRICE_HINT } from '../../lib/features';
+import { FREE_WATCH_LIMIT, PAYMENTS_ENABLED, PREMIUM_PRICE, PREMIUM_PRICE_LABEL } from '../../lib/features';
 import { PREMIUM_FEATURES } from '../../lib/premium';
-import { LinkButton, PageHeader } from '../../components/ui';
+import { openBillingPortal, startCheckout } from '../../lib/api';
+import { Button, LinkButton, Notice, PageHeader } from '../../components/ui';
 import WaitlistForm from '../../components/Waitlist/WaitlistForm';
 import s from './PremiumPage.module.css';
 
@@ -14,10 +17,87 @@ const FREE = [
 ];
 
 export default function PremiumPage() {
-  const { user, isPremium } = useAuth();
+  const { user, isPremium, refreshProfile } = useAuth();
+  const [params, setParams] = useSearchParams();
+  const result = params.get('paiement');
+  const [accepted, setAccepted] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [waiting, setWaiting] = useState(result === 'ok');
+
+  // Retour de Stripe : le webhook active Premium en quelques secondes, on vérifie régulièrement.
+  useEffect(() => {
+    if (result !== 'ok' || isPremium) { setWaiting(false); return; }
+    let tries = 0;
+    const id = setInterval(async () => {
+      tries++;
+      await refreshProfile();
+      if (tries >= 15) { clearInterval(id); setWaiting(false); }
+    }, 2000);
+    return () => clearInterval(id);
+  }, [result, isPremium, refreshProfile]);
+
+  const subscribe = async () => {
+    setBusy(true); setError(null);
+    try { await startCheckout(); } catch (e) { setError(e instanceof Error ? e.message : 'Paiement indisponible.'); setBusy(false); }
+  };
+  const manage = async () => {
+    setBusy(true); setError(null);
+    try { await openBillingPortal(); } catch (e) { setError(e instanceof Error ? e.message : 'Espace abonnement indisponible.'); setBusy(false); }
+  };
+
+  const action = () => {
+    if (isPremium) {
+      return (
+        <div className={s.cta}>
+          <p>Votre compte est Premium. Merci de soutenir The Box.</p>
+          {PAYMENTS_ENABLED && <Button variant="secondary" onClick={manage} disabled={busy}>Gérer mon abonnement</Button>}
+        </div>
+      );
+    }
+    if (!PAYMENTS_ENABLED) {
+      return (
+        <div className={s.cta}>
+          <p className={s.muted}>Le paiement n'est pas encore ouvert. Laissez votre adresse et nous vous écrirons une fois, au lancement.</p>
+          <WaitlistForm premiumDefault />
+        </div>
+      );
+    }
+    if (!user) {
+      return (
+        <div className={s.cta}>
+          <LinkButton to="/signup">Créer un compte pour passer à Premium</LinkButton>
+          <p className={s.muted}>Déjà inscrit ? <Link to="/login" state={{ from: { pathname: '/premium' } }}>Se connecter</Link></p>
+        </div>
+      );
+    }
+    return (
+      <div className={s.cta}>
+        <label className={s.consent}>
+          <input type="checkbox" checked={accepted} onChange={e => setAccepted(e.target.checked)} />
+          <span>J'accepte les <Link to="/cgv">conditions générales de vente</Link> et je demande l'accès immédiat à Premium.</span>
+        </label>
+        <Button onClick={subscribe} disabled={!accepted || busy}>{busy ? 'Ouverture du paiement…' : `Passer à Premium, ${PREMIUM_PRICE_LABEL}`}</Button>
+        <p className={s.small}>Paiement sécurisé par Stripe. Résiliable à tout moment depuis votre profil : Premium reste actif jusqu'à la fin de la période payée.</p>
+      </div>
+    );
+  };
+
   return (
     <div className="page">
       <PageHeader title="Premium" subtitle="Pour les collections qui débordent de l'écrin, et ceux qui veulent tout savoir de leurs montres." />
+
+      {result === 'ok' && (
+        <Notice tone={isPremium ? 'ok' : 'info'}>
+          {isPremium ? 'Bienvenue dans Premium. Toutes les fonctionnalités sont débloquées.'
+            : waiting ? 'Paiement reçu, activation de Premium en cours…'
+            : "Paiement reçu. L'activation prend plus de temps que prévu : rechargez la page dans une minute."}
+        </Notice>
+      )}
+      {result === 'annule' && (
+        <Notice>Paiement annulé, rien n'a été débité. <button className={s.linkBtn} onClick={() => setParams({})}>Fermer</button></Notice>
+      )}
+      {error && <Notice tone="error">{error}</Notice>}
 
       <div className={s.plans}>
         <section className={s.plan}>
@@ -28,26 +108,12 @@ export default function PremiumPage() {
 
         <section className={`${s.plan} ${s.premium}`}>
           <h2>Premium</h2>
-          <p className={s.price}>Bientôt <span>{PREMIUM_PRICE_HINT}</span></p>
+          <p className={s.price}>{PREMIUM_PRICE.amount} <span>{PREMIUM_PRICE.period}{!PAYMENTS_ENABLED && ', bientôt disponible'}</span></p>
           <p className={s.includes}>Tout le gratuit, et :</p>
           <ul>{PREMIUM_FEATURES.map(f => <li key={f.title}><strong>{f.title}</strong>{f.text}</li>)}</ul>
+          {action()}
         </section>
       </div>
-
-      <section className={s.notify}>
-        {isPremium ? (
-          <p>Votre compte est déjà Premium. Merci.</p>
-        ) : (
-          <>
-            <div>
-              <h2>Être prévenu de l'ouverture</h2>
-              <p className={s.muted}>Le paiement n'est pas encore ouvert. Laissez votre adresse et nous vous écrirons une fois, au lancement.</p>
-            </div>
-            {user ? <WaitlistForm premiumDefault compact /> : <WaitlistForm premiumDefault />}
-          </>
-        )}
-        {!user && <LinkButton to="/galerie" variant="ghost">Voir la galerie en attendant</LinkButton>}
-      </section>
     </div>
   );
 }

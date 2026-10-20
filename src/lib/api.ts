@@ -2,7 +2,7 @@
 import { supabase } from './supabaseClient';
 import { preparePhoto } from './images';
 import type {
-  GalleryShot, MaintenanceEntry, Passport, Photo, Profile, PublicCollection,
+  GalleryShot, MaintenanceEntry, Passport, Photo, Profile, PublicCollection, Subscription,
   ValuePoint, Watch, WatchInput, WearLog, WishlistItem,
 } from '../types';
 
@@ -275,4 +275,35 @@ export async function fetchNews(feedUrl: string): Promise<NewsItem[]> {
   const { data, error } = await supabase.functions.invoke('rss-feed-parser', { body: { feedUrl } });
   if (error) throw new Error("Cette source est indisponible pour le moment.");
   return (data?.items as NewsItem[]) ?? [];
+}
+
+/* ---------- Abonnement (Stripe) ---------- */
+
+async function invokeForUrl(fn: 'create-checkout-session' | 'create-portal-session'): Promise<string> {
+  const { data, error } = await supabase.functions.invoke(fn, { body: {} });
+  if (error) {
+    // Le message précis renvoyé par la fonction se trouve dans la réponse.
+    const ctx = (error as { context?: Response }).context;
+    const detail = ctx && typeof ctx.json === 'function' ? await ctx.json().catch(() => null) : null;
+    throw new Error(detail?.error ?? 'Service de paiement indisponible pour le moment.');
+  }
+  if (!data?.url) throw new Error('Service de paiement indisponible pour le moment.');
+  return data.url as string;
+}
+
+/** Envoie vers la page de paiement Stripe. */
+export async function startCheckout() {
+  window.location.assign(await invokeForUrl('create-checkout-session'));
+}
+
+/** Envoie vers l'espace client Stripe (carte, factures, résiliation). */
+export async function openBillingPortal() {
+  window.location.assign(await invokeForUrl('create-portal-session'));
+}
+
+export async function getSubscription(userId: string): Promise<Subscription | null> {
+  const { data, error } = await supabase.from('subscriptions')
+    .select('status, current_period_end, cancel_at_period_end').eq('user_id', userId).maybeSingle();
+  if (error) return null; // table absente tant que la migration n'est pas passée
+  return (data as Subscription) ?? null;
 }

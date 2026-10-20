@@ -152,3 +152,9 @@ export interface GalleryShot {
   username: string | null;
   wrist_size_cm: number | null;
 }
+
+export interface Subscription {
+  status: string;
+  current_period_end: string | null;
+  cancel_at_period_end: boolean;
+}

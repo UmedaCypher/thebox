@@ -37,6 +37,11 @@ npm run dev
 - `supabase/migrations` : scripts SQL à exécuter dans Supabase, dans l'ordre
 - `supabase/schema` : trace du schéma de la base
 
+## Paiement
+
+Abonnement Premium via Stripe Checkout et trois fonctions Supabase (`supabase/functions`).
+Mise en place pas à pas : [`docs/stripe.md`](docs/stripe.md). Désactivé tant que `PAYMENTS_ENABLED` vaut `false`.
+
 ## Base de données
 
 Chaque évolution de la base est un fichier de `supabase/migrations`, à coller dans
