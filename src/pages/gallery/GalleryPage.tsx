@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useLoad } from '../../hooks/useLoad';
 import { listGalleryBrands, listGalleryShots } from '../../lib/api';
@@ -11,10 +11,12 @@ const parse = (v: string) => { const n = Number(v.replace(',', '.')); return v.t
 
 export default function GalleryPage() {
   const { user, profile } = useAuth();
+  const [params] = useSearchParams();
+  // Filtres initiaux possibles depuis l'accueil : /galerie?min=16.5&max=17.5
   const [brand, setBrand] = useState('');
-  const [min, setMin] = useState('');
-  const [max, setMax] = useState('');
-  const [filters, setFilters] = useState({ brand: null as string | null, minWrist: null as number | null, maxWrist: null as number | null });
+  const [min, setMin] = useState(params.get('min')?.replace('.', ',') ?? '');
+  const [max, setMax] = useState(params.get('max')?.replace('.', ',') ?? '');
+  const [filters, setFilters] = useState({ brand: null as string | null, minWrist: parse(params.get('min') ?? ''), maxWrist: parse(params.get('max') ?? '') });
 
   const brands = useLoad(listGalleryBrands, []);
   const shots = useLoad(() => listGalleryShots(filters), [filters]);
