@@ -1,6 +1,6 @@
 // client/src/pages/LegalMentionsPage.tsx
 import React from 'react';
-import styles from './LegalMentionsPage.module.css'; // Ce fichier CSS sera créé
+import styles from './StaticPage.module.css';
 import { Link } from 'react-router-dom';
 
 const LegalMentionsPage: React.FC = () => {

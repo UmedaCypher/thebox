@@ -1,6 +1,6 @@
 // client/src/pages/PressPage.tsx
 import React from 'react';
-import styles from './PressPage.module.css'; // Ce fichier CSS sera créé
+import styles from './StaticPage.module.css';
 
 const PressPage: React.FC = () => {
   return (

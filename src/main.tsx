@@ -1,20 +1,16 @@
-// client/src/main.tsx
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import App from './App'; // Votre composant App principal
-import { AuthProvider } from './contexts/AuthContext'; // Importez le AuthProvider
-import './index.css'; // Vos styles globaux
+import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
+import App from './App';
+import { AuthProvider } from './contexts/AuthContext';
+import { captureSource } from './lib/source';
+import './index.css';
 
-const rootElement = document.getElementById('root');
+captureSource();
 
-if (rootElement) {
-  ReactDOM.createRoot(rootElement).render(
-    <React.StrictMode>
-      <AuthProvider> {/* Enveloppez App avec AuthProvider */}
-        <App />
-      </AuthProvider>
-    </React.StrictMode>
-  );
-} else {
-  console.error("L'élément racine avec l'ID 'root' n'a pas été trouvé dans le DOM.");
-}
+createRoot(document.getElementById('root')!).render(
+  <StrictMode>
+    <AuthProvider>
+      <App />
+    </AuthProvider>
+  </StrictMode>,
+);

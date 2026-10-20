@@ -1,6 +1,6 @@
 // client/src/pages/CguPage.tsx
 import React from 'react';
-import styles from './CguPage.module.css'; // Assurez-vous que ce fichier CSS existe
+import styles from './StaticPage.module.css';
 import { Link } from 'react-router-dom';
 
 const CguPage: React.FC = () => {

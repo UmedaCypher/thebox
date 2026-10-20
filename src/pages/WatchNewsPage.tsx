@@ -1,153 +1,41 @@
-// client/src/pages/WatchNewsPage/WatchNewsPage.tsx
-import React, { useState, useEffect } from 'react';
-import { supabase } from '../lib/supabaseClient'; // Ajustez le chemin si nécessaire
-import styles from './WatchNewsPage.module.css';
+import { useState } from 'react';
+import { useLoad } from '../hooks/useLoad';
+import { fetchNews } from '../lib/api';
+import { formatDate } from '../lib/format';
+import { EmptyState, Loading, Notice, PageHeader, Segmented } from '../components/ui';
+import s from './WatchNewsPage.module.css';
 
-interface NewsItem {
-  title?: string;
-  link?: string;
-  pubDate?: string;
-  isoDate?: string;
-  creator?: string;
-  contentSnippet?: string;
-  imageUrl?: string | null;
-  sourceTitle?: string;
-}
-
-// Liste des flux RSS que vous souhaitez agréger
-const RSS_FEEDS = [
-  
-  { name: 'thewatchobserver', url: 'https://thewatchobserver.ouest-france.fr/feed/' },
-  { name: 'lecalibre', url: 'https://www.lecalibre.com/feed/' },
-  { name: 'lesrhabilleurs', url: 'https://www.lesrhabilleurs.com/feed/' },
-  { name: 'mrmontre', url: 'https://www.mrmontre.com/feed' },
-  { name: 'watches-news', url: 'https://www.watches-news.com/fr/feed/' },
-
-  // Ajoutez d'autres flux ici
+const FEEDS = [
+  { value: 'https://www.lecalibre.com/feed/', label: 'Le Calibre' },
+  { value: 'https://www.lesrhabilleurs.com/feed/', label: 'Les Rhabilleurs' },
+  { value: 'https://thewatchobserver.ouest-france.fr/feed/', label: 'Watch Observer' },
+  { value: 'https://www.mrmontre.com/feed', label: 'Mr Montre' },
+  { value: 'https://www.watches-news.com/fr/feed/', label: 'Watches News' },
 ];
 
-const WatchNewsPage: React.FC = () => {
-  const [newsItems, setNewsItems] = useState<NewsItem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [selectedFeed, setSelectedFeed] = useState<string>(RSS_FEEDS[0].url); // Premier flux par défaut
-
-  useEffect(() => {
-    const fetchNews = async (feedUrl: string) => {
-      setLoading(true);
-      setError(null);
-      setNewsItems([]); // Vider les anciennes actualités lors du changement de flux
-
-      try {
-        console.log(`Appel de la fonction Edge 'rss-feed-parser' pour l'URL: ${feedUrl}`);
-        const { data, error: functionError } = await supabase.functions.invoke('rss-feed-parser', {
-          body: { feedUrl },
-        });
-
-        if (functionError) {
-          console.error("Erreur de la fonction Edge:", functionError);
-          throw new Error(functionError.message || "Erreur lors de l'appel de la fonction Edge.");
-        }
-
-        if (data && data.items) {
-          console.log("Actualités reçues:", data.items);
-          setNewsItems(data.items);
-        } else if (data && data.error) { // Si la fonction Edge retourne une erreur formatée
-          console.error("Erreur retournée par la fonction Edge:", data.error);
-          throw new Error(data.error);
-        } else {
-          console.warn("Aucun item retourné par la fonction Edge ou format de réponse inattendu:", data);
-          setNewsItems([]);
-        }
-      } catch (err: any) {
-        console.error("Erreur lors de la récupération des actualités:", err);
-        setError(err.message || "Impossible de charger les actualités.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (selectedFeed) {
-      fetchNews(selectedFeed);
-    }
-  }, [selectedFeed]); // Se redéclenche si selectedFeed change
-
-  const formatDate = (dateString?: string) => {
-    if (!dateString) return 'Date inconnue';
-    try {
-      return new Date(dateString).toLocaleDateString('fr-FR', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-      });
-    } catch (e) {
-      return dateString; // Retourner la chaîne originale si le formatage échoue
-    }
-  };
+/** Bonus : les derniers articles de quelques sites horlogers, lus via leur flux RSS. */
+export default function WatchNewsPage() {
+  const [feed, setFeed] = useState(FEEDS[0].value);
+  const q = useLoad(() => fetchNews(feed), [feed]);
 
   return (
-    <div className="page-container">
-      <header className={styles.pageHeader}>
-        <h1 className={styles.pageTitle}>Actualités Horlogères</h1>
-        <div className={styles.feedSelectorContainer}>
-          <label htmlFor="feedSelector" className={styles.feedSelectorLabel}>Source :</label>
-          <select 
-            id="feedSelector"
-            value={selectedFeed} 
-            onChange={(e) => setSelectedFeed(e.target.value)}
-            className={styles.feedSelector}
-          >
-            {RSS_FEEDS.map(feed => (
-              <option key={feed.url} value={feed.url}>
-                {feed.name}
-              </option>
-            ))}
-          </select>
-        </div>
-      </header>
-
-      {loading && <div className="message-global message-info">Chargement des actualités...</div>}
-      {error && <div className="message-global message-error">Erreur : {error}</div>}
-
-      {!loading && !error && newsItems.length === 0 && (
-        <div className="message-global message-info">Aucune actualité trouvée pour cette source.</div>
-      )}
-
-      {!loading && newsItems.length > 0 && (
-        <div className="grid-container grid-autofit-300">
-          {newsItems.map((item, index) => (
-            <a 
-              key={item.link || index} 
-              href={item.link} 
-              target="_blank" 
-              rel="noopener noreferrer" 
-              className={styles.newsCard}
-            >
-              {item.imageUrl && (
-                <div className={styles.cardImageContainer}>
-                  <img 
-                    src={item.imageUrl} 
-                    alt={`Image pour ${item.title}`} 
-                    className={styles.cardImage} 
-                    onError={(e) => (e.currentTarget.style.display = 'none')}
-                  />
-                </div>
-              )}
-              <div className={styles.cardContent}>
-                <h3 className={styles.cardTitle}>{item.title || 'Titre non disponible'}</h3>
-                {item.contentSnippet && <p className={styles.cardSnippet}>{item.contentSnippet}</p>}
-                <div className={styles.cardMeta}>
-                  {item.creator && <span className={styles.cardCreator}>Par : {item.creator}</span>}
-                  <span className={styles.cardDate}>{formatDate(item.isoDate || item.pubDate)}</span>
-                </div>
-                {item.sourceTitle && <span className={styles.cardSource}>Source : {item.sourceTitle}</span>}
-              </div>
-            </a>
-          ))}
-        </div>
-      )}
+    <div className="page">
+      <PageHeader title="Actualités" subtitle="Les derniers articles de quelques sites horlogers francophones." />
+      <Segmented label="Source" value={feed} onChange={setFeed} options={FEEDS} />
+      <div className={s.list}>
+        {q.loading ? <Loading /> : q.error ? <Notice tone="error">{q.error}</Notice> : !q.data?.length ? (
+          <EmptyState title="Aucun article">Cette source n'a rien publié récemment.</EmptyState>
+        ) : q.data.map((n, i) => (
+          <a key={n.link ?? i} href={n.link} target="_blank" rel="noopener noreferrer" className={s.item}>
+            {n.imageUrl && <img src={n.imageUrl} alt="" loading="lazy" onError={e => (e.currentTarget.style.display = 'none')} />}
+            <span className={s.text}>
+              <span className={s.title}>{n.title}</span>
+              {n.contentSnippet && <span className={s.snippet}>{n.contentSnippet.replace(/\.\.\.$/, '…')}</span>}
+              <span className={s.meta}>{formatDate(n.isoDate ?? n.pubDate)}</span>
+            </span>
+          </a>
+        ))}
+      </div>
     </div>
   );
-};
-
-export default WatchNewsPage;
+}

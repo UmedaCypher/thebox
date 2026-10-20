@@ -1,112 +1,56 @@
-// client/src/pages/FaqPage.tsx
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom'; // <<< IMPORT AJOUTÉ ICI
-import styles from './FaqPage.module.css';
-// Optionnel: Importer une icône pour l'accordéon, par exemple de react-icons
-// import { FiChevronDown, FiChevronUp } from 'react-icons/fi';
+import { Link } from 'react-router-dom';
+import { FREE_WATCH_LIMIT } from '../lib/features';
+import { PageHeader } from '../components/ui';
+import s from './FaqPage.module.css';
 
-interface FaqItem {
-  id: number;
-  question: string;
-  answer: string; // Peut être du JSX si vous avez besoin de formatage complexe ou de liens
-}
-
-const faqData: FaqItem[] = [
+const FAQ: { q: string; a: React.ReactNode }[] = [
   {
-    id: 1,
-    question: "Qu'est-ce que l'application [Votre Marque] exactement ?",
-    answer: "L'application [Votre Marque] est une plateforme numérique sophistiquée conçue pour les collectionneurs exigeants de montres, bijoux et petite maroquinerie de luxe. Elle vous permet de cataloguer, valoriser, suivre l'entretien, partager (si vous le souhaitez) et approfondir vos connaissances sur vos pièces d'exception.",
+    q: 'À quoi sert The Box ?',
+    a: "À tenir le registre de votre collection de montres : une fiche complète par montre, un calendrier de ce que vous portez, l'historique des entretiens, et une galerie de photos au poignet pour comparer avec d'autres collectionneurs.",
   },
   {
-    id: 2,
-    question: "L'application est-elle gratuite ?",
-    answer: "Oui, l'accès à l'ensemble des fonctionnalités actuelles de [Votre Marque] App est offert. Nous souhaitons que chaque passionné puisse bénéficier d'outils d'excellence pour gérer sa collection. Des fonctionnalités premium avancées pourraient être proposées à l'avenir.",
+    q: "C'est gratuit ?",
+    a: `Oui, jusqu'à ${FREE_WATCH_LIMIT} montres, avec le passeport, le calendrier de portage et la galerie. Premium, payant, rend la collection illimitée et ajoute le carnet d'entretien, les statistiques, le suivi de valeur, la wishlist et l'inventaire pour l'assurance.`,
   },
   {
-    id: 3,
-    question: "Comment mes données de collection sont-elles sécurisées ?",
-    answer: "La sécurité et la confidentialité de vos données sont notre priorité absolue. Nous utilisons des sauvegardes cloud chiffrées et des protocoles de sécurité de pointe pour protéger toutes les informations relatives à votre collection. Vous disposez également d'options de confidentialité granulaires pour chaque pièce.",
+    q: 'Qui voit ma collection ?',
+    a: "Personne tant que vous ne le décidez pas. Vous pouvez rendre votre profil public, partager le passeport d'une seule montre par lien, ou montrer une photo au poignet dans la galerie. Les prix d'achat, valeurs et lieux d'achat ne sont jamais publics.",
   },
   {
-    id: 4,
-    question: "Puis-je ajouter tous types d'objets de luxe ?",
-    answer: "Bien que l'application soit initialement optimisée pour les montres, elle est conçue pour être flexible. Vous pouvez y cataloguer vos bijoux précieux et articles de petite maroquinerie de luxe, en adaptant les champs d'information selon la nature de l'objet.",
+    q: 'Mes photos révèlent-elles où je vis ?',
+    a: "Non. Avant l'envoi, chaque photo est réduite et ré-encodée sur votre appareil, ce qui supprime ses métadonnées, dont la position GPS.",
   },
   {
-    id: 5,
-    question: "Comment fonctionne l'estimation de valeur ?",
-    answer: "Pour les montres, nous prévoyons d'intégrer des API de plateformes reconnues (comme eBay, Chrono24) pour fournir des estimations de valeur basées sur les ventes récentes de modèles similaires. Cette fonctionnalité sera déployée progressivement.",
+    q: "D'où vient la valeur de mes montres ?",
+    a: "De vous. Vous indiquez la valeur estimée, et The Box garde l'historique de chaque mise à jour. Aucune cotation automatique n'est utilisée pour l'instant.",
   },
   {
-    id: 6,
-    question: "L'essayage virtuel en Réalité Augmentée est-il disponible pour toutes les montres ?",
-    answer: "L'essayage virtuel en RA est une fonctionnalité innovante que nous développons activement. Elle sera initialement disponible pour une sélection de modèles populaires et nous étendrons progressivement sa compatibilité.",
+    q: 'À quoi sert le calendrier de portage ?',
+    a: "D'un geste, vous notez la montre du jour. Vous voyez ainsi lesquelles vous portez vraiment, lesquelles dorment, et combien vous coûte chaque port. Chaque mois, une image résume votre rotation pour la partager.",
   },
-  // Ajoutez d'autres questions ici
+  {
+    q: "Comment fonctionne le filtre par tour de poignet ?",
+    a: "Les photos de la galerie sont accompagnées du tour de poignet de leur auteur. Filtrez autour du vôtre pour voir comment une montre tombe sur un poignet comme le vôtre avant de l'acheter.",
+  },
+  {
+    q: 'Comment supprimer mon compte ?',
+    a: <>Écrivez-nous depuis la page <Link to="/contact">Contact</Link> avec l'adresse de votre compte. Toutes vos données et photos sont supprimées sous 7 jours.</>,
+  },
 ];
 
-const FaqPage: React.FC = () => {
-  const [activeIndex, setActiveIndex] = useState<number | null>(null);
-
-  const toggleAccordion = (index: number) => {
-    if (activeIndex === index) {
-      setActiveIndex(null); // Ferme l'élément si déjà ouvert
-    } else {
-      setActiveIndex(index); // Ouvre le nouvel élément
-    }
-  };
-
+export default function FaqPage() {
   return (
-    <div className={styles.faqPageWrapper}> {/* Wrapper pour le fond pleine largeur */}
-      <div className={styles.container}> {/* Conteneur pour le contenu centré */}
-        <header className={styles.faqHeader}>
-          <h1 className={styles.pageTitle}>Questions Fréquemment Posées</h1>
-          <p className={styles.pageSubtitle}>
-            Trouvez ici les réponses à vos interrogations concernant l'application [Votre Marque] et ses fonctionnalités.
-          </p>
-        </header>
-
-        <div className={styles.faqList}>
-          {faqData.map((item, index) => (
-            <div key={item.id} className={styles.faqItem}>
-              <button
-                className={`${styles.faqQuestion} ${activeIndex === index ? styles.active : ''}`}
-                onClick={() => toggleAccordion(index)}
-                aria-expanded={activeIndex === index}
-                aria-controls={`faq-answer-${item.id}`}
-              >
-                {item.question}
-                <span className={styles.accordionIcon}>
-                  {/* Remplacer par des icônes SVG ou react-icons si souhaité */}
-                  {activeIndex === index ? '-' : '+'}
-                  {/* Exemple avec react-icons: activeIndex === index ? <FiChevronUp /> : <FiChevronDown /> */}
-                </span>
-              </button>
-              <div
-                id={`faq-answer-${item.id}`}
-                className={`${styles.faqAnswer} ${activeIndex === index ? styles.open : ''}`}
-                aria-hidden={activeIndex !== index}
-              >
-                <p>{item.answer}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <section className={styles.contactSupport}>
-          <h2 className={styles.contactTitle}>Vous ne trouvez pas votre réponse ?</h2>
-          <p className={styles.contactText}>
-            Notre équipe est à votre disposition pour toute question supplémentaire. N'hésitez pas à nous contacter.
-          </p>
-          {/* Optionnel: Ajouter un bouton ou un lien vers une page de contact */}
-          {/* La ligne 101 est probablement ici si vous avez un lien vers une page /contact */}
-          <Link to="/contact" className={`${styles.ctaButton} ${styles.contactButton}`}>
-            Nous Contacter
-          </Link>
-        </section>
+    <div className="page page--narrow">
+      <PageHeader title="Questions fréquentes" />
+      <div className={s.list}>
+        {FAQ.map(item => (
+          <details key={item.q} className={s.item}>
+            <summary>{item.q}</summary>
+            <p>{item.a}</p>
+          </details>
+        ))}
       </div>
+      <p className={s.more}>Une autre question ? <Link to="/contact">Écrivez-nous</Link>.</p>
     </div>
   );
-};
-
-export default FaqPage;
+}

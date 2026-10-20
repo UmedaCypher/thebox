@@ -1,0 +1,22 @@
+.summary {
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--sp-4);
+  padding-bottom: var(--sp-5); margin-bottom: var(--sp-4);
+  border-bottom: 1px solid var(--line);
+}
+@media (min-width: 720px) { .summary { grid-template-columns: repeat(3, max-content); gap: var(--sp-8); } }
+
+/* Quota : six index d'heures, remplis un par un. */
+.quota { display: flex; align-items: center; gap: var(--sp-3); margin-bottom: var(--sp-6); }
+.indices { display: inline-flex; gap: 5px; }
+.indices span { width: 4px; height: 14px; border-radius: 1px; background: var(--line-strong); }
+.indices span[data-filled='true'] { background: var(--brass); }
+.quotaText { font-size: var(--fs-sm); color: var(--text-2); }
+.inlineLink { color: var(--brass); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+
+.reminders { display: grid; gap: var(--sp-2); margin-bottom: var(--sp-6); }
+.reminder {
+  display: flex; flex-direction: column; gap: 2px; padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--r-control); background: var(--surface); border: 1px solid var(--seam);
+  text-decoration: none; font-size: var(--fs-sm);
+}
+.reminder span { color: var(--text-2); }

@@ -1,0 +1,23 @@
+.summary { display: flex; flex-wrap: wrap; gap: var(--sp-5) var(--sp-7); padding: var(--sp-5) 0; }
+.block { padding: var(--sp-6) 0; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: var(--sp-4); max-width: 760px; }
+.block h2 { font-size: var(--fs-xl); }
+.muted { color: var(--text-2); font-size: var(--fs-sm); }
+
+.bars { list-style: none; display: flex; flex-direction: column; gap: var(--sp-2); }
+.barRow { display: flex; align-items: center; gap: var(--sp-3); text-decoration: none; padding: 4px 0; }
+.thumb { width: 44px; flex: none; border-radius: 12px; }
+.barText { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.barName { font-size: var(--fs-sm); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.track { height: 6px; border-radius: 3px; background: var(--surface); overflow: hidden; }
+.track span { display: block; height: 100%; background: var(--brass); border-radius: 3px; }
+.barNum { width: 32px; text-align: right; color: var(--text-2); font-size: var(--fs-sm); }
+
+.table { width: 100%; border-collapse: collapse; font-size: var(--fs-sm); }
+.table th { text-align: left; font-weight: 600; color: var(--text-3); padding: var(--sp-2) 0; border-bottom: 1px solid var(--line-strong); }
+.table td { padding: var(--sp-3) 0; border-bottom: 1px solid var(--line); }
+.table th:not(:first-child), .table td:not(:first-child) { text-align: right; padding-left: var(--sp-3); }
+
+.dormant { list-style: none; display: flex; flex-direction: column; }
+.dormant li { display: flex; justify-content: space-between; gap: var(--sp-3); padding: var(--sp-3) 0; border-bottom: 1px solid var(--line); font-size: var(--fs-sm); }
+.dormant a { text-decoration: none; }
+.dormant span { color: var(--text-3); }

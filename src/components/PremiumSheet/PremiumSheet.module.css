@@ -1,0 +1,5 @@
+.reason { color: var(--text-2); margin-bottom: var(--sp-4); }
+.list { list-style: none; display: grid; gap: var(--sp-3); margin-bottom: var(--sp-5); }
+.list li { display: flex; flex-direction: column; gap: 1px; padding-left: var(--sp-4); border-left: 1px solid var(--seam); }
+.list strong { font-weight: 600; }
+.list span { color: var(--text-2); font-size: var(--fs-sm); }

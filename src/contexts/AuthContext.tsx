@@ -1,104 +1,80 @@
-// client/src/contexts/AuthContext.tsx (Corrigé)
-// import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react'; // <--- AVANT pour ReactNode
-import React, { createContext, useContext, useState, useEffect } from 'react';          // <--- APRÈS
-import type { ReactNode } from 'react';                                                  // <--- APRÈS (ReactNode importé comme type)
-// import type { Session, User, AuthChangeEvent, AuthError, Subscription } from '@supabase/supabase-js'; // <--- AVANT pour Subscription
-import type { Session, User, AuthChangeEvent, AuthError } from '@supabase/supabase-js'; // <--- APRÈS (Subscription supprimé)
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import type { ReactNode } from 'react';
+import type { AuthError, Session, User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabaseClient';
+import { fetchProfile } from '../lib/api';
+import type { Profile } from '../types';
 
 interface AuthContextType {
   session: Session | null;
   user: User | null;
   loading: boolean;
-  signOut: () => Promise<void>;
   authError: AuthError | null;
-  refreshUser?: () => Promise<void>; // Ajouté pour l'erreur de UserProfilePage, marquez-le comme optionnel si pas toujours implémenté
+  profile: Profile | null;
+  isPremium: boolean;
+  signOut: () => Promise<void>;
+  refreshUser: () => Promise<void>;
+  refreshProfile: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-interface AuthProviderProps {
-  children: ReactNode;
-}
-
-export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
-  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [authError, setAuthError] = useState<AuthError | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
 
-  const refreshUserData = async () => { // Exemple de fonction refreshUser
-    const { data: { session: currentSession }, error } = await supabase.auth.refreshSession();
-    // Ou supabase.auth.getUser() si vous voulez juste rafraîchir les données utilisateur
-    if (error) {
-      console.error("AuthContext: Erreur lors du rafraîchissement de la session:", error);
-      setAuthError(error);
-    }
-    setSession(currentSession);
-    setUser(currentSession?.user ?? null);
-  };
-
+  const user = session?.user ?? null;
 
   useEffect(() => {
-    setLoading(true);
-    setAuthError(null);
-
-    supabase.auth.getSession().then(({ data: { session: currentSession }, error }) => {
-      if (error) {
-        console.error("AuthContext: Erreur lors de la récupération de la session initiale:", error);
-        setAuthError(error);
-      }
-      setSession(currentSession);
-      setUser(currentSession?.user ?? null);
-      setLoading(false);
-    }).catch(error => {
-      console.error("AuthContext: Catch - Erreur lors de la récupération de la session initiale:", error);
-      setAuthError(error as AuthError);
+    supabase.auth.getSession().then(({ data, error }) => {
+      if (error) setAuthError(error);
+      setSession(data.session);
       setLoading(false);
     });
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event: AuthChangeEvent, newSession: Session | null) => {
-        console.log('AuthContext: Changement d\'état d\'authentification:', _event, newSession);
-        setAuthError(null);
-        setSession(newSession);
-        setUser(newSession?.user ?? null);
-        setLoading(false);
-      }
-    );
-
-    return () => {
-      subscription?.unsubscribe();
-    };
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, next) => {
+      setSession(next);
+      setLoading(false);
+    });
+    return () => subscription.unsubscribe();
   }, []);
 
-  const handleSignOut = async () => {
-    setLoading(true);
-    setAuthError(null);
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-      console.error('AuthContext: Erreur lors de la déconnexion:', error);
-      setAuthError(error);
+  const refreshProfile = useCallback(async () => {
+    if (!user) { setProfile(null); return; }
+    try {
+      setProfile(await fetchProfile(user.id));
+    } catch {
+      setProfile(null);
     }
-    setLoading(false);
-  };
+  }, [user]);
 
-  const value = {
-    session,
-    user,
-    loading,
-    signOut: handleSignOut,
-    authError,
-    refreshUser: refreshUserData, // Exposer la fonction refreshUser
-  };
+  useEffect(() => { refreshProfile(); }, [refreshProfile]);
+
+  const refreshUser = useCallback(async () => {
+    const { data, error } = await supabase.auth.refreshSession();
+    if (error) setAuthError(error);
+    if (data.session) setSession(data.session);
+  }, []);
+
+  const signOut = useCallback(async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) setAuthError(error);
+    setProfile(null);
+  }, []);
+
+  const value = useMemo<AuthContextType>(() => ({
+    session, user, loading, authError, profile,
+    isPremium: profile?.plan === 'premium' || profile?.account_type === 'admin',
+    signOut, refreshUser, refreshProfile,
+  }), [session, user, loading, authError, profile, signOut, refreshUser, refreshProfile]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-};
+}
 
-export const useAuth = (): AuthContextType => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth doit être utilisé à l\'intérieur d\'un AuthProvider');
-  }
-  return context;
-};
+// eslint-disable-next-line react-refresh/only-export-components
+export function useAuth(): AuthContextType {
+  const ctx = useContext(AuthContext);
+  if (!ctx) throw new Error("useAuth doit être utilisé à l'intérieur d'un AuthProvider");
+  return ctx;
+}

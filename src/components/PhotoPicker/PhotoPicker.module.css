@@ -1,0 +1,13 @@
+.wrap { display: flex; flex-direction: column; gap: var(--sp-2); min-width: 0; }
+.label { font-size: var(--fs-sm); font-weight: 600; }
+.target { display: block; cursor: pointer; border-radius: var(--r-cushion); }
+.target:focus-within, .wrap:has(input:focus-visible) .target { outline: 2px solid var(--brass); outline-offset: 3px; }
+.prompt {
+  position: absolute; inset: 0; z-index: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: var(--sp-2); color: var(--text-2); font-size: var(--fs-sm); text-align: center; padding: var(--sp-4);
+}
+.target:hover .prompt { color: var(--text); }
+.remove { align-self: flex-start; display: inline-flex; align-items: center; gap: 4px; color: var(--text-2); font-size: var(--fs-sm); padding: 4px 0; }
+.remove:hover { color: var(--danger); }
+.hint { font-size: var(--fs-xs); color: var(--text-3); }
+.error { font-size: var(--fs-sm); color: var(--danger); }

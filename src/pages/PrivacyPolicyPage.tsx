@@ -1,6 +1,6 @@
 // client/src/pages/PrivacyPolicyPage.tsx
 import React from 'react';
-import styles from './PrivacyPolicyPage.module.css'; // Ce fichier CSS sera créé
+import styles from './StaticPage.module.css';
 import { Link } from 'react-router-dom';
 
 const PrivacyPolicyPage: React.FC = () => {

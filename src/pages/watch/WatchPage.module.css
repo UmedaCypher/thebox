@@ -1,0 +1,52 @@
+.layout { display: grid; gap: var(--sp-6); }
+@media (min-width: 900px) {
+  .layout { grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: var(--sp-7); align-items: start; }
+  .media { position: sticky; top: calc(var(--header-h) + var(--sp-5)); }
+}
+.media { display: flex; flex-direction: column; gap: var(--sp-3); }
+.hero { width: 100%; }
+@media (max-width: 899px) { .hero { width: min(100%, 38vh, 420px); margin: 0 auto; } }
+.thumbs { display: flex; gap: var(--sp-2); overflow-x: auto; padding: 2px; }
+.thumb { width: 64px; flex: none; border-radius: 14px; opacity: 0.6; }
+.thumb > div { border-radius: 14px; }
+.thumb[aria-selected='true'] { opacity: 1; outline: 1px solid var(--brass); outline-offset: 2px; }
+
+.body { display: flex; flex-direction: column; gap: var(--sp-5); min-width: 0; }
+.body header { margin-bottom: 0; }
+.body h1 { font-size: clamp(var(--fs-2xl), 5vw, var(--fs-3xl)); }
+
+.quick { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-4); }
+.edit { display: inline-flex; align-items: center; gap: 6px; color: var(--text-2); font-size: var(--fs-sm); font-weight: 600; text-decoration: none; }
+.edit:hover { color: var(--text); }
+
+.panel { min-height: 160px; }
+.stack { display: flex; flex-direction: column; gap: var(--sp-5); }
+.rowBetween { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3); flex-wrap: wrap; }
+.subtle { color: var(--text-2); font-size: var(--fs-sm); }
+.subtle a { color: var(--brass); }
+
+.specs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--sp-5); }
+.specs > div { padding: var(--sp-3) 0; border-bottom: 1px solid var(--line); min-width: 0; }
+.specs dt { font-size: var(--fs-xs); color: var(--text-3); }
+.specs dd { font-size: var(--fs-md); overflow-wrap: anywhere; }
+
+.story h3 { font-size: var(--fs-lg); margin-bottom: var(--sp-2); }
+.story p { color: var(--text-2); white-space: pre-line; }
+
+.shareBox { padding: var(--sp-4); border-radius: var(--r-control); border: 1px dashed var(--seam); display: flex; flex-direction: column; gap: var(--sp-4); }
+.shareRow { display: flex; align-items: center; gap: var(--sp-4); flex-wrap: wrap; }
+
+.statsRow { display: flex; flex-wrap: wrap; gap: var(--sp-5) var(--sp-7); }
+.lockedStat { display: inline-flex; flex-direction: column; align-items: flex-start; gap: 6px; text-align: left; }
+.lockedValue { font-family: var(--font-display); font-size: var(--fs-lg); color: var(--text-3); }
+
+.timeline { list-style: none; display: flex; flex-direction: column; }
+.timeline li { position: relative; padding: var(--sp-3) var(--sp-7) var(--sp-4) var(--sp-5); border-left: 1px solid var(--seam); }
+.timeline li::before { content: ''; position: absolute; left: -4px; top: 18px; width: 7px; height: 7px; border-radius: 50%; background: var(--brass); }
+.timeline p { color: var(--text-2); font-size: var(--fs-sm); margin-top: var(--sp-1); }
+.timelineHead { display: flex; justify-content: space-between; gap: var(--sp-3); }
+.timelineHead span { color: var(--text-2); font-size: var(--fs-sm); }
+.timelineDelete { position: absolute; right: 0; top: 50%; transform: translateY(-50%); }
+
+.delete { align-self: flex-start; color: var(--text-3); }
+.delete:hover:not(:disabled) { color: var(--danger); }

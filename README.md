@@ -1,54 +1,43 @@
-# React + TypeScript + Vite
+# The Box
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+L'écrin numérique des collectionneurs de montres : une fiche (passeport) par montre, un calendrier de portage,
+une galerie de photos au poignet filtrable par tour de poignet. Application web installable (PWA).
 
-Currently, two official plugins are available:
+## Offre
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+| Gratuit | Premium |
+| --- | --- |
+| 6 montres | Collection illimitée |
+| Passeport partageable | Carnet d'entretien et rappels |
+| Calendrier de portage et image du mois | Statistiques : coût par port, montres dormantes, rotation |
+| Galerie au poignet | Historique de la valeur déclarée |
+| | Wishlist avec prix cible |
+| | Inventaire PDF pour l'assurance |
 
-## Expanding the ESLint configuration
+Les prix et valeurs sont déclarés par l'utilisateur et ne sont jamais publics.
+Réglages produit (limite gratuite, mode liste d'attente, adresse de contact) : `src/lib/features.ts`.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Lancer en local
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+```bash
+npm install
+cp .env.example .env   # puis renseigner l'URL et la clé anon Supabase
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+`npm run build` vérifie les types et construit l'application ; `npm run lint` contrôle le code.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Structure
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+- `src/components/ui` : composants du système de design « Écrin » (boutons, champs, coussin, feuille…)
+- `src/index.css` : couleurs, typographie et espacements ; thème sombre « écrin » et thème clair « soie »
+- `src/lib/api.ts` : tous les accès à Supabase
+- `src/pages` : un dossier par écran
+- `src/paused` : messagerie, marché et espace revendeur, en pause
+- `supabase/migrations` : scripts SQL à exécuter dans Supabase, dans l'ordre
+- `supabase/schema` : trace du schéma de la base
+
+## Base de données
+
+Chaque évolution de la base est un fichier de `supabase/migrations`, à coller dans
+Supabase → SQL Editor (ou `npx supabase db push`). Voir `supabase/schema/README.md` pour tenir la trace à jour.
