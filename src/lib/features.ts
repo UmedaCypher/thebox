@@ -22,12 +22,18 @@ export const LAUNCH_MODE: 'waitlist' | 'open' = 'waitlist';
  */
 export const PAYMENTS_ENABLED = false;
 
-/** Prix affiché. Le vrai prix est celui défini dans Stripe : garder les deux identiques. */
-export const PREMIUM_PRICE = { amount: '39 €', period: 'par an' };
-export const PREMIUM_PRICE_LABEL = `${PREMIUM_PRICE.amount} ${PREMIUM_PRICE.period}`;
+/**
+ * Prix affichés. Les vrais prix sont ceux définis dans Stripe (STRIPE_PRICE_MONTHLY / STRIPE_PRICE_YEARLY) :
+ * garder les deux identiques.
+ */
+export type BillingInterval = 'month' | 'year';
+export const PREMIUM_PRICES: Record<BillingInterval, { amount: string; period: string; note?: string }> = {
+  month: { amount: '2 €', period: 'par mois' },
+  year: { amount: '20 €', period: 'par an', note: '2 mois offerts' },
+};
 
 /**
  * Adresse affichée sur la page Contact (lien mailto).
- * À RENSEIGNER avant la mise en ligne : tant qu'elle est vide, la page l'indique.
+ * Provisoire : à remplacer par l'adresse dédiée quand le nom définitif de l'app sera choisi.
  */
-export const CONTACT_EMAIL = '';
+export const CONTACT_EMAIL = 'contact@maison-mahe.com';

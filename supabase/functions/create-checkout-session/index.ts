@@ -5,7 +5,8 @@
 //
 // Secrets nécessaires (Supabase → Edge Functions → Secrets) :
 //   STRIPE_SECRET_KEY  clé secrète Stripe (sk_test_… puis sk_live_…)
-//   STRIPE_PRICE_ID    identifiant du prix annuel (price_…)
+//   STRIPE_PRICE_MONTHLY  identifiant du prix mensuel (price_…, 2 €/mois)
+//   STRIPE_PRICE_YEARLY   identifiant du prix annuel (price_…, 20 €/an)
 //   SITE_URL           adresse publique de l'app, sans / final (ex. https://thebox.app)
 // SUPABASE_URL, SUPABASE_ANON_KEY et SUPABASE_SERVICE_ROLE_KEY sont fournis automatiquement.
 
@@ -46,6 +47,11 @@ Deno.serve(async (req) => {
     const { data: { user }, error: userError } = await userClient.auth.getUser();
     if (userError || !user) return json({ error: 'Connectez-vous pour passer à Premium.' }, 401);
 
+    // Formule choisie : uniquement 'month' ou 'year' (l'app n'envoie jamais d'identifiant de prix)
+    const body = await req.json().catch(() => ({}));
+    const interval = body?.interval === 'month' ? 'month' : 'year';
+    const priceId = env(interval === 'month' ? 'STRIPE_PRICE_MONTHLY' : 'STRIPE_PRICE_YEARLY');
+
     const admin = createClient(env('SUPABASE_URL'), env('SUPABASE_SERVICE_ROLE_KEY'));
 
     const { data: profile } = await admin.from('profiles').select('plan').eq('id', user.id).maybeSingle();
@@ -73,7 +79,7 @@ Deno.serve(async (req) => {
       mode: 'subscription',
       customer: customerId,
       client_reference_id: user.id,
-      line_items: [{ price: env('STRIPE_PRICE_ID'), quantity: 1 }],
+      line_items: [{ price: priceId, quantity: 1 }],
       subscription_data: { metadata: { supabase_user_id: user.id } },
       metadata: { supabase_user_id: user.id },
       allow_promotion_codes: true,

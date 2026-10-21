@@ -141,7 +141,7 @@ export default function AccountPage() {
               ? `Abonnement résilié : Premium reste actif jusqu'au ${formatDate(sub.data.current_period_end)}.`
               : sub.data.status === 'past_due'
                 ? 'Le dernier paiement a échoué. Mettez à jour votre carte pour garder Premium.'
-                : `Abonnement annuel, prochain renouvellement le ${formatDate(sub.data.current_period_end)}.`}
+                : `Abonnement Premium, prochain renouvellement le ${formatDate(sub.data.current_period_end)}.`}
           </p>
         )}
         {portalError && <Notice tone="error">{portalError}</Notice>}

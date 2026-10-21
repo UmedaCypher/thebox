@@ -279,8 +279,8 @@ export async function fetchNews(feedUrl: string): Promise<NewsItem[]> {
 
 /* ---------- Abonnement (Stripe) ---------- */
 
-async function invokeForUrl(fn: 'create-checkout-session' | 'create-portal-session'): Promise<string> {
-  const { data, error } = await supabase.functions.invoke(fn, { body: {} });
+async function invokeForUrl(fn: 'create-checkout-session' | 'create-portal-session', body: Record<string, string> = {}): Promise<string> {
+  const { data, error } = await supabase.functions.invoke(fn, { body });
   if (error) {
     // Le message précis renvoyé par la fonction se trouve dans la réponse.
     const ctx = (error as { context?: Response }).context;
@@ -291,9 +291,9 @@ async function invokeForUrl(fn: 'create-checkout-session' | 'create-portal-sessi
   return data.url as string;
 }
 
-/** Envoie vers la page de paiement Stripe. */
-export async function startCheckout() {
-  window.location.assign(await invokeForUrl('create-checkout-session'));
+/** Envoie vers la page de paiement Stripe, au mois ou à l'année. */
+export async function startCheckout(interval: 'month' | 'year') {
+  window.location.assign(await invokeForUrl('create-checkout-session', { interval }));
 }
 
 /** Envoie vers l'espace client Stripe (carte, factures, résiliation). */

@@ -19,8 +19,11 @@ Supabase → **SQL Editor** → coller et exécuter `supabase/migrations/2026102
 
 ## 2. Stripe
 
-1. **Produit et prix** : Catalogue de produits → Ajouter un produit « The Box Premium »,
-   prix récurrent **annuel**, 39 €. Copier l'identifiant du prix (`price_…`).
+1. **Produit et prix** : Catalogue de produits → Ajouter un produit « The Box Premium » avec **deux prix récurrents** :
+   - 2 € **par mois** ;
+   - 20 € **par an**.
+
+   Copier l'identifiant de chaque prix (`price_…`).
 2. **Clé secrète** : Développeurs → Clés API → copier la clé secrète (`sk_test_…`).
 3. **Espace client** : Paramètres → Facturation → Portail client → activer
    « Mettre à jour le moyen de paiement », « Historique des factures » et « Annuler l'abonnement »
@@ -33,7 +36,8 @@ Supabase → **Edge Functions** → **Secrets** → ajouter :
 | Nom | Valeur |
 | --- | --- |
 | `STRIPE_SECRET_KEY` | `sk_test_…` |
-| `STRIPE_PRICE_ID` | `price_…` |
+| `STRIPE_PRICE_MONTHLY` | `price_…` du prix mensuel |
+| `STRIPE_PRICE_YEARLY` | `price_…` du prix annuel |
 | `SITE_URL` | l'adresse de l'app, sans `/` final (ex. `https://thebox.app`) |
 | `STRIPE_WEBHOOK_SECRET` | ajouté à l'étape 5 |
 
@@ -70,7 +74,7 @@ Copier le **secret de signature** (`whsec_…`) dans le secret Supabase `STRIPE_
 
 ## 6. Activer dans l'app
 
-Dans `src/lib/features.ts` : `PAYMENTS_ENABLED = true`, et vérifier que `PREMIUM_PRICE` affiche le même prix que Stripe.
+Dans `src/lib/features.ts` : `PAYMENTS_ENABLED = true`, et vérifier que `PREMIUM_PRICES` affiche les mêmes prix que Stripe.
 
 ## 7. Tester
 

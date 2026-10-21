@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { FREE_WATCH_LIMIT, PAYMENTS_ENABLED, PREMIUM_PRICE, PREMIUM_PRICE_LABEL } from '../../lib/features';
+import { FREE_WATCH_LIMIT, PAYMENTS_ENABLED, PREMIUM_PRICES } from '../../lib/features';
+import type { BillingInterval } from '../../lib/features';
 import { PREMIUM_FEATURES } from '../../lib/premium';
 import { openBillingPortal, startCheckout } from '../../lib/api';
-import { Button, LinkButton, Notice, PageHeader } from '../../components/ui';
+import { Button, LinkButton, Notice, PageHeader, Segmented } from '../../components/ui';
 import WaitlistForm from '../../components/Waitlist/WaitlistForm';
 import s from './PremiumPage.module.css';
 
@@ -21,6 +22,8 @@ export default function PremiumPage() {
   const [params, setParams] = useSearchParams();
   const result = params.get('paiement');
   const [accepted, setAccepted] = useState(false);
+  const [interval, setInterval_] = useState<BillingInterval>('year');
+  const price = PREMIUM_PRICES[interval];
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [waiting, setWaiting] = useState(result === 'ok');
@@ -39,7 +42,7 @@ export default function PremiumPage() {
 
   const subscribe = async () => {
     setBusy(true); setError(null);
-    try { await startCheckout(); } catch (e) { setError(e instanceof Error ? e.message : 'Paiement indisponible.'); setBusy(false); }
+    try { await startCheckout(interval); } catch (e) { setError(e instanceof Error ? e.message : 'Paiement indisponible.'); setBusy(false); }
   };
   const manage = async () => {
     setBusy(true); setError(null);
@@ -77,7 +80,7 @@ export default function PremiumPage() {
           <input type="checkbox" checked={accepted} onChange={e => setAccepted(e.target.checked)} />
           <span>J'accepte les <Link to="/cgv">conditions générales de vente</Link> et je demande l'accès immédiat à Premium.</span>
         </label>
-        <Button onClick={subscribe} disabled={!accepted || busy}>{busy ? 'Ouverture du paiement…' : `Passer à Premium, ${PREMIUM_PRICE_LABEL}`}</Button>
+        <Button onClick={subscribe} disabled={!accepted || busy}>{busy ? 'Ouverture du paiement…' : `Passer à Premium, ${price.amount} ${price.period}`}</Button>
         <p className={s.small}>Paiement sécurisé par Stripe. Résiliable à tout moment depuis votre profil : Premium reste actif jusqu'à la fin de la période payée.</p>
       </div>
     );
@@ -108,7 +111,12 @@ export default function PremiumPage() {
 
         <section className={`${s.plan} ${s.premium}`}>
           <h2>Premium</h2>
-          <p className={s.price}>{PREMIUM_PRICE.amount} <span>{PREMIUM_PRICE.period}{!PAYMENTS_ENABLED && ', bientôt disponible'}</span></p>
+          <Segmented label="Facturation" value={interval} onChange={setInterval_}
+            options={[{ value: 'year', label: 'À l’année' }, { value: 'month', label: 'Au mois' }]} />
+          <p className={s.price}>
+            {price.amount}
+            <span>{price.period}{price.note && `, ${price.note}`}{!PAYMENTS_ENABLED && '. Bientôt disponible'}</span>
+          </p>
           <p className={s.includes}>Tout le gratuit, et :</p>
           <ul>{PREMIUM_FEATURES.map(f => <li key={f.title}><strong>{f.title}</strong>{f.text}</li>)}</ul>
           {action()}
