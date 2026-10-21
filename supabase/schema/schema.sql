@@ -1,12 +1,16 @@
 -- =============================================================================
 -- THE BOX — Schéma de la base Supabase (schéma public)
--- Instantané du : 2026-10-20
+-- Instantané du : 2026-10-21, après les migrations :
+--   20261020120000_recadrage_collectionneur.sql
+--   20261020180000_abonnements_stripe.sql
+--   20261021100000_securite_lectures_publiques.sql
 -- Source : export "Schema" du tableau de bord Supabase (contexte uniquement)
 --
 -- Ce fichier est une TRACE de la structure des tables, pas une migration.
 -- Il n'est pas exécutable tel quel (ordre des tables, types USER-DEFINED).
 -- Il ne contient PAS : les types enum, les politiques RLS, les fonctions RPC,
--- les triggers, ni les règles des buckets Storage.
+-- les triggers, ni les règles des buckets Storage (voir supabase/migrations).
+-- Note : l'export tronque « NOT VALID » en « NOT VALI) » sur watches.current_estimated_value.
 --
 -- Mise à jour : voir supabase/schema/README.md
 -- =============================================================================
@@ -30,6 +34,7 @@ CREATE TABLE public.profiles (
   wrist_size_mm numeric,
   allow_private_messages boolean DEFAULT true,
   account_type USER-DEFINED NOT NULL DEFAULT 'free'::user_account_type,
+  plan text NOT NULL DEFAULT 'free'::text CHECK (plan = ANY (ARRAY['free'::text, 'premium'::text])),
   CONSTRAINT profiles_pkey PRIMARY KEY (id),
   CONSTRAINT profiles_id_fkey FOREIGN KEY (id) REFERENCES auth.users(id)
 );
@@ -49,7 +54,7 @@ CREATE TABLE public.watches (
   purchase_date date,
   purchase_location text,
   notes_history text,
-  current_estimated_value numeric,
+  current_estimated_value numeric CHECK (current_estimated_value >= 0::numeric) NOT VALI),
   created_at timestamp with time zone DEFAULT now(),
   updated_at timestamp with time zone DEFAULT now(),
   bracelet_type text,
@@ -61,7 +66,8 @@ CREATE TABLE public.watches (
   last_service_date date,
   sale_price numeric,
   current_location_id uuid,
-  current_status USER-DEFINED NOT NULL,
+  current_status USER-DEFINED NOT NULL DEFAULT 'in_collection'::watch_current_status,
+  passport_public boolean NOT NULL DEFAULT false,
   CONSTRAINT watches_pkey PRIMARY KEY (id),
   CONSTRAINT watches_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id),
   CONSTRAINT watches_current_location_id_fkey FOREIGN KEY (current_location_id) REFERENCES public.locations(id)
@@ -118,8 +124,8 @@ CREATE TABLE public.photos (
   updated_at timestamp with time zone DEFAULT now(),
   created_at timestamp with time zone DEFAULT now(),
   CONSTRAINT photos_pkey PRIMARY KEY (id),
-  CONSTRAINT photos_watch_id_fkey FOREIGN KEY (watch_id) REFERENCES public.watches(id),
-  CONSTRAINT photos_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id)
+  CONSTRAINT photos_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id),
+  CONSTRAINT photos_watch_id_fkey FOREIGN KEY (watch_id) REFERENCES public.watches(id)
 );
 CREATE TABLE public.conversations (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
@@ -218,8 +224,8 @@ CREATE TABLE public.documents (
   created_at timestamp with time zone DEFAULT now(),
   updated_at timestamp with time zone DEFAULT now(),
   CONSTRAINT documents_pkey PRIMARY KEY (id),
-  CONSTRAINT documents_watch_id_fkey FOREIGN KEY (watch_id) REFERENCES public.watches(id),
-  CONSTRAINT documents_pro_id_fkey FOREIGN KEY (pro_id) REFERENCES public.profiles(id)
+  CONSTRAINT documents_pro_id_fkey FOREIGN KEY (pro_id) REFERENCES public.profiles(id),
+  CONSTRAINT documents_watch_id_fkey FOREIGN KEY (watch_id) REFERENCES public.watches(id)
 );
 CREATE TABLE public.watch_service_history (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
@@ -235,10 +241,10 @@ CREATE TABLE public.watch_service_history (
   created_at timestamp with time zone DEFAULT now(),
   updated_at timestamp with time zone DEFAULT now(),
   CONSTRAINT watch_service_history_pkey PRIMARY KEY (id),
-  CONSTRAINT watch_service_history_watch_id_fkey FOREIGN KEY (watch_id) REFERENCES public.watches(id),
   CONSTRAINT watch_service_history_pro_id_fkey FOREIGN KEY (pro_id) REFERENCES public.profiles(id),
   CONSTRAINT watch_service_history_service_provider_pro_id_fkey FOREIGN KEY (service_provider_pro_id) REFERENCES public.profiles(id),
-  CONSTRAINT watch_service_history_invoice_id_fkey FOREIGN KEY (invoice_id) REFERENCES public.invoices(id)
+  CONSTRAINT watch_service_history_invoice_id_fkey FOREIGN KEY (invoice_id) REFERENCES public.invoices(id),
+  CONSTRAINT watch_service_history_watch_id_fkey FOREIGN KEY (watch_id) REFERENCES public.watches(id)
 );
 CREATE TABLE public.market_prices (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
@@ -255,4 +261,75 @@ CREATE TABLE public.market_prices (
   CONSTRAINT market_prices_pkey PRIMARY KEY (id),
   CONSTRAINT market_prices_watch_condition_id_fkey FOREIGN KEY (watch_condition_id) REFERENCES public.watch_conditions(id),
   CONSTRAINT market_prices_brand_id_fkey FOREIGN KEY (brand_id) REFERENCES public.brands(id)
+);
+CREATE TABLE public.wear_logs (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL,
+  watch_id uuid NOT NULL,
+  worn_on date NOT NULL,
+  note text CHECK (char_length(note) <= 280),
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT wear_logs_pkey PRIMARY KEY (id),
+  CONSTRAINT wear_logs_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id),
+  CONSTRAINT wear_logs_watch_id_fkey FOREIGN KEY (watch_id) REFERENCES public.watches(id)
+);
+CREATE TABLE public.maintenance_entries (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL,
+  watch_id uuid NOT NULL,
+  performed_on date NOT NULL,
+  kind text NOT NULL CHECK (kind = ANY (ARRAY['revision'::text, 'polissage'::text, 'reglage'::text, 'etancheite'::text, 'reparation'::text, 'pile'::text, 'bracelet'::text, 'autre'::text])),
+  provider text CHECK (char_length(provider) <= 120),
+  cost numeric CHECK (cost >= 0::numeric),
+  notes text CHECK (char_length(notes) <= 2000),
+  next_due_on date,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT maintenance_entries_pkey PRIMARY KEY (id),
+  CONSTRAINT maintenance_entries_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id),
+  CONSTRAINT maintenance_entries_watch_id_fkey FOREIGN KEY (watch_id) REFERENCES public.watches(id)
+);
+CREATE TABLE public.watch_value_history (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL,
+  watch_id uuid NOT NULL,
+  value numeric NOT NULL CHECK (value >= 0::numeric),
+  recorded_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT watch_value_history_pkey PRIMARY KEY (id),
+  CONSTRAINT watch_value_history_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id),
+  CONSTRAINT watch_value_history_watch_id_fkey FOREIGN KEY (watch_id) REFERENCES public.watches(id)
+);
+CREATE TABLE public.wishlist_items (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL,
+  brand text NOT NULL CHECK (char_length(brand) >= 1 AND char_length(brand) <= 80),
+  model text NOT NULL CHECK (char_length(model) >= 1 AND char_length(model) <= 120),
+  reference_number text CHECK (char_length(reference_number) <= 60),
+  target_price numeric CHECK (target_price >= 0::numeric),
+  priority smallint NOT NULL DEFAULT 2 CHECK (priority >= 1 AND priority <= 3),
+  notes text CHECK (char_length(notes) <= 1000),
+  acquired_at timestamp with time zone,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT wishlist_items_pkey PRIMARY KEY (id),
+  CONSTRAINT wishlist_items_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id)
+);
+CREATE TABLE public.waitlist (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  email text NOT NULL CHECK (email ~* '^[^@\s]+@[^@\s]+\.[^@\s]+$'::text AND char_length(email) <= 254),
+  watch_count text CHECK (watch_count = ANY (ARRAY['0'::text, '1-2'::text, '3-5'::text, '6-10'::text, '11+'::text])),
+  interested_in_premium boolean NOT NULL DEFAULT false,
+  source text CHECK (char_length(source) <= 60),
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT waitlist_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.subscriptions (
+  user_id uuid NOT NULL,
+  stripe_customer_id text NOT NULL UNIQUE,
+  stripe_subscription_id text UNIQUE,
+  status text NOT NULL DEFAULT 'incomplete'::text,
+  price_id text,
+  current_period_end timestamp with time zone,
+  cancel_at_period_end boolean NOT NULL DEFAULT false,
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT subscriptions_pkey PRIMARY KEY (user_id),
+  CONSTRAINT subscriptions_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id)
 );

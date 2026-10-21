@@ -40,10 +40,26 @@ Après avoir exécuté une migration dans Supabase, refaites l'export ci-dessus 
 - `20261021100000_securite_lectures_publiques.sql` : fin des lectures publiques directes des montres
   (prix) et des profils (téléphone…) ; galerie limitée aux photos partagées.
 
+## Dernier instantané
+
+21/10/2026, après les trois migrations ci-dessus (exécutées et vérifiées dans Supabase).
+
+## Ce qui n'est décrit que dans les migrations
+Créés par les fichiers de `supabase/migrations` (donc tracés) :
+- Règles RLS des nouvelles tables (`wear_logs`, `maintenance_entries`, `watch_value_history`,
+  `wishlist_items`, `waitlist`, `subscriptions`) et lecture « propriétaire uniquement » sur `watches` et `profiles`
+- Fonctions : `free_watch_limit`, `get_watch_passport`, `get_public_collection`,
+  `get_public_wrist_shots`, `get_gallery_available_brands`, `private.is_premium`
+- Déclencheurs : `profiles_protect_privileges`, `watches_enforce_limit`, `watches_record_value`
+
 ## Ce qui manque encore à cette trace
-- Types enum : `user_account_type`, `watch_status` (nom à confirmer), `client_status_type`, `invoice_status_type`
-- Politiques RLS de chaque table et des buckets `watch.images` et `avatars`
-- Fonctions RPC : `get_user_conversations`, `create_or_get_conversation`, `count_unread_conversations`,
-  `get_public_wrist_shots`, `get_gallery_available_brands`, `search_market_watches`,
-  `get_market_available_brands`, `create_invoice_and_update_inventory`
-- Trigger de création du profil à l'inscription (`handle_new_user`)
+Antérieur aux migrations, visible seulement dans Supabase :
+- Types enum : `user_account_type`, `watch_current_status`, `client_status_type`, `invoice_status_type`
+- Règles RLS d'origine de `photos` et des tables en pause, règles des buckets `watch.images` et `avatars`
+- Fonctions des fonctionnalités en pause : `get_user_conversations`, `create_or_get_conversation`,
+  `count_unread_conversations`, `search_market_watches`, `get_market_available_brands`,
+  `create_invoice_and_update_inventory`
+- Trigger de création du profil à l'inscription (`handle_new_user`), vérifié le 21/10 :
+  il ne copie ni `plan` ni `account_type`
+
+Pour tout capturer d'un coup : `npx supabase db dump --schema public` (voir plus haut).
