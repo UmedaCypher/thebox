@@ -37,6 +37,8 @@ Après avoir exécuté une migration dans Supabase, refaites l'export ci-dessus 
 - `20261020120000_recadrage_collectionneur.sql` : limite de 6 montres en gratuit, offre Premium (`profiles.plan`),
   calendrier de portage, carnet d'entretien, historique de valeur, wishlist, liste d'attente, passeport public.
 - `20261020180000_abonnements_stripe.sql` : table `subscriptions` tenue à jour par le webhook Stripe.
+- `20261021100000_securite_lectures_publiques.sql` : fin des lectures publiques directes des montres
+  (prix) et des profils (téléphone…) ; galerie limitée aux photos partagées.
 
 ## Ce qui manque encore à cette trace
 - Types enum : `user_account_type`, `watch_status` (nom à confirmer), `client_status_type`, `invoice_status_type`
