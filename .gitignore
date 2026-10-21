@@ -25,3 +25,6 @@ dist-ssr
 
 # Ignorer le fichier d'environnement contenant les clés secrètes
 .env
+.env.*
+!.env.example
+dev-dist

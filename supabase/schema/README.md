@@ -29,6 +29,15 @@ seulement la structure.
 - Noter en une ligne dans le message de commit ce qui a changé (ex. « ajout table wear_logs »).
 - Ne jamais commiter de données ni de clés (`.env`, clé `service_role`).
 
+## Migrations
+
+Les changements de structure sont écrits dans `supabase/migrations/`, un fichier daté par évolution.
+Après avoir exécuté une migration dans Supabase, refaites l'export ci-dessus pour que `schema.sql` reste fidèle.
+
+- `20261020120000_recadrage_collectionneur.sql` : limite de 6 montres en gratuit, offre Premium (`profiles.plan`),
+  calendrier de portage, carnet d'entretien, historique de valeur, wishlist, liste d'attente, passeport public.
+- `20261020180000_abonnements_stripe.sql` : table `subscriptions` tenue à jour par le webhook Stripe.
+
 ## Ce qui manque encore à cette trace
 - Types enum : `user_account_type`, `watch_status` (nom à confirmer), `client_status_type`, `invoice_status_type`
 - Politiques RLS de chaque table et des buckets `watch.images` et `avatars`

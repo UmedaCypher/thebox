@@ -9,3 +9,16 @@ entrypoint = "./functions/rss-feed-parser/index.ts"
 # Specifies static files to be bundled with the function. Supports glob patterns.
 # For example, if you want to serve static HTML pages in your function:
 # static_files = [ "./functions/rss-feed-parser/*.html" ]
+
+[functions.create-checkout-session]
+enabled = true
+verify_jwt = true
+
+[functions.create-portal-session]
+enabled = true
+verify_jwt = true
+
+# Appelée par Stripe, pas par l'app : la sécurité repose sur la signature Stripe.
+[functions.stripe-webhook]
+enabled = true
+verify_jwt = false

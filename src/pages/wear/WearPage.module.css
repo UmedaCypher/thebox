@@ -1,0 +1,65 @@
+.sectionTitle { font-size: var(--fs-lg); margin-bottom: var(--sp-4); }
+
+/* Choix du jour : un rang de coussins à faire défiler */
+.today { margin-bottom: var(--sp-7); }
+.picker {
+  list-style: none; display: grid; grid-auto-flow: column; grid-auto-columns: 112px; gap: var(--sp-4);
+  overflow-x: auto; scroll-snap-type: x mandatory; padding: 4px 4px var(--sp-2); margin: 0 -4px;
+  scrollbar-width: thin;
+}
+.picker li { scroll-snap-align: start; }
+.pick { display: flex; flex-direction: column; gap: 2px; width: 100%; text-align: left; border-radius: var(--r-cushion); }
+.pick > div { margin-bottom: var(--sp-2); transition: box-shadow 160ms var(--ease); }
+.pick[aria-pressed='true'] > div { box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--brass); }
+.pickName { font-family: var(--font-display); font-size: var(--fs-md); line-height: 1.2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pickBrand { font-size: var(--fs-xs); color: var(--text-3); }
+.check {
+  position: absolute; z-index: 3; right: 8px; bottom: 8px; width: 30px; height: 30px; border-radius: 50%;
+  display: grid; place-items: center; background: var(--brass); color: var(--brass-ink);
+}
+
+/* Mois */
+.month { max-width: 640px; }
+.monthHead { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--sp-3); }
+.monthTitle { font-size: var(--fs-xl); }
+.calendar { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
+.weekday { text-align: center; font-size: var(--fs-xs); color: var(--text-3); padding-bottom: var(--sp-1); }
+.day {
+  aspect-ratio: 1; border-radius: 50%; display: grid; place-items: center; position: relative;
+  background: transparent; border: 1px solid var(--line); color: var(--text-2);
+  transition: border-color 140ms var(--ease);
+}
+.day:hover:not(:disabled) { border-color: var(--brass); }
+.day:disabled { opacity: 0.3; cursor: default; }
+.day[data-today='true'] { border-color: var(--brass); color: var(--text); }
+.day[data-worn='true'] { border-color: var(--brass); background: var(--cushion); }
+.dayNum { font-size: var(--fs-sm); font-variant-numeric: tabular-nums; }
+.dayPhoto { position: absolute; inset: 2px; border-radius: 50%; overflow: hidden; display: grid; place-items: center; color: var(--text); font-size: var(--fs-sm); }
+.dayPhoto img { width: 100%; height: 100%; object-fit: cover; }
+.more {
+  position: absolute; right: -2px; bottom: -2px; min-width: 20px; height: 20px; padding: 0 4px; border-radius: 10px;
+  background: var(--brass); color: var(--brass-ink); font-size: 0.6875rem; font-weight: 700; display: grid; place-items: center;
+}
+
+.monthFoot { margin-top: var(--sp-5); display: flex; flex-direction: column; gap: var(--sp-5); }
+.monthStats { display: flex; flex-wrap: wrap; gap: var(--sp-4) var(--sp-7); }
+.monthActions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-4); }
+.statsLink { color: var(--brass); font-size: var(--fs-sm); font-weight: 600; }
+
+/* Feuille du jour */
+.dayList { list-style: none; display: flex; flex-direction: column; }
+.dayRow { width: 100%; display: flex; align-items: center; gap: var(--sp-4); padding: var(--sp-2) 0; text-align: left; border-bottom: 1px solid var(--line); }
+.dayRowPhoto { width: 56px; flex: none; border-radius: 14px; }
+.dayRowText { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+.dayRowText strong { font-weight: 600; }
+.dayRowText span { color: var(--text-3); font-size: var(--fs-sm); }
+.dayRowCheck { width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--line-strong); display: grid; place-items: center; flex: none; }
+.dayRow[aria-pressed='true'] .dayRowCheck { background: var(--brass); color: var(--brass-ink); border-color: var(--brass); }
+
+/* Grand écran : le calendrier à gauche, le bilan du mois à droite. */
+@media (min-width: 1000px) {
+  .month { max-width: none; display: grid; grid-template-columns: minmax(0, 560px) minmax(0, 1fr); column-gap: var(--sp-8); }
+  .monthHead, .calendar { grid-column: 1; }
+  .monthFoot { grid-column: 2; grid-row: 1 / span 2; margin-top: 56px; align-self: start; }
+  .monthStats { flex-direction: column; gap: var(--sp-5); }
+}

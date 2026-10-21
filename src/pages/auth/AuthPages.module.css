@@ -1,0 +1,14 @@
+.wrap { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: var(--sp-7) var(--gutter); gap: var(--sp-4); }
+.card {
+  width: 100%; max-width: 400px; padding: var(--sp-6) var(--sp-5);
+  border-radius: var(--r-cushion); background: var(--surface); border: 1px solid var(--line);
+  outline: 1px dashed var(--seam); outline-offset: -8px;
+}
+.title { font-size: var(--fs-2xl); margin-bottom: var(--sp-5); text-align: center; }
+.form { display: flex; flex-direction: column; gap: var(--sp-4); }
+.text { color: var(--text-2); text-align: center; }
+.subtle { align-self: center; color: var(--text-2); font-size: var(--fs-sm); }
+.legal { font-size: var(--fs-xs); color: var(--text-3); text-align: center; }
+.legal a { color: var(--text-2); }
+.foot { color: var(--text-2); font-size: var(--fs-sm); }
+.foot a { color: var(--brass); font-weight: 600; }
