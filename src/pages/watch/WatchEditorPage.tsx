@@ -5,7 +5,7 @@ import { Star, Trash2 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useLoad } from '../../hooks/useLoad';
 import {
-  addWatchPhoto, createWatch, deletePhoto, fetchReferenceOptions, getWatch, photoUrl, setMainPhoto, updateWatch, WatchLimitError,
+  addWatchPhoto, createWatch, deletePhoto, fetchReferenceOptions, getWatch, setMainPhoto, thumbSrc, updateWatch, WatchLimitError,
 } from '../../lib/api';
 import type { Photo, Watch, WatchInput } from '../../types';
 import { Button, Cushion, IconButton, Loading, Notice, PageHeader, SelectField, TextArea, TextField, Toggle } from '../../components/ui';
@@ -293,7 +293,7 @@ function ExistingPhotos({ userId, watch, onChange }: { userId: string; watch: Wa
     <ul className={s.existing}>
       {photos.map(p => (
         <li key={p.id}>
-          <Cushion src={photoUrl(p.storage_path)} alt={p.photo_type === 'wrist_shot' ? 'Photo au poignet' : 'Photo de la montre'} />
+          <Cushion src={thumbSrc(p.storage_path).src} fallbackSrc={thumbSrc(p.storage_path).fallback} alt={p.photo_type === 'wrist_shot' ? 'Photo au poignet' : 'Photo de la montre'} />
           <div className={s.existingBar}>
             <IconButton
               label={p.is_main_photo ? 'Photo principale' : 'Définir comme photo principale'}

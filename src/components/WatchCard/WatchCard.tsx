@@ -7,14 +7,15 @@ interface Props {
   brand: string;
   model: string;
   photo: string | null;
+  photoFallback?: string | null;
   meta?: string | null;
 }
 
 /** Une montre posée dans son coussin, son nom dessous. */
-export default function WatchCard({ to, brand, model, photo, meta }: Props) {
+export default function WatchCard({ to, brand, model, photo, photoFallback, meta }: Props) {
   return (
     <Link to={to} className={s.card}>
-      <Cushion src={photo} alt={`${brand} ${model}`} ratio="portrait" />
+      <Cushion src={photo} fallbackSrc={photoFallback} alt={`${brand} ${model}`} ratio="portrait" />
       <span className={s.text}>
         <span className={s.brand}>{brand}</span>
         <span className={s.model}>{model}</span>

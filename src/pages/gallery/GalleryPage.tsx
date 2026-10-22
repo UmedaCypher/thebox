@@ -66,7 +66,7 @@ export default function GalleryPage() {
         <ul className={s.masonry}>
           {shots.data.map(p => (
             <li key={p.id} className={s.item}>
-              <Cushion src={p.url} alt={`${p.brand} ${p.model} au poignet`} ratio="portrait" />
+              <Cushion src={p.thumb} fallbackSrc={p.url} alt={`${p.brand} ${p.model} au poignet`} ratio="portrait" />
               <div className={s.caption}>
                 <span className={s.capModel}>{p.brand} {p.model}</span>
                 <span className={s.capMeta}>

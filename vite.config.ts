@@ -70,7 +70,7 @@ export default defineConfig({
               // Suggestion: Nom de cache unique
               cacheName: 'supabase-watch-images-cache',
               expiration: {
-                maxEntries: 100, // Ajusté pour potentiellement plus d'images de montres
+                maxEntries: 400, // miniatures + pleines tailles
                 maxAgeSeconds: 60 * 60 * 24 * 30 // 30 jours
               },
               cacheableResponse: {

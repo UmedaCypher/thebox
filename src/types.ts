@@ -146,6 +146,7 @@ export interface PublicCollection {
 export interface GalleryShot {
   id: string;
   url: string;
+  thumb: string;
   watch_id: string;
   brand: string;
   model: string;

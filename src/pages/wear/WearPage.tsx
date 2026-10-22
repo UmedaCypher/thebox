@@ -3,11 +3,11 @@ import { Link } from 'react-router-dom';
 import { Check, ChevronLeft, ChevronRight, Share2 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useLoad } from '../../hooks/useLoad';
-import { addWear, listWatches, listWearLogs, mainPhoto, photoUrl, removeWear } from '../../lib/api';
+import { addWear, listWatches, listWearLogs, mainPhoto, photoUrl, removeWear, thumbSrc } from '../../lib/api';
 import { formatDate, plural, toISODate, todayISO } from '../../lib/format';
 import { drawMonthCard, shareImage } from '../../lib/shareCard';
 import type { Watch } from '../../types';
-import { Button, Cushion, EmptyState, IconButton, LinkButton, Loading, Notice, PageHeader, Sheet, Stat } from '../../components/ui';
+import { Button, Cushion, EmptyState, IconButton, Img, LinkButton, Loading, Notice, PageHeader, Sheet, Stat } from '../../components/ui';
 import s from './WearPage.module.css';
 
 const WEEKDAYS = ['lun.', 'mar.', 'mer.', 'jeu.', 'ven.', 'sam.', 'dim.'];
@@ -72,7 +72,9 @@ export default function WearPage() {
     return { daysWorn, distinct: counts.size, top: top ? { watch: byId.get(top[0]), n: top[1] } : null };
   }, [byDay, byId, cursor]);
 
-  const photoFor = (w: Watch | undefined) => (w ? photoUrl(mainPhoto(w.photos)?.storage_path) : null);
+  const pathFor = (w: Watch | undefined) => (w ? mainPhoto(w.photos)?.storage_path ?? null : null);
+  const thumbFor = (w: Watch | undefined) => thumbSrc(pathFor(w));
+  const fullFor = (w: Watch | undefined) => photoUrl(pathFor(w));
 
   const share = async () => {
     setSharing(true);
@@ -80,7 +82,7 @@ export default function WearPage() {
       const photoByDay = new Map<number, string | null>();
       for (let d = 1; d <= daysInMonth; d++) {
         const ids = byDay.get(toISODate(new Date(year, month, d)));
-        if (ids?.length) photoByDay.set(d, photoFor(byId.get(ids[0])));
+        if (ids?.length) photoByDay.set(d, fullFor(byId.get(ids[0])));
       }
       const blob = await drawMonthCard({
         title: monthTitle, year, month, photoByDay, username: profile?.username ?? null,
@@ -127,7 +129,7 @@ export default function WearPage() {
             return (
               <li key={w.id}>
                 <button className={s.pick} aria-pressed={on} onClick={() => toggle(w.id, today)}>
-                  <Cushion src={photoFor(w)} alt="">{on && <span className={s.check}><Check size={18} strokeWidth={2.4} /></span>}</Cushion>
+                  <Cushion src={thumbFor(w).src} fallbackSrc={thumbFor(w).fallback} alt="">{on && <span className={s.check}><Check size={18} strokeWidth={2.4} /></span>}</Cushion>
                   <span className={s.pickName}>{w.model}</span>
                   <span className={s.pickBrand}>{w.brand}</span>
                 </button>
@@ -165,7 +167,7 @@ export default function WearPage() {
               >
                 {first ? (
                   <span className={s.dayPhoto}>
-                    {photoFor(first) ? <img src={photoFor(first)!} alt="" loading="lazy" /> : <span>{i + 1}</span>}
+                    {thumbFor(first).src ? <Img src={thumbFor(first).src!} fallback={thumbFor(first).fallback} alt="" /> : <span>{i + 1}</span>}
                     {ids.length > 1 && <span className={s.more}>+{ids.length - 1}</span>}
                   </span>
                 ) : <span className={s.dayNum}>{i + 1}</span>}
@@ -199,7 +201,7 @@ export default function WearPage() {
               return (
                 <li key={w.id}>
                   <button className={s.dayRow} aria-pressed={on} onClick={() => toggle(w.id, openDay)}>
-                    <Cushion src={photoFor(w)} alt="" className={s.dayRowPhoto} />
+                    <Cushion src={thumbFor(w).src} fallbackSrc={thumbFor(w).fallback} alt="" className={s.dayRowPhoto} />
                     <span className={s.dayRowText}><strong>{w.model}</strong><span>{w.brand}</span></span>
                     <span className={s.dayRowCheck} aria-hidden="true">{on && <Check size={18} strokeWidth={2.4} />}</span>
                   </button>

@@ -1,6 +1,6 @@
 /** Accès aux données Supabase. Les pages n'appellent jamais supabase directement. */
 import { supabase } from './supabaseClient';
-import { preparePhoto } from './images';
+import { preparePhoto, preparePhotoWithThumb } from './images';
 import type {
   GalleryShot, MaintenanceEntry, Passport, Photo, Profile, PublicCollection, Subscription,
   ValuePoint, Watch, WatchInput, WearLog, WishlistItem,
@@ -20,6 +20,18 @@ function fail(error: { message: string; code?: string } | null, fallback: string
 
 export const photoUrl = (path: string | null | undefined) =>
   path ? supabase.storage.from(WATCH_BUCKET).getPublicUrl(path).data.publicUrl : null;
+
+/** Chemin de la miniature d'une photo : même dossier, suffixe « .thumb.jpg ». */
+export const thumbPath = (path: string) => path.replace(/\.[^./]+$/, '') + '.thumb.jpg';
+
+/**
+ * Miniature pour l'affichage en petit, avec la pleine taille en secours :
+ * les photos envoyées avant le 22/10/2026 n'ont pas de miniature.
+ */
+export const thumbSrc = (path: string | null | undefined) =>
+  path ? { src: photoUrl(thumbPath(path)), fallback: photoUrl(path) } : { src: null, fallback: null };
+
+const withThumbs = (paths: string[]) => paths.flatMap(p => [p, thumbPath(p)]);
 
 /** Photo principale : la photo « montre seule » marquée principale, sinon la première disponible. */
 export function mainPhoto(photos: Pick<Photo, 'storage_path' | 'photo_type' | 'is_main_photo'>[] | undefined) {
@@ -83,7 +95,7 @@ export async function updateWatch(userId: string, id: string, input: Partial<Wat
 }
 
 export async function deleteWatch(userId: string, watch: Watch) {
-  const paths = (watch.photos ?? []).map(p => p.storage_path);
+  const paths = withThumbs((watch.photos ?? []).map(p => p.storage_path));
   if (paths.length) await supabase.storage.from(WATCH_BUCKET).remove(paths);
   // Les tables liées sont supprimées en cascade par la base (migration du 20/10/2026).
   const { error } = await supabase.from('watches').delete().eq('id', watch.id).eq('user_id', userId);
@@ -94,10 +106,16 @@ export async function addWatchPhoto(
   userId: string, watchId: string, file: File,
   opts: { type: 'watch_only' | 'wrist_shot'; isMain?: boolean; inGallery?: boolean; wristSizeCm?: number | null },
 ) {
-  const prepared = await preparePhoto(file);
+  const { full: prepared, thumb } = await preparePhotoWithThumb(file);
   const path = `${userId}/${watchId}/${opts.type}/${Date.now()}_${Math.random().toString(36).slice(2, 8)}.jpg`;
-  const up = await supabase.storage.from(WATCH_BUCKET).upload(path, prepared, { contentType: 'image/jpeg' });
+  const opt = { contentType: 'image/jpeg', cacheControl: '31536000' };
+  const [up, upThumb] = await Promise.all([
+    supabase.storage.from(WATCH_BUCKET).upload(path, prepared, opt),
+    supabase.storage.from(WATCH_BUCKET).upload(thumbPath(path), thumb, opt),
+  ]);
   fail(up.error, "Envoi de la photo impossible.");
+  // Une miniature manquante n'empêche pas l'ajout : l'app affiche alors la pleine taille.
+  if (upThumb.error) console.warn('Miniature non envoyée', upThumb.error.message);
 
   if (opts.isMain) {
     await supabase.from('photos').update({ is_main_photo: false }).eq('watch_id', watchId).eq('user_id', userId);
@@ -113,7 +131,7 @@ export async function addWatchPhoto(
 }
 
 export async function deletePhoto(userId: string, photo: Photo) {
-  await supabase.storage.from(WATCH_BUCKET).remove([photo.storage_path]);
+  await supabase.storage.from(WATCH_BUCKET).remove(withThumbs([photo.storage_path]));
   const { error } = await supabase.from('photos').delete().eq('id', photo.id).eq('user_id', userId);
   fail(error, 'Suppression de la photo impossible.');
 }
@@ -262,7 +280,8 @@ export async function listGalleryShots(filters: { brand: string | null; minWrist
   fail(error, 'Chargement de la galerie impossible.');
   type Row = { photo_id: string; photo_storage_path: string; watch_id: string; watch_brand: string; watch_model: string; user_username: string | null; user_wrist_size_cm: number | null };
   return ((data as Row[]) ?? []).map(r => ({
-    id: r.photo_id, url: photoUrl(r.photo_storage_path) ?? '', watch_id: r.watch_id, brand: r.watch_brand,
+    id: r.photo_id, url: photoUrl(r.photo_storage_path) ?? '', thumb: photoUrl(thumbPath(r.photo_storage_path)) ?? '',
+    watch_id: r.watch_id, brand: r.watch_brand,
     model: r.watch_model, username: r.user_username, wrist_size_cm: r.user_wrist_size_cm,
   })).filter(s => s.url);
 }

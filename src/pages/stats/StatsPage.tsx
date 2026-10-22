@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useLoad } from '../../hooks/useLoad';
-import { listValueHistory, listWatches, listWearLogs, mainPhoto, photoUrl } from '../../lib/api';
+import { listValueHistory, listWatches, listWearLogs, mainPhoto, thumbSrc } from '../../lib/api';
 import { daysBetween, formatEuros, plural, toISODate } from '../../lib/format';
 import { Cushion, Loading, Notice, PageHeader, Segmented, Stat } from '../../components/ui';
 import Sparkline from '../../components/Sparkline/Sparkline';
@@ -10,6 +10,7 @@ import PremiumGate from '../../components/PremiumGate/PremiumGate';
 import s from './StatsPage.module.css';
 
 const DORMANT_DAYS = 60;
+const cushionSrc = (path?: string | null) => { const t = thumbSrc(path); return { src: t.src, fallbackSrc: t.fallback }; };
 type Period = '90' | '365' | 'all';
 
 function StatsContent() {
@@ -78,7 +79,7 @@ function StatsContent() {
           {stats.rows.map(r => (
             <li key={r.w.id}>
               <Link to={`/montre/${r.w.id}?onglet=portage`} className={s.barRow}>
-                <Cushion src={photoUrl(mainPhoto(r.w.photos)?.storage_path)} alt="" className={s.thumb} />
+                <Cushion {...cushionSrc(mainPhoto(r.w.photos)?.storage_path)} alt="" className={s.thumb} />
                 <span className={s.barText}>
                   <span className={s.barName}>{r.w.brand} {r.w.model}</span>
                   <span className={s.track}><span style={{ width: `${Math.max(r.share * 100, r.n ? 2 : 0)}%` }} /></span>

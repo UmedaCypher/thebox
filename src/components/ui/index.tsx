@@ -187,13 +187,26 @@ export function PremiumTag() {
 
 /* ---------- Coussin ---------- */
 
-export function Cushion({ src, alt, ratio = 'square', className, children }:
-  { src?: string | null; alt: string; ratio?: 'square' | 'portrait' | 'wide'; className?: string; children?: ReactNode }) {
+/** Image qui bascule une fois sur une source de secours si la première manque (ex. miniature absente). */
+export function Img({ src, fallback, alt, className }: { src: string; fallback?: string | null; alt: string; className?: string }) {
+  return (
+    <img
+      src={src} alt={alt} className={className} loading="lazy" decoding="async"
+      onError={e => {
+        const img = e.currentTarget;
+        if (fallback && img.dataset.fallback !== '1') { img.dataset.fallback = '1'; img.src = fallback; }
+      }}
+    />
+  );
+}
+
+export function Cushion({ src, fallbackSrc, alt, ratio = 'square', className, children }:
+  { src?: string | null; fallbackSrc?: string | null; alt: string; ratio?: 'square' | 'portrait' | 'wide'; className?: string; children?: ReactNode }) {
   const r = ratio === 'portrait' ? s.ratioPortrait : ratio === 'wide' ? s.ratioWide : s.ratioSquare;
   return (
     <div className={cx(s.cushion, r, className)}>
       {src
-        ? <img src={src} alt={alt} loading="lazy" decoding="async" />
+        ? <Img key={src} src={src} fallback={fallbackSrc} alt={alt} />
         : !children && <span className={s.cushionEmpty} aria-label={alt}><WatchIcon size={36} strokeWidth={1.2} /></span>}
       {children}
     </div>

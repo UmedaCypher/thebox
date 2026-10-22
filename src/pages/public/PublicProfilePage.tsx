@@ -1,7 +1,7 @@
 import { useParams } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useLoad } from '../../hooks/useLoad';
-import { getPublicCollection, photoUrl } from '../../lib/api';
+import { getPublicCollection, thumbSrc } from '../../lib/api';
 import { formatDate } from '../../lib/format';
 import { EmptyState, LinkButton, Loading, Notice, PageHeader } from '../../components/ui';
 import WatchCard, { WatchGrid } from '../../components/WatchCard/WatchCard';
@@ -38,7 +38,7 @@ export default function PublicProfilePage() {
         <WatchGrid>
           {p.watches.map(w => (
             <WatchCard key={w.id} to={`/passeport/${w.id}`} brand={w.brand} model={w.model}
-              photo={photoUrl(w.main_photo_path)} meta={[w.reference_number, w.year_of_production].filter(Boolean).join(', ') || null} />
+              photo={thumbSrc(w.main_photo_path).src} photoFallback={thumbSrc(w.main_photo_path).fallback} meta={[w.reference_number, w.year_of_production].filter(Boolean).join(', ') || null} />
           ))}
         </WatchGrid>
       )}

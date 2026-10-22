@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Plus } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useLoad } from '../../hooks/useLoad';
-import { listMaintenance, listWatches, listWearLogs, mainPhoto, photoUrl } from '../../lib/api';
+import { listMaintenance, listWatches, listWearLogs, mainPhoto, thumbSrc } from '../../lib/api';
 import { FREE_WATCH_LIMIT } from '../../lib/features';
 import { daysBetween, formatDate, formatEuros, plural, todayISO } from '../../lib/format';
 import { Button, EmptyState, LinkButton, Loading, Notice, PageHeader, Stat } from '../../components/ui';
@@ -115,7 +115,8 @@ export default function CollectionPage() {
                 to={`/montre/${w.id}`}
                 brand={w.brand}
                 model={w.model}
-                photo={photoUrl(mainPhoto(w.photos)?.storage_path)}
+                photo={thumbSrc(mainPhoto(w.photos)?.storage_path).src}
+                photoFallback={thumbSrc(mainPhoto(w.photos)?.storage_path).fallback}
                 meta={lastWornLabel(lastWorn.get(w.id))}
               />
             ))}

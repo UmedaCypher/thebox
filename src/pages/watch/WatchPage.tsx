@@ -6,7 +6,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useLoad } from '../../hooks/useLoad';
 import {
   addMaintenance, addWear, deleteMaintenance, deleteWatch, getWatch, listMaintenance, listValueHistory,
-  listWearLogs, mainPhoto, photoUrl, removeWear, setPassportPublic,
+  listWearLogs, mainPhoto, photoUrl, removeWear, setPassportPublic, thumbSrc,
 } from '../../lib/api';
 import { formatDate, formatEuros, formatMm, plural, todayISO } from '../../lib/format';
 import type { MaintenanceEntry, MaintenanceKind, Watch } from '../../types';
@@ -83,7 +83,7 @@ export default function WatchPage() {
             <div className={s.thumbs} role="tablist" aria-label="Photos">
               {photos.map((p, i) => (
                 <button key={p.id} role="tab" aria-selected={p === current} aria-label={`Photo ${i + 1}`} onClick={() => setPhotoIndex(i)} className={s.thumb}>
-                  <Cushion src={photoUrl(p.storage_path)} alt="" />
+                  <Cushion src={thumbSrc(p.storage_path).src} fallbackSrc={thumbSrc(p.storage_path).fallback} alt="" />
                 </button>
               ))}
             </div>

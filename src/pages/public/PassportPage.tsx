@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useLoad } from '../../hooks/useLoad';
-import { getPassport, mainPhoto, photoUrl } from '../../lib/api';
+import { getPassport, mainPhoto, photoUrl, thumbSrc } from '../../lib/api';
 import { formatDate, formatMm } from '../../lib/format';
 import { Cushion, LinkButton, Loading, Notice } from '../../components/ui';
 import s from './PassportPage.module.css';
@@ -41,7 +41,7 @@ export default function PassportPage() {
             <div className={s.thumbs}>
               {photos.map((ph, i) => (
                 <button key={ph.storage_path} aria-label={`Photo ${i + 1}`} aria-pressed={ph === current} onClick={() => setIdx(i)}>
-                  <Cushion src={photoUrl(ph.storage_path)} alt="" />
+                  <Cushion src={thumbSrc(ph.storage_path).src} fallbackSrc={thumbSrc(ph.storage_path).fallback} alt="" />
                 </button>
               ))}
             </div>
