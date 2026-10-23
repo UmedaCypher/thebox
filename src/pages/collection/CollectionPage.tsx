@@ -12,17 +12,65 @@ import WatchCard, { WatchGrid } from '../../components/WatchCard/WatchCard';
 import PremiumSheet from '../../components/PremiumSheet/PremiumSheet';
 import CostTeaser from '../../components/CostTeaser/CostTeaser';
 import { analyseCosts } from '../../lib/costPerWear';
+import { defineStrings, useStrings } from '../../i18n';
+import { COMMON } from '../../i18n/common';
 import s from './CollectionPage.module.css';
 
-function lastWornLabel(day: string | undefined) {
-  if (!day) return 'Jamais portée';
+const S = defineStrings({
+  neverWorn: 'Jamais portée',
+  wornToday: "Portée aujourd'hui",
+  wornYesterday: 'Portée hier',
+  wornDaysAgo: (d: number) => `Portée il y a ${plural(d, 'jour', 'jours')}`,
+  opening: "Ouverture de l'écrin…",
+  title: 'Collection',
+  add: 'Ajouter',
+  emptyTitle: 'Votre écrin est vide',
+  addFirst: 'Ajouter ma première montre',
+  emptyText: 'Commencez par la montre que vous portez le plus. Une photo, une marque, un modèle : le reste peut attendre.',
+  summaryAria: 'Résumé de la collection',
+  watches: (n: number) => (n > 1 ? 'montres' : 'montre'),
+  declaredValue: 'valeur déclarée',
+  brands: (n: number) => (n > 1 ? 'marques' : 'marque'),
+  freeFull: 'Collection gratuite complète.',
+  goPremium: 'Passer à Premium',
+  quota: (n: number, max: number) => `${n} sur ${max} montres de la collection gratuite`,
+  serviceOverdue: 'Entretien en retard depuis le',
+  serviceDue: 'Entretien prévu le',
+  premiumReason: (max: number) => `La collection gratuite accueille ${max} montres. Premium la rend illimitée et ajoute les outils du collectionneur.`,
+}, {
+  neverWorn: 'Never worn',
+  wornToday: 'Worn today',
+  wornYesterday: 'Worn yesterday',
+  wornDaysAgo: d => `Worn ${plural(d, 'day', 'days')} ago`,
+  opening: 'Opening your watch box…',
+  title: 'Collection',
+  add: 'Add',
+  emptyTitle: 'Your watch box is empty',
+  addFirst: 'Add my first watch',
+  emptyText: 'Start with the watch you wear most. A photo, a brand, a model: the rest can wait.',
+  summaryAria: 'Collection summary',
+  watches: n => (n === 1 ? 'watch' : 'watches'),
+  declaredValue: 'declared value',
+  brands: n => (n === 1 ? 'brand' : 'brands'),
+  freeFull: 'Your free collection is full.',
+  goPremium: 'Go Premium',
+  quota: (n, max) => `${n} of ${max} watches in the free collection`,
+  serviceOverdue: 'Service overdue since',
+  serviceDue: 'Service due on',
+  premiumReason: max => `The free collection holds ${max} watches. Premium makes it unlimited and adds the collector's tools.`,
+});
+
+function lastWornLabel(t: typeof S.fr, day: string | undefined) {
+  if (!day) return t.neverWorn;
   const d = daysBetween(day);
-  if (d <= 0) return "Portée aujourd'hui";
-  if (d === 1) return 'Portée hier';
-  return `Portée il y a ${plural(d, 'jour', 'jours')}`;
+  if (d <= 0) return t.wornToday;
+  if (d === 1) return t.wornYesterday;
+  return t.wornDaysAgo(d);
 }
 
 export default function CollectionPage() {
+  const t = useStrings(S);
+  const c = useStrings(COMMON);
   const { user, isPremium } = useAuth();
   const navigate = useNavigate();
   const [premiumOpen, setPremiumOpen] = useState(false);
@@ -62,31 +110,31 @@ export default function CollectionPage() {
 
   const onAdd = () => (atLimit ? setPremiumOpen(true) : navigate('/ajouter-montre'));
 
-  if (loading && !data) return <div className="page"><Loading label="Ouverture de l'écrin…" /></div>;
-  if (error) return <div className="page"><Notice tone="error">{error}</Notice><Button variant="secondary" onClick={reload}>Réessayer</Button></div>;
+  if (loading && !data) return <div className="page"><Loading label={t.opening} /></div>;
+  if (error) return <div className="page"><Notice tone="error">{error}</Notice><Button variant="secondary" onClick={reload}>{c.retry}</Button></div>;
 
   return (
     <div className="page">
       <PageHeader
-        title="Collection"
+        title={t.title}
         action={watches.length > 0 && (
-          <Button size="small" onClick={onAdd}><Plus size={16} strokeWidth={2} aria-hidden="true" />Ajouter</Button>
+          <Button size="small" onClick={onAdd}><Plus size={16} strokeWidth={2} aria-hidden="true" />{t.add}</Button>
         )}
       />
 
       {watches.length === 0 ? (
         <EmptyState
-          title="Votre écrin est vide"
-          action={<LinkButton to="/ajouter-montre">Ajouter ma première montre</LinkButton>}
+          title={t.emptyTitle}
+          action={<LinkButton to="/ajouter-montre">{t.addFirst}</LinkButton>}
         >
-          Commencez par la montre que vous portez le plus. Une photo, une marque, un modèle : le reste peut attendre.
+          {t.emptyText}
         </EmptyState>
       ) : (
         <>
-          <section className={s.summary} aria-label="Résumé de la collection">
-            <Stat value={<span className="num">{watches.length}</span>} label={watches.length > 1 ? 'montres' : 'montre'} />
-            <Stat value={<span className="num">{formatEuros(totalValue)}</span>} label="valeur déclarée" />
-            <Stat value={<span className="num">{brands}</span>} label={brands > 1 ? 'marques' : 'marque'} />
+          <section className={s.summary} aria-label={t.summaryAria}>
+            <Stat value={<span className="num">{watches.length}</span>} label={t.watches(watches.length)} />
+            <Stat value={<span className="num">{formatEuros(totalValue)}</span>} label={t.declaredValue} />
+            <Stat value={<span className="num">{brands}</span>} label={t.brands(brands)} />
           </section>
 
           {!isPremium && (
@@ -96,8 +144,8 @@ export default function CollectionPage() {
               </span>
               <span className={s.quotaText}>
                 {atLimit
-                  ? <>Collection gratuite complète. <button className={s.inlineLink} onClick={() => setPremiumOpen(true)}>Passer à Premium</button></>
-                  : `${watches.length} sur ${FREE_WATCH_LIMIT} montres de la collection gratuite`}
+                  ? <>{t.freeFull} <button className={s.inlineLink} onClick={() => setPremiumOpen(true)}>{t.goPremium}</button></>
+                  : t.quota(watches.length, FREE_WATCH_LIMIT)}
               </span>
             </div>
           )}
@@ -109,7 +157,7 @@ export default function CollectionPage() {
               {dueSoon.map(m => (
                 <Link key={m.id} to={`/montre/${m.watch_id}?onglet=entretien`} className={s.reminder}>
                   <strong>{m.watch!.brand} {m.watch!.model}</strong>
-                  <span>{m.overdue ? 'Entretien en retard depuis le' : 'Entretien prévu le'} {formatDate(m.next_due_on)}</span>
+                  <span>{m.overdue ? t.serviceOverdue : t.serviceDue} {formatDate(m.next_due_on)}</span>
                 </Link>
               ))}
             </div>
@@ -124,7 +172,7 @@ export default function CollectionPage() {
                 model={w.model}
                 photo={thumbSrc(mainPhoto(w.photos)?.storage_path).src}
                 photoFallback={thumbSrc(mainPhoto(w.photos)?.storage_path).fallback}
-                meta={lastWornLabel(lastWorn.get(w.id))}
+                meta={lastWornLabel(t, lastWorn.get(w.id))}
                 badge={listingBadge(statusKind(w.current_status))}
               />
             ))}
@@ -135,7 +183,7 @@ export default function CollectionPage() {
       <PremiumSheet
         open={premiumOpen}
         onClose={() => setPremiumOpen(false)}
-        reason={`La collection gratuite accueille ${FREE_WATCH_LIMIT} montres. Premium la rend illimitée et ajoute les outils du collectionneur.`}
+        reason={t.premiumReason(FREE_WATCH_LIMIT)}
       />
     </div>
   );

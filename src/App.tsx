@@ -3,6 +3,7 @@ import { BrowserRouter, Navigate, Route, Routes, useParams } from 'react-router-
 import Layout from './components/Layout/Layout';
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
 import { EmptyState, LinkButton, Loading } from './components/ui';
+import { defineStrings, useStrings } from './i18n';
 
 import HomePage from './pages/home/HomePage';
 import CollectionPage from './pages/collection/CollectionPage';
@@ -45,11 +46,22 @@ function LegacyWatchRedirect() {
   return <Navigate to={`/montre/${watchId}`} replace />;
 }
 
+const NOT_FOUND = defineStrings({
+  title: 'Cette page n\'existe pas',
+  home: 'Retour à l\'accueil',
+  text: 'Le lien est peut-être ancien, ou l\'adresse contient une faute de frappe.',
+}, {
+  title: 'This page doesn’t exist',
+  home: 'Back to home',
+  text: 'The link may be out of date, or the address may contain a typo.',
+});
+
 function NotFound() {
+  const t = useStrings(NOT_FOUND);
   return (
     <div className="page">
-      <EmptyState title="Cette page n'existe pas" action={<LinkButton to="/">Retour à l'accueil</LinkButton>}>
-        Le lien est peut-être ancien, ou l'adresse contient une faute de frappe.
+      <EmptyState title={t.title} action={<LinkButton to="/">{t.home}</LinkButton>}>
+        {t.text}
       </EmptyState>
     </div>
   );

@@ -5,17 +5,56 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useLoad } from '../../hooks/useLoad';
 import { listGalleryBrands, listGalleryShots } from '../../lib/api';
 import { Button, Cushion, EmptyState, LinkButton, Loading, Notice, PageHeader, SelectField, TextField } from '../../components/ui';
+import { formatDecimal } from '../../lib/format';
+import { defineStrings, useStrings } from '../../i18n';
+import { COMMON } from '../../i18n/common';
 import s from './GalleryPage.module.css';
+
+const S = defineStrings({
+  subtitle: 'Des montres photographiées au poignet. Filtrez par tour de poignet pour voir comment une pièce tombe sur un poignet comme le vôtre.',
+  brand: 'Marque',
+  allBrands: 'Toutes les marques',
+  wristMin: 'Poignet min.',
+  wristMax: 'Poignet max.',
+  filter: 'Filtrer',
+  likeMine: 'Poignets comme le mien',
+  showAll: 'Tout afficher',
+  noResultsTitle: 'Aucune photo pour ces filtres',
+  emptyTitle: 'La galerie attend ses premières photos',
+  addShot: 'Ajouter une photo au poignet',
+  noResultsText: 'Élargissez la fourchette de tour de poignet ou retirez la marque.',
+  emptyText: 'Ajoutez une photo au poignet à une montre de votre collection et choisissez de la montrer ici.',
+  onWrist: (watch: string) => `${watch} au poignet`,
+  member: 'Membre',
+}, {
+  subtitle: 'Watches photographed on the wrist. Filter by wrist size to see how a piece sits on a wrist like yours.',
+  brand: 'Brand',
+  allBrands: 'All brands',
+  wristMin: 'Min. wrist',
+  wristMax: 'Max. wrist',
+  filter: 'Filter',
+  likeMine: 'Wrists like mine',
+  showAll: 'Show all',
+  noResultsTitle: 'No photos match these filters',
+  emptyTitle: 'The gallery is waiting for its first photos',
+  addShot: 'Add a wrist shot',
+  noResultsText: 'Widen the wrist size range or remove the brand.',
+  emptyText: 'Add a wrist shot to a watch in your collection and choose to show it here.',
+  onWrist: watch => `${watch} on the wrist`,
+  member: 'Member',
+});
 
 const parse = (v: string) => { const n = Number(v.replace(',', '.')); return v.trim() && Number.isFinite(n) ? n : null; };
 
 export default function GalleryPage() {
+  const t = useStrings(S);
+  const c = useStrings(COMMON);
   const { user, profile } = useAuth();
   const [params] = useSearchParams();
   // Filtres initiaux possibles depuis l'accueil : /galerie?min=16.5&max=17.5
   const [brand, setBrand] = useState('');
-  const [min, setMin] = useState(params.get('min')?.replace('.', ',') ?? '');
-  const [max, setMax] = useState(params.get('max')?.replace('.', ',') ?? '');
+  const [min, setMin] = useState((params.get('min') ? formatDecimal(params.get('min')!) : ''));
+  const [max, setMax] = useState((params.get('max') ? formatDecimal(params.get('max')!) : ''));
   const [filters, setFilters] = useState({ brand: null as string | null, minWrist: parse(params.get('min') ?? ''), maxWrist: parse(params.get('max') ?? '') });
 
   const brands = useLoad(listGalleryBrands, []);
@@ -29,7 +68,7 @@ export default function GalleryPage() {
   const aroundMine = () => {
     if (!profile?.wrist_size_cm) return;
     const w = Number(profile.wrist_size_cm);
-    const lo = String(w - 0.5).replace('.', ','), hi = String(w + 0.5).replace('.', ',');
+    const lo = formatDecimal(w - 0.5), hi = formatDecimal(w + 0.5);
     setMin(lo); setMax(hi);
     setFilters({ brand: brand || null, minWrist: w - 0.5, maxWrist: w + 0.5 });
   };
@@ -40,38 +79,38 @@ export default function GalleryPage() {
   return (
     <div className="page">
       <PageHeader
-        title="Galerie"
-        subtitle="Des montres photographiées au poignet. Filtrez par tour de poignet pour voir comment une pièce tombe sur un poignet comme le vôtre."
+        title={c.tabs.gallery}
+        subtitle={t.subtitle}
       />
 
       <form className={s.filters} onSubmit={apply}>
-        <SelectField label="Marque" placeholder="Toutes les marques" options={brands.data ?? []} value={brand} onChange={e => setBrand(e.target.value)} />
-        <TextField label="Poignet min." inputMode="decimal" suffix="cm" value={min} onChange={e => setMin(e.target.value)} placeholder="16" />
-        <TextField label="Poignet max." inputMode="decimal" suffix="cm" value={max} onChange={e => setMax(e.target.value)} placeholder="18" />
+        <SelectField label={t.brand} placeholder={t.allBrands} options={brands.data ?? []} value={brand} onChange={e => setBrand(e.target.value)} />
+        <TextField label={t.wristMin} inputMode="decimal" suffix="cm" value={min} onChange={e => setMin(e.target.value)} placeholder="16" />
+        <TextField label={t.wristMax} inputMode="decimal" suffix="cm" value={max} onChange={e => setMax(e.target.value)} placeholder="18" />
         <div className={s.filterActions}>
-          <Button type="submit">Filtrer</Button>
-          {profile?.wrist_size_cm && <Button variant="ghost" onClick={aroundMine}>Poignets comme le mien</Button>}
-          {filtered && <Button variant="ghost" onClick={reset}>Tout afficher</Button>}
+          <Button type="submit">{t.filter}</Button>
+          {profile?.wrist_size_cm && <Button variant="ghost" onClick={aroundMine}>{t.likeMine}</Button>}
+          {filtered && <Button variant="ghost" onClick={reset}>{t.showAll}</Button>}
         </div>
       </form>
 
       {shots.loading ? <Loading /> : shots.error ? <Notice tone="error">{shots.error}</Notice> : !shots.data?.length ? (
         <EmptyState
-          title={filtered ? 'Aucune photo pour ces filtres' : 'La galerie attend ses premières photos'}
-          action={user ? <LinkButton to="/collection" variant="secondary">Ajouter une photo au poignet</LinkButton> : undefined}
+          title={filtered ? t.noResultsTitle : t.emptyTitle}
+          action={user ? <LinkButton to="/collection" variant="secondary">{t.addShot}</LinkButton> : undefined}
         >
-          {filtered ? 'Élargissez la fourchette de tour de poignet ou retirez la marque.' : 'Ajoutez une photo au poignet à une montre de votre collection et choisissez de la montrer ici.'}
+          {filtered ? t.noResultsText : t.emptyText}
         </EmptyState>
       ) : (
         <ul className={s.masonry}>
           {shots.data.map(p => (
             <li key={p.id} className={s.item}>
-              <Cushion src={p.thumb} fallbackSrc={p.url} alt={`${p.brand} ${p.model} au poignet`} ratio="portrait" />
+              <Cushion src={p.thumb} fallbackSrc={p.url} alt={t.onWrist(`${p.brand} ${p.model}`)} ratio="portrait" />
               <div className={s.caption}>
                 <span className={s.capModel}>{p.brand} {p.model}</span>
                 <span className={s.capMeta}>
-                  {p.username ? <Link to={`/profil/${p.username}`}>@{p.username}</Link> : 'Membre'}
-                  {p.wrist_size_cm && <span className="num">{String(p.wrist_size_cm).replace('.', ',')} cm</span>}
+                  {p.username ? <Link to={`/profil/${p.username}`}>@{p.username}</Link> : t.member}
+                  {p.wrist_size_cm && <span className="num">{formatDecimal(p.wrist_size_cm)} cm</span>}
                 </span>
               </div>
             </li>

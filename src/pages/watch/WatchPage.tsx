@@ -9,6 +9,8 @@ import {
   listWearLogs, mainPhoto, photoUrl, removeWear, setPassportPublic, thumbSrc,
 } from '../../lib/api';
 import { formatDate, formatEuros, formatMm, plural, todayISO } from '../../lib/format';
+import { defineStrings, getLocale, useStrings } from '../../i18n';
+import { COMMON } from '../../i18n/common';
 import { listingPrice, statusKind } from '../../lib/listing';
 import type { MaintenanceEntry, MaintenanceKind, Watch } from '../../types';
 import {
@@ -19,34 +21,178 @@ import Sparkline from '../../components/Sparkline/Sparkline';
 import PremiumSheet from '../../components/PremiumSheet/PremiumSheet';
 import s from './WatchPage.module.css';
 
-type Tab = 'passeport' | 'portage' | 'entretien' | 'valeur';
-const TABS: { value: Tab; label: string }[] = [
-  { value: 'passeport', label: 'Passeport' },
-  { value: 'portage', label: 'Portage' },
-  { value: 'entretien', label: 'Entretien' },
-  { value: 'valeur', label: 'Valeur' },
-];
+const S = defineStrings({
+  tabs: { passeport: 'Passeport', portage: 'Portage', entretien: 'Entretien', valeur: 'Valeur' },
+  kinds: {
+    revision: 'Révision complète',
+    reglage: 'Réglage',
+    etancheite: "Contrôle d'étanchéité",
+    polissage: 'Polissage',
+    reparation: 'Réparation',
+    pile: 'Changement de pile',
+    bracelet: 'Bracelet',
+    autre: 'Autre',
+  },
+  /** Valeurs de mouvement enregistrées en base (en français) et leur libellé. */
+  movements: {
+    Automatique: 'Automatique', Manuel: 'Manuel', Quartz: 'Quartz', Solaire: 'Solaire',
+    'Spring Drive': 'Spring Drive', 'Mécanique connecté': 'Mécanique connecté',
+  },
+  notFound: "Cette montre n'existe pas ou n'est pas dans votre collection.",
+  confirmDelete: (name: string) => `Supprimer ${name} et toutes ses photos ? Cette action est définitive.`,
+  photos: 'Photos',
+  photoN: (i: number) => `Photo ${i}`,
+  collection: 'Collection',
+  wornToday: "Portée aujourd'hui",
+  wearToday: 'Je la porte aujourd’hui',
+  edit: 'Modifier',
+  forSale: 'En vente',
+  seeListing: "Voir l'annonce",
+  sellOrTrade: "Mettre en vente ou proposer à l'échange",
+  sections: 'Sections',
+  premiumCost: 'Le coût par port fait partie des statistiques Premium.',
+  premiumService: "Le carnet d'entretien et ses rappels font partie de Premium.",
+  premiumValue: "L'historique de valeur fait partie de Premium.",
+  deleteWatch: 'Supprimer cette montre',
+  specs: {
+    reference: 'Référence', year: 'Année', movement: 'Mouvement', diameter: 'Diamètre', lugToLug: 'Corne à corne',
+    lugWidth: 'Entrecorne', case: 'Boîtier', dial: 'Cadran', bracelet: 'Bracelet', condition: 'État', boxPapers: 'Boîte et papiers',
+    lastService: 'Dernière révision',
+  },
+  story: 'Histoire',
+  sharePassport: 'Partager le passeport',
+  sharePassportHint: "Toute personne ayant le lien voit les photos et les caractéristiques. Jamais les prix, la valeur ni le lieu d'achat.",
+  linkCopied: 'Lien copié',
+  shareLink: 'Partager le lien',
+  seePublic: 'Voir la page publique',
+  daysWorn: (n: number) => (n > 1 ? 'jours portée' : 'jour portée'),
+  lastWear: 'dernier port',
+  costPerWear: 'coût par port',
+  costPerWearLocked: 'Coût par port',
+  logHintBefore: "Notez vos ports depuis l'onglet ",
+  logHintTab: 'Portage',
+  logHintAfter: ' ou avec le bouton ci-dessus.',
+  nextDue: 'Prochaine échéance : ',
+  noneDue: 'Aucune échéance prévue.',
+  noService: "Aucun entretien noté pour l'instant.",
+  add: 'Ajouter',
+  deleteService: 'Supprimer cet entretien',
+  confirmDeleteService: 'Supprimer cet entretien ?',
+  saveFailed: 'Enregistrement impossible.',
+  newService: 'Nouvel entretien',
+  intervention: 'Intervention',
+  date: 'Date',
+  provider: 'Horloger ou atelier',
+  cost: 'Coût',
+  nextDueLabel: 'Prochaine échéance',
+  nextDueHint: 'Elle apparaîtra en rappel dans votre collection.',
+  notes: 'Notes',
+  saveService: "Enregistrer l'entretien",
+  purchasePrice: "prix d'achat",
+  estimatedValue: 'valeur estimée',
+  sincePurchase: "depuis l'achat",
+  valueChart: 'Évolution de la valeur estimée',
+  historyEmpty: "L'historique se construit à chaque fois que vous mettez à jour la valeur estimée.",
+  valueHistory: 'Historique de valeur',
+  valuesPrivate: 'Valeurs déclarées par vous, visibles par vous seul.',
+  update: 'Mettre à jour',
+  estimates: (n: number) => ` (${plural(n, 'estimation', 'estimations')})`,
+}, {
+  tabs: { passeport: 'Passport', portage: 'Wear', entretien: 'Service', valeur: 'Value' },
+  kinds: {
+    revision: 'Full service',
+    reglage: 'Regulation',
+    etancheite: 'Water resistance test',
+    polissage: 'Polishing',
+    reparation: 'Repair',
+    pile: 'Battery change',
+    bracelet: 'Strap or bracelet',
+    autre: 'Other',
+  },
+  movements: {
+    Automatique: 'Automatic', Manuel: 'Manual wind', Quartz: 'Quartz', Solaire: 'Solar',
+    'Spring Drive': 'Spring Drive', 'Mécanique connecté': 'Hybrid smartwatch',
+  },
+  notFound: "This watch doesn't exist or isn't in your collection.",
+  confirmDelete: name => `Delete ${name} and all its photos? This cannot be undone.`,
+  photos: 'Photos',
+  photoN: i => `Photo ${i}`,
+  collection: 'Collection',
+  wornToday: 'Worn today',
+  wearToday: 'Wearing it today',
+  edit: 'Edit',
+  forSale: 'For sale',
+  seeListing: 'View listing',
+  sellOrTrade: 'Sell it or offer it for trade',
+  sections: 'Sections',
+  premiumCost: 'Cost per wear is part of the Premium stats.',
+  premiumService: 'The service log and its reminders are part of Premium.',
+  premiumValue: 'Value history is part of Premium.',
+  deleteWatch: 'Delete this watch',
+  specs: {
+    reference: 'Reference', year: 'Year', movement: 'Movement', diameter: 'Diameter', lugToLug: 'Lug to lug',
+    lugWidth: 'Lug width', case: 'Case', dial: 'Dial', bracelet: 'Strap', condition: 'Condition', boxPapers: 'Box & papers',
+    lastService: 'Last service',
+  },
+  story: 'Story',
+  sharePassport: 'Share the passport',
+  sharePassportHint: 'Anyone with the link can see the photos and specs. Never the prices, the value or where you bought it.',
+  linkCopied: 'Link copied',
+  shareLink: 'Share the link',
+  seePublic: 'View the public page',
+  daysWorn: n => (n === 1 ? 'day worn' : 'days worn'),
+  lastWear: 'last worn',
+  costPerWear: 'cost per wear',
+  costPerWearLocked: 'Cost per wear',
+  logHintBefore: 'Log your wears from the ',
+  logHintTab: 'Wear',
+  logHintAfter: ' tab or with the button above.',
+  nextDue: 'Next service due: ',
+  noneDue: 'No service scheduled.',
+  noService: 'No service logged yet.',
+  add: 'Add',
+  deleteService: 'Delete this service entry',
+  confirmDeleteService: 'Delete this service entry?',
+  saveFailed: "Couldn't save.",
+  newService: 'New service entry',
+  intervention: 'Work done',
+  date: 'Date',
+  provider: 'Watchmaker or workshop',
+  cost: 'Cost',
+  nextDueLabel: 'Next service due',
+  nextDueHint: 'It will show up as a reminder in your collection.',
+  notes: 'Notes',
+  saveService: 'Save service entry',
+  purchasePrice: 'purchase price',
+  estimatedValue: 'estimated value',
+  sincePurchase: 'since purchase',
+  valueChart: 'Estimated value over time',
+  historyEmpty: 'The history builds up each time you update the estimated value.',
+  valueHistory: 'Value history',
+  valuesPrivate: 'Values you entered, visible only to you.',
+  update: 'Update',
+  estimates: n => ` (${plural(n, 'estimate', 'estimates')})`,
+});
+type T = typeof S.fr;
 
-const MAINTENANCE_KINDS: { value: MaintenanceKind; label: string }[] = [
-  { value: 'revision', label: 'Révision complète' },
-  { value: 'reglage', label: 'Réglage' },
-  { value: 'etancheite', label: "Contrôle d'étanchéité" },
-  { value: 'polissage', label: 'Polissage' },
-  { value: 'reparation', label: 'Réparation' },
-  { value: 'pile', label: 'Changement de pile' },
-  { value: 'bracelet', label: 'Bracelet' },
-  { value: 'autre', label: 'Autre' },
-];
-const kindLabel = (k: MaintenanceKind) => MAINTENANCE_KINDS.find(m => m.value === k)?.label ?? k;
+type Tab = 'passeport' | 'portage' | 'entretien' | 'valeur';
+const TAB_VALUES: Tab[] = ['passeport', 'portage', 'entretien', 'valeur'];
+const KIND_VALUES: MaintenanceKind[] = ['revision', 'reglage', 'etancheite', 'polissage', 'reparation', 'pile', 'bracelet', 'autre'];
+const kindLabel = (t: T, k: MaintenanceKind) => t.kinds[k] ?? k;
+const movementLabel = (t: T, v: string | null) => (v ? t.movements[v as keyof T['movements']] ?? v : v);
+const formatPercent = (n: number) =>
+  new Intl.NumberFormat(getLocale(), { style: 'percent', maximumFractionDigits: 0, signDisplay: 'exceptZero' }).format(n / 100);
 
 export default function WatchPage() {
+  const t = useStrings(S);
+  const c = useStrings(COMMON);
   const { watchId } = useParams();
   const { user, isPremium } = useAuth();
   const uid = user!.id;
   const navigate = useNavigate();
   const [params, setParams] = useSearchParams();
-  const tab = (TABS.some(t => t.value === params.get('onglet')) ? params.get('onglet') : 'passeport') as Tab;
-  const setTab = (t: Tab) => setParams(t === 'passeport' ? {} : { onglet: t }, { replace: true });
+  const tab = (TAB_VALUES.some(v => v === params.get('onglet')) ? params.get('onglet') : 'passeport') as Tab;
+  const setTab = (v: Tab) => setParams(v === 'passeport' ? {} : { onglet: v }, { replace: true });
 
   const { data: watch, setData: setWatch, loading, error } = useLoad(() => getWatch(uid, watchId!), [uid, watchId]);
   const wears = useLoad(() => listWearLogs(uid).then(l => l.filter(w => w.watch_id === watchId)), [uid, watchId]);
@@ -57,7 +203,7 @@ export default function WatchPage() {
   const wornToday = wornDays.has(todayISO());
 
   if (loading) return <div className="page"><Loading /></div>;
-  if (error || !watch) return <div className="page"><Notice tone="error">{error ?? "Cette montre n'existe pas ou n'est pas dans votre collection."}</Notice></div>;
+  if (error || !watch) return <div className="page"><Notice tone="error">{error ?? t.notFound}</Notice></div>;
 
   const photos = [...(watch.photos ?? [])].sort((a, b) => Number(b.is_main_photo) - Number(a.is_main_photo));
   const current = photos[photoIndex] ?? mainPhoto(photos);
@@ -70,7 +216,7 @@ export default function WatchPage() {
   };
 
   const onDelete = async () => {
-    if (!window.confirm(`Supprimer ${watch.brand} ${watch.model} et toutes ses photos ? Cette action est définitive.`)) return;
+    if (!window.confirm(t.confirmDelete(`${watch.brand} ${watch.model}`))) return;
     await deleteWatch(uid, watch);
     navigate('/collection', { replace: true });
   };
@@ -81,9 +227,9 @@ export default function WatchPage() {
         <div className={s.media}>
           <Cushion src={photoUrl(current?.storage_path)} alt={`${watch.brand} ${watch.model}`} ratio="portrait" className={s.hero} />
           {photos.length > 1 && (
-            <div className={s.thumbs} role="tablist" aria-label="Photos">
+            <div className={s.thumbs} role="tablist" aria-label={t.photos}>
               {photos.map((p, i) => (
-                <button key={p.id} role="tab" aria-selected={p === current} aria-label={`Photo ${i + 1}`} onClick={() => setPhotoIndex(i)} className={s.thumb}>
+                <button key={p.id} role="tab" aria-selected={p === current} aria-label={t.photoN(i + 1)} onClick={() => setPhotoIndex(i)} className={s.thumb}>
                   <Cushion src={thumbSrc(p.storage_path).src} fallbackSrc={thumbSrc(p.storage_path).fallback} alt="" />
                 </button>
               ))}
@@ -93,50 +239,50 @@ export default function WatchPage() {
 
         <div className={s.body}>
           <PageHeader
-            back={{ to: '/collection', label: 'Collection' }}
+            back={{ to: '/collection', label: t.collection }}
             title={watch.model}
             subtitle={[watch.brand, watch.reference_number, watch.year_of_production].filter(Boolean).join(', ')}
           />
 
           <div className={s.quick}>
             <Button variant={wornToday ? 'secondary' : 'primary'} onClick={toggleToday}>
-              {wornToday ? <><Check size={18} strokeWidth={2} aria-hidden="true" />Portée aujourd'hui</> : 'Je la porte aujourd’hui'}
+              {wornToday ? <><Check size={18} strokeWidth={2} aria-hidden="true" />{t.wornToday}</> : t.wearToday}
             </Button>
-            <Link to={`/montre/${watch.id}/modifier`} className={s.edit}><Pencil size={16} strokeWidth={1.6} aria-hidden="true" />Modifier</Link>
+            <Link to={`/montre/${watch.id}/modifier`} className={s.edit}><Pencil size={16} strokeWidth={1.6} aria-hidden="true" />{t.edit}</Link>
           </div>
 
           {statusKind(watch.current_status) ? (
             <div className={s.listingBanner}>
               <span>
-                <strong>{statusKind(watch.current_status) === 'sale' ? 'En vente' : 'À échanger'}</strong>
+                <strong>{statusKind(watch.current_status) === 'sale' ? t.forSale : c.listing.forTrade}</strong>
                 <span className="num">{listingPrice(statusKind(watch.current_status), watch.sale_price)}</span>
               </span>
               <span className={s.listingLinks}>
-                <Link to={`/passeport/${watch.id}`}>Voir l'annonce</Link>
-                <Link to={`/montre/${watch.id}/modifier`}>Modifier</Link>
+                <Link to={`/passeport/${watch.id}`}>{t.seeListing}</Link>
+                <Link to={`/montre/${watch.id}/modifier`}>{t.edit}</Link>
               </span>
             </div>
           ) : (
-            <Link to={`/montre/${watch.id}/modifier`} className={s.sellLink}>Mettre en vente ou proposer à l'échange</Link>
+            <Link to={`/montre/${watch.id}/modifier`} className={s.sellLink}>{t.sellOrTrade}</Link>
           )}
 
-          <Segmented label="Sections" value={tab} onChange={setTab} options={TABS} />
+          <Segmented label={t.sections} value={tab} onChange={setTab} options={TAB_VALUES.map(v => ({ value: v, label: t.tabs[v] }))} />
 
           <div className={s.panel}>
             {tab === 'passeport' && <PassportTab watch={watch} uid={uid} onUpdate={setWatch} />}
             {tab === 'portage' && (
-              <WearTab watch={watch} days={wornDays} isPremium={isPremium} onPremium={() => setPremiumReason('Le coût par port fait partie des statistiques Premium.')} />
+              <WearTab watch={watch} days={wornDays} isPremium={isPremium} onPremium={() => setPremiumReason(t.premiumCost)} />
             )}
             {tab === 'entretien' && (
-              <MaintenanceTab watch={watch} uid={uid} isPremium={isPremium} onPremium={() => setPremiumReason("Le carnet d'entretien et ses rappels font partie de Premium.")} />
+              <MaintenanceTab watch={watch} uid={uid} isPremium={isPremium} onPremium={() => setPremiumReason(t.premiumService)} />
             )}
             {tab === 'valeur' && (
-              <ValueTab watch={watch} uid={uid} isPremium={isPremium} onPremium={() => setPremiumReason("L'historique de valeur fait partie de Premium.")} />
+              <ValueTab watch={watch} uid={uid} isPremium={isPremium} onPremium={() => setPremiumReason(t.premiumValue)} />
             )}
           </div>
 
           <hr className="seam" />
-          <Button variant="ghost" onClick={onDelete} className={s.delete}><Trash2 size={16} strokeWidth={1.6} aria-hidden="true" />Supprimer cette montre</Button>
+          <Button variant="ghost" onClick={onDelete} className={s.delete}><Trash2 size={16} strokeWidth={1.6} aria-hidden="true" />{t.deleteWatch}</Button>
         </div>
       </div>
 
@@ -157,23 +303,24 @@ function Specs({ rows }: { rows: [string, ReactNode][] }) {
   );
 }
 
-function passportRows(w: Pick<Watch, 'movement' | 'case_diameter_mm' | 'lug_to_lug_mm' | 'lug_width_mm' | 'case_material' | 'dial_color' | 'bracelet_material' | 'bracelet_type' | 'condition' | 'box_papers_status' | 'reference_number' | 'year_of_production'>): [string, ReactNode][] {
+function passportRows(t: T, w: Pick<Watch, 'movement' | 'case_diameter_mm' | 'lug_to_lug_mm' | 'lug_width_mm' | 'case_material' | 'dial_color' | 'bracelet_material' | 'bracelet_type' | 'condition' | 'box_papers_status' | 'reference_number' | 'year_of_production'>): [string, ReactNode][] {
   return [
-    ['Référence', w.reference_number],
-    ['Année', w.year_of_production],
-    ['Mouvement', w.movement],
-    ['Diamètre', formatMm(w.case_diameter_mm)],
-    ['Corne à corne', formatMm(w.lug_to_lug_mm)],
-    ['Entrecorne', formatMm(w.lug_width_mm)],
-    ['Boîtier', w.case_material],
-    ['Cadran', w.dial_color],
-    ['Bracelet', [w.bracelet_material, w.bracelet_type].filter(Boolean).join(', ')],
-    ['État', w.condition],
-    ['Boîte et papiers', w.box_papers_status],
+    [t.specs.reference, w.reference_number],
+    [t.specs.year, w.year_of_production],
+    [t.specs.movement, movementLabel(t, w.movement)],
+    [t.specs.diameter, formatMm(w.case_diameter_mm)],
+    [t.specs.lugToLug, formatMm(w.lug_to_lug_mm)],
+    [t.specs.lugWidth, formatMm(w.lug_width_mm)],
+    [t.specs.case, w.case_material],
+    [t.specs.dial, w.dial_color],
+    [t.specs.bracelet, [w.bracelet_material, w.bracelet_type].filter(Boolean).join(', ')],
+    [t.specs.condition, w.condition],
+    [t.specs.boxPapers, w.box_papers_status],
   ];
 }
 
 function PassportTab({ watch, uid, onUpdate }: { watch: Watch; uid: string; onUpdate: (w: Watch) => void }) {
+  const t = useStrings(S);
   const [copied, setCopied] = useState(false);
   const url = `${window.location.origin}/passeport/${watch.id}`;
 
@@ -193,26 +340,26 @@ function PassportTab({ watch, uid, onUpdate }: { watch: Watch; uid: string; onUp
 
   return (
     <div className={s.stack}>
-      <Specs rows={[...passportRows(watch), ['Dernière révision', watch.last_service_date ? formatDate(watch.last_service_date) : null]]} />
+      <Specs rows={[...passportRows(t, watch), [t.specs.lastService, watch.last_service_date ? formatDate(watch.last_service_date) : null]]} />
       {watch.notes_history && (
         <section className={s.story}>
-          <h3>Histoire</h3>
+          <h3>{t.story}</h3>
           <p>{watch.notes_history}</p>
         </section>
       )}
       <section className={s.shareBox}>
         <Toggle
-          label="Partager le passeport"
-          description="Toute personne ayant le lien voit les photos et les caractéristiques. Jamais les prix, la valeur ni le lieu d'achat."
+          label={t.sharePassport}
+          description={t.sharePassportHint}
           checked={Boolean(watch.passport_public)}
           onChange={togglePublic}
         />
         {watch.passport_public && (
           <div className={s.shareRow}>
             <Button variant="secondary" size="small" onClick={share}>
-              {copied ? <><Check size={16} aria-hidden="true" />Lien copié</> : <><Link2 size={16} aria-hidden="true" />Partager le lien</>}
+              {copied ? <><Check size={16} aria-hidden="true" />{t.linkCopied}</> : <><Link2 size={16} aria-hidden="true" />{t.shareLink}</>}
             </Button>
-            <Link to={`/passeport/${watch.id}`} className={s.subtle}>Voir la page publique</Link>
+            <Link to={`/passeport/${watch.id}`} className={s.subtle}>{t.seePublic}</Link>
           </div>
         )}
       </section>
@@ -223,20 +370,21 @@ function PassportTab({ watch, uid, onUpdate }: { watch: Watch; uid: string; onUp
 /* ---------- Portage ---------- */
 
 function WearTab({ watch, days, isPremium, onPremium }: { watch: Watch; days: Set<string>; isPremium: boolean; onPremium: () => void }) {
+  const t = useStrings(S);
   const sorted = [...days].sort();
   const last = sorted[sorted.length - 1];
   const costPerWear = watch.purchase_price && days.size ? Number(watch.purchase_price) / days.size : null;
   return (
     <div className={s.stack}>
       <div className={s.statsRow}>
-        <Stat value={<span className="num">{days.size}</span>} label={days.size > 1 ? 'jours portée' : 'jour portée'} />
-        <Stat value={last ? formatDate(last, { day: 'numeric', month: 'short' }) : '—'} label="dernier port" />
+        <Stat value={<span className="num">{days.size}</span>} label={t.daysWorn(days.size)} />
+        <Stat value={last ? formatDate(last, { day: 'numeric', month: 'short' }) : '—'} label={t.lastWear} />
         {isPremium
-          ? <Stat value={<span className="num">{costPerWear ? formatEuros(costPerWear) : '—'}</span>} label="coût par port" />
-          : <button className={s.lockedStat} onClick={onPremium}><span className={s.lockedValue}>Coût par port</span><PremiumTag /></button>}
+          ? <Stat value={<span className="num">{costPerWear ? formatEuros(costPerWear) : '—'}</span>} label={t.costPerWear} />
+          : <button className={s.lockedStat} onClick={onPremium}><span className={s.lockedValue}>{t.costPerWearLocked}</span><PremiumTag /></button>}
       </div>
       <WearStrip days={days} />
-      <p className={s.subtle}>Notez vos ports depuis l'onglet <Link to="/portage">Portage</Link> ou avec le bouton ci-dessus.</p>
+      <p className={s.subtle}>{t.logHintBefore}<Link to="/portage">{t.logHintTab}</Link>{t.logHintAfter}</p>
     </div>
   );
 }
@@ -244,6 +392,7 @@ function WearTab({ watch, days, isPremium, onPremium }: { watch: Watch; days: Se
 /* ---------- Entretien ---------- */
 
 function MaintenanceTab({ watch, uid, isPremium, onPremium }: { watch: Watch; uid: string; isPremium: boolean; onPremium: () => void }) {
+  const t = useStrings(S);
   const list = useLoad(() => listMaintenance(uid, watch.id), [uid, watch.id]);
   const [open, setOpen] = useState(false);
 
@@ -254,10 +403,10 @@ function MaintenanceTab({ watch, uid, isPremium, onPremium }: { watch: Watch; ui
     <div className={s.stack}>
       <div className={s.rowBetween}>
         <p className={s.subtle}>
-          {next ? <>Prochaine échéance : <strong>{formatDate(next)}</strong></> : entries.length ? 'Aucune échéance prévue.' : "Aucun entretien noté pour l'instant."}
+          {next ? <>{t.nextDue}<strong>{formatDate(next)}</strong></> : entries.length ? t.noneDue : t.noService}
         </p>
         <Button size="small" variant="secondary" onClick={() => (isPremium ? setOpen(true) : onPremium())}>
-          <Plus size={16} aria-hidden="true" />Ajouter{!isPremium && <PremiumTag />}
+          <Plus size={16} aria-hidden="true" />{t.add}{!isPremium && <PremiumTag />}
         </Button>
       </div>
 
@@ -266,15 +415,15 @@ function MaintenanceTab({ watch, uid, isPremium, onPremium }: { watch: Watch; ui
           {entries.map(e => (
             <li key={e.id}>
               <div className={s.timelineHead}>
-                <strong>{kindLabel(e.kind)}</strong>
+                <strong>{kindLabel(t, e.kind)}</strong>
                 <span className="num">{formatDate(e.performed_on)}</span>
               </div>
               <div className={s.subtle}>
                 {[e.provider, e.cost !== null ? formatEuros(Number(e.cost)) : null].filter(Boolean).join(', ')}
               </div>
               {e.notes && <p>{e.notes}</p>}
-              <IconButton label="Supprimer cet entretien" className={s.timelineDelete}
-                onClick={async () => { if (window.confirm('Supprimer cet entretien ?')) { await deleteMaintenance(uid, e.id); list.reload(); } }}>
+              <IconButton label={t.deleteService} className={s.timelineDelete}
+                onClick={async () => { if (window.confirm(t.confirmDeleteService)) { await deleteMaintenance(uid, e.id); list.reload(); } }}>
                 <Trash2 size={16} strokeWidth={1.6} />
               </IconButton>
             </li>
@@ -288,6 +437,8 @@ function MaintenanceTab({ watch, uid, isPremium, onPremium }: { watch: Watch; ui
 }
 
 function MaintenanceSheet({ open, onClose, onSaved, uid, watchId }: { open: boolean; onClose: () => void; onSaved: () => void; uid: string; watchId: string }) {
+  const t = useStrings(S);
+  const c = useStrings(COMMON);
   const [f, setF] = useState({ performed_on: todayISO(), kind: 'revision' as MaintenanceKind, provider: '', cost: '', next_due_on: '', notes: '' });
   const [err, setErr] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -303,21 +454,21 @@ function MaintenanceSheet({ open, onClose, onSaved, uid, watchId }: { open: bool
       await addMaintenance(uid, entry);
       onSaved();
     } catch (x) {
-      setErr(x instanceof Error ? x.message : 'Enregistrement impossible.');
+      setErr(x instanceof Error ? x.message : t.saveFailed);
     } finally { setSaving(false); }
   };
 
   return (
-    <Sheet open={open} onClose={onClose} title="Nouvel entretien">
+    <Sheet open={open} onClose={onClose} title={t.newService}>
       <form onSubmit={submit} className={s.stack}>
         {err && <Notice tone="error">{err}</Notice>}
-        <SelectField label="Intervention" options={MAINTENANCE_KINDS} placeholder="Choisir…" value={f.kind} onChange={e => setF({ ...f, kind: e.target.value as MaintenanceKind })} required />
-        <TextField label="Date" type="date" value={f.performed_on} onChange={e => setF({ ...f, performed_on: e.target.value })} required />
-        <TextField label="Horloger ou atelier" optional value={f.provider} onChange={e => setF({ ...f, provider: e.target.value })} />
-        <TextField label="Coût" optional inputMode="decimal" suffix="€" value={f.cost} onChange={e => setF({ ...f, cost: e.target.value })} />
-        <TextField label="Prochaine échéance" optional type="date" value={f.next_due_on} onChange={e => setF({ ...f, next_due_on: e.target.value })} hint="Elle apparaîtra en rappel dans votre collection." />
-        <TextArea label="Notes" optional rows={3} value={f.notes} onChange={e => setF({ ...f, notes: e.target.value })} />
-        <Button type="submit" block disabled={saving}>{saving ? 'Enregistrement…' : "Enregistrer l'entretien"}</Button>
+        <SelectField label={t.intervention} options={KIND_VALUES.map(k => ({ value: k, label: t.kinds[k] }))} placeholder={c.choose} value={f.kind} onChange={e => setF({ ...f, kind: e.target.value as MaintenanceKind })} required />
+        <TextField label={t.date} type="date" value={f.performed_on} onChange={e => setF({ ...f, performed_on: e.target.value })} required />
+        <TextField label={t.provider} optional value={f.provider} onChange={e => setF({ ...f, provider: e.target.value })} />
+        <TextField label={t.cost} optional inputMode="decimal" suffix="€" value={f.cost} onChange={e => setF({ ...f, cost: e.target.value })} />
+        <TextField label={t.nextDueLabel} optional type="date" value={f.next_due_on} onChange={e => setF({ ...f, next_due_on: e.target.value })} hint={t.nextDueHint} />
+        <TextArea label={t.notes} optional rows={3} value={f.notes} onChange={e => setF({ ...f, notes: e.target.value })} />
+        <Button type="submit" block disabled={saving}>{saving ? c.saving : t.saveService}</Button>
       </form>
     </Sheet>
   );
@@ -326,6 +477,7 @@ function MaintenanceSheet({ open, onClose, onSaved, uid, watchId }: { open: bool
 /* ---------- Valeur ---------- */
 
 function ValueTab({ watch, uid, isPremium, onPremium }: { watch: Watch; uid: string; isPremium: boolean; onPremium: () => void }) {
+  const t = useStrings(S);
   const history = useLoad(() => listValueHistory(uid, watch.id), [uid, watch.id], isPremium);
   const bought = watch.purchase_price !== null ? Number(watch.purchase_price) : null;
   const now = watch.current_estimated_value !== null ? Number(watch.current_estimated_value) : null;
@@ -337,20 +489,20 @@ function ValueTab({ watch, uid, isPremium, onPremium }: { watch: Watch; uid: str
   return (
     <div className={s.stack}>
       <div className={s.statsRow}>
-        <Stat value={<span className="num">{formatEuros(bought)}</span>} label="prix d'achat" />
-        <Stat value={<span className="num">{formatEuros(now)}</span>} label="valeur estimée" />
-        {delta !== null && <Stat value={<span className="num">{delta > 0 ? '+' : ''}{delta.toFixed(0)} %</span>} label="depuis l'achat" />}
+        <Stat value={<span className="num">{formatEuros(bought)}</span>} label={t.purchasePrice} />
+        <Stat value={<span className="num">{formatEuros(now)}</span>} label={t.estimatedValue} />
+        {delta !== null && <Stat value={<span className="num">{formatPercent(delta)}</span>} label={t.sincePurchase} />}
       </div>
       {isPremium ? (
         points.length >= 2
-          ? <Sparkline points={points} label="Évolution de la valeur estimée" />
-          : <p className={s.subtle}>L'historique se construit à chaque fois que vous mettez à jour la valeur estimée.</p>
+          ? <Sparkline points={points} label={t.valueChart} />
+          : <p className={s.subtle}>{t.historyEmpty}</p>
       ) : (
-        <button className={s.lockedStat} onClick={onPremium}><span className={s.lockedValue}>Historique de valeur</span><PremiumTag /></button>
+        <button className={s.lockedStat} onClick={onPremium}><span className={s.lockedValue}>{t.valueHistory}</span><PremiumTag /></button>
       )}
       <p className={s.subtle}>
-        Valeurs déclarées par vous, visibles par vous seul. <Link to={`/montre/${watch.id}/modifier`}>Mettre à jour</Link>
-        {history.data && history.data.length > 1 && ` (${plural(history.data.length, 'estimation', 'estimations')})`}
+        {t.valuesPrivate} <Link to={`/montre/${watch.id}/modifier`}>{t.update}</Link>
+        {history.data && history.data.length > 1 && t.estimates(history.data.length)}
       </p>
     </div>
   );

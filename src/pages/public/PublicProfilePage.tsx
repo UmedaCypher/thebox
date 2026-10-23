@@ -7,9 +7,33 @@ import { listingBadge, listingPrice } from '../../lib/listing';
 import { EmptyState, LinkButton, Loading, Notice, PageHeader } from '../../components/ui';
 import ContactButton from '../../components/ContactButton/ContactButton';
 import WatchCard, { WatchGrid } from '../../components/WatchCard/WatchCard';
+import { defineStrings, useStrings } from '../../i18n';
 import s from './PublicProfilePage.module.css';
 
+const S = defineStrings({
+  notFoundTitle: 'Profil introuvable',
+  notFoundText: 'Aucun membre ne porte ce pseudo.',
+  watches: (n: number) => `${n} montre${n > 1 ? 's' : ''}`,
+  memberSince: (date: string) => `, membre depuis ${date}`,
+  edit: 'Modifier',
+  writeTo: (username: string) => `Écrire à @${username}`,
+  privateTitle: 'Collection privée',
+  privateText: 'Ce membre garde sa collection pour lui.',
+  emptyTitle: 'Écrin vide pour l\'instant',
+}, {
+  notFoundTitle: 'Profile not found',
+  notFoundText: 'No member goes by this username.',
+  watches: n => `${n} ${n === 1 ? 'watch' : 'watches'}`,
+  memberSince: date => `, member since ${date}`,
+  edit: 'Edit',
+  writeTo: username => `Message @${username}`,
+  privateTitle: 'Private collection',
+  privateText: 'This member keeps their collection to themselves.',
+  emptyTitle: 'The watch box is empty for now',
+});
+
 export default function PublicProfilePage() {
+  const t = useStrings(S);
   const { username } = useParams();
   const { profile: me } = useAuth();
   const q = useLoad(() => getPublicCollection(username!), [username]);
@@ -17,7 +41,7 @@ export default function PublicProfilePage() {
   if (q.loading) return <div className="page"><Loading /></div>;
   if (q.error) return <div className="page"><Notice tone="error">{q.error}</Notice></div>;
   const p = q.data;
-  if (!p) return <div className="page"><EmptyState title="Profil introuvable">Aucun membre ne porte ce pseudo.</EmptyState></div>;
+  if (!p) return <div className="page"><EmptyState title={t.notFoundTitle}>{t.notFoundText}</EmptyState></div>;
 
   const isMe = me?.username === p.username;
 
@@ -27,18 +51,18 @@ export default function PublicProfilePage() {
         <span className={s.avatar}>{p.profile_picture_url ? <img src={p.profile_picture_url} alt="" /> : p.username.charAt(0).toUpperCase()}</span>
         <PageHeader
           title={`@${p.username}`}
-          subtitle={p.is_public ? `${p.watches.length} montre${p.watches.length > 1 ? 's' : ''}${p.created_at ? `, membre depuis ${formatDate(p.created_at, { month: 'long', year: 'numeric' })}` : ''}` : undefined}
-          action={isMe ? <LinkButton to="/profil" variant="secondary" size="small">Modifier</LinkButton> : undefined}
+          subtitle={p.is_public ? `${t.watches(p.watches.length)}${p.created_at ? t.memberSince(formatDate(p.created_at, { month: 'long', year: 'numeric' })) : ''}` : undefined}
+          action={isMe ? <LinkButton to="/profil" variant="secondary" size="small">{t.edit}</LinkButton> : undefined}
         />
       </div>
       {!isMe && p.is_public && p.accepts_messages && (
-        <div className={s.contact}><ContactButton username={p.username} label={`Écrire à @${p.username}`} variant="secondary" /></div>
+        <div className={s.contact}><ContactButton username={p.username} label={t.writeTo(p.username)} variant="secondary" /></div>
       )}
 
       {!p.is_public ? (
-        <EmptyState title="Collection privée">Ce membre garde sa collection pour lui.</EmptyState>
+        <EmptyState title={t.privateTitle}>{t.privateText}</EmptyState>
       ) : p.watches.length === 0 ? (
-        <EmptyState title="Écrin vide pour l'instant" />
+        <EmptyState title={t.emptyTitle} />
       ) : (
         <WatchGrid>
           {p.watches.map(w => (

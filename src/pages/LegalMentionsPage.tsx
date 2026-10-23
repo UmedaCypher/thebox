@@ -2,13 +2,24 @@
 import React from 'react';
 import styles from './StaticPage.module.css';
 import { Link } from 'react-router-dom';
+import { defineStrings, useStrings } from '../i18n';
+
+const S = defineStrings({
+  title: 'Mentions Légales',
+  notice: '',
+}, {
+  title: 'Legal Notice',
+  notice: 'This document is currently available in French only.',
+});
 
 const LegalMentionsPage: React.FC = () => {
+  const t = useStrings(S);
   return (
     <div className={styles.staticPageContainer}>
       <div className={styles.staticPageContent}>
         <header className={styles.staticPageHeader}>
-          <h1>Mentions Légales</h1>
+          <h1>{t.title}</h1>
+          {t.notice && <p>{t.notice}</p>}
         </header>
         <section className={styles.staticPageSection}>
           <p>Conformément aux dispositions des Articles 6-III et 19 de la Loi n°2004-575 du 21 juin 2004 pour la Confiance dans l’économie numérique, dite L.C.E.N., il est porté à la connaissance des utilisateurs et visiteurs de l'application THE BOX les présentes mentions légales.</p>

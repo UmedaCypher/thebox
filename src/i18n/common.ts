@@ -23,6 +23,10 @@ export const COMMON = defineStrings({
   },
   unread: (n: number) => `${n} non lu${n > 1 ? 's' : ''}`,
   language: { auto: 'Automatique', fr: 'Français', en: 'English' },
+  movements: {
+    Automatique: 'Automatique', Manuel: 'Manuel', Quartz: 'Quartz', Solaire: 'Solaire',
+    'Spring Drive': 'Spring Drive', 'Mécanique connecté': 'Mécanique connecté',
+  } as Record<string, string>,
 }, {
   loading: 'Loading…',
   close: 'Close',
@@ -45,4 +49,12 @@ export const COMMON = defineStrings({
   },
   unread: n => `${n} unread`,
   language: { auto: 'Automatic', fr: 'Français', en: 'English' },
+  movements: {
+    Automatique: 'Automatic', Manuel: 'Manual wind', Quartz: 'Quartz', Solaire: 'Solar',
+    'Spring Drive': 'Spring Drive', 'Mécanique connecté': 'Hybrid smartwatch',
+  },
 });
+
+/** Libellé d'un mouvement : la valeur enregistrée reste en français, l'affichage suit la langue. */
+export const movementLabel = (v: string | null | undefined, lang: 'fr' | 'en') =>
+  (v ? COMMON[lang].movements[v] ?? v : null);

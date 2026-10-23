@@ -2,13 +2,24 @@
 import React from 'react';
 import styles from './StaticPage.module.css';
 import { Link } from 'react-router-dom';
+import { defineStrings, useStrings } from '../i18n';
+
+const S = defineStrings({
+  title: 'Politique de Confidentialité',
+  notice: '',
+}, {
+  title: 'Privacy Policy',
+  notice: 'This document is currently available in French only.',
+});
 
 const PrivacyPolicyPage: React.FC = () => {
+  const t = useStrings(S);
   return (
     <div className={styles.staticPageContainer}>
       <div className={styles.staticPageContent}>
         <header className={styles.staticPageHeader}>
-          <h1>Politique de Confidentialité</h1>
+          <h1>{t.title}</h1>
+          {t.notice && <p>{t.notice}</p>}
         </header>
         <section className={styles.staticPageSection}>
           <p><strong>Date de dernière mise à jour :</strong> [Date]</p>

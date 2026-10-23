@@ -3,7 +3,32 @@ import { FREE_WATCH_LIMIT, LAUNCH_MODE } from '../../lib/features';
 import { LinkButton } from '../../components/ui';
 import type { EcrinScene } from './scene/ecrinScene';
 import { hasWebGL, prefersReducedMotion, useScrollVar } from './useScrollVar';
+import { defineStrings, useStrings } from '../../i18n';
 import s from './EcrinHero.module.css';
+
+const S = defineStrings({
+  joinWaitlist: "Rejoindre la liste d'attente",
+  create: 'Créer mon écrin',
+  aria: 'Présentation',
+  title: 'Chaque montre a sa\u00a0place.',
+  lead: "The Box est l'écrin de votre collection : une fiche par montre, le jour où vous l'avez portée, ses entretiens, et des photos au poignet pour comparer avec d'autres collectionneurs.",
+  seeGallery: 'Voir la galerie',
+  placesTitle: (n: number) => `${n} places, pour commencer.`,
+  placesLead: (n: number) => `La collection gratuite accueille ${n} montres. Chaque coussin attend une fiche, des photos et une histoire.`,
+  lastTitle: 'Laquelle rangerez-vous en premier\u00a0?',
+  cue: "Faites défiler pour ouvrir l'écrin",
+}, {
+  joinWaitlist: 'Join the waitlist',
+  create: 'Create my watch box',
+  aria: 'Introduction',
+  title: 'Every watch has its\u00a0place.',
+  lead: 'The Box is the watch box for your collection: a page for every watch, the days you wore it, its service history, and wrist shots to compare with other collectors.',
+  seeGallery: 'See the gallery',
+  placesTitle: n => `${n} slots to begin with.`,
+  placesLead: n => `The free collection holds ${n} watches. Each cushion is waiting for a page, some photos and a story.`,
+  lastTitle: 'Which one will you put in first?',
+  cue: 'Scroll to open the box',
+});
 
 /**
  * Ouverture de l'écrin : la section fait trois écrans de haut, la scène reste fixée
@@ -11,6 +36,7 @@ import s from './EcrinHero.module.css';
  * Sans WebGL ou avec les animations réduites : une image fixe de l'écrin ouvert.
  */
 export default function EcrinHero() {
+  const t = useStrings(S);
   const sectionRef = useRef<HTMLElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const sceneRef = useRef<EcrinScene | null>(null);
@@ -73,39 +99,36 @@ export default function EcrinHero() {
   }, [mode]);
 
   const cta = LAUNCH_MODE === 'waitlist'
-    ? <LinkButton to="/#liste">Rejoindre la liste d'attente</LinkButton>
-    : <LinkButton to="/signup">Créer mon écrin</LinkButton>;
+    ? <LinkButton to="/#liste">{t.joinWaitlist}</LinkButton>
+    : <LinkButton to="/signup">{t.create}</LinkButton>;
 
   return (
-    <section ref={sectionRef} data-stage="a" className={`${s.hero} ${mode === 'still' ? s.still : ''}`} aria-label="Présentation">
+    <section ref={sectionRef} data-stage="a" className={`${s.hero} ${mode === 'still' ? s.still : ''}`} aria-label={t.aria}>
       <div className={s.stage}>
         <img className={s.poster} data-hidden={ready} src={mode === 'still' ? '/landing/ecrin-ouvert.webp' : '/landing/ecrin-ferme.webp'} alt="" />
         {mode === '3d' && <canvas ref={canvasRef} className={s.canvas} data-ready={ready} aria-hidden="true" />}
         <div className={s.vignette} aria-hidden="true" />
 
         <div className={`${s.copy} ${s.copyA}`}>
-          <h1 className={s.title}>Chaque montre a sa&nbsp;place.</h1>
-          <p className={s.lead}>
-            The Box est l'écrin de votre collection : une fiche par montre, le jour où vous l'avez portée,
-            ses entretiens, et des photos au poignet pour comparer avec d'autres collectionneurs.
-          </p>
+          <h1 className={s.title}>{t.title}</h1>
+          <p className={s.lead}>{t.lead}</p>
           <div className={s.ctas}>
             {cta}
-            <LinkButton to="/galerie" variant="ghost">Voir la galerie</LinkButton>
+            <LinkButton to="/galerie" variant="ghost">{t.seeGallery}</LinkButton>
           </div>
         </div>
 
         <div className={`${s.copy} ${s.copyB}`}>
-          <h2 className={s.subtitle}>{FREE_WATCH_LIMIT} places, pour commencer.</h2>
-          <p className={s.lead}>La collection gratuite accueille {FREE_WATCH_LIMIT} montres. Chaque coussin attend une fiche, des photos et une histoire.</p>
+          <h2 className={s.subtitle}>{t.placesTitle(FREE_WATCH_LIMIT)}</h2>
+          <p className={s.lead}>{t.placesLead(FREE_WATCH_LIMIT)}</p>
         </div>
 
         <div className={`${s.copy} ${s.copyC}`}>
-          <h2 className={s.subtitle}>Laquelle rangerez-vous en premier&nbsp;?</h2>
+          <h2 className={s.subtitle}>{t.lastTitle}</h2>
           <div className={s.ctas}>{cta}</div>
         </div>
 
-        <span className={s.cue} aria-hidden="true">Faites défiler pour ouvrir l'écrin</span>
+        <span className={s.cue} aria-hidden="true">{t.cue}</span>
       </div>
     </section>
   );
