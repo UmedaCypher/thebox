@@ -1,13 +1,10 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { FREE_WATCH_LIMIT, PAYMENTS_ENABLED, PREMIUM_PRICES } from '../../lib/features';
 import type { BillingInterval } from '../../lib/features';
-import { PREMIUM_FEATURES } from '../../lib/premium';
-import { listWatches, listWearLogs, openBillingPortal, startCheckout } from '../../lib/api';
-import { analyseCosts } from '../../lib/costPerWear';
-import { useLoad } from '../../hooks/useLoad';
-import CostTeaser from '../../components/CostTeaser/CostTeaser';
+import { PREMIUM_FEATURES, PREMIUM_HIGHLIGHTS } from '../../lib/premium';
+import { openBillingPortal, startCheckout } from '../../lib/api';
 import { Button, LinkButton, Notice, PageHeader, Segmented } from '../../components/ui';
 import WaitlistForm from '../../components/Waitlist/WaitlistForm';
 import s from './PremiumPage.module.css';
@@ -30,11 +27,6 @@ export default function PremiumPage() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [waiting, setWaiting] = useState(result === 'ok');
-  const mine = useLoad(async () => {
-    const [watches, wears] = await Promise.all([listWatches(user!.id), listWearLogs(user!.id)]);
-    return analyseCosts(watches, wears);
-  }, [user?.id], Boolean(user) && !isPremium);
-  const personal = useMemo(() => (mine.data && (mine.data.priciest || mine.data.dormant.length) ? mine.data : null), [mine.data]);
 
   // Retour de Stripe : le webhook active Premium en quelques secondes, on vérifie régulièrement.
   useEffect(() => {
@@ -96,7 +88,7 @@ export default function PremiumPage() {
 
   return (
     <div className="page">
-      <PageHeader title="Premium" subtitle="Savoir ce que chaque montre vous coûte vraiment, et le faire payer à celles qui dorment." />
+      <PageHeader title="Premium" subtitle="Savoir ce que chaque montre vous coûte vraiment." />
 
       {result === 'ok' && (
         <Notice tone={isPremium ? 'ok' : 'info'}>
@@ -109,42 +101,6 @@ export default function PremiumPage() {
         <Notice>Paiement annulé, rien n'a été débité. <button className={s.linkBtn} onClick={() => setParams({})}>Fermer</button></Notice>
       )}
       {error && <Notice tone="error">{error}</Notice>}
-
-      {!isPremium && (
-        <section className={s.hero} aria-labelledby="cpw-title">
-          <div className={s.heroText}>
-            <p className={s.kicker}>Le coût par port</p>
-            <h2 id="cpw-title">Le chiffre qui fait réfléchir avant le prochain achat</h2>
-            <p>
-              Le prix d'une montre divisé par le nombre de jours où vous l'avez portée. Une pièce chère portée tous les jours
-              revient moins cher qu'une affaire qui ne quitte jamais son coussin.
-            </p>
-            <ul className={s.reasons}>
-              <li><strong>Acheter mieux.</strong> Voir que la dernière arrivée dort déjà évite d'en acheter une autre sur un coup de cœur.</li>
-              <li><strong>Revendre au bon moment.</strong> Les montres dormantes et l'argent qu'elles immobilisent, prêtes à passer sur le Marché.</li>
-              <li><strong>Porter ce que vous aimez.</strong> La rotation réelle de votre collection, mois après mois.</li>
-            </ul>
-            <p className={s.payback}>
-              À {PREMIUM_PRICES.year.amount} par an, Premium se rentabilise dès qu'il vous fait renoncer à un seul achat inutile,
-              ou vendre une seule montre oubliée.
-            </p>
-          </div>
-          {personal ? <CostTeaser analysis={personal} compact /> : (
-            <figure className={s.example}>
-              <figcaption>Exemple</figcaption>
-              <div className={s.exampleRow}>
-                <span><strong>Montre A</strong>achetée 6 000 €, portée 15 jours</span>
-                <span className={`${s.exampleValue} num`}>400 €<small>par port</small></span>
-              </div>
-              <div className={s.exampleRow}>
-                <span><strong>Montre B</strong>achetée 1 200 €, portée 180 jours</span>
-                <span className={`${s.exampleValue} num`}>6,67 €<small>par port</small></span>
-              </div>
-              <p>La moins chère n'est pas toujours celle qu'on croit.</p>
-            </figure>
-          )}
-        </section>
-      )}
 
       <div className={s.plans}>
         <section className={s.plan}>
@@ -161,7 +117,16 @@ export default function PremiumPage() {
             {price.amount}
             <span>{price.period}{price.note && `, ${price.note}`}{!PAYMENTS_ENABLED && '. Bientôt disponible'}</span>
           </p>
-          <p className={s.includes}>Tout le gratuit, et :</p>
+          <p className={s.includes}>Ce qui le rentabilise</p>
+          <ol className={s.highlights}>
+            {PREMIUM_HIGHLIGHTS.map(({ title, text, icon: Icon }) => (
+              <li key={title}>
+                <span className={s.hlIcon} aria-hidden="true"><Icon size={20} strokeWidth={1.6} /></span>
+                <span><strong>{title}</strong>{text}</span>
+              </li>
+            ))}
+          </ol>
+          <p className={s.includes}>Et aussi, en plus du gratuit :</p>
           <ul>{PREMIUM_FEATURES.map(f => <li key={f.title}><strong>{f.title}</strong>{f.text}</li>)}</ul>
           {action()}
         </section>

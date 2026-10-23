@@ -19,25 +19,15 @@
 .small { font-size: var(--fs-xs); color: var(--text-3); }
 .linkBtn { color: var(--brass); text-decoration: underline; font-size: inherit; }
 
-/* Argument principal : le coût par port */
-.hero { display: grid; gap: var(--sp-5); margin-bottom: var(--sp-7); align-items: start; }
-@media (min-width: 900px) { .hero { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: var(--sp-7); } }
-.heroText { display: flex; flex-direction: column; gap: var(--sp-3); }
-.heroText h2 { font-size: clamp(var(--fs-2xl), 5vw, var(--fs-3xl)); line-height: 1.15; }
-.heroText > p { color: var(--text-2); max-width: 58ch; }
-.kicker { font-size: var(--fs-xs); font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--brass); }
-.reasons { list-style: none; display: flex; flex-direction: column; gap: var(--sp-3); margin-top: var(--sp-2); }
-.reasons li { padding-left: var(--sp-4); border-left: 1px solid var(--seam); color: var(--text-2); }
-.reasons strong { color: var(--text); font-weight: 600; }
-.heroText > p.payback { color: var(--text); font-weight: 600; }
-.example {
-  padding: var(--sp-5); border-radius: var(--r-cushion); background: var(--surface); border: 1px solid var(--seam);
-  display: flex; flex-direction: column; gap: var(--sp-3);
+/* Les trois avantages qui rentabilisent Premium */
+.plan ol.highlights { list-style: none; display: flex; flex-direction: column; gap: var(--sp-2); margin: var(--sp-1) 0 var(--sp-3); }
+.plan ol.highlights li {
+  display: flex; gap: var(--sp-3); align-items: flex-start; padding: var(--sp-3) var(--sp-4);
+  border: 1px solid var(--seam); border-left: 1px solid var(--seam); border-radius: var(--r-control);
+  background: color-mix(in srgb, var(--brass) 8%, var(--surface));
 }
-.example figcaption { font-size: var(--fs-xs); font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-3); }
-.example > p { font-size: var(--fs-sm); color: var(--text-2); }
-.exampleRow { display: flex; justify-content: space-between; align-items: center; gap: var(--sp-4); padding: var(--sp-3) 0; border-bottom: 1px solid var(--line); }
-.exampleRow > span:first-child { display: flex; flex-direction: column; font-size: var(--fs-sm); color: var(--text-2); }
-.exampleRow strong { color: var(--text); font-size: var(--fs-md); }
-.exampleValue { font-family: var(--font-display); font-size: var(--fs-2xl); color: var(--brass); text-align: right; line-height: 1; }
-.exampleValue small { display: block; font-family: var(--font-body); font-size: var(--fs-xs); color: var(--text-3); margin-top: 4px; }
+.plan ol.highlights li strong { color: var(--text); }
+.hlIcon {
+  flex: none; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center;
+  background: color-mix(in srgb, var(--brass) 18%, transparent); color: var(--brass);
+}
