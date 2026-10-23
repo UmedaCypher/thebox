@@ -10,11 +10,14 @@ import { supabase } from '../../lib/supabaseClient';
 import { FREE_WATCH_LIMIT, PAYMENTS_ENABLED } from '../../lib/features';
 import { formatDate } from '../../lib/format';
 import { Button, LinkButton, Notice, PageHeader, PremiumTag, Segmented, TextField, Toggle } from '../../components/ui';
+import { useLanguageSetting } from '../../i18n/useLanguageSetting';
+import type { LangChoice } from '../../i18n';
 import s from './AccountPage.module.css';
 
 export default function AccountPage() {
   const { user, profile, isPremium, refreshProfile, signOut } = useAuth();
   const { theme, setTheme } = useTheme();
+  const language = useLanguageSetting();
   const navigate = useNavigate();
   const uid = user!.id;
 
@@ -172,6 +175,13 @@ export default function AccountPage() {
       <section className={s.section}>
         <h2 className={s.h}>Apparence</h2>
         <Segmented label="Thème" value={theme} onChange={setTheme} options={[{ value: 'ecrin', label: 'Écrin (sombre)' }, { value: 'soie', label: 'Soie (clair)' }]} />
+      </section>
+
+      <section className={s.section}>
+        <h2 className={s.h}>Langue</h2>
+        <Segmented label="Langue" value={language.choice} onChange={(v: LangChoice) => language.change(v)}
+          options={[{ value: 'auto', label: 'Automatique' }, { value: 'fr', label: 'Français' }, { value: 'en', label: 'English' }]} />
+        <p className={s.small}>« Automatique » suit la langue de votre téléphone ou de votre ordinateur.</p>
       </section>
 
       <section className={s.section}>

@@ -8,7 +8,7 @@ import { Cushion, LinkButton, Loading, Notice, PageHeader, Segmented, Stat } fro
 import Sparkline from '../../components/Sparkline/Sparkline';
 import CostTeaser from '../../components/CostTeaser/CostTeaser';
 import { analyseCosts } from '../../lib/costPerWear';
-import { PAYMENTS_ENABLED, PREMIUM_PRICES } from '../../lib/features';
+import { PAYMENTS_ENABLED, premiumPrices } from '../../lib/features';
 import s from './StatsPage.module.css';
 
 const DORMANT_DAYS = 60;
@@ -174,7 +174,7 @@ function StatsPreview() {
         </ul>
         <div>
           <LinkButton to="/premium">
-            {PAYMENTS_ENABLED ? `Passer à Premium, ${PREMIUM_PRICES.year.amount} par an` : 'Découvrir Premium'}
+            {PAYMENTS_ENABLED ? `Passer à Premium, ${premiumPrices().year.amount} par an` : 'Découvrir Premium'}
           </LinkButton>
         </div>
       </section>

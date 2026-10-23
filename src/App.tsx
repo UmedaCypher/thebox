@@ -31,6 +31,7 @@ const PrivacyPolicyPage = lazy(() => import('./pages/PrivacyPolicyPage'));
 const LegalMentionsPage = lazy(() => import('./pages/LegalMentionsPage'));
 const MarketPage = lazy(() => import('./pages/market/MarketPage'));
 const MessagesPage = lazy(() => import('./pages/messages/MessagesPage'));
+const OnboardingPage = lazy(() => import('./pages/onboarding/OnboardingPage'));
 
 /*
  * En pause (voir src/lib/features.ts) : espace revendeur.
@@ -91,6 +92,7 @@ export default function App() {
             <Route path="/stats" element={P(<StatsPage />)} />
             <Route path="/wishlist" element={P(<WishlistPage />)} />
             <Route path="/export/assurance" element={P(<InsuranceExportPage />)} />
+            <Route path="/bienvenue" element={P(<OnboardingPage />)} />
             <Route path="/messages" element={P(<MessagesPage />)} />
             <Route path="/messages/:conversationId" element={P(<MessagesPage />)} />
 

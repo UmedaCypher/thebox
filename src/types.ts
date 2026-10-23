@@ -19,6 +19,8 @@ export interface Profile {
   account_type: AccountType | null;
   plan: Plan | null;
   created_at?: string | null;
+  /** Fin de l'accueil des nouveaux membres ; absent si la migration du 23/10 n'est pas passée. */
+  onboarded_at?: string | null;
 }
 
 export interface Photo {

@@ -1,0 +1,48 @@
+import { defineStrings } from '.';
+
+/** Textes partagés par plusieurs écrans. */
+export const COMMON = defineStrings({
+  loading: 'Chargement…',
+  close: 'Fermer',
+  optional: '(facultatif)',
+  choose: 'Choisir…',
+  save: 'Enregistrer',
+  saving: 'Enregistrement…',
+  cancel: 'Annuler',
+  back: 'Retour',
+  retry: 'Réessayer',
+  error: 'Une erreur est survenue.',
+  premium: 'Premium',
+  tabs: { collection: 'Collection', wear: 'Portage', market: 'Marché', messages: 'Messages', gallery: 'Galerie', profile: 'Profil' },
+  listing: {
+    forSale: 'À vendre',
+    forTrade: 'À échanger',
+    trade: 'Échange',
+    priceOnRequest: 'Prix sur demande',
+    mine: 'Mon annonce',
+  },
+  unread: (n: number) => `${n} non lu${n > 1 ? 's' : ''}`,
+  language: { auto: 'Automatique', fr: 'Français', en: 'English' },
+}, {
+  loading: 'Loading…',
+  close: 'Close',
+  optional: '(optional)',
+  choose: 'Choose…',
+  save: 'Save',
+  saving: 'Saving…',
+  cancel: 'Cancel',
+  back: 'Back',
+  retry: 'Try again',
+  error: 'Something went wrong.',
+  premium: 'Premium',
+  tabs: { collection: 'Collection', wear: 'Wear', market: 'Market', messages: 'Messages', gallery: 'Gallery', profile: 'Profile' },
+  listing: {
+    forSale: 'For sale',
+    forTrade: 'For trade',
+    trade: 'Trade',
+    priceOnRequest: 'Price on request',
+    mine: 'My listing',
+  },
+  unread: n => `${n} unread`,
+  language: { auto: 'Automatic', fr: 'Français', en: 'English' },
+});

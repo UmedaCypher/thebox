@@ -1,3 +1,10 @@
+import { defineStrings, tr } from '../i18n';
+
+const S = defineStrings(
+  { prepare: 'Impossible de préparer la photo sur cet appareil.', convert: 'Conversion de la photo impossible.' },
+  { prepare: "This device can't prepare the photo.", convert: "Couldn't convert the photo." },
+);
+
 /**
  * Prépare une photo avant envoi : redimensionne (2000 px max) et ré-encode en JPEG.
  * Le ré-encodage via canvas supprime toutes les métadonnées EXIF, dont la position GPS :
@@ -39,12 +46,12 @@ async function encode(bitmap: ImageBitmap | HTMLImageElement, name: string, maxS
   canvas.width = w;
   canvas.height = h;
   const ctx = canvas.getContext('2d');
-  if (!ctx) throw new Error("Impossible de préparer la photo sur cet appareil.");
+  if (!ctx) throw new Error(tr(S).prepare);
   ctx.imageSmoothingQuality = 'high';
   ctx.drawImage(bitmap, 0, 0, w, h);
 
   const blob: Blob = await new Promise((resolve, reject) =>
-    canvas.toBlob(b => (b ? resolve(b) : reject(new Error('Conversion de la photo impossible.'))), 'image/jpeg', quality),
+    canvas.toBlob(b => (b ? resolve(b) : reject(new Error(tr(S).convert))), 'image/jpeg', quality),
   );
   const base = name.replace(/\.[^.]+$/, '') || 'photo';
   return new File([blob], `${base}.jpg`, { type: 'image/jpeg' });

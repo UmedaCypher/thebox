@@ -3,6 +3,8 @@ import type { ButtonHTMLAttributes, InputHTMLAttributes, ReactNode, SelectHTMLAt
 import { Link } from 'react-router-dom';
 import type { LinkProps } from 'react-router-dom';
 import { ChevronLeft, Watch as WatchIcon, X } from 'lucide-react';
+import { useStrings } from '../../i18n';
+import { COMMON } from '../../i18n/common';
 import s from './ui.module.css';
 
 const cx = (...c: (string | false | null | undefined)[]) => c.filter(Boolean).join(' ');
@@ -30,10 +32,11 @@ export function IconButton({ label, className, ...rest }: ButtonHTMLAttributes<H
 interface FieldShell { label: string; hint?: ReactNode; error?: string | null; optional?: boolean; className?: string }
 
 function Shell({ id, label, hint, error, optional, className, children }: FieldShell & { id: string; children: ReactNode }) {
+  const t = useStrings(COMMON);
   return (
     <div className={cx(s.field, className)}>
       <label htmlFor={id} className={s.label}>
-        {label}{optional && <span className={s.optional}> (facultatif)</span>}
+        {label}{optional && <span className={s.optional}> {t.optional}</span>}
       </label>
       {children}
       {hint && !error && <span className={s.hint} id={`${id}-hint`}>{hint}</span>}
@@ -52,13 +55,14 @@ export function TextField({ label, hint, error, optional, className, suffix, ...
   );
 }
 
-export function SelectField({ label, hint, error, optional, className, options, placeholder = 'Choisir…', ...rest }:
+export function SelectField({ label, hint, error, optional, className, options, placeholder, ...rest }:
   FieldShell & SelectHTMLAttributes<HTMLSelectElement> & { options: (string | { value: string; label: string })[]; placeholder?: string }) {
   const id = useId();
+  const t = useStrings(COMMON);
   return (
     <Shell id={id} label={label} hint={hint} error={error} optional={optional} className={className}>
       <select id={id} className={s.control} {...rest}>
-        <option value="">{placeholder}</option>
+        <option value="">{placeholder ?? t.choose}</option>
         {options.map(o => typeof o === 'string'
           ? <option key={o} value={o}>{o}</option>
           : <option key={o.value} value={o.value}>{o.label}</option>)}
@@ -110,6 +114,7 @@ export function Segmented<T extends string>({ value, onChange, options, label }:
 
 export function Sheet({ open, onClose, title, children }: { open: boolean; onClose: () => void; title: string; children: ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
+  const t = useStrings(COMMON);
   useEffect(() => {
     if (!open) return;
     const prev = document.activeElement as HTMLElement | null;
@@ -130,7 +135,7 @@ export function Sheet({ open, onClose, title, children }: { open: boolean; onClo
         <div className={s.grabber} />
         <div className={s.sheetHead}>
           <h2 className={s.sheetTitle}>{title}</h2>
-          <IconButton label="Fermer" onClick={onClose}><X size={20} strokeWidth={1.6} /></IconButton>
+          <IconButton label={t.close} onClick={onClose}><X size={20} strokeWidth={1.6} /></IconButton>
         </div>
         {children}
       </div>
@@ -168,8 +173,9 @@ export function Notice({ tone = 'info', children }: { tone?: 'info' | 'error' | 
   return <div className={s.notice} data-tone={tone} role={tone === 'error' ? 'alert' : 'status'}>{children}</div>;
 }
 
-export function Loading({ label = 'Chargement…' }: { label?: string }) {
-  return <p className={s.loading} role="status">{label}</p>;
+export function Loading({ label }: { label?: string }) {
+  const t = useStrings(COMMON);
+  return <p className={s.loading} role="status">{label ?? t.loading}</p>;
 }
 
 export function Stat({ value, label }: { value: ReactNode; label: string }) {

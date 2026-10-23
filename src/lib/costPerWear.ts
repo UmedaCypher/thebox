@@ -1,5 +1,14 @@
 import { daysBetween, formatEuros } from './format';
-import { PREMIUM_PRICES } from './features';
+import { premiumPrices } from './features';
+import { defineStrings, tr } from '../i18n';
+
+const S = defineStrings({
+  lessThanOneWear: (year: string, model: string) => `Premium coûte ${year} par an : moins qu'un seul port de votre ${model}.`,
+  perMonth: (year: string, month: string) => `Premium coûte ${year} par an, soit ${month} par mois.`,
+}, {
+  lessThanOneWear: (year, model) => `Premium costs ${year} a year: less than a single wear of your ${model}.`,
+  perMonth: (year, month) => `Premium costs ${year} a year, that's ${month} a month.`,
+});
 import type { Watch, WearLog } from '../types';
 
 /** Une montre est « dormante » sans port depuis 60 jours (ou jamais portée après 30 jours dans la collection). */
@@ -63,9 +72,9 @@ export function analyseCosts(watches: Watch[], wears: WearLog[]): CostAnalysis {
 
 /** Phrase de comparaison avec le prix de Premium, à partir d'un vrai chiffre de la collection. */
 export function premiumAnchor(a: CostAnalysis): string {
-  const year = PREMIUM_PRICES.year.amount;
+  const year = premiumPrices().year.amount;
   if (a.priciest && a.priciest.costPerWear! > 20) {
-    return `Premium coûte ${year} par an : moins qu'un seul port de votre ${a.priciest.watch.model}.`;
+    return tr(S).lessThanOneWear(year, a.priciest.watch.model);
   }
-  return `Premium coûte ${year} par an, soit ${formatEuros(20 / 12, true)} par mois.`;
+  return tr(S).perMonth(year, formatEuros(20 / 12, true));
 }

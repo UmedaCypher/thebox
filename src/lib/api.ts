@@ -1,6 +1,7 @@
 /** Accès aux données Supabase. Les pages n'appellent jamais supabase directement. */
 import { supabase } from './supabaseClient';
 import { preparePhoto, preparePhotoWithThumb } from './images';
+import { getLang } from '../i18n';
 import type {
   ConversationSummary, GalleryShot, MaintenanceEntry, MarketFilterOptions, MarketFilters, MarketItem, Message,
   Passport, Photo, Profile, PublicCollection, Subscription, ValuePoint, Watch, WatchInput, WearLog, WishlistItem,
@@ -12,7 +13,59 @@ export class WatchLimitError extends Error {
   constructor() { super('WATCH_LIMIT_REACHED'); }
 }
 
+/** Messages d'erreur : le français est écrit dans le code, l'anglais vient de cette table. */
+const EN_MESSAGES: Record<string, string> = {
+  "Action impossible.": "That didn't work.",
+  "Ajout de l'entretien impossible.": "Couldn't add the service entry.",
+  "Ajout de la montre impossible.": "Couldn't add the watch.",
+  "Ajout impossible.": "Couldn't add it.",
+  "Chargement de l'historique de valeur impossible.": "Couldn't load the value history.",
+  "Chargement de la collection impossible.": "Couldn't load your collection.",
+  "Chargement de la galerie impossible.": "Couldn't load the gallery.",
+  "Chargement de la montre impossible.": "Couldn't load this watch.",
+  "Chargement de la wishlist impossible.": "Couldn't load your wishlist.",
+  "Chargement des filtres impossible.": "Couldn't load the filters.",
+  "Chargement des marques impossible.": "Couldn't load the brands.",
+  "Chargement des messages impossible.": "Couldn't load your messages.",
+  "Chargement du calendrier impossible.": "Couldn't load the calendar.",
+  "Chargement du carnet d'entretien impossible.": "Couldn't load the service log.",
+  "Chargement du marché impossible.": "Couldn't load the market.",
+  "Conversation indisponible.": "This conversation isn't available.",
+  "Enregistrement de la photo impossible.": "Couldn't save the photo.",
+  "Enregistrement du profil impossible.": "Couldn't save your profile.",
+  "Enregistrement impossible.": "Couldn't save.",
+  "Envoi de l'avatar impossible.": "Couldn't upload your profile picture.",
+  "Envoi de la photo impossible.": "Couldn't upload the photo.",
+  "Envoi impossible.": "Couldn't send.",
+  "Impossible d'ouvrir la conversation.": "Couldn't open the conversation.",
+  "Impossible de noter le port.": "Couldn't log this wear.",
+  "Inscription impossible pour le moment.": "Sign-up isn't available right now.",
+  "Mise à jour du partage impossible.": "Couldn't update sharing.",
+  "Mise à jour impossible.": "Couldn't update.",
+  "Passeport indisponible.": "This passport isn't available.",
+  "Profil indisponible.": "This profile isn't available.",
+  "Signalement impossible.": "Couldn't send the report.",
+  "Suppression de la photo impossible.": "Couldn't delete the photo.",
+  "Suppression impossible.": "Couldn't delete.",
+  "Ce pseudo est déjà pris.": "This username is already taken.",
+  "Cette source est indisponible pour le moment.": "This source is unavailable right now.",
+  "Service de paiement indisponible pour le moment.": "Payment is unavailable right now.",
+};
+/** Message d'erreur dans la langue courante. */
+const L = (fr: string) => (getLang() === 'en' ? EN_MESSAGES[fr] ?? fr : fr);
+
 /** Codes renvoyés par les fonctions de la base, traduits pour l'écran. */
+const DB_ERRORS_EN: Record<string, string> = {
+  USERNAME_REQUIRED: 'Choose a username in your profile first: it is what other members see.',
+  MESSAGES_DISABLED: 'This member does not accept messages.',
+  BLOCKED: 'Messages are not possible with this member.',
+  RATE_LIMIT: 'You are writing a lot in a short time. Please try again in a moment.',
+  INVALID_CONTENT: 'A message must be between 1 and 2,000 characters.',
+  SELF: 'This is your own watch.',
+  NOT_FOUND: 'Conversation or listing not found.',
+  AUTH_REQUIRED: 'Please log in to continue.',
+};
+
 const DB_ERRORS: Record<string, string> = {
   USERNAME_REQUIRED: 'Choisissez d\'abord un pseudo dans votre profil : c\'est lui qui s\'affiche auprès des autres membres.',
   MESSAGES_DISABLED: 'Ce membre ne reçoit pas de messages.',
@@ -33,8 +86,10 @@ function fail(error: { message: string; code?: string } | null, fallback: string
   if (!error) return;
   if (error.message?.includes('WATCH_LIMIT_REACHED')) throw new WatchLimitError();
   const code = Object.keys(DB_ERRORS).find(c => error.message?.includes(c));
-  if (code) throw new AppError(code, DB_ERRORS[code]);
-  throw new Error(error.message || fallback);
+  if (code) throw new AppError(code, getLang() === 'en' ? DB_ERRORS_EN[code] : DB_ERRORS[code]);
+  // Le message technique reste dans la console ; l'écran affiche un message compréhensible.
+  console.warn(error.message);
+  throw new Error(L(fallback));
 }
 
 export const photoUrl = (path: string | null | undefined) =>
@@ -71,7 +126,7 @@ export async function saveProfile(userId: string, patch: Partial<Profile>, exist
   const { error } = exists
     ? await supabase.from('profiles').update(row).eq('id', userId)
     : await supabase.from('profiles').insert({ ...row, id: userId });
-  if (error?.message.includes('profiles_username_key')) throw new Error('Ce pseudo est déjà pris.');
+  if (error?.message.includes('profiles_username_key')) throw new Error(L('Ce pseudo est déjà pris.'));
   fail(error, 'Enregistrement du profil impossible.');
 }
 
@@ -405,7 +460,7 @@ export interface NewsItem { title?: string; link?: string; isoDate?: string; pub
 
 export async function fetchNews(feedUrl: string): Promise<NewsItem[]> {
   const { data, error } = await supabase.functions.invoke('rss-feed-parser', { body: { feedUrl } });
-  if (error) throw new Error("Cette source est indisponible pour le moment.");
+  if (error) throw new Error(L("Cette source est indisponible pour le moment."));
   return (data?.items as NewsItem[]) ?? [];
 }
 
@@ -417,9 +472,9 @@ async function invokeForUrl(fn: 'create-checkout-session' | 'create-portal-sessi
     // Le message précis renvoyé par la fonction se trouve dans la réponse.
     const ctx = (error as { context?: Response }).context;
     const detail = ctx && typeof ctx.json === 'function' ? await ctx.json().catch(() => null) : null;
-    throw new Error(detail?.error ?? 'Service de paiement indisponible pour le moment.');
+    throw new Error(detail?.error ?? L('Service de paiement indisponible pour le moment.'));
   }
-  if (!data?.url) throw new Error('Service de paiement indisponible pour le moment.');
+  if (!data?.url) throw new Error(L('Service de paiement indisponible pour le moment.'));
   return data.url as string;
 }
 

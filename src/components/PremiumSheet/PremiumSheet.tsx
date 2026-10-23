@@ -1,5 +1,5 @@
 import { LinkButton, Sheet } from '../ui';
-import { ALL_PREMIUM_FEATURES } from '../../lib/premium';
+import { allPremiumFeatures } from '../../lib/premium';
 import s from './PremiumSheet.module.css';
 
 export default function PremiumSheet({ open, onClose, reason }: { open: boolean; onClose: () => void; reason?: string }) {
@@ -7,7 +7,7 @@ export default function PremiumSheet({ open, onClose, reason }: { open: boolean;
     <Sheet open={open} onClose={onClose} title="The Box Premium">
       {reason && <p className={s.reason}>{reason}</p>}
       <ul className={s.list}>
-        {ALL_PREMIUM_FEATURES.map(f => (
+        {allPremiumFeatures().map(f => (
           <li key={f.title}><strong>{f.title}</strong><span>{f.text}</span></li>
         ))}
       </ul>

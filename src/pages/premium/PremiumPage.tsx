@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { FREE_WATCH_LIMIT, PAYMENTS_ENABLED, PREMIUM_PRICES } from '../../lib/features';
+import { FREE_WATCH_LIMIT, PAYMENTS_ENABLED, premiumPrices } from '../../lib/features';
 import type { BillingInterval } from '../../lib/features';
-import { PREMIUM_FEATURES, PREMIUM_HIGHLIGHTS } from '../../lib/premium';
+import { premiumFeatures, premiumHighlights } from '../../lib/premium';
 import { openBillingPortal, startCheckout } from '../../lib/api';
 import { Button, LinkButton, Notice, PageHeader, Segmented } from '../../components/ui';
 import WaitlistForm from '../../components/Waitlist/WaitlistForm';
@@ -23,7 +23,7 @@ export default function PremiumPage() {
   const result = params.get('paiement');
   const [accepted, setAccepted] = useState(false);
   const [interval, setInterval_] = useState<BillingInterval>('year');
-  const price = PREMIUM_PRICES[interval];
+  const price = premiumPrices()[interval];
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [waiting, setWaiting] = useState(result === 'ok');
@@ -119,7 +119,7 @@ export default function PremiumPage() {
           </p>
           <p className={s.includes}>Ce qui le rentabilise</p>
           <ol className={s.highlights}>
-            {PREMIUM_HIGHLIGHTS.map(({ title, text, icon: Icon }) => (
+            {premiumHighlights().map(({ title, text, icon: Icon }) => (
               <li key={title}>
                 <span className={s.hlIcon} aria-hidden="true"><Icon size={20} strokeWidth={1.6} /></span>
                 <span><strong>{title}</strong>{text}</span>
@@ -127,7 +127,7 @@ export default function PremiumPage() {
             ))}
           </ol>
           <p className={s.includes}>Et aussi, en plus du gratuit :</p>
-          <ul>{PREMIUM_FEATURES.map(f => <li key={f.title}><strong>{f.title}</strong>{f.text}</li>)}</ul>
+          <ul>{premiumFeatures().map(f => <li key={f.title}><strong>{f.title}</strong>{f.text}</li>)}</ul>
           {action()}
         </section>
       </div>

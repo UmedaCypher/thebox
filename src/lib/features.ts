@@ -1,3 +1,5 @@
+import { defineStrings, tr } from '../i18n';
+
 /**
  * Réglages produit en un seul endroit.
  *
@@ -26,10 +28,14 @@ export const PAYMENTS_ENABLED = false;
  * garder les deux identiques.
  */
 export type BillingInterval = 'month' | 'year';
-export const PREMIUM_PRICES: Record<BillingInterval, { amount: string; period: string; note?: string }> = {
+const PRICES = defineStrings<Record<BillingInterval, { amount: string; period: string; note?: string }>>({
   month: { amount: '2 €', period: 'par mois' },
   year: { amount: '20 €', period: 'par an', note: '2 mois offerts' },
-};
+}, {
+  month: { amount: '€2', period: 'per month' },
+  year: { amount: '€20', period: 'per year', note: '2 months free' },
+});
+export const premiumPrices = () => tr(PRICES);
 
 /**
  * Adresse affichée sur la page Contact (lien mailto).

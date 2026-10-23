@@ -6,6 +6,11 @@
 const W = 1080;
 const H = 1350;
 const C = { bg: '#1f0e11', bg2: '#2f161b', cushion: '#3a1c21', text: '#f3ede3', text2: '#c4b4a9', text3: '#95817a', brass: '#c2a072', seam: 'rgba(194,160,114,0.45)' };
+import { defineStrings, tr } from '../i18n';
+
+const S = defineStrings({ heading: 'Mon mois au poignet', days: ['L', 'M', 'M', 'J', 'V', 'S', 'D'] },
+  { heading: 'My month on the wrist', days: ['M', 'T', 'W', 'T', 'F', 'S', 'S'] });
+
 const DISPLAY = '"Bodoni Moda Variable", Georgia, serif';
 const BODY = '"Hanken Grotesk Variable", Helvetica, Arial, sans-serif';
 
@@ -89,7 +94,7 @@ export async function drawMonthCard(input: MonthCardInput): Promise<Blob> {
   ctx.fillStyle = C.text2;
   ctx.font = `500 30px ${BODY}`;
   ctx.textAlign = 'left';
-  ctx.fillText('Mon mois au poignet', 96, 160);
+  ctx.fillText(tr(S).heading, 96, 160);
   ctx.fillStyle = C.text;
   ctx.font = `500 92px ${DISPLAY}`;
   ctx.fillText(input.title, 96, 262);
@@ -101,7 +106,7 @@ export async function drawMonthCard(input: MonthCardInput): Promise<Blob> {
   const gx = 96, gy = 330, cell = (W - 192) / 7, rowH = 104, r = rowH * 0.42;
   ctx.font = `600 22px ${BODY}`;
   ctx.textAlign = 'center';
-  ['L', 'M', 'M', 'J', 'V', 'S', 'D'].forEach((d, i) => { ctx.fillStyle = C.text3; ctx.fillText(d, gx + cell * i + cell / 2, gy); });
+  tr(S).days.forEach((d, i) => { ctx.fillStyle = C.text3; ctx.fillText(d, gx + cell * i + cell / 2, gy); });
 
   const urls = [...new Set([...input.photoByDay.values()].filter(Boolean) as string[])];
   const images = new Map<string, HTMLImageElement | null>(await Promise.all(urls.map(async u => [u, await loadImage(u)] as const)));
