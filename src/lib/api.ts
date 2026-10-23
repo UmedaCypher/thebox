@@ -2,8 +2,8 @@
 import { supabase } from './supabaseClient';
 import { preparePhoto, preparePhotoWithThumb } from './images';
 import type {
-  GalleryShot, MaintenanceEntry, Passport, Photo, Profile, PublicCollection, Subscription,
-  ValuePoint, Watch, WatchInput, WearLog, WishlistItem,
+  ConversationSummary, GalleryShot, MaintenanceEntry, MarketFilterOptions, MarketFilters, MarketItem, Message,
+  Passport, Photo, Profile, PublicCollection, Subscription, ValuePoint, Watch, WatchInput, WearLog, WishlistItem,
 } from '../types';
 
 const WATCH_BUCKET = 'watch.images';
@@ -12,9 +12,28 @@ export class WatchLimitError extends Error {
   constructor() { super('WATCH_LIMIT_REACHED'); }
 }
 
+/** Codes renvoyés par les fonctions de la base, traduits pour l'écran. */
+const DB_ERRORS: Record<string, string> = {
+  USERNAME_REQUIRED: 'Choisissez d\'abord un pseudo dans votre profil : c\'est lui qui s\'affiche auprès des autres membres.',
+  MESSAGES_DISABLED: 'Ce membre ne reçoit pas de messages.',
+  BLOCKED: 'Les messages ne sont pas possibles avec ce membre.',
+  RATE_LIMIT: 'Vous écrivez beaucoup en peu de temps. Réessayez dans un moment.',
+  INVALID_CONTENT: 'Le message doit faire entre 1 et 2 000 caractères.',
+  SELF: 'Il s\'agit de votre propre montre.',
+  NOT_FOUND: 'Conversation ou annonce introuvable.',
+  AUTH_REQUIRED: 'Connectez-vous pour continuer.',
+};
+
+export class AppError extends Error {
+  code: string;
+  constructor(code: string, message: string) { super(message); this.code = code; }
+}
+
 function fail(error: { message: string; code?: string } | null, fallback: string): never | void {
   if (!error) return;
   if (error.message?.includes('WATCH_LIMIT_REACHED')) throw new WatchLimitError();
+  const code = Object.keys(DB_ERRORS).find(c => error.message?.includes(c));
+  if (code) throw new AppError(code, DB_ERRORS[code]);
   throw new Error(error.message || fallback);
 }
 
@@ -284,6 +303,100 @@ export async function listGalleryShots(filters: { brand: string | null; minWrist
     watch_id: r.watch_id, brand: r.watch_brand,
     model: r.watch_model, username: r.user_username, wrist_size_cm: r.user_wrist_size_cm,
   })).filter(s => s.url);
+}
+
+/* ---------- Marché ---------- */
+
+const SIZE_RANGES: Record<MarketFilters['size'], [number | null, number | null]> = {
+  '': [null, null], small: [null, 37.9], medium: [38, 41.9], large: [42, null],
+};
+
+export const MARKET_PAGE = 48;
+
+export async function searchMarket(f: MarketFilters, offset = 0): Promise<MarketItem[]> {
+  const n = (v: string) => { const x = Number(v.replace(',', '.').replace(/\s/g, '')); return v.trim() && Number.isFinite(x) ? x : null; };
+  const [minD, maxD] = SIZE_RANGES[f.size];
+  const { data, error } = await supabase.rpc('search_market', {
+    p_query: f.query.trim() || null, p_brand: f.brand || null, p_kind: f.kind || null,
+    p_min_price: n(f.minPrice), p_max_price: n(f.maxPrice), p_condition: f.condition || null,
+    p_box_papers: f.boxPapers || null, p_min_diameter: minD, p_max_diameter: maxD,
+    p_sort: f.sort, p_limit: MARKET_PAGE, p_offset: offset,
+  });
+  fail(error, 'Chargement du marché impossible.');
+  return ((data as MarketItem[]) ?? []).map(r => ({ ...r, sale_price: r.sale_price === null ? null : Number(r.sale_price) }));
+}
+
+export async function getMarketFilterOptions(): Promise<MarketFilterOptions> {
+  const { data, error } = await supabase.rpc('get_market_filters');
+  fail(error, 'Chargement des filtres impossible.');
+  return (data as MarketFilterOptions) ?? { brands: [], conditions: [], box_papers: [], count: 0 };
+}
+
+/* ---------- Messagerie ---------- */
+
+/** Ouvre ou retrouve la conversation avec le vendeur d'une montre, ou avec un membre au profil public. */
+export async function startConversation(target: { watchId?: string; username?: string }): Promise<string> {
+  const { data, error } = await supabase.rpc('start_conversation', { p_username: target.username ?? null, p_watch_id: target.watchId ?? null });
+  fail(error, 'Impossible d\'ouvrir la conversation.');
+  return data as string;
+}
+
+export async function listConversations(): Promise<ConversationSummary[]> {
+  const { data, error } = await supabase.rpc('get_my_conversations');
+  fail(error, 'Chargement des messages impossible.');
+  return (data as ConversationSummary[]) ?? [];
+}
+
+export async function getConversation(id: string): Promise<ConversationSummary | null> {
+  const { data, error } = await supabase.rpc('get_my_conversations', { p_conversation_id: id });
+  fail(error, 'Conversation indisponible.');
+  return ((data as ConversationSummary[]) ?? [])[0] ?? null;
+}
+
+export async function listMessages(conversationId: string): Promise<Message[]> {
+  const { data, error } = await supabase.from('messages').select('id, conversation_id, sender_id, content, created_at')
+    .eq('conversation_id', conversationId).order('created_at', { ascending: false }).limit(300);
+  fail(error, 'Chargement des messages impossible.');
+  return ((data as Message[]) ?? []).reverse();
+}
+
+export async function sendMessage(conversationId: string, content: string): Promise<Message> {
+  const { data, error } = await supabase.rpc('send_message', { p_conversation_id: conversationId, p_content: content });
+  fail(error, 'Envoi impossible.');
+  return data as Message;
+}
+
+export async function markConversationRead(conversationId: string) {
+  await supabase.rpc('mark_conversation_read', { p_conversation_id: conversationId });
+  window.dispatchEvent(new Event(UNREAD_REFRESH));
+}
+
+export async function getUnreadCount(): Promise<number> {
+  const { data, error } = await supabase.rpc('get_unread_count');
+  if (error) return 0;
+  return Number(data) || 0;
+}
+
+export async function setBlocked(conversationId: string, blocked: boolean) {
+  const { error } = await supabase.rpc('set_block', { p_conversation_id: conversationId, p_blocked: blocked });
+  fail(error, 'Action impossible.');
+}
+
+export async function reportMessage(messageId: string, reason?: string) {
+  const { error } = await supabase.rpc('report_message', { p_message_id: messageId, p_reason: reason ?? null });
+  fail(error, 'Signalement impossible.');
+}
+
+/** Événement interne : demande au compteur de non-lus de se mettre à jour. */
+export const UNREAD_REFRESH = 'thebox:unread-refresh';
+
+/** Nouveaux messages en direct. Renvoie la fonction de désabonnement. */
+export function subscribeToMessages(onInsert: (m: Message) => void): () => void {
+  const channel = supabase
+    .channel(`messages-${Math.random().toString(36).slice(2)}`)
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, payload => onInsert(payload.new as Message))
+    .subscribe();
+  return () => { supabase.removeChannel(channel); };
 }
 
 /* ---------- Actualités ---------- */

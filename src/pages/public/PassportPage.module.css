@@ -23,3 +23,14 @@
 .owner { color: var(--text-2); font-size: var(--fs-sm); }
 .owner a { color: var(--brass); }
 .body > a { align-self: flex-start; }
+
+.listing {
+  display: flex; flex-direction: column; gap: var(--sp-3); padding: var(--sp-5);
+  border-radius: var(--r-cushion); background: var(--surface); border: 1px solid var(--seam);
+}
+.listingHead { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: var(--sp-2) var(--sp-4); }
+.listingPrice { font-family: var(--font-display); font-size: var(--fs-3xl); font-weight: 500; color: var(--brass); line-height: 1; }
+.listingMeta { font-size: var(--fs-sm); color: var(--text-2); }
+.listingNote { white-space: pre-line; color: var(--text); }
+.contact { display: flex; flex-direction: column; gap: var(--sp-2); align-items: flex-start; }
+.listing > a { align-self: flex-start; }

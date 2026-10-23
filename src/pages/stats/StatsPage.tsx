@@ -4,9 +4,11 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useLoad } from '../../hooks/useLoad';
 import { listValueHistory, listWatches, listWearLogs, mainPhoto, thumbSrc } from '../../lib/api';
 import { daysBetween, formatEuros, plural, toISODate } from '../../lib/format';
-import { Cushion, Loading, Notice, PageHeader, Segmented, Stat } from '../../components/ui';
+import { Cushion, LinkButton, Loading, Notice, PageHeader, Segmented, Stat } from '../../components/ui';
 import Sparkline from '../../components/Sparkline/Sparkline';
-import PremiumGate from '../../components/PremiumGate/PremiumGate';
+import CostTeaser from '../../components/CostTeaser/CostTeaser';
+import { analyseCosts } from '../../lib/costPerWear';
+import { PAYMENTS_ENABLED, PREMIUM_PRICES } from '../../lib/features';
 import s from './StatsPage.module.css';
 
 const DORMANT_DAYS = 60;
@@ -135,10 +137,52 @@ function StatsContent() {
   );
 }
 
-export default function StatsPage() {
+/** Version gratuite : les vrais chiffres de la collection en aperçu, le détail réservé à Premium. */
+function StatsPreview() {
+  const { user, profile } = useAuth();
+  const uid = user!.id;
+  const q = useLoad(async () => {
+    const [watches, wears] = await Promise.all([listWatches(uid), listWearLogs(uid)]);
+    return { watches, wears };
+  }, [uid]);
+  const a = useMemo(() => (q.data ? analyseCosts(q.data.watches, q.data.wears) : null), [q.data]);
+
+  if (q.loading || !profile) return <div className="page"><Loading /></div>;
+  if (q.error || !a) return <div className="page"><Notice tone="error">{q.error}</Notice></div>;
+
+  const since = toISODate(new Date(Date.now() - 365 * 86_400_000));
+  const days = new Set(q.data!.wears.filter(w => w.worn_on >= since).map(w => w.worn_on)).size;
+
   return (
-    <PremiumGate title="Statistiques" pitch="Coût par port, montres dormantes, rotation et valeur de la collection : vos ports notés deviennent des chiffres.">
-      <StatsContent />
-    </PremiumGate>
+    <div className="page">
+      <PageHeader title="Statistiques" subtitle="Aperçu calculé sur votre collection." back={{ to: '/portage', label: 'Portage' }} />
+      <section className={s.summary}>
+        <Stat value={<span className="num">{days}</span>} label="jours notés en 12 mois" />
+        <Stat value={<span className="num">{a.rows.filter(r => r.wears > 0).length}/{a.rows.length}</span>} label="montres portées" />
+        <Stat value={<span className="num">{a.dormant.length}</span>} label={`dormante${a.dormant.length > 1 ? 's' : ''}`} />
+      </section>
+
+      <CostTeaser analysis={a} />
+
+      <section className={s.block}>
+        <h2>Avec Premium</h2>
+        <ul className={s.dormant}>
+          <li><strong>Le coût par port de chaque montre</strong><span>et son évolution à chaque port</span></li>
+          <li><strong>Les montres dormantes</strong><span>depuis quand, et ce qu'elles immobilisent</span></li>
+          <li><strong>La rotation</strong><span>la part de chaque montre dans vos ports</span></li>
+          <li><strong>La valeur de la collection</strong><span>payée, déclarée, et sa courbe</span></li>
+        </ul>
+        <div>
+          <LinkButton to="/premium">
+            {PAYMENTS_ENABLED ? `Passer à Premium, ${PREMIUM_PRICES.year.amount} par an` : 'Découvrir Premium'}
+          </LinkButton>
+        </div>
+      </section>
+    </div>
   );
+}
+
+export default function StatsPage() {
+  const { isPremium } = useAuth();
+  return isPremium ? <StatsContent /> : <StatsPreview />;
 }

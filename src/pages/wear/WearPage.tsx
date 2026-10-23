@@ -186,8 +186,8 @@ export default function WearPage() {
             <Button variant="secondary" size="small" onClick={share} disabled={sharing || monthStats.daysWorn === 0}>
               <Share2 size={16} aria-hidden="true" />{sharing ? 'Préparation…' : 'Partager le mois'}
             </Button>
-            <Link to={isPremium ? '/stats' : '/premium'} className={s.statsLink}>
-              {isPremium ? 'Statistiques détaillées' : 'Coût par port et montres dormantes avec Premium'}
+            <Link to="/stats" className={s.statsLink}>
+              {isPremium ? 'Statistiques détaillées' : 'Combien vous coûte chaque port ?'}
             </Link>
           </div>
         </div>

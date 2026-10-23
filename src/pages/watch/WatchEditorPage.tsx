@@ -1,14 +1,14 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { FormEvent } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Star, Trash2 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useLoad } from '../../hooks/useLoad';
 import {
   addWatchPhoto, createWatch, deletePhoto, fetchReferenceOptions, getWatch, setMainPhoto, thumbSrc, updateWatch, WatchLimitError,
 } from '../../lib/api';
-import type { Photo, Watch, WatchInput } from '../../types';
-import { Button, Cushion, IconButton, Loading, Notice, PageHeader, SelectField, TextArea, TextField, Toggle } from '../../components/ui';
+import type { Photo, Watch, WatchInput, WatchStatus } from '../../types';
+import { Button, Cushion, IconButton, Loading, Notice, PageHeader, Segmented, SelectField, TextArea, TextField, Toggle } from '../../components/ui';
 import PhotoPicker from '../../components/PhotoPicker/PhotoPicker';
 import PremiumSheet from '../../components/PremiumSheet/PremiumSheet';
 import { FREE_WATCH_LIMIT } from '../../lib/features';
@@ -18,14 +18,22 @@ type Form = Record<
   'brand' | 'model' | 'reference_number' | 'year_of_production' | 'movement' | 'case_diameter_mm' | 'lug_to_lug_mm' |
   'lug_width_mm' | 'dial_color' | 'case_material' | 'bracelet_material' | 'bracelet_type' | 'condition' |
   'box_papers_status' | 'purchase_price' | 'purchase_date' | 'purchase_location' | 'current_estimated_value' |
-  'last_service_date' | 'notes_history', string>;
+  'last_service_date' | 'notes_history' | 'sale_price' | 'sale_city' | 'sale_note', string>;
 
 const EMPTY: Form = {
   brand: '', model: '', reference_number: '', year_of_production: '', movement: '', case_diameter_mm: '', lug_to_lug_mm: '',
   lug_width_mm: '', dial_color: '', case_material: '', bracelet_material: '', bracelet_type: '', condition: '',
   box_papers_status: '', purchase_price: '', purchase_date: '', purchase_location: '', current_estimated_value: '',
-  last_service_date: '', notes_history: '',
+  last_service_date: '', notes_history: '', sale_price: '', sale_city: '', sale_note: '',
 };
+
+/** Statut proposé à l'utilisateur ; les anciens statuts « pro » sont conservés tels quels. */
+type ListingStatus = 'in_collection' | 'for_sale' | 'for_exchange';
+const LISTING_OPTIONS: { value: ListingStatus; label: string }[] = [
+  { value: 'in_collection', label: 'Dans ma collection' },
+  { value: 'for_sale', label: 'À vendre' },
+  { value: 'for_exchange', label: 'À échanger' },
+];
 
 const MOVEMENTS = ['Automatique', 'Manuel', 'Quartz', 'Solaire', 'Spring Drive', 'Mécanique connecté'];
 
@@ -54,6 +62,7 @@ const toInput = (f: Form): Partial<WatchInput> => ({
   purchase_price: num(f.purchase_price), purchase_date: txt(f.purchase_date), purchase_location: txt(f.purchase_location),
   current_estimated_value: num(f.current_estimated_value), last_service_date: txt(f.last_service_date),
   notes_history: txt(f.notes_history),
+  sale_price: num(f.sale_price), sale_city: txt(f.sale_city), sale_note: txt(f.sale_note),
 });
 
 const STEPS = ['Photos', 'Identité', 'Détails'] as const;
@@ -74,11 +83,15 @@ export default function WatchEditorPage() {
   const [error, setError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Partial<Record<keyof Form, string>>>({});
   const [limitOpen, setLimitOpen] = useState(false);
+  const [status, setStatus] = useState<WatchStatus>('in_collection');
 
   const options = useLoad(fetchReferenceOptions, []);
   const existing = useLoad(() => getWatch(uid, watchId!), [uid, watchId], isEdit);
 
-  useEffect(() => { if (existing.data) setForm(fromWatch(existing.data)); }, [existing.data]);
+  useEffect(() => {
+    if (existing.data) { setForm(fromWatch(existing.data)); setStatus(existing.data.current_status); }
+  }, [existing.data]);
+  const listed = status === 'for_sale' || status === 'for_exchange';
 
   const set = (k: keyof Form) => (e: { target: { value: string } }) => {
     setForm(f => ({ ...f, [k]: e.target.value }));
@@ -92,7 +105,7 @@ export default function WatchEditorPage() {
     if (!only) {
       const y = num(form.year_of_production);
       if (form.year_of_production && (y === null || y < 1700 || y > new Date().getFullYear())) fe.year_of_production = 'Année invalide.';
-      for (const k of ['case_diameter_mm', 'lug_to_lug_mm', 'lug_width_mm', 'purchase_price', 'current_estimated_value'] as const) {
+      for (const k of ['case_diameter_mm', 'lug_to_lug_mm', 'lug_width_mm', 'purchase_price', 'current_estimated_value', 'sale_price'] as const) {
         if (form[k] && num(form[k]) === null) fe[k] = 'Saisissez un nombre.';
         else if (form[k] && (num(form[k]) as number) < 0) fe[k] = 'Le montant ne peut pas être négatif.';
       }
@@ -105,12 +118,15 @@ export default function WatchEditorPage() {
     e?.preventDefault();
     const fe = validate();
     if (Object.keys(fe).length) { if (!isEdit) setStep(fe.brand || fe.model ? 1 : 2); return; }
+    if (listed && !profile?.username) { setError("Choisissez d'abord un pseudo dans votre profil : c'est lui qui s'affiche dans le Marché."); return; }
     setSaving(true);
     setError(null);
     try {
       let id = watchId;
-      if (isEdit) await updateWatch(uid, id!, toInput(form));
-      else id = (await createWatch(uid, { ...toInput(form), current_status: 'in_collection' })).id;
+      const input = { ...toInput(form), current_status: status };
+      if (status === 'for_exchange') input.sale_price = null;
+      if (isEdit) await updateWatch(uid, id!, input);
+      else id = (await createWatch(uid, input)).id;
 
       if (mainFile) await addWatchPhoto(uid, id!, mainFile, { type: 'watch_only', isMain: true });
       if (wristFile) await addWatchPhoto(uid, id!, wristFile, { type: 'wrist_shot', inGallery: wristInGallery, wristSizeCm: profile?.wrist_size_cm ?? null });
@@ -195,6 +211,35 @@ export default function WatchEditorPage() {
           <TextField label="Lieu d'achat" optional value={form.purchase_location} onChange={set('purchase_location')} placeholder="Boutique, particulier, enchères…" />
           <TextField label="Valeur estimée" optional inputMode="decimal" suffix="€" value={form.current_estimated_value} onChange={set('current_estimated_value')} error={fieldErrors.current_estimated_value} hint="Votre estimation actuelle. Chaque mise à jour est gardée dans l'historique." />
         </div>
+      </fieldset>
+
+      <fieldset className={s.group}>
+        <legend>Annonce</legend>
+        <p className={s.groupHint}>
+          Une montre à vendre ou à échanger apparaît dans le <Link to="/marche">Marché</Link> avec ses photos et ses caractéristiques.
+          Le prix d'achat, la valeur estimée et le lieu d'achat restent privés.
+        </p>
+        <Segmented label="Statut" value={(LISTING_OPTIONS.some(o => o.value === status) ? status : 'in_collection') as ListingStatus}
+          onChange={v => setStatus(v)} options={LISTING_OPTIONS} />
+        {listed && (
+          <>
+            {!profile?.username && (
+              <Notice tone="error">Choisissez un pseudo dans votre <Link to="/profil">profil</Link> pour publier une annonce.</Notice>
+            )}
+            {profile && profile.allow_private_messages === false && (
+              <Notice>Vous avez désactivé les messages dans votre <Link to="/profil">profil</Link> : les intéressés ne pourront pas vous écrire.</Notice>
+            )}
+            <div className={s.grid2}>
+              {status === 'for_sale' && (
+                <TextField label="Prix demandé" optional inputMode="decimal" suffix="€" value={form.sale_price} onChange={set('sale_price')}
+                  error={fieldErrors.sale_price} hint="Sans prix, l'annonce affiche « Prix sur demande »." />
+              )}
+              <TextField label="Ville" optional value={form.sale_city} onChange={set('sale_city')} maxLength={80} placeholder="Pour une remise en main propre" />
+            </div>
+            <TextArea label="Un mot pour les intéressés" optional rows={3} maxLength={1000} value={form.sale_note} onChange={set('sale_note')}
+              placeholder={status === 'for_sale' ? 'État, révision récente, accessoires fournis…' : 'Ce que vous recherchez en échange…'} />
+          </>
+        )}
       </fieldset>
 
       <fieldset className={s.group}>

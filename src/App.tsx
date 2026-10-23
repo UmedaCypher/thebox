@@ -29,10 +29,12 @@ const CguPage = lazy(() => import('./pages/CguPage'));
 const CgvPage = lazy(() => import('./pages/CgvPage'));
 const PrivacyPolicyPage = lazy(() => import('./pages/PrivacyPolicyPage'));
 const LegalMentionsPage = lazy(() => import('./pages/LegalMentionsPage'));
+const MarketPage = lazy(() => import('./pages/market/MarketPage'));
+const MessagesPage = lazy(() => import('./pages/messages/MessagesPage'));
 
 /*
- * En pause (voir src/lib/features.ts) : messagerie, marché, espace revendeur.
- * Leurs fichiers restent dans src/pages ; leurs anciennes adresses renvoient vers la collection.
+ * En pause (voir src/lib/features.ts) : espace revendeur.
+ * Ses fichiers restent dans src/paused ; ses anciennes adresses renvoient vers la collection.
  */
 
 const P = (el: React.ReactElement) => <ProtectedRoute>{el}</ProtectedRoute>;
@@ -61,6 +63,7 @@ export default function App() {
             {/* Public */}
             <Route path="/" element={<HomePage />} />
             <Route path="/galerie" element={<GalleryPage />} />
+            <Route path="/marche" element={<MarketPage />} />
             <Route path="/passeport/:watchId" element={<PassportPage />} />
             <Route path="/profil/:username" element={<PublicProfilePage />} />
             <Route path="/premium" element={<PremiumPage />} />
@@ -88,6 +91,8 @@ export default function App() {
             <Route path="/stats" element={P(<StatsPage />)} />
             <Route path="/wishlist" element={P(<WishlistPage />)} />
             <Route path="/export/assurance" element={P(<InsuranceExportPage />)} />
+            <Route path="/messages" element={P(<MessagesPage />)} />
+            <Route path="/messages/:conversationId" element={P(<MessagesPage />)} />
 
             {/* Anciennes adresses */}
             <Route path="/ma-collection" element={<Navigate to="/collection" replace />} />
@@ -95,7 +100,8 @@ export default function App() {
             <Route path="/pricing" element={<Navigate to="/premium" replace />} />
             <Route path="/app-details" element={<Navigate to="/" replace />} />
             <Route path="/montre/:watchId/detail" element={<LegacyWatchRedirect />} />
-            {['/messagerie/*', '/marche', '/dashboard-pro', '/gerer-lieux', '/creer-facture', '/clients/*'].map(p => (
+            <Route path="/messagerie/*" element={<Navigate to="/messages" replace />} />
+            {['/dashboard-pro', '/gerer-lieux', '/creer-facture', '/clients/*'].map(p => (
               <Route key={p} path={p} element={<Navigate to="/collection" replace />} />
             ))}
 

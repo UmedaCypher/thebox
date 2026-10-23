@@ -55,13 +55,16 @@ export interface Watch {
   notes_history: string | null;
   current_status: WatchStatus;
   sale_price: number | null;
+  sale_city?: string | null;
+  sale_note?: string | null;
+  listed_at?: string | null;
   passport_public: boolean | null;
   created_at: string;
   updated_at?: string | null;
   photos?: Photo[];
 }
 
-export type WatchInput = Omit<Watch, 'id' | 'user_id' | 'created_at' | 'updated_at' | 'photos'>;
+export type WatchInput = Omit<Watch, 'id' | 'user_id' | 'created_at' | 'updated_at' | 'photos' | 'listed_at'>;
 
 export interface WearLog {
   id: string;
@@ -120,7 +123,9 @@ export interface Passport {
   box_papers_status: string | null;
   owner_username: string | null;
   owner_is_public: boolean;
+  owner_accepts_messages: boolean;
   is_owner: boolean;
+  listing: Listing | null;
   service_count: number;
   last_service_on: string | null;
   wear_count: number;
@@ -133,12 +138,15 @@ export interface PublicCollection {
   profile_picture_url: string | null;
   created_at: string | null;
   is_public: boolean;
+  accepts_messages: boolean;
   watches: {
     id: string;
     brand: string;
     model: string;
     reference_number: string | null;
     year_of_production: number | null;
+    kind: ListingKind | null;
+    sale_price: number | null;
     main_photo_path: string | null;
   }[];
 }
@@ -158,4 +166,77 @@ export interface Subscription {
   status: string;
   current_period_end: string | null;
   cancel_at_period_end: boolean;
+}
+
+/* ---------- Marché ---------- */
+
+export type ListingKind = 'sale' | 'exchange';
+
+export interface Listing {
+  kind: ListingKind;
+  price: number | null;
+  city: string | null;
+  note: string | null;
+  listed_at: string | null;
+}
+
+export interface MarketItem {
+  watch_id: string;
+  brand: string;
+  model: string;
+  reference_number: string | null;
+  year_of_production: number | null;
+  case_diameter_mm: number | null;
+  condition: string | null;
+  box_papers_status: string | null;
+  kind: ListingKind;
+  sale_price: number | null;
+  sale_city: string | null;
+  listed_at: string | null;
+  main_photo_path: string | null;
+  seller_username: string;
+  seller_is_public: boolean;
+  is_mine: boolean | null;
+}
+
+export interface MarketFilters {
+  query: string;
+  brand: string;
+  kind: '' | ListingKind;
+  minPrice: string;
+  maxPrice: string;
+  condition: string;
+  boxPapers: string;
+  size: '' | 'small' | 'medium' | 'large';
+  sort: 'recent' | 'price_asc' | 'price_desc';
+}
+
+export interface MarketFilterOptions { brands: string[]; conditions: string[]; box_papers: string[]; count: number }
+
+/* ---------- Messagerie ---------- */
+
+export interface ConversationSummary {
+  conversation_id: string;
+  other_username: string | null;
+  other_avatar_url: string | null;
+  other_is_public: boolean;
+  watch_id: string | null;
+  watch_brand: string | null;
+  watch_model: string | null;
+  watch_photo_path: string | null;
+  watch_kind: ListingKind | null;
+  watch_sale_price: number | null;
+  last_message: string | null;
+  last_message_at: string | null;
+  last_from_me: boolean | null;
+  unread_count: number;
+  blocked_by_me: boolean;
+}
+
+export interface Message {
+  id: string;
+  conversation_id: string;
+  sender_id: string;
+  content: string;
+  created_at: string;
 }

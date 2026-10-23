@@ -1,8 +1,7 @@
 /**
  * Réglages produit en un seul endroit.
  *
- * Fonctionnalités en pause (code conservé, plus de route ni de lien) :
- *   messagerie (MessagingPage), marché (MarketplacePage),
+ * Fonctionnalités en pause (code conservé dans src/paused, plus de route ni de lien) :
  *   espace revendeur (ProDashboardPage, ClientListPage, ClientDetailPage, InvoiceEditorPage, LocationManagerPage).
  * Pour en réactiver une : remettre sa route dans App.tsx.
  */

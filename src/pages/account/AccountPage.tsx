@@ -18,7 +18,7 @@ export default function AccountPage() {
   const navigate = useNavigate();
   const uid = user!.id;
 
-  const [f, setF] = useState({ username: '', full_name: '', wrist: '', is_public: false });
+  const [f, setF] = useState({ username: '', full_name: '', wrist: '', is_public: false, messages: true });
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState<{ tone: 'ok' | 'error'; text: string } | null>(null);
   const [avatarBusy, setAvatarBusy] = useState(false);
@@ -39,6 +39,7 @@ export default function AccountPage() {
       full_name: profile?.full_name ?? '',
       wrist: profile?.wrist_size_cm ? String(profile.wrist_size_cm).replace('.', ',') : '',
       is_public: Boolean(profile?.is_public),
+      messages: profile?.allow_private_messages !== false,
     });
   }, [profile]);
 
@@ -61,7 +62,7 @@ export default function AccountPage() {
     }
     setSaving(true);
     try {
-      await saveProfile(uid, { username: username || null, full_name: f.full_name.trim() || null, wrist_size_cm: wrist, is_public: f.is_public }, Boolean(profile));
+      await saveProfile(uid, { username: username || null, full_name: f.full_name.trim() || null, wrist_size_cm: wrist, is_public: f.is_public, allow_private_messages: f.messages }, Boolean(profile));
       await refreshProfile();
       setMsg({ tone: 'ok', text: 'Profil enregistré.' });
     } catch (x) {
@@ -130,6 +131,12 @@ export default function AccountPage() {
           checked={f.is_public}
           onChange={v => setF({ ...f, is_public: v })}
         />
+        <Toggle
+          label="Accepter les messages"
+          description="Les membres peuvent vous écrire depuis vos annonces et votre profil public. Les conversations déjà ouvertes restent actives ; pour en couper une, bloquez le membre."
+          checked={f.messages}
+          onChange={v => setF({ ...f, messages: v })}
+        />
         <div><Button type="submit" disabled={saving}>{saving ? 'Enregistrement…' : 'Enregistrer'}</Button></div>
       </form>
 
@@ -185,11 +192,21 @@ export default function AccountPage() {
       </section>
 
       <section className={s.section}>
+        <h2 className={s.h}>Informations</h2>
         <ul className={s.links}>
           <li><Link to="/actualites">Actualités horlogères</Link></li>
           <li><Link to="/faq">Questions fréquentes</Link></li>
+          <li><Link to="/a-propos">À propos</Link></li>
+          <li><Link to="/presse">Presse</Link></li>
           <li><Link to="/contact">Contact</Link></li>
         </ul>
+        <ul className={s.legal}>
+          <li><Link to="/cgu">CGU</Link></li>
+          <li><Link to="/cgv">CGV</Link></li>
+          <li><Link to="/confidentialite">Confidentialité</Link></li>
+          <li><Link to="/mentions-legales">Mentions légales</Link></li>
+        </ul>
+        <p className={s.small}>© {new Date().getFullYear()} The Box</p>
       </section>
     </div>
   );

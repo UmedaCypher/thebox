@@ -3,7 +3,9 @@ import { Link, useParams } from 'react-router-dom';
 import { useLoad } from '../../hooks/useLoad';
 import { getPassport, mainPhoto, photoUrl, thumbSrc } from '../../lib/api';
 import { formatDate, formatMm } from '../../lib/format';
+import { listingPrice } from '../../lib/listing';
 import { Cushion, LinkButton, Loading, Notice } from '../../components/ui';
+import ContactButton from '../../components/ContactButton/ContactButton';
 import s from './PassportPage.module.css';
 
 /** Passeport public d'une montre : caractéristiques et historique, jamais les prix. */
@@ -49,9 +51,30 @@ export default function PassportPage() {
         </div>
 
         <div className={s.body}>
-          <p className={s.kind}>Passeport de montre</p>
+          <p className={s.kind}>{p.listing ? (p.listing.kind === 'sale' ? 'À vendre' : 'À échanger') : 'Passeport de montre'}</p>
           <h1 className={s.title}>{p.model}</h1>
           <p className={s.brand}>{p.brand}</p>
+
+          {p.listing && (
+            <section className={s.listing} aria-label="Annonce">
+              <div className={s.listingHead}>
+                <strong className={`${s.listingPrice} num`}>{listingPrice(p.listing.kind, p.listing.price)}</strong>
+                <span className={s.listingMeta}>
+                  {[p.listing.city, p.listing.listed_at && `en ligne depuis le ${formatDate(p.listing.listed_at, { day: 'numeric', month: 'long' })}`].filter(Boolean).join(' · ')}
+                </span>
+              </div>
+              {p.listing.note && <p className={s.listingNote}>{p.listing.note}</p>}
+              {p.is_owner ? (
+                <LinkButton to={`/montre/${p.id}/modifier`} variant="secondary">Modifier mon annonce</LinkButton>
+              ) : p.owner_accepts_messages ? (
+                <div className={s.contact}>
+                  <ContactButton watchId={p.id} label={p.owner_username ? `Écrire à @${p.owner_username}` : 'Contacter le vendeur'} />
+                </div>
+              ) : (
+                <p className={s.owner}>Ce membre ne reçoit pas de messages pour le moment.</p>
+              )}
+            </section>
+          )}
 
           <dl className={s.specs}>
             {rows.filter(([, v]) => v !== null && v !== '').map(([k, v]) => <div key={k}><dt>{k}</dt><dd>{v}</dd></div>)}
@@ -66,12 +89,14 @@ export default function PassportPage() {
           <p className={s.owner}>
             {p.owner_username && p.owner_is_public
               ? <>Dans la collection de <Link to={`/profil/${p.owner_username}`}>@{p.owner_username}</Link>.</>
+              : p.listing && p.owner_username ? <>Proposée par @{p.owner_username}.</>
               : 'Dans une collection privée.'}{' '}
-            Prix et valeur ne sont jamais publiés.
+            {p.listing ? "Le prix d'achat et la valeur estimée ne sont jamais publiés." : 'Prix et valeur ne sont jamais publiés.'}
           </p>
 
           {p.is_owner
-            ? <LinkButton to={`/montre/${p.id}`} variant="secondary">Retour à ma montre</LinkButton>
+            ? <LinkButton to={`/montre/${p.id}`} variant="ghost">Retour à ma montre</LinkButton>
+            : p.listing ? <LinkButton to="/marche" variant="ghost">Retour au marché</LinkButton>
             : <LinkButton to="/" variant="secondary">Créer le passeport de mes montres</LinkButton>}
         </div>
       </article>

@@ -50,3 +50,14 @@
 
 .delete { align-self: flex-start; color: var(--text-3); }
 .delete:hover:not(:disabled) { color: var(--danger); }
+
+.listingBanner {
+  display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--sp-2) var(--sp-4);
+  padding: var(--sp-3) var(--sp-4); border-radius: var(--r-control); border: 1px solid var(--seam); background: var(--surface);
+}
+.listingBanner > span:first-child { display: flex; gap: var(--sp-3); align-items: baseline; }
+.listingBanner strong { color: var(--brass); }
+.listingLinks { display: flex; gap: var(--sp-4); font-size: var(--fs-sm); }
+.listingLinks a { color: var(--text-2); }
+.sellLink { font-size: var(--fs-sm); color: var(--text-2); align-self: flex-start; }
+.sellLink:hover { color: var(--brass); }

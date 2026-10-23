@@ -39,6 +39,9 @@ Après avoir exécuté une migration dans Supabase, refaites l'export ci-dessus 
 - `20261020180000_abonnements_stripe.sql` : table `subscriptions` tenue à jour par le webhook Stripe.
 - `20261021100000_securite_lectures_publiques.sql` : fin des lectures publiques directes des montres
   (prix) et des profils (téléphone…) ; galerie limitée aux photos partagées.
+- `20261023100000_marche_messagerie.sql` : annonces (`watches.listed_at`, `sale_city`, `sale_note`), Marché filtré,
+  messagerie sécurisée (une conversation par paire, envoi via fonctions, limites anti-spam), blocages
+  (`user_blocks`) et signalements (`message_reports`). **À exécuter** ; refaire ensuite l'export de `schema.sql`.
 
 ## Dernier instantané
 
@@ -49,15 +52,19 @@ Créés par les fichiers de `supabase/migrations` (donc tracés) :
 - Règles RLS des nouvelles tables (`wear_logs`, `maintenance_entries`, `watch_value_history`,
   `wishlist_items`, `waitlist`, `subscriptions`) et lecture « propriétaire uniquement » sur `watches` et `profiles`
 - Fonctions : `free_watch_limit`, `get_watch_passport`, `get_public_collection`,
-  `get_public_wrist_shots`, `get_gallery_available_brands`, `private.is_premium`
-- Déclencheurs : `profiles_protect_privileges`, `watches_enforce_limit`, `watches_record_value`
+  `get_public_wrist_shots`, `get_gallery_available_brands`, `private.is_premium`,
+  `search_market`, `get_market_filters`, `start_conversation`, `send_message`, `mark_conversation_read`,
+  `get_my_conversations`, `get_unread_count`, `set_block`, `report_message`,
+  `private.is_participant`, `private.is_blocked_between`
+- Règles RLS de `conversations`, `conversation_participants`, `messages`, `user_blocks`, `message_reports`
+- Déclencheurs : `profiles_protect_privileges`, `watches_enforce_limit`, `watches_record_value`, `watches_track_listing`
 
 ## Ce qui manque encore à cette trace
 Antérieur aux migrations, visible seulement dans Supabase :
 - Types enum : `user_account_type`, `watch_current_status`, `client_status_type`, `invoice_status_type`
 - Règles RLS d'origine de `photos` et des tables en pause, règles des buckets `watch.images` et `avatars`
-- Fonctions des fonctionnalités en pause : `get_user_conversations`, `create_or_get_conversation`,
-  `count_unread_conversations`, `search_market_watches`, `get_market_available_brands`,
+- Fonctions de l'espace revendeur en pause (les anciennes fonctions de messagerie et de marché sont supprimées
+  par la migration du 23/10) :
   `create_invoice_and_update_inventory`
 - Trigger de création du profil à l'inscription (`handle_new_user`), vérifié le 21/10 :
   il ne copie ni `plan` ni `account_type`

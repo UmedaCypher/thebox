@@ -6,9 +6,12 @@ import { useLoad } from '../../hooks/useLoad';
 import { listMaintenance, listWatches, listWearLogs, mainPhoto, thumbSrc } from '../../lib/api';
 import { FREE_WATCH_LIMIT } from '../../lib/features';
 import { daysBetween, formatDate, formatEuros, plural, todayISO } from '../../lib/format';
+import { listingBadge, statusKind } from '../../lib/listing';
 import { Button, EmptyState, LinkButton, Loading, Notice, PageHeader, Stat } from '../../components/ui';
 import WatchCard, { WatchGrid } from '../../components/WatchCard/WatchCard';
 import PremiumSheet from '../../components/PremiumSheet/PremiumSheet';
+import CostTeaser from '../../components/CostTeaser/CostTeaser';
+import { analyseCosts } from '../../lib/costPerWear';
 import s from './CollectionPage.module.css';
 
 function lastWornLabel(day: string | undefined) {
@@ -55,6 +58,8 @@ export default function CollectionPage() {
       .filter(m => m.watch);
   }, [data, watches]);
 
+  const costs = useMemo(() => (data && !isPremium ? analyseCosts(data.watches, data.wears) : null), [data, isPremium]);
+
   const onAdd = () => (atLimit ? setPremiumOpen(true) : navigate('/ajouter-montre'));
 
   if (loading && !data) return <div className="page"><Loading label="Ouverture de l'écrin…" /></div>;
@@ -97,6 +102,8 @@ export default function CollectionPage() {
             </div>
           )}
 
+          {costs && (costs.priciest || costs.dormant.length > 0) && <CostTeaser analysis={costs} compact />}
+
           {dueSoon.length > 0 && (
             <div className={s.reminders}>
               {dueSoon.map(m => (
@@ -118,6 +125,7 @@ export default function CollectionPage() {
                 photo={thumbSrc(mainPhoto(w.photos)?.storage_path).src}
                 photoFallback={thumbSrc(mainPhoto(w.photos)?.storage_path).fallback}
                 meta={lastWornLabel(lastWorn.get(w.id))}
+                badge={listingBadge(statusKind(w.current_status))}
               />
             ))}
           </WatchGrid>

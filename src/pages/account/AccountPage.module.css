@@ -26,3 +26,6 @@
 .links { list-style: none; display: flex; flex-direction: column; }
 .links a { display: block; padding: var(--sp-3) 0; border-bottom: 1px solid var(--line); text-decoration: none; }
 .links a:hover { color: var(--brass); }
+.legal { list-style: none; display: flex; flex-wrap: wrap; gap: var(--sp-2) var(--sp-4); }
+.legal a { color: var(--text-3); font-size: var(--fs-sm); text-decoration: none; }
+.legal a:hover { color: var(--text); }

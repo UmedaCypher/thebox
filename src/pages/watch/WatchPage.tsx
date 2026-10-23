@@ -9,6 +9,7 @@ import {
   listWearLogs, mainPhoto, photoUrl, removeWear, setPassportPublic, thumbSrc,
 } from '../../lib/api';
 import { formatDate, formatEuros, formatMm, plural, todayISO } from '../../lib/format';
+import { listingPrice, statusKind } from '../../lib/listing';
 import type { MaintenanceEntry, MaintenanceKind, Watch } from '../../types';
 import {
   Button, Cushion, IconButton, Loading, Notice, PageHeader, PremiumTag, Segmented, SelectField, Sheet, Stat, TextArea, TextField, Toggle,
@@ -103,6 +104,21 @@ export default function WatchPage() {
             </Button>
             <Link to={`/montre/${watch.id}/modifier`} className={s.edit}><Pencil size={16} strokeWidth={1.6} aria-hidden="true" />Modifier</Link>
           </div>
+
+          {statusKind(watch.current_status) ? (
+            <div className={s.listingBanner}>
+              <span>
+                <strong>{statusKind(watch.current_status) === 'sale' ? 'En vente' : 'À échanger'}</strong>
+                <span className="num">{listingPrice(statusKind(watch.current_status), watch.sale_price)}</span>
+              </span>
+              <span className={s.listingLinks}>
+                <Link to={`/passeport/${watch.id}`}>Voir l'annonce</Link>
+                <Link to={`/montre/${watch.id}/modifier`}>Modifier</Link>
+              </span>
+            </div>
+          ) : (
+            <Link to={`/montre/${watch.id}/modifier`} className={s.sellLink}>Mettre en vente ou proposer à l'échange</Link>
+          )}
 
           <Segmented label="Sections" value={tab} onChange={setTab} options={TABS} />
 
