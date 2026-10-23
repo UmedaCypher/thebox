@@ -9,6 +9,7 @@ import { drawMonthCard, shareImage } from '../../lib/shareCard';
 import type { Watch } from '../../types';
 import { Button, Cushion, EmptyState, IconButton, Img, LinkButton, Loading, Notice, PageHeader, Sheet, Stat } from '../../components/ui';
 import { defineStrings, getLocale, useStrings } from '../../i18n';
+import NewsTeaser from '../../components/NewsTeaser/NewsTeaser';
 import s from './WearPage.module.css';
 
 const S = defineStrings({
@@ -236,6 +237,8 @@ export default function WearPage() {
           </div>
         </div>
       </section>
+
+      <NewsTeaser />
 
       <Sheet open={Boolean(openDay)} onClose={() => setOpenDay(null)} title={openDay ? formatDate(openDay, { weekday: 'long', day: 'numeric', month: 'long' }) : ''}>
         {openDay && (

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useLoad } from '../hooks/useLoad';
 import { fetchNews } from '../lib/api';
+import { NEWS_FEEDS } from '../lib/news';
 import { formatDate } from '../lib/format';
 import { EmptyState, Loading, Notice, PageHeader, Segmented } from '../components/ui';
 import { defineStrings, useStrings } from '../i18n';
@@ -20,13 +21,7 @@ const S = defineStrings({
   empty: "This source hasn't published anything recently.",
 });
 
-const FEEDS = [
-  { value: 'https://www.lecalibre.com/feed/', label: 'Le Calibre' },
-  { value: 'https://www.lesrhabilleurs.com/feed/', label: 'Les Rhabilleurs' },
-  { value: 'https://thewatchobserver.ouest-france.fr/feed/', label: 'Watch Observer' },
-  { value: 'https://www.mrmontre.com/feed', label: 'Mr Montre' },
-  { value: 'https://www.watches-news.com/fr/feed/', label: 'Watches News' },
-];
+const FEEDS = NEWS_FEEDS;
 
 /** Bonus : les derniers articles de quelques sites horlogers, lus via leur flux RSS. */
 export default function WatchNewsPage() {
