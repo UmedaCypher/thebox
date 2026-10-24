@@ -159,6 +159,9 @@ export function WearWall() {
 
 /* ------------------------------------------------------------------ essai au poignet */
 
+/* Repères mesurés sur la photo détourée (672 × 672 px) : centre du cadran et largeur du boîtier hors couronne. */
+const GS = { size: 672, cx: 335, cy: 323, caseW: 371 };
+
 const verdict = (ratio: number) =>
   ratio > 1 ? 'over' as const : ratio > 0.9 ? 'bold' as const : ratio > 0.72 ? 'classic' as const : 'discreet' as const;
 
@@ -200,19 +203,17 @@ export function WristTry() {
           <linearGradient id="wristGrad" x1="0" x2="0" y1="0" y2="1">
             <stop offset="0" stopColor="#5a2a2f" /><stop offset="0.5" stopColor="#6e363b" /><stop offset="1" stopColor="#4a2125" />
           </linearGradient>
-          <filter id="caseShadow" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="5" /></filter>
-          <linearGradient id="steel" x1="0" x2="1"><stop offset="0" stopColor="#5f6266" /><stop offset="0.5" stopColor="#b9bcc0" /><stop offset="1" stopColor="#56595c" /></linearGradient>
+          <filter id="caseShadow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="6" stdDeviation="6" floodColor="#000" floodOpacity="0.45" /></filter>
         </defs>
         {/* Avant-bras vu de dessus */}
         <rect x="0" y={200 - (width * k) / 2} width="400" height={width * k} rx={18} fill="url(#wristGrad)" className={s.anim} />
-        {/* Bracelet */}
-        <rect x={200 - diam * k * 0.26} y="0" width={diam * k * 0.52} height="400" fill="#1b1012" opacity="0.92" className={s.anim} />
-        {/* Cornes */}
-        <rect x={200 - diam * k * 0.25} y={200 - (l2l * k) / 2} width={diam * k * 0.5} height={l2l * k} rx={6} fill="url(#steel)" className={s.anim} />
-        {/* Boîtier : une vraie photo (Speedmaster vue de face), mise à l'échelle du diamètre choisi */}
-        <circle cx="200" cy="200" r={(diam * k) / 2 + 1.5} fill="#0d0607" opacity="0.45" filter="url(#caseShadow)" className={s.anim} />
-        <image href="/landing/speedmaster-head.webp" x={200 - (diam * k) / 2} y={200 - (diam * k) / 2} width={diam * k} height={diam * k}
-          preserveAspectRatio="xMidYMid meet" className={s.anim} />
+        {/* Bracelet cuir, prolongé sous la photo */}
+        <rect x={200 - diam * k * 0.21} y="0" width={diam * k * 0.42} height="400" rx={4} fill="#121011" className={s.anim} />
+        {/* Montre entière détourée (Grand Seiko, vue de face), mise à l'échelle : la largeur du boîtier = le diamètre choisi */}
+        <image href="/landing/grandseiko-cut.webp"
+          x={200 - GS.cx * (diam * k / GS.caseW)} y={200 - GS.cy * (diam * k / GS.caseW)}
+          width={GS.size * (diam * k / GS.caseW)} height={GS.size * (diam * k / GS.caseW)}
+          preserveAspectRatio="xMidYMid meet" filter="url(#caseShadow)" className={s.anim} />
         {/* Repères de largeur */}
         <g className={s.measure}>
           <line x1="372" x2="372" y1={200 - (width * k) / 2} y2={200 + (width * k) / 2} />
