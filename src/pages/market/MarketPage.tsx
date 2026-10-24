@@ -139,6 +139,8 @@ export default function MarketPage() {
   const [params, setParams] = useSearchParams();
   const filters = useMemo(() => readFilters(params), [params]);
   const [query, setQuery] = useState(filters.query);
+  // Recherche arrivée par l'adresse (ex. depuis la recherche de l'en-tête) : le champ suit.
+  useEffect(() => { setQuery(filters.query); }, [filters.query]);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [extra, setExtra] = useState<MarketItem[]>([]);
   const [moreBusy, setMoreBusy] = useState(false);

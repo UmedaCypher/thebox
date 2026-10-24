@@ -43,7 +43,9 @@
   --page-max: 1120px;
   --gutter: 16px;
   --tabbar-h: 74px;
-  --header-h: 56px;
+  --header-h: 56px;          /* hauteur totale de l'en-tête (une ligne sur mobile) */
+  --header-row-h: 56px;
+  --subnav-h: 0px;
   --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
 
   /* Alias de compatibilité pour les anciennes feuilles de style */
@@ -78,6 +80,11 @@
   --success-text: var(--ok);
 
   color-scheme: dark;
+}
+
+/* Ordinateur : en-tête sur deux lignes (logo, recherche, compte / rubriques) */
+@media (min-width: 860px) {
+  :root { --header-row-h: 72px; --subnav-h: 46px; --header-h: calc(var(--header-row-h) + var(--subnav-h) + 1px); }
 }
 
 :root[data-theme='soie'] {

@@ -368,17 +368,30 @@ const SIZE_RANGES: Record<MarketFilters['size'], [number | null, number | null]>
 
 export const MARKET_PAGE = 48;
 
+/** Mots d'une recherche, en minuscules, sans accents ni ponctuation. */
+export const searchWords = (q: string) =>
+  q.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim().split(' ').filter(Boolean);
+export const containsWords = (text: string, words: string[]) => {
+  const h = searchWords(text).join(' ');
+  return words.every(w => h.includes(w));
+};
+
 export async function searchMarket(f: MarketFilters, offset = 0): Promise<MarketItem[]> {
   const n = (v: string) => { const x = Number(v.replace(',', '.').replace(/\s/g, '')); return v.trim() && Number.isFinite(x) ? x : null; };
   const [minD, maxD] = SIZE_RANGES[f.size];
+  // La base cherche une suite exacte de caractères : on lui envoie le mot le plus long,
+  // puis on ne garde que les annonces qui contiennent tous les mots (sans accents ni tirets : « yacht master » trouve « Yacht-Master »).
+  const words = searchWords(f.query);
   const { data, error } = await supabase.rpc('search_market', {
-    p_query: f.query.trim() || null, p_brand: f.brand || null, p_kind: f.kind || null,
+    p_query: words.length ? [...words].sort((a, b) => b.length - a.length)[0] : null, p_brand: f.brand || null, p_kind: f.kind || null,
     p_min_price: n(f.minPrice), p_max_price: n(f.maxPrice), p_condition: f.condition || null,
     p_box_papers: f.boxPapers || null, p_min_diameter: minD, p_max_diameter: maxD,
     p_sort: f.sort, p_limit: MARKET_PAGE, p_offset: offset,
   });
   fail(error, 'Chargement du marché impossible.');
-  return ((data as MarketItem[]) ?? []).map(r => ({ ...r, sale_price: r.sale_price === null ? null : Number(r.sale_price) }));
+  return ((data as MarketItem[]) ?? [])
+    .filter(r => words.length < 2 || containsWords(`${r.brand} ${r.model} ${r.reference_number ?? ''}`, words))
+    .map(r => ({ ...r, sale_price: r.sale_price === null ? null : Number(r.sale_price) }));
 }
 
 export async function getMarketFilterOptions(): Promise<MarketFilterOptions> {

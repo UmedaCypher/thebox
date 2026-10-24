@@ -19,17 +19,33 @@
   text-decoration: none; color: var(--text); white-space: nowrap;
 }
 .wordmark:hover { color: var(--text); }
-.nav { display: none; gap: var(--sp-1); }
-.navLink {
-  display: inline-flex; align-items: center;
-  padding: 8px 12px; border-radius: 999px; text-decoration: none; color: var(--text-2);
-  font-size: var(--fs-sm); font-weight: 600;
+/* Recherche (ordinateur) */
+.searchSlot { display: none; flex: 1; justify-content: center; }
+
+/* Deuxième ligne de l'en-tête (ordinateur) */
+.subnav { display: none; border-top: 1px solid var(--line); }
+.subnavInner {
+  max-width: var(--page-max); margin: 0 auto; height: var(--subnav-h); padding: 0 var(--gutter);
+  display: flex; align-items: stretch; justify-content: space-between; gap: var(--sp-5);
 }
-.navLink:hover { color: var(--text); }
-.navLinkIcon { gap: 7px; }
-.navLinkIcon svg { flex: none; opacity: 0.85; }
-.navLink[aria-current='page'] svg { color: var(--brass); opacity: 1; }
-.navLink[aria-current='page'] { color: var(--text); background: var(--surface); }
+.subnavMain, .subnavAside { display: flex; align-items: stretch; gap: var(--sp-5); }
+.subLink {
+  position: relative; display: inline-flex; align-items: center; gap: 8px;
+  text-decoration: none; color: var(--text-2); font-size: var(--fs-sm); font-weight: 600; letter-spacing: 0.01em;
+}
+.subLink svg { flex: none; opacity: 0.8; }
+.subLink:hover { color: var(--text); }
+.subLink[aria-current='page'] { color: var(--text); }
+.subLink[aria-current='page'] svg { color: var(--brass); opacity: 1; }
+.subLink::after {
+  content: ''; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; border-radius: 2px;
+  background: var(--brass); transform: scaleX(0); transition: transform 220ms var(--ease);
+}
+.subLink[aria-current='page']::after { transform: scaleX(1); }
+.premiumLink { color: var(--brass); }
+.premiumLink:hover { color: var(--brass-hover); }
+.premiumLink svg { opacity: 1; }
+
 .headerEnd { margin-left: auto; display: flex; align-items: center; gap: var(--sp-2); }
 .avatar {
   width: 34px; height: 34px; border-radius: 50%; object-fit: cover; display: grid; place-items: center;
@@ -42,7 +58,11 @@
 .textLink:hover { color: var(--text); }
 
 @media (min-width: 860px) {
-  .nav { display: flex; }
+  .headerInner { height: var(--header-row-h); gap: var(--sp-6); }
+  .wordmark { font-size: 1.625rem; }
+  .avatar { width: 38px; height: 38px; }
+  .searchSlot { display: flex; }
+  .subnav { display: block; }
   .desktopOnly { display: inline-flex; }
   .withTabbar { padding-bottom: 0; }
 }

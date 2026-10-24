@@ -1,8 +1,9 @@
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
-import { CalendarDays, Images, MessageCircle, Store, Watch } from 'lucide-react';
+import { CalendarDays, Images, MessageCircle, Newspaper, Sparkles, Store, Watch } from 'lucide-react';
 import { useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { LinkButton } from '../ui';
+import GlobalSearch from '../Search/GlobalSearch';
 import { LAUNCH_MODE } from '../../lib/features';
 import { useUnreadCount } from '../../hooks/useUnreadCount';
 import { defineStrings, useStrings } from '../../i18n';
@@ -53,25 +54,11 @@ function Header({ unread }: { unread: number }) {
       <div className={s.headerInner}>
         <Link to={user ? '/collection' : '/'} className={s.wordmark}>The Box</Link>
 
-        <nav className={s.nav} aria-label={t.mainNav}>
-          {user
-            ? APP_TABS.map(({ to, key, icon: Icon }) => (
-                <NavLink key={to} to={to} className={`${s.navLink} ${s.navLinkIcon}`}>
-                  <Icon size={18} strokeWidth={1.7} aria-hidden="true" />{c.tabs[key]}
-                </NavLink>
-              ))
-            : <>
-                <NavLink to="/marche" className={s.navLink}>{c.tabs.market}</NavLink>
-                <NavLink to="/galerie" className={s.navLink}>{c.tabs.gallery}</NavLink>
-                <NavLink to="/premium" className={s.navLink}>Premium</NavLink>
-                <NavLink to="/faq" className={s.navLink}>{t.questions}</NavLink>
-              </>}
-        </nav>
+        <div className={s.searchSlot}><GlobalSearch /></div>
 
         <div className={s.headerEnd}>
           {user ? (
             <>
-              {!isPremium && <Link to="/premium" className={`${s.textLink} ${s.desktopOnly}`}>Premium</Link>}
               <NavLink to="/messages" className={`${s.iconLink} ${s.desktopOnly}`}
                 aria-label={unread > 0 ? `${c.tabs.messages}, ${c.unread(unread)}` : c.tabs.messages} title={c.tabs.messages}>
                 <MessageCircle size={22} strokeWidth={1.7} aria-hidden="true" />
@@ -91,6 +78,31 @@ function Header({ unread }: { unread: number }) {
           )}
         </div>
       </div>
+
+      {/* Deuxième ligne (ordinateur) : les rubriques, avec les mêmes icônes que la barre mobile */}
+      <nav className={s.subnav} aria-label={t.mainNav}>
+        <div className={s.subnavInner}>
+          <div className={s.subnavMain}>
+            {user
+              ? APP_TABS.map(({ to, key, icon: Icon }) => (
+                  <NavLink key={to} to={to} className={s.subLink}>
+                    <Icon size={18} strokeWidth={1.7} aria-hidden="true" />{c.tabs[key]}
+                  </NavLink>
+                ))
+              : <>
+                  <NavLink to="/marche" className={s.subLink}><Store size={18} strokeWidth={1.7} aria-hidden="true" />{c.tabs.market}</NavLink>
+                  <NavLink to="/galerie" className={s.subLink}><Images size={18} strokeWidth={1.7} aria-hidden="true" />{c.tabs.gallery}</NavLink>
+                  <NavLink to="/faq" className={s.subLink}>{t.questions}</NavLink>
+                </>}
+          </div>
+          <div className={s.subnavAside}>
+            <NavLink to="/actualites" className={s.subLink}><Newspaper size={18} strokeWidth={1.7} aria-hidden="true" />{t.news}</NavLink>
+            {!isPremium && (
+              <NavLink to="/premium" className={`${s.subLink} ${s.premiumLink}`}><Sparkles size={16} strokeWidth={1.8} aria-hidden="true" />Premium</NavLink>
+            )}
+          </div>
+        </div>
+      </nav>
     </header>
   );
 }

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useLocation, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useLoad } from '../../hooks/useLoad';
 import { listGalleryBrands, listGalleryShots } from '../../lib/api';
@@ -46,16 +46,22 @@ const S = defineStrings({
 
 const parse = (v: string) => { const n = Number(v.replace(',', '.')); return v.trim() && Number.isFinite(n) ? n : null; };
 
+/** Une nouvelle adresse (ex. depuis la recherche : ?marque=Omega) repart de filtres neufs. */
 export default function GalleryPage() {
+  const { search } = useLocation();
+  return <GalleryView key={search} />;
+}
+
+function GalleryView() {
   const t = useStrings(S);
   const c = useStrings(COMMON);
   const { user, profile } = useAuth();
   const [params] = useSearchParams();
   // Filtres initiaux possibles depuis l'accueil : /galerie?min=16.5&max=17.5
-  const [brand, setBrand] = useState('');
+  const [brand, setBrand] = useState(params.get('marque') ?? '');
   const [min, setMin] = useState((params.get('min') ? formatDecimal(params.get('min')!) : ''));
   const [max, setMax] = useState((params.get('max') ? formatDecimal(params.get('max')!) : ''));
-  const [filters, setFilters] = useState({ brand: null as string | null, minWrist: parse(params.get('min') ?? ''), maxWrist: parse(params.get('max') ?? '') });
+  const [filters, setFilters] = useState({ brand: (params.get('marque') || null) as string | null, minWrist: parse(params.get('min') ?? ''), maxWrist: parse(params.get('max') ?? '') });
 
   const brands = useLoad(listGalleryBrands, []);
   const shots = useLoad(() => listGalleryShots(filters), [filters]);
