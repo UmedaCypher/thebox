@@ -7,15 +7,15 @@ import { formatDecimal } from '../../lib/format';
 import s from './Sections.module.css';
 
 /** Photos réelles de la collection du fondateur (public/landing), dans l'ordre des légendes S.photos. */
-export const PHOTOS = [{ key: 'gmt' }, { key: 'santos' }, { key: 'seagull' }, { key: 'abart' }, { key: 'gshock' }] as const;
+export const PHOTOS = [{ key: 'speedmaster' }, { key: 'yachtmaster' }, { key: 'leuba' }, { key: 'tudor' }, { key: 'zenith' }] as const;
 
 const S = defineStrings({
   photos: [
-    'Plongeuse GMT, bracelet Nato',
-    'Carrée en acier, bracelet vissé',
-    'Coussin à cadran pixel',
-    'Minimaliste à quantième circulaire',
-    'Digitale en résine, encore dans sa boîte',
+    'Omega Speedmaster Professional, lunette verte',
+    'Rolex Yacht-Master 40, cadran ardoise',
+    'Leuba Louis Genève, rectangulaire des années 70',
+    'Tudor Prince Date « Tiger », cadran rouge',
+    'Zenith Defy Classic, céramique blanche',
   ],
   wall: {
     title: 'Un mois au poignet.',
@@ -24,7 +24,7 @@ const S = defineStrings({
     watches: 'montres portées',
     top: 'la plus portée',
     topDays: (n: number) => `${n} jours`,
-    note: "Exemple avec la collection du fondateur. L'image du mois se partage en un geste.",
+    note: "Exemple de collection. L'image du mois se partage en un geste.",
     aria: (n: number) => `Calendrier d'un mois : ${n} jours notés sur 31`,
     weekdays: ['L', 'M', 'M', 'J', 'V', 'S', 'D'],
   },
@@ -45,13 +45,13 @@ const S = defineStrings({
   passport: {
     title: 'Un passeport pour chaque montre.',
     text: "Référence, dimensions, état, boîte et papiers, entretiens. Partagez-le d'un lien quand vous vendez, faites expertiser ou assurez une pièce : les prix, eux, restent privés.",
-    alt: 'Plongeuse GMT au poignet',
+    alt: 'Rolex Yacht-Master 40 au poignet',
     kind: 'Passeport de montre, exemple',
-    name: 'Plongeuse GMT',
+    name: 'Yacht-Master 40',
     specs: [
-      ['Mouvement', 'Automatique'],
-      ['Bracelet', 'Nato tissé'],
-      ['Lunette', 'Céramique 24 h'],
+      ['Référence', '126622'],
+      ['Mouvement', 'Automatique, cal. 3235'],
+      ['Lunette', 'Platine, bidirectionnelle'],
       ['Entretiens', '2 notés'],
     ],
   },
@@ -62,11 +62,11 @@ const S = defineStrings({
   },
 }, {
   photos: [
-    'GMT diver on a NATO strap',
-    'Square steel watch, screwed bracelet',
-    'Cushion case with a pixel dial',
-    'Minimalist with a circular date',
-    'Resin digital, still in its box',
+    'Omega Speedmaster Professional, green bezel',
+    'Rolex Yacht-Master 40, slate dial',
+    'Leuba Louis Genève, a 1970s rectangular',
+    'Tudor Prince Date "Tiger", red dial',
+    'Zenith Defy Classic, white ceramic',
   ],
   wall: {
     title: 'A month on the wrist.',
@@ -75,7 +75,7 @@ const S = defineStrings({
     watches: 'watches worn',
     top: 'most worn',
     topDays: n => (n === 1 ? '1 day' : `${n} days`),
-    note: "An example from the founder's collection. Share the month's picture in one tap.",
+    note: "An example collection. Share the month's picture in one tap.",
     aria: n => `One month calendar: ${n} of 31 days logged`,
     weekdays: ['M', 'T', 'W', 'T', 'F', 'S', 'S'],
   },
@@ -96,13 +96,13 @@ const S = defineStrings({
   passport: {
     title: 'A passport for every watch.',
     text: 'Reference, dimensions, condition, box & papers, service history. Share it with a link when you sell, get a valuation or insure a piece. Prices stay private.',
-    alt: 'GMT diver on the wrist',
+    alt: 'Rolex Yacht-Master 40 on the wrist',
     kind: 'Watch passport, example',
-    name: 'GMT diver',
+    name: 'Yacht-Master 40',
     specs: [
-      ['Movement', 'Automatic'],
-      ['Strap', 'Woven NATO'],
-      ['Bezel', 'Ceramic 24 h'],
+      ['Reference', '126622'],
+      ['Movement', 'Automatic, cal. 3235'],
+      ['Bezel', 'Platinum, bidirectional'],
       ['Services', '2 logged'],
     ],
   },
@@ -200,27 +200,19 @@ export function WristTry() {
           <linearGradient id="wristGrad" x1="0" x2="0" y1="0" y2="1">
             <stop offset="0" stopColor="#5a2a2f" /><stop offset="0.5" stopColor="#6e363b" /><stop offset="1" stopColor="#4a2125" />
           </linearGradient>
-          <radialGradient id="dialGrad" cx="0.4" cy="0.35" r="0.8">
-            <stop offset="0" stopColor="#1d3566" /><stop offset="1" stopColor="#0a1530" />
-          </radialGradient>
-          <linearGradient id="steel" x1="0" x2="1"><stop offset="0" stopColor="#9fa3a7" /><stop offset="0.5" stopColor="#eceef0" /><stop offset="1" stopColor="#8d9194" /></linearGradient>
+          <filter id="caseShadow" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="5" /></filter>
+          <linearGradient id="steel" x1="0" x2="1"><stop offset="0" stopColor="#5f6266" /><stop offset="0.5" stopColor="#b9bcc0" /><stop offset="1" stopColor="#56595c" /></linearGradient>
         </defs>
         {/* Avant-bras vu de dessus */}
         <rect x="0" y={200 - (width * k) / 2} width="400" height={width * k} rx={18} fill="url(#wristGrad)" className={s.anim} />
         {/* Bracelet */}
         <rect x={200 - diam * k * 0.26} y="0" width={diam * k * 0.52} height="400" fill="#1b1012" opacity="0.92" className={s.anim} />
         {/* Cornes */}
-        <rect x={200 - diam * k * 0.3} y={200 - (l2l * k) / 2} width={diam * k * 0.6} height={l2l * k} rx={8} fill="url(#steel)" className={s.anim} />
-        {/* Boîtier et cadran */}
-        <circle cx="200" cy="200" r={(diam * k) / 2} fill="url(#steel)" className={s.anim} />
-        <circle cx="200" cy="200" r={(diam * k) / 2 * 0.84} fill="url(#dialGrad)" className={s.anim} />
-        {Array.from({ length: 12 }, (_, i) => {
-          const a = (i * Math.PI) / 6, r1 = (diam * k) / 2 * 0.62, r2 = (diam * k) / 2 * 0.76;
-          return <line key={i} x1={200 + Math.sin(a) * r1} y1={200 - Math.cos(a) * r1} x2={200 + Math.sin(a) * r2} y2={200 - Math.cos(a) * r2} stroke="#efe8dc" strokeWidth={i % 3 ? 2 : 4} strokeLinecap="round" className={s.anim} />;
-        })}
-        <line x1="200" y1="200" x2={200 + (diam * k) * 0.2} y2={200 - (diam * k) * 0.12} stroke="#efe8dc" strokeWidth="4" strokeLinecap="round" className={s.anim} />
-        <line x1="200" y1="200" x2={200 - (diam * k) * 0.06} y2={200 - (diam * k) * 0.32} stroke="#efe8dc" strokeWidth="3" strokeLinecap="round" className={s.anim} />
-        <circle cx="200" cy="200" r="4" fill="#c2a072" />
+        <rect x={200 - diam * k * 0.25} y={200 - (l2l * k) / 2} width={diam * k * 0.5} height={l2l * k} rx={6} fill="url(#steel)" className={s.anim} />
+        {/* Boîtier : une vraie photo (Speedmaster vue de face), mise à l'échelle du diamètre choisi */}
+        <circle cx="200" cy="200" r={(diam * k) / 2 + 1.5} fill="#0d0607" opacity="0.45" filter="url(#caseShadow)" className={s.anim} />
+        <image href="/landing/speedmaster-head.webp" x={200 - (diam * k) / 2} y={200 - (diam * k) / 2} width={diam * k} height={diam * k}
+          preserveAspectRatio="xMidYMid meet" className={s.anim} />
         {/* Repères de largeur */}
         <g className={s.measure}>
           <line x1="372" x2="372" y1={200 - (width * k) / 2} y2={200 + (width * k) / 2} />
@@ -273,7 +265,7 @@ export function PassportShowcase() {
       </div>
       <div className={s.cardWrap} onPointerMove={move} onPointerLeave={leave}>
         <div ref={card} className={s.card}>
-          <div className={s.cardPhoto}><img src="/landing/gmt.webp" alt={t.alt} loading="lazy" /></div>
+          <div className={s.cardPhoto}><img src="/landing/yachtmaster.webp" alt={t.alt} loading="lazy" /></div>
           <div className={s.cardBody}>
             <span className={s.cardKind}>{t.kind}</span>
             <strong className={s.cardTitle}>{t.name}</strong>

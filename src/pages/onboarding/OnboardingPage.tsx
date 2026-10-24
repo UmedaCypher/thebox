@@ -94,7 +94,7 @@ const IMG = (name: string) => `/landing/${name}.webp`;
 
 // Un mois de 28 jours : l'index de la montre portée, ou -1.
 const MONTH = [0, 1, -1, 2, 0, 3, -1, 1, 0, 4, -1, 2, 0, 1, 3, -1, 0, 2, 1, -1, 4, 0, 1, -1, 2, 0, 3, -1];
-const FACES = ['gmt-face', 'santos-face', 'seagull-face', 'abart-face', 'gshock-face'];
+const FACES = ['speedmaster-face', 'yachtmaster-face', 'leuba-face', 'tudor-face', 'zenith-face'];
 
 function CalendarDemo({ t }: { t: typeof S.fr }) {
   return (
@@ -118,7 +118,7 @@ function GalleryDemo({ t }: { t: typeof S.fr }) {
   return (
     <div className={s.demo} role="img" aria-label={t.demo.galleryAria}>
       <div className={s.fan}>
-        {['seagull', 'santos', 'gmt'].map((n, i) => (
+        {['leuba', 'speedmaster', 'zenith'].map((n, i) => (
           <figure key={n} className={s.fanItem} style={{ ['--i' as string]: i - 1 }}>
             <img src={IMG(n)} alt="" loading="lazy" />
             {i === 1 && <figcaption className="num">{t.demo.wrist(formatDecimal(17.5))}</figcaption>}
@@ -134,13 +134,13 @@ function MarketDemo({ t }: { t: typeof S.fr }) {
     <div className={s.demo} role="img" aria-label={t.demo.marketAria}>
       <div className={s.listing}>
         <div className={s.listingPhoto}>
-          <img src={IMG('gshock')} alt="" loading="lazy" />
+          <img src={IMG('tudor')} alt="" loading="lazy" />
           <span className={s.badge}>{t.demo.forSale}</span>
         </div>
         <div className={s.listingBody}>
-          <span className={s.listingBrand}>Casio</span>
-          <span className={s.listingModel}>G-Shock Adventurer's Stone</span>
-          <span className={`${s.listingPrice} num`}>{formatEuros(450)}</span>
+          <span className={s.listingBrand}>Tudor</span>
+          <span className={s.listingModel}>Prince Date “Tiger”</span>
+          <span className={`${s.listingPrice} num`}>{formatEuros(5900)}</span>
           <span className={s.fakeButton}><MessageCircle size={14} strokeWidth={1.8} aria-hidden="true" />{t.demo.contact}</span>
         </div>
       </div>
