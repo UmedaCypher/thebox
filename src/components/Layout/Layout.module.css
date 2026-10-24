@@ -47,7 +47,7 @@
 /* Barre d'onglets (mobile, connecté) : grandes cibles, libellés lisibles */
 .tabbar {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 60;
-  display: grid; grid-template-columns: repeat(5, 1fr);
+  display: grid; grid-template-columns: repeat(4, 1fr);
   height: calc(var(--tabbar-h) + env(safe-area-inset-bottom)); padding: 0 4px env(safe-area-inset-bottom);
   background: color-mix(in srgb, var(--surface) 94%, transparent);
   backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
@@ -65,12 +65,24 @@
 .tabLabel { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .tab[aria-current='page'] { color: var(--brass); }
 .tab[aria-current='page'] .tabIcon { background: color-mix(in srgb, var(--brass) 16%, transparent); }
-.tabBadge, .navBadge {
-  min-width: 20px; height: 20px; padding: 0 6px; border-radius: 999px; display: inline-grid; place-items: center;
-  background: var(--brass); color: var(--brass-ink); font-size: 0.6875rem; font-weight: 700; line-height: 1;
+/* Séparation discrète entre « mes montres » et « la communauté » */
+.navItem { display: inline-flex; align-items: center; }
+.navItem[data-group-start='true']::before {
+  content: ''; width: 1px; height: 18px; background: var(--line-strong); margin: 0 var(--sp-3) 0 var(--sp-2);
 }
-.tabBadge { position: absolute; top: -3px; right: 6px; border: 2px solid var(--surface); }
-.navBadge { margin-left: 6px; }
+
+/* Messages : icône à côté du profil, pastille dorée s'il y a des messages non lus */
+.iconLink {
+  position: relative; width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center;
+  color: var(--text-2); text-decoration: none;
+}
+.iconLink:hover { color: var(--text); background: var(--surface); }
+.iconLink[aria-current='page'] { color: var(--brass); background: var(--surface); }
+.iconBadge {
+  position: absolute; top: 2px; right: 0; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 999px;
+  display: grid; place-items: center; background: var(--brass); color: var(--brass-ink);
+  font-size: 0.6875rem; font-weight: 700; line-height: 1; border: 2px solid var(--bg);
+}
 @media (max-width: 359px) { .tab { font-size: 0.75rem; } .tabIcon { width: 48px; } }
 @media (min-width: 860px) { .tabbar { display: none; } }
 @media (max-width: 859px) { .hideOnMobile { display: none; } }

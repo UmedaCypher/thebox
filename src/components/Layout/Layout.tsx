@@ -23,13 +23,15 @@ const S = defineStrings({
   contact: 'Contact', cgu: 'Terms of use', cgv: 'Terms of sale', privacy: 'Privacy', mentions: 'Legal notice', language: 'Language',
 });
 
-/* Le profil reste accessible par l'avatar en haut à droite. */
+/*
+ * Navigation du membre en deux temps : ses montres (Collection, Portage), puis la communauté (Galerie, Marché).
+ * Messages et profil sont des icônes à droite de l'en-tête, comme dans les applications de messagerie.
+ */
 const APP_TABS = [
-  { to: '/collection', key: 'collection', icon: Watch },
-  { to: '/portage', key: 'wear', icon: CalendarDays },
-  { to: '/marche', key: 'market', icon: Store },
-  { to: '/messages', key: 'messages', icon: MessageCircle },
-  { to: '/galerie', key: 'gallery', icon: Images },
+  { to: '/collection', key: 'collection', icon: Watch, group: 'mine' },
+  { to: '/portage', key: 'wear', icon: CalendarDays, group: 'mine' },
+  { to: '/galerie', key: 'gallery', icon: Images, group: 'community' },
+  { to: '/marche', key: 'market', icon: Store, group: 'community' },
 ] as const;
 
 const badgeText = (n: number) => (n > 99 ? '99+' : String(n));
@@ -47,11 +49,10 @@ function Header({ unread }: { unread: number }) {
 
         <nav className={s.nav} aria-label={t.mainNav}>
           {user
-            ? APP_TABS.map(tab => (
-                <NavLink key={tab.to} to={tab.to} className={s.navLink}>
-                  {c.tabs[tab.key]}
-                  {tab.to === '/messages' && unread > 0 && <span className={s.navBadge} aria-label={c.unread(unread)}>{badgeText(unread)}</span>}
-                </NavLink>
+            ? APP_TABS.map((tab, i) => (
+                <span key={tab.to} className={s.navItem} data-group-start={i > 0 && APP_TABS[i - 1].group !== tab.group}>
+                  <NavLink to={tab.to} className={s.navLink}>{c.tabs[tab.key]}</NavLink>
+                </span>
               ))
             : <>
                 <NavLink to="/marche" className={s.navLink}>{c.tabs.market}</NavLink>
@@ -65,6 +66,11 @@ function Header({ unread }: { unread: number }) {
           {user ? (
             <>
               {!isPremium && <Link to="/premium" className={`${s.textLink} ${s.desktopOnly}`}>Premium</Link>}
+              <NavLink to="/messages" className={s.iconLink}
+                aria-label={unread > 0 ? `${c.tabs.messages}, ${c.unread(unread)}` : c.tabs.messages} title={c.tabs.messages}>
+                <MessageCircle size={22} strokeWidth={1.7} aria-hidden="true" />
+                {unread > 0 && <span className={s.iconBadge} aria-hidden="true">{badgeText(unread)}</span>}
+              </NavLink>
               <Link to="/profil" className={s.avatar} aria-label={t.myProfile}>
                 {profile?.profile_picture_url ? <img src={profile.profile_picture_url} alt="" className={s.avatar} /> : initial}
               </Link>
@@ -83,7 +89,7 @@ function Header({ unread }: { unread: number }) {
   );
 }
 
-function TabBar({ unread }: { unread: number }) {
+function TabBar() {
   const t = useStrings(S);
   const c = useStrings(COMMON);
   return (
@@ -92,7 +98,6 @@ function TabBar({ unread }: { unread: number }) {
         <NavLink key={to} to={to} className={s.tab}>
           <span className={s.tabIcon}>
             <Icon size={26} strokeWidth={1.6} aria-hidden="true" />
-            {to === '/messages' && unread > 0 && <span className={s.tabBadge} aria-label={c.unread(unread)}>{badgeText(unread)}</span>}
           </span>
           <span className={s.tabLabel}>{c.tabs[key]}</span>
         </NavLink>
@@ -175,7 +180,7 @@ export default function Layout() {
         <Outlet />
       </main>
       {!inMessages && !inOnboarding && <Footer loggedIn={Boolean(user)} />}
-      {user && !inOnboarding && <div className={inThread ? s.hideOnMobile : undefined}><TabBar unread={unread} /></div>}
+      {user && !inOnboarding && <div className={inThread ? s.hideOnMobile : undefined}><TabBar /></div>}
     </div>
   );
 }
