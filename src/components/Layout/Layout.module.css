@@ -26,6 +26,9 @@
   font-size: var(--fs-sm); font-weight: 600;
 }
 .navLink:hover { color: var(--text); }
+.navLinkIcon { gap: 7px; }
+.navLinkIcon svg { flex: none; opacity: 0.85; }
+.navLink[aria-current='page'] svg { color: var(--brass); opacity: 1; }
 .navLink[aria-current='page'] { color: var(--text); background: var(--surface); }
 .headerEnd { margin-left: auto; display: flex; align-items: center; gap: var(--sp-2); }
 .avatar {
@@ -65,11 +68,6 @@
 .tabLabel { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .tab[aria-current='page'] { color: var(--brass); }
 .tab[aria-current='page'] .tabIcon { background: color-mix(in srgb, var(--brass) 16%, transparent); }
-/* Séparation discrète entre « mes montres » et « la communauté » */
-.navItem { display: inline-flex; align-items: center; }
-.navItem[data-group-start='true']::before {
-  content: ''; width: 1px; height: 18px; background: var(--line-strong); margin: 0 var(--sp-3) 0 var(--sp-2);
-}
 
 /* Messages : icône à côté du profil, pastille dorée s'il y a des messages non lus */
 .iconLink {

@@ -23,15 +23,12 @@ const S = defineStrings({
   contact: 'Contact', cgu: 'Terms of use', cgv: 'Terms of sale', privacy: 'Privacy', mentions: 'Legal notice', language: 'Language',
 });
 
-/*
- * Navigation du membre en deux temps : ses montres (Collection, Portage), puis la communauté (Galerie, Marché).
- * Messages et profil sont des icônes à droite de l'en-tête, comme dans les applications de messagerie.
- */
+/* Navigation du membre sur ordinateur, avec les mêmes icônes que la barre mobile. Messages et profil sont à droite. */
 const APP_TABS = [
-  { to: '/collection', key: 'collection', icon: Watch, group: 'mine' },
-  { to: '/portage', key: 'wear', icon: CalendarDays, group: 'mine' },
-  { to: '/galerie', key: 'gallery', icon: Images, group: 'community' },
-  { to: '/marche', key: 'market', icon: Store, group: 'community' },
+  { to: '/collection', key: 'collection', icon: Watch },
+  { to: '/portage', key: 'wear', icon: CalendarDays },
+  { to: '/galerie', key: 'gallery', icon: Images },
+  { to: '/marche', key: 'market', icon: Store },
 ] as const;
 
 /* Sur mobile, tout reste dans la barre du bas, Messages compris. */
@@ -58,10 +55,10 @@ function Header({ unread }: { unread: number }) {
 
         <nav className={s.nav} aria-label={t.mainNav}>
           {user
-            ? APP_TABS.map((tab, i) => (
-                <span key={tab.to} className={s.navItem} data-group-start={i > 0 && APP_TABS[i - 1].group !== tab.group}>
-                  <NavLink to={tab.to} className={s.navLink}>{c.tabs[tab.key]}</NavLink>
-                </span>
+            ? APP_TABS.map(({ to, key, icon: Icon }) => (
+                <NavLink key={to} to={to} className={`${s.navLink} ${s.navLinkIcon}`}>
+                  <Icon size={18} strokeWidth={1.7} aria-hidden="true" />{c.tabs[key]}
+                </NavLink>
               ))
             : <>
                 <NavLink to="/marche" className={s.navLink}>{c.tabs.market}</NavLink>
