@@ -47,7 +47,7 @@
 /* Barre d'onglets (mobile, connecté) : grandes cibles, libellés lisibles */
 .tabbar {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 60;
-  display: grid; grid-template-columns: repeat(4, 1fr);
+  display: grid; grid-template-columns: repeat(5, 1fr);
   height: calc(var(--tabbar-h) + env(safe-area-inset-bottom)); padding: 0 4px env(safe-area-inset-bottom);
   background: color-mix(in srgb, var(--surface) 94%, transparent);
   backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
@@ -79,7 +79,7 @@
 .iconLink:hover { color: var(--text); background: var(--surface); }
 .iconLink[aria-current='page'] { color: var(--brass); background: var(--surface); }
 .iconBadge {
-  position: absolute; top: 2px; right: 0; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 999px;
+  position: absolute; top: 2px; right: 0; z-index: 1; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 999px;
   display: grid; place-items: center; background: var(--brass); color: var(--brass-ink);
   font-size: 0.6875rem; font-weight: 700; line-height: 1; border: 2px solid var(--bg);
 }
@@ -113,3 +113,8 @@
   background: var(--surface); color: var(--text-2); border: 1px solid var(--line-strong); border-radius: 999px;
   padding: 6px 12px; font: inherit; font-size: var(--fs-xs); font-weight: 600;
 }
+
+.tabIcon .iconBadge { top: -3px; right: 6px; border-color: var(--surface); }
+/* L'icône Messages de l'en-tête n'existe que sur ordinateur (sur mobile, Messages est dans la barre du bas). */
+.iconLink.desktopOnly { display: none; }
+@media (min-width: 860px) { .iconLink.desktopOnly { display: grid; } }
