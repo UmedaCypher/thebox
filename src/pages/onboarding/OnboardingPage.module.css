@@ -13,10 +13,10 @@
 }
 
 .dots { list-style: none; display: flex; gap: 6px; }
-.dots li { height: 4px; flex: 1; border-radius: 2px; background: var(--line-strong); transition: background 300ms var(--ease); }
+.dots li { height: 4px; flex: 1; border-radius: 2px; background: var(--line-strong); transition: background var(--dur-slow) var(--ease); }
 .dots li[data-state='done'], .dots li[data-state='current'] { background: var(--brass); }
 
-.step { min-width: 0; display: flex; flex-direction: column; gap: var(--sp-4); animation: in 380ms var(--ease); }
+.step { min-width: 0; display: flex; flex-direction: column; gap: var(--sp-4); animation: in var(--dur-slow) var(--ease); }
 .step h1 { font-size: clamp(var(--fs-2xl), 7vw, var(--fs-3xl)); line-height: 1.1; }
 .lead { color: var(--text-2); }
 
@@ -41,7 +41,7 @@
 .kicker { font-size: var(--fs-xs); font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--brass); margin-top: var(--sp-3); }
 .slideTitle { font-size: clamp(var(--fs-2xl), 6.5vw, var(--fs-3xl)); line-height: 1.12; }
 .slideDots { display: flex; justify-content: center; gap: 8px; }
-.slideDots button { width: 8px; height: 8px; border-radius: 50%; background: var(--line-strong); transition: width 250ms var(--ease), background 250ms; }
+.slideDots button { width: 8px; height: 8px; border-radius: 50%; background: var(--line-strong); transition: width var(--dur) var(--ease), background var(--dur); }
 .slideDots button[data-on='true'] { width: 22px; border-radius: 4px; background: var(--brass); }
 
 .demo {
@@ -66,25 +66,25 @@
 .fan { position: relative; width: 100%; height: 100%; }
 .fanItem {
   position: absolute; top: 50%; left: 50%; width: 42%; aspect-ratio: 4 / 5; margin: 0;
-  border-radius: 16px; overflow: hidden; box-shadow: 0 16px 30px -16px rgba(0, 0, 0, 0.7);
+  border-radius: var(--r-lg); overflow: hidden; box-shadow: 0 16px 30px -16px rgba(0, 0, 0, 0.7);
   transform: translate(calc(-50% + var(--i) * 62%), -50%) rotate(calc(var(--i) * 7deg)) scale(calc(1 - var(--i) * var(--i) * 0.12));
   z-index: calc(2 - var(--i) * var(--i));
 }
 .fanItem img { width: 100%; height: 100%; object-fit: cover; }
 .fanItem figcaption {
-  position: absolute; left: 8px; bottom: 8px; padding: 3px 8px; border-radius: 999px; font-size: var(--fs-xs); font-weight: 600;
+  position: absolute; left: 8px; bottom: 8px; padding: 3px 8px; border-radius: var(--r-pill); font-size: var(--fs-xs); font-weight: 600;
   background: color-mix(in srgb, var(--bg) 78%, transparent); color: var(--brass); border: 1px solid var(--seam);
 }
 
 /* Annonce */
 .listing {
   display: grid; grid-template-columns: 42% 1fr; gap: var(--sp-4); align-items: center; width: 100%;
-  padding: var(--sp-3); border-radius: 18px; background: color-mix(in srgb, var(--bg) 60%, transparent); border: 1px solid var(--seam);
+  padding: var(--sp-3); border-radius: var(--r-lg); background: color-mix(in srgb, var(--bg) 60%, transparent); border: 1px solid var(--seam);
 }
-.listingPhoto { position: relative; aspect-ratio: 4 / 5; border-radius: 12px; overflow: hidden; }
+.listingPhoto { position: relative; aspect-ratio: 4 / 5; border-radius: var(--r-md); overflow: hidden; }
 .listingPhoto img { width: 100%; height: 100%; object-fit: cover; }
 .badge {
-  position: absolute; top: 6px; left: 6px; padding: 2px 8px; border-radius: 999px; font-size: 0.6875rem; font-weight: 600;
+  position: absolute; top: 6px; left: 6px; padding: 2px 8px; border-radius: var(--r-pill); font-size: var(--fs-xs); font-weight: 600;
   background: color-mix(in srgb, var(--bg) 78%, transparent); color: var(--brass); border: 1px solid var(--seam);
 }
 .listingBody { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
@@ -92,7 +92,7 @@
 .listingModel { font-family: var(--font-display); font-size: var(--fs-md); line-height: 1.2; }
 .listingPrice { color: var(--brass); font-weight: 600; margin: 4px 0 8px; }
 .fakeButton {
-  display: inline-flex; align-items: center; gap: 6px; align-self: flex-start; padding: 6px 10px; border-radius: 999px;
+  display: inline-flex; align-items: center; gap: 6px; align-self: flex-start; padding: 6px 10px; border-radius: var(--r-pill);
   background: var(--brass); color: var(--brass-ink); font-size: var(--fs-xs); font-weight: 600;
 }
 

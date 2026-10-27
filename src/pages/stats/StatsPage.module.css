@@ -5,7 +5,7 @@
 
 .bars { list-style: none; display: flex; flex-direction: column; gap: var(--sp-2); }
 .barRow { display: flex; align-items: center; gap: var(--sp-3); text-decoration: none; padding: 4px 0; }
-.thumb { width: 44px; flex: none; border-radius: 12px; }
+.thumb { width: 44px; flex: none; border-radius: var(--r-md); }
 .barText { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
 .barName { font-size: var(--fs-sm); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .track { height: 6px; border-radius: 3px; background: var(--surface); overflow: hidden; }

@@ -7,7 +7,7 @@
 
 .card { display: flex; flex-direction: column; gap: var(--sp-3); text-decoration: none; color: inherit; }
 .card:hover { color: inherit; }
-.card img { transition: transform 400ms var(--ease); }
+.card img { transition: transform var(--dur-slow) var(--ease); }
 .card:hover img { transform: scale(1.03); }
 
 .text { display: flex; flex-direction: column; gap: 1px; padding: 0 2px; min-width: 0; }
@@ -20,7 +20,7 @@
 .price { font-size: var(--fs-md); font-weight: 600; color: var(--brass); margin-top: 2px; }
 .badge {
   position: absolute; top: 10px; left: 10px; z-index: 3;
-  padding: 4px 10px; border-radius: 999px; font-size: var(--fs-xs); font-weight: 600; letter-spacing: 0.02em;
+  padding: 4px 10px; border-radius: var(--r-pill); font-size: var(--fs-xs); font-weight: 600; letter-spacing: 0.02em;
   background: color-mix(in srgb, var(--bg) 78%, transparent); color: var(--brass);
   border: 1px solid var(--seam); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
 }

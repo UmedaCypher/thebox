@@ -7,8 +7,8 @@
 .hero { width: 100%; }
 @media (max-width: 899px) { .hero { width: min(100%, 38vh, 420px); margin: 0 auto; } }
 .thumbs { display: flex; gap: var(--sp-2); overflow-x: auto; padding: 2px; }
-.thumb { width: 64px; flex: none; border-radius: 14px; opacity: 0.6; }
-.thumb > div { border-radius: 14px; }
+.thumb { width: 64px; flex: none; border-radius: var(--r-md); opacity: 0.6; }
+.thumb > div { border-radius: var(--r-md); }
 .thumb[aria-selected='true'] { opacity: 1; outline: 1px solid var(--brass); outline-offset: 2px; }
 
 .body { display: flex; flex-direction: column; gap: var(--sp-5); min-width: 0; }

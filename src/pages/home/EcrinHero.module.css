@@ -24,8 +24,8 @@
 .copyA { top: calc(var(--header-h) + 9vh); opacity: clamp(0, calc((0.16 - var(--p)) * 8), 1); transform: translateY(calc(var(--p) * -120px)); }
 .copyB { bottom: 12vh; opacity: clamp(0, calc(min((var(--p) - 0.32) * 9, (0.68 - var(--p)) * 9)), 1); pointer-events: none; }
 .copyC { bottom: 10vh; align-items: center; text-align: center; opacity: clamp(0, calc((var(--p) - 0.8) * 7), 1); pointer-events: none; }
-.hero:not([data-stage='a']) .copyA { pointer-events: none; visibility: hidden; transition: visibility 0s 300ms; }
-.hero:not([data-stage='c']) .copyC { visibility: hidden; transition: visibility 0s 300ms; }
+.hero:not([data-stage='a']) .copyA { pointer-events: none; visibility: hidden; transition: visibility 0s var(--dur-slow); }
+.hero:not([data-stage='c']) .copyC { visibility: hidden; transition: visibility 0s var(--dur-slow); }
 .hero[data-stage='c'] .copyC { pointer-events: auto; }
 
 .title {

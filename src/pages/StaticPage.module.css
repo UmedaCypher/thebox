@@ -13,7 +13,7 @@
 .legalDisclaimer { font-size: var(--fs-sm); color: var(--text-3); padding: var(--sp-4); border: 1px dashed var(--seam); border-radius: var(--r-control); }
 .aboutSectionItem, .pressSectionItem, .pressRelease { padding: var(--sp-4) 0; border-bottom: 1px solid var(--line); }
 .downloadButton {
-  display: inline-flex; align-items: center; min-height: 40px; padding: 0 var(--sp-4); border-radius: 999px;
+  display: inline-flex; align-items: center; min-height: 40px; padding: 0 var(--sp-4); border-radius: var(--r-pill);
   border: 1px solid var(--line-strong); color: var(--text); text-decoration: none; font-weight: 600; font-size: var(--fs-sm); align-self: flex-start;
 }
 
@@ -28,7 +28,7 @@
 .textareaField { padding: var(--sp-3) var(--sp-4); min-height: 140px; }
 .inputField:focus, .textareaField:focus { outline: none; border-color: var(--brass); }
 .submitButton {
-  align-self: flex-start; min-height: 44px; padding: 0 var(--sp-5); border-radius: 999px;
+  align-self: flex-start; min-height: 44px; padding: 0 var(--sp-5); border-radius: var(--r-pill);
   background: var(--brass); color: var(--brass-ink); font-weight: 600;
 }
 .formMessageError { color: var(--danger); }

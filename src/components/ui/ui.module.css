@@ -2,25 +2,29 @@
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: var(--sp-2);
   min-height: 44px; padding: 0 var(--sp-5);
-  border-radius: 999px; border: 1px solid transparent;
+  border-radius: var(--r-pill); border: 1px solid transparent;
   font-size: var(--fs-md); font-weight: 600; letter-spacing: 0.005em;
   text-decoration: none; white-space: nowrap;
-  transition: background-color 160ms var(--ease), border-color 160ms var(--ease), color 160ms var(--ease);
+  transition: background-color var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease);
 }
+/* Retour au toucher : le bouton s'enfonce légèrement */
+.btn:active:not(:disabled) { transform: scale(0.98); }
 .btn:disabled, .btn[aria-disabled='true'] { opacity: 0.5; cursor: not-allowed; }
-.primary { background: var(--brass); color: var(--brass-ink); }
-.primary:hover:not(:disabled) { background: var(--brass-hover); color: var(--brass-ink); }
+.primary { background: var(--brass-fill); color: var(--brass-ink); }
+.primary:hover:not(:disabled) { background: var(--brass-fill-hover); color: var(--brass-ink); }
 .secondary { background: transparent; color: var(--text); border-color: var(--line-strong); }
 .secondary:hover:not(:disabled) { border-color: var(--brass); color: var(--text); }
 .ghost { background: transparent; color: var(--text-2); padding: 0 var(--sp-3); }
 .ghost:hover:not(:disabled) { color: var(--text); }
 .danger { background: transparent; color: var(--danger); border-color: color-mix(in srgb, var(--danger) 45%, transparent); }
-.small { min-height: 36px; padding: 0 var(--sp-4); font-size: var(--fs-sm); }
+.small { min-height: 40px; padding: 0 var(--sp-4); font-size: var(--fs-sm); }
 .block { width: 100%; }
 .iconBtn {
-  width: 44px; height: 44px; display: inline-grid; place-items: center; border-radius: 999px; color: var(--text-2);
+  width: 44px; height: 44px; display: inline-grid; place-items: center; border-radius: var(--r-pill); color: var(--text-2);
 }
+.iconBtn { transition: background-color var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease); }
 .iconBtn:hover { color: var(--text); background: var(--line); }
+.iconBtn:active:not(:disabled) { transform: scale(0.94); }
 
 /* ---------- Champs ---------- */
 .field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
@@ -52,7 +56,7 @@ select.control {
 .toggleText { display: flex; flex-direction: column; gap: 2px; }
 .toggle { position: relative; flex: none; width: 46px; height: 28px; margin-top: 2px; }
 .toggle input { position: absolute; inset: 0; opacity: 0; cursor: pointer; margin: 0; }
-.track { position: absolute; inset: 0; border-radius: 999px; background: var(--line-strong); transition: background-color 160ms var(--ease); }
+.track { position: absolute; inset: 0; border-radius: var(--r-pill); background: var(--line-strong); transition: background-color var(--dur-fast) var(--ease); }
 .track::after {
   content: ''; position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%;
   background: var(--text); transition: transform 180ms var(--ease);
@@ -62,10 +66,10 @@ select.control {
 .toggle input:focus-visible + .track { outline: 2px solid var(--brass); outline-offset: 2px; }
 
 /* ---------- Segmenté ---------- */
-.segmented { display: flex; gap: 2px; padding: 3px; border-radius: 999px; background: var(--surface); border: 1px solid var(--line); overflow-x: auto; scrollbar-width: none; }
+.segmented { display: flex; gap: 2px; padding: 3px; border-radius: var(--r-pill); background: var(--surface); border: 1px solid var(--line); overflow-x: auto; scrollbar-width: none; }
 .segmented::-webkit-scrollbar { display: none; }
 .segment {
-  flex: 1 0 auto; min-height: 38px; padding: 0 var(--sp-4); border-radius: 999px;
+  flex: 1 0 auto; min-height: 40px; padding: 0 var(--sp-4); border-radius: var(--r-pill);
   font-size: var(--fs-sm); font-weight: 600; color: var(--text-2); white-space: nowrap;
 }
 .segment[aria-selected='true'] { background: var(--cushion); color: var(--text); }
@@ -74,14 +78,14 @@ select.control {
 .sheetBackdrop {
   position: fixed; inset: 0; z-index: 100; background: var(--overlay);
   display: flex; align-items: flex-end; justify-content: center;
-  animation: fade 160ms var(--ease);
+  animation: fade var(--dur-fast) var(--ease);
 }
 .sheet {
   width: 100%; max-width: 560px; max-height: 92vh; overflow-y: auto;
   background: var(--surface); border: 1px solid var(--line);
   border-radius: var(--r-cushion) var(--r-cushion) 0 0;
   padding: var(--sp-3) var(--sp-5) calc(var(--sp-6) + env(safe-area-inset-bottom));
-  animation: rise 220ms var(--ease);
+  animation: rise var(--dur) var(--ease);
 }
 .grabber { width: 40px; height: 4px; border-radius: 2px; background: var(--line-strong); margin: 0 auto var(--sp-4); }
 .sheetHead { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3); margin-bottom: var(--sp-4); }
@@ -118,7 +122,7 @@ select.control {
 
 /* ---------- Pastille Premium ---------- */
 .premiumTag {
-  display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 999px;
+  display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: var(--r-pill);
   font-size: var(--fs-xs); font-weight: 600; color: var(--brass); border: 1px solid var(--seam);
 }
 
@@ -129,7 +133,7 @@ select.control {
   border-radius: var(--r-cushion);
   background:
     radial-gradient(120% 85% at 50% 30%, color-mix(in srgb, var(--cushion) 82%, #fff 9%) 0%, var(--cushion) 55%, var(--cushion-edge) 100%);
-  box-shadow: 0 1px 0 color-mix(in srgb, var(--cushion) 60%, #fff 10%) inset, 0 18px 30px -22px rgba(0, 0, 0, 0.55);
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--cushion) 60%, #fff 10%) inset, var(--shadow-md);
 }
 .cushion::after {
   content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; z-index: 2;
@@ -140,3 +144,8 @@ select.control {
 .ratioSquare { aspect-ratio: 1 / 1; }
 .ratioPortrait { aspect-ratio: 4 / 5; }
 .ratioWide { aspect-ratio: 4 / 3; }
+
+/* Écrans tactiles : toutes les cibles atteignent 44 px (recommandation d'accessibilité) */
+@media (pointer: coarse) {
+  .small, .segment { min-height: 44px; }
+}

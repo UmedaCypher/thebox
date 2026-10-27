@@ -16,9 +16,11 @@
   --seam: rgba(194, 160, 114, 0.38);
   --text: #f3ede3;
   --text-2: #c4b4a9;
-  --text-3: #95817a;
+  --text-3: #9b8982;          /* 4,6:1 sur les coussins */
   --brass: #c2a072;
   --brass-hover: #d4b688;
+  --brass-fill: #c2a072;       /* fond des boutons dorés */
+  --brass-fill-hover: #d4b688;
   --brass-ink: #1f0e11;
   --danger: #e58b7b;
   --ok: #a9c39a;
@@ -40,6 +42,15 @@
   --sp-1: 4px; --sp-2: 8px; --sp-3: 12px; --sp-4: 16px; --sp-5: 24px; --sp-6: 32px; --sp-7: 48px; --sp-8: 72px;
   --r-control: 10px;
   --r-cushion: 22px;
+  /* Échelle d'arrondis : une seule famille de formes dans toute l'app */
+  --r-xs: 6px; --r-sm: 10px; --r-md: 14px; --r-lg: 18px; --r-xl: 22px; --r-pill: 999px;
+  /* Élévations : posé, flottant, en avant-plan */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.22), 0 2px 8px -4px rgba(0, 0, 0, 0.3);
+  --shadow-md: var(--shadow-md);
+  --shadow-lg: var(--shadow-lg);
+  /* Durées : rapide (survol), standard (états), lente (apparitions) */
+  --dur-fast: 150ms; --dur: 220ms; --dur-slow: 380ms;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --page-max: 1120px;
   --gutter: 16px;
   --tabbar-h: 74px;
@@ -97,11 +108,13 @@
   --seam: rgba(138, 102, 53, 0.45);
   --text: #2a1418;
   --text-2: #5f4b46;
-  --text-3: #7d6862;
-  --brass: #8a6635;
-  --brass-hover: #74552b;
+  --text-3: #6b5954;          /* 4,6:1 sur les coussins (contraste AA) */
+  --brass: #75572d;            /* texte doré : 4,6:1 minimum */
+  --brass-hover: #634825;
+  --brass-fill: #8a6635;       /* fond des boutons : texte ivoire à 4,7:1 */
+  --brass-fill-hover: #75572d;
   --brass-ink: #f7f2ea;
-  --danger: #b4473a;
+  --danger: #9d3e32;
   --ok: #4f7042;
   --overlay: rgba(42, 20, 24, 0.45);
   color-scheme: light;

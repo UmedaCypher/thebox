@@ -6,7 +6,7 @@
 .list { list-style: none; display: flex; flex-direction: column; }
 .item { display: flex; gap: var(--sp-3); align-items: center; padding: var(--sp-3) 0; border-bottom: 1px solid var(--line); text-decoration: none; color: inherit; }
 .item:hover { color: inherit; }
-.item img, .noImage { width: 64px; height: 64px; flex: none; object-fit: cover; border-radius: 12px; background: var(--cushion); }
+.item img, .noImage { width: 64px; height: 64px; flex: none; object-fit: cover; border-radius: var(--r-md); background: var(--cushion); }
 .text { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
 .itemTitle {
   font-family: var(--font-display); font-size: var(--fs-md); line-height: 1.25;
