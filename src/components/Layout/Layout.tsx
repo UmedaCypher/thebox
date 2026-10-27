@@ -196,7 +196,8 @@ export default function Layout() {
       <a href="#contenu" className="visually-hidden">{t.skip}</a>
       <Header unread={unread} />
       <main id="contenu" className={`${s.main} ${user && !inThread && !inOnboarding ? s.withTabbar : ''}`}>
-        <Outlet />
+        {/* Fondu léger à chaque changement de page (la messagerie garde sa liste en place) */}
+        <div key={inMessages ? '/messages' : pathname} className={s.route}><Outlet /></div>
       </main>
       {!inMessages && !inOnboarding && <Footer loggedIn={Boolean(user)} />}
       {user && !inOnboarding && <div className={inThread ? s.hideOnMobile : undefined}><TabBar unread={unread} /></div>}

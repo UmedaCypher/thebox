@@ -2,7 +2,7 @@ import { lazy, Suspense } from 'react';
 import { BrowserRouter, Navigate, Route, Routes, useParams } from 'react-router-dom';
 import Layout from './components/Layout/Layout';
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
-import { EmptyState, LinkButton, Loading } from './components/ui';
+import { EmptyState, LinkButton } from './components/ui';
 import { defineStrings, useStrings } from './i18n';
 
 import HomePage from './pages/home/HomePage';
@@ -16,6 +16,7 @@ import PassportPage from './pages/public/PassportPage';
 import PublicProfilePage from './pages/public/PublicProfilePage';
 import PremiumPage from './pages/premium/PremiumPage';
 import { ForgotPasswordPage, LoginPage, NewPasswordPage, SignupPage } from './pages/auth/AuthPages';
+import { SkeletonHeader } from './components/Skeleton/Skeleton';
 
 // Pages secondaires, chargées à la demande.
 const StatsPage = lazy(() => import('./pages/stats/StatsPage'));
@@ -70,7 +71,7 @@ function NotFound() {
 export default function App() {
   return (
     <BrowserRouter>
-      <Suspense fallback={<div className="page"><Loading /></div>}>
+      <Suspense fallback={<div className="page"><SkeletonHeader /></div>}>
         <Routes>
           <Route element={<Layout />}>
             {/* Public */}

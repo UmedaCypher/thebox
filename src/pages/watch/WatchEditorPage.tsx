@@ -8,7 +8,7 @@ import {
   addWatchPhoto, createWatch, deletePhoto, fetchReferenceOptions, getWatch, setMainPhoto, thumbSrc, updateWatch, WatchLimitError,
 } from '../../lib/api';
 import type { Photo, Watch, WatchInput, WatchStatus } from '../../types';
-import { Button, Cushion, IconButton, Loading, Notice, PageHeader, Segmented, SelectField, TextArea, TextField, Toggle } from '../../components/ui';
+import { Button, Cushion, IconButton, Notice, PageHeader, Segmented, SelectField, TextArea, TextField, Toggle } from '../../components/ui';
 import PhotoPicker from '../../components/PhotoPicker/PhotoPicker';
 import PremiumSheet from '../../components/PremiumSheet/PremiumSheet';
 import { FREE_WATCH_LIMIT } from '../../lib/features';
@@ -16,6 +16,8 @@ import { formatDecimal } from '../../lib/format';
 import { defineStrings, useStrings } from '../../i18n';
 import { COMMON } from '../../i18n/common';
 import s from './WatchEditorPage.module.css';
+import { SkeletonHeader, SkeletonList } from '../../components/Skeleton/Skeleton';
+import { useToast } from '../../components/Toast/Toast';
 
 type Form = Record<
   'brand' | 'model' | 'reference_number' | 'year_of_production' | 'movement' | 'case_diameter_mm' | 'lug_to_lug_mm' |
@@ -256,6 +258,7 @@ const STEP_COUNT = 3;
 export default function WatchEditorPage() {
   const t = useStrings(S);
   const c = useStrings(COMMON);
+  const toast = useToast();
   const { watchId } = useParams();
   const isEdit = Boolean(watchId);
   const { user, profile } = useAuth();
@@ -318,6 +321,8 @@ export default function WatchEditorPage() {
 
       if (mainFile) await addWatchPhoto(uid, id!, mainFile, { type: 'watch_only', isMain: true });
       if (wristFile) await addWatchPhoto(uid, id!, wristFile, { type: 'wrist_shot', inGallery: wristInGallery, wristSizeCm: profile?.wrist_size_cm ?? null });
+      const wasListed = Boolean(existing.data && ['for_sale', 'for_exchange'].includes(existing.data.current_status));
+      toast(listed && !wasListed ? c.toast.listingOn : isEdit ? c.toast.watchSaved : c.toast.watchAdded);
       navigate(`/montre/${id}`, { replace: !isEdit });
     } catch (err) {
       if (err instanceof WatchLimitError) setLimitOpen(true);
@@ -330,7 +335,7 @@ export default function WatchEditorPage() {
   const o = options.data;
   const brandList = useMemo(() => o?.brands ?? [], [o]);
 
-  if (isEdit && existing.loading) return <div className="page"><Loading /></div>;
+  if (isEdit && existing.loading) return <div className="page page--narrow"><SkeletonHeader /><SkeletonList rows={6} thumb={0} /></div>;
   if (isEdit && !existing.loading && !existing.data) return <div className="page"><Notice tone="error">{existing.error ?? t.notFound}</Notice></div>;
 
   const photosBlock = (
@@ -512,6 +517,8 @@ export default function WatchEditorPage() {
 }
 
 function ExistingPhotos({ userId, watch, onChange }: { userId: string; watch: Watch; onChange: () => void }) {
+  const toast = useToast();
+  const tc = useStrings(COMMON);
   const t = useStrings(S);
   const [busy, setBusy] = useState<string | null>(null);
   const photos = watch.photos ?? [];
@@ -531,14 +538,14 @@ function ExistingPhotos({ userId, watch, onChange }: { userId: string; watch: Wa
             <IconButton
               label={p.is_main_photo ? t.mainPhoto : t.setMain}
               disabled={busy === p.id || p.is_main_photo}
-              onClick={() => act(p, () => setMainPhoto(userId, watch.id, p.id))}
+              onClick={() => act(p, () => setMainPhoto(userId, watch.id, p.id)).then(() => toast(tc.toast.mainPhoto))}
             >
               <Star size={18} strokeWidth={1.6} fill={p.is_main_photo ? 'currentColor' : 'none'} />
             </IconButton>
             <IconButton
               label={t.deletePhoto}
               disabled={busy === p.id}
-              onClick={() => { if (window.confirm(t.confirmDeletePhoto)) act(p, () => deletePhoto(userId, p)); }}
+              onClick={() => { if (window.confirm(t.confirmDeletePhoto)) act(p, () => deletePhoto(userId, p)).then(() => toast(tc.toast.photoDeleted)); }}
             >
               <Trash2 size={18} strokeWidth={1.6} />
             </IconButton>

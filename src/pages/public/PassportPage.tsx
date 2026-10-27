@@ -4,11 +4,12 @@ import { useLoad } from '../../hooks/useLoad';
 import { getPassport, mainPhoto, photoUrl, thumbSrc } from '../../lib/api';
 import { formatDate, formatMm } from '../../lib/format';
 import { listingPrice } from '../../lib/listing';
-import { Cushion, LinkButton, Loading, Notice } from '../../components/ui';
+import { Cushion, LinkButton, Notice } from '../../components/ui';
 import ContactButton from '../../components/ContactButton/ContactButton';
 import { defineStrings, useLang, useStrings } from '../../i18n';
 import { COMMON, movementLabel } from '../../i18n/common';
 import s from './PassportPage.module.css';
+import { SkeletonDetail } from '../../components/Skeleton/Skeleton';
 
 const S = defineStrings({
   notFound: 'Ce passeport n\'existe pas ou n\'est plus partagé.',
@@ -71,7 +72,7 @@ export default function PassportPage() {
   const q = useLoad(() => getPassport(watchId!), [watchId]);
   const [idx, setIdx] = useState(0);
 
-  if (q.loading) return <div className="page"><Loading /></div>;
+  if (q.loading) return <div className="page"><SkeletonDetail /></div>;
   const p = q.data;
   if (q.error || !p) {
     return (

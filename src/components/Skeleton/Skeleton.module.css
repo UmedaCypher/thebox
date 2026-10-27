@@ -1,0 +1,32 @@
+/* Os de squelette : la teinte des coussins, parcourue d'un reflet lent */
+.bone {
+  display: block; height: 14px; border-radius: var(--r-xs);
+  background:
+    linear-gradient(100deg, transparent 20%, color-mix(in srgb, var(--text) 7%, transparent) 50%, transparent 80%) 0 0 / 220% 100%,
+    color-mix(in srgb, var(--cushion) 78%, var(--surface));
+  animation: shimmer 1.6s linear infinite;
+}
+@keyframes shimmer { from { background-position: 120% 0, 0 0; } to { background-position: -120% 0, 0 0; } }
+@media (prefers-reduced-motion: reduce) { .bone { animation: none; } }
+
+.header { display: flex; flex-direction: column; gap: var(--sp-3); margin-bottom: var(--sp-6); }
+.stats { display: flex; gap: var(--sp-7); margin-top: var(--sp-3); }
+.stats span { display: flex; flex-direction: column; gap: var(--sp-2); }
+
+.grid { display: grid; gap: var(--sp-5) var(--sp-4); grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (min-width: 640px) { .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (min-width: 1000px) { .grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--sp-6) var(--sp-5); } }
+.card { display: flex; flex-direction: column; gap: var(--sp-2); }
+.card > :first-child { margin-bottom: var(--sp-2); }
+
+.list { display: flex; flex-direction: column; }
+.row { display: flex; gap: var(--sp-3); align-items: center; padding: var(--sp-3) 0; border-bottom: 1px solid var(--line); }
+.rowText { flex: 1; display: flex; flex-direction: column; gap: var(--sp-2); }
+
+.detail { display: grid; gap: var(--sp-6); }
+@media (min-width: 900px) { .detail { grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: var(--sp-8); align-items: start; } }
+.detailText { display: flex; flex-direction: column; gap: var(--sp-3); }
+.specs { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-4) var(--sp-5); margin-top: var(--sp-4); }
+.specs span { display: flex; flex-direction: column; gap: 6px; }
+
+.calendar { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; max-width: 560px; }

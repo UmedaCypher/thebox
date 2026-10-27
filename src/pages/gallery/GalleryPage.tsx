@@ -4,11 +4,12 @@ import { Link, useLocation, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useLoad } from '../../hooks/useLoad';
 import { listGalleryBrands, listGalleryShots } from '../../lib/api';
-import { Button, Cushion, EmptyState, LinkButton, Loading, Notice, PageHeader, SelectField, TextField } from '../../components/ui';
+import { Button, Cushion, EmptyState, LinkButton, Notice, PageHeader, SelectField, TextField } from '../../components/ui';
 import { formatDecimal } from '../../lib/format';
 import { defineStrings, useStrings } from '../../i18n';
 import { COMMON } from '../../i18n/common';
 import s from './GalleryPage.module.css';
+import { SkeletonGrid } from '../../components/Skeleton/Skeleton';
 
 const S = defineStrings({
   subtitle: 'Des montres photographiées au poignet. Filtrez par tour de poignet pour voir comment une pièce tombe sur un poignet comme le vôtre.',
@@ -100,7 +101,7 @@ function GalleryView() {
         </div>
       </form>
 
-      {shots.loading ? <Loading /> : shots.error ? <Notice tone="error">{shots.error}</Notice> : !shots.data?.length ? (
+      {shots.loading ? <SkeletonGrid count={8} /> : shots.error ? <Notice tone="error">{shots.error}</Notice> : !shots.data?.length ? (
         <EmptyState
           title={filtered ? t.noResultsTitle : t.emptyTitle}
           action={user ? <LinkButton to="/collection" variant="secondary">{t.addShot}</LinkButton> : undefined}
@@ -108,7 +109,7 @@ function GalleryView() {
           {filtered ? t.noResultsText : t.emptyText}
         </EmptyState>
       ) : (
-        <ul className={s.masonry}>
+        <ul className={`${s.masonry} reveal`}>
           {shots.data.map(p => (
             <li key={p.id} className={s.item}>
               <Cushion src={p.thumb} fallbackSrc={p.url} alt={t.onWrist(`${p.brand} ${p.model}`)} ratio="portrait" />

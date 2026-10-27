@@ -3,9 +3,10 @@ import { useLoad } from '../hooks/useLoad';
 import { fetchNews } from '../lib/api';
 import { NEWS_FEEDS } from '../lib/news';
 import { formatDate } from '../lib/format';
-import { EmptyState, Loading, Notice, PageHeader, Segmented } from '../components/ui';
+import { EmptyState, Notice, PageHeader, Segmented } from '../components/ui';
 import { defineStrings, useStrings } from '../i18n';
 import s from './WatchNewsPage.module.css';
+import { SkeletonList } from '../components/Skeleton/Skeleton';
 
 const S = defineStrings({
   title: 'Actualités',
@@ -33,8 +34,8 @@ export default function WatchNewsPage() {
     <div className="page">
       <PageHeader title={t.title} subtitle={t.subtitle} />
       <Segmented label={t.source} value={feed} onChange={setFeed} options={FEEDS} />
-      <div className={s.list}>
-        {q.loading ? <Loading /> : q.error ? <Notice tone="error">{q.error}</Notice> : !q.data?.length ? (
+      <div className={`${s.list} reveal`}>
+        {q.loading ? <SkeletonList rows={6} thumb={104} /> : q.error ? <Notice tone="error">{q.error}</Notice> : !q.data?.length ? (
           <EmptyState title={t.emptyTitle}>{t.empty}</EmptyState>
         ) : q.data.map((n, i) => (
           <a key={n.link ?? i} href={n.link} target="_blank" rel="noopener noreferrer" className={s.item}>

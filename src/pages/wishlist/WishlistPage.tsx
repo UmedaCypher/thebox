@@ -6,10 +6,13 @@ import { useLoad } from '../../hooks/useLoad';
 import { addWishlistItem, deleteWishlistItem, listWishlist, updateWishlistItem } from '../../lib/api';
 import { formatEuros } from '../../lib/format';
 import type { WishlistItem } from '../../types';
-import { Button, EmptyState, IconButton, Loading, Notice, PageHeader, Segmented, Sheet, TextArea, TextField } from '../../components/ui';
+import { Button, EmptyState, IconButton, Notice, PageHeader, Segmented, Sheet, TextArea, TextField } from '../../components/ui';
 import PremiumGate from '../../components/PremiumGate/PremiumGate';
 import { defineStrings, useStrings } from '../../i18n';
+import { useToast } from '../../components/Toast/Toast';
+import { COMMON } from '../../i18n/common';
 import s from './WishlistPage.module.css';
+import { SkeletonList } from '../../components/Skeleton/Skeleton';
 
 const S = defineStrings({
   title: 'Wishlist',
@@ -66,6 +69,8 @@ const S = defineStrings({
 
 function WishlistContent() {
   const t = useStrings(S);
+  const c = useStrings(COMMON);
+  const toast = useToast();
   const PRIORITY = t.priorities;
   const { user } = useAuth();
   const uid = user!.id;
@@ -85,6 +90,7 @@ function WishlistContent() {
       });
       setOpen(false);
       setF({ brand: '', model: '', reference_number: '', target_price: '', priority: '2', notes: '' });
+      toast(c.toast.wishAdded);
       list.reload();
     } catch (x) { setErr(x instanceof Error ? x.message : t.addError); }
   };
@@ -98,7 +104,7 @@ function WishlistContent() {
       <PageHeader title={t.title} subtitle={t.subtitle}
         action={<Button size="small" onClick={() => { setErr(null); setOpen(true); }}><Plus size={16} aria-hidden="true" />{t.add}</Button>} />
 
-      {list.loading ? <Loading /> : list.error ? <Notice tone="error">{list.error}</Notice> : !items.length ? (
+      {list.loading ? <SkeletonList rows={4} thumb={0} /> : list.error ? <Notice tone="error">{list.error}</Notice> : !items.length ? (
         <EmptyState title={t.emptyTitle} action={<Button onClick={() => setOpen(true)}>{t.addWanted}</Button>}>
           {t.emptyText}
         </EmptyState>
@@ -114,7 +120,7 @@ function WishlistContent() {
                   {i.notes && <p>{i.notes}</p>}
                 </div>
                 <div className={s.actions}>
-                  <IconButton label={t.markFound} onClick={async () => { await updateWishlistItem(uid, i.id, { acquired_at: new Date().toISOString() }); list.reload(); }}><Check size={18} strokeWidth={1.8} /></IconButton>
+                  <IconButton label={t.markFound} onClick={async () => { await updateWishlistItem(uid, i.id, { acquired_at: new Date().toISOString() }); toast(c.toast.wishDone); list.reload(); }}><Check size={18} strokeWidth={1.8} /></IconButton>
                   <IconButton label={t.remove} onClick={async () => { if (window.confirm(t.removeConfirm)) { await deleteWishlistItem(uid, i.id); list.reload(); } }}><Trash2 size={18} strokeWidth={1.6} /></IconButton>
                 </div>
               </li>

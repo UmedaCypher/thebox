@@ -139,3 +139,8 @@ a.avatar::after { content: ''; position: absolute; inset: -6px; border-radius: 5
 /* L'icône Messages de l'en-tête n'existe que sur ordinateur (sur mobile, Messages est dans la barre du bas). */
 .iconLink.desktopOnly { display: none; }
 @media (min-width: 860px) { .iconLink.desktopOnly { display: grid; } }
+
+/* Transition de page : la nouvelle page apparaît en fondu en remontant à peine */
+.route { flex: 1; display: flex; flex-direction: column; min-width: 0; animation: routeIn var(--dur-slow) var(--ease-out) both; }
+@keyframes routeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .route { animation: none; } }

@@ -211,3 +211,11 @@ button { cursor: pointer; background: none; border: 0; }
 @media print {
   :root { --bg: #fff; --surface: #fff; --text: #111; --text-2: #444; --text-3: #666; --line: #ddd; --seam: #bbb; --brass: #6b4f28; color-scheme: light; }
 }
+
+/* Apparition douce des listes et sections (utilitaire) */
+.reveal > * { animation: revealIn var(--dur-slow) var(--ease-out) both; }
+.reveal > :nth-child(2) { animation-delay: 40ms; } .reveal > :nth-child(3) { animation-delay: 80ms; }
+.reveal > :nth-child(4) { animation-delay: 120ms; } .reveal > :nth-child(5) { animation-delay: 160ms; }
+.reveal > :nth-child(n + 6) { animation-delay: 200ms; }
+@keyframes revealIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .reveal > * { animation: none; } }

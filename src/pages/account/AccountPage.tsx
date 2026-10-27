@@ -15,6 +15,7 @@ import { defineStrings, tr, useStrings } from '../../i18n';
 import type { LangChoice } from '../../i18n';
 import { COMMON } from '../../i18n/common';
 import { formatDecimal } from '../../lib/format';
+import { useToast } from '../../components/Toast/Toast';
 import s from './AccountPage.module.css';
 
 const S = defineStrings({
@@ -142,6 +143,7 @@ const S = defineStrings({
 export default function AccountPage() {
   const t = useStrings(S);
   const c = useStrings(COMMON);
+  const toast = useToast();
   const { user, profile, isPremium, refreshProfile, signOut } = useAuth();
   const { theme, setTheme } = useTheme();
   const language = useLanguageSetting();
@@ -194,7 +196,8 @@ export default function AccountPage() {
     try {
       await saveProfile(uid, { username: username || null, full_name: f.full_name.trim() || null, wrist_size_cm: wrist, is_public: f.is_public, allow_private_messages: f.messages }, Boolean(profile));
       await refreshProfile();
-      setMsg({ tone: 'ok', text: t.saved });
+      setMsg(null);
+      toast(c.toast.profileSaved);
     } catch (x) {
       setMsg({ tone: 'error', text: x instanceof Error ? x.message : t.saveError });
     } finally { setSaving(false); }
