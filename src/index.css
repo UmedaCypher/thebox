@@ -213,7 +213,7 @@ button { cursor: pointer; background: none; border: 0; }
 }
 
 /* Apparition douce des listes et sections (utilitaire) */
-.reveal > * { animation: revealIn var(--dur-slow) var(--ease-out) both; }
+.reveal > * { animation: revealIn var(--dur-slow) var(--ease-out) backwards; }
 .reveal > :nth-child(2) { animation-delay: 40ms; } .reveal > :nth-child(3) { animation-delay: 80ms; }
 .reveal > :nth-child(4) { animation-delay: 120ms; } .reveal > :nth-child(5) { animation-delay: 160ms; }
 .reveal > :nth-child(n + 6) { animation-delay: 200ms; }
