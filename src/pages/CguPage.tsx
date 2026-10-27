@@ -1,13 +1,18 @@
 // client/src/pages/CguPage.tsx
 import React from 'react';
+import InfoPage from '../components/InfoPage/InfoPage';
 import styles from './StaticPage.module.css';
 import { Link } from 'react-router-dom';
 import { defineStrings, useStrings } from '../i18n';
 
 const S = defineStrings({
+  kicker: 'Informations légales',
+  lead: 'Texte provisoire, en cours de finalisation avant le lancement.',
   title: "Conditions Générales d'Utilisation (CGU)",
   notice: '',
 }, {
+  kicker: 'Legal',
+  lead: 'Draft text, being finalised before launch.',
   title: 'Terms of Use',
   notice: 'This document is currently available in French only.',
 });
@@ -15,20 +20,15 @@ const S = defineStrings({
 const CguPage: React.FC = () => {
   const t = useStrings(S);
   return (
-    <div className={styles.staticPageContainer}>
-      <div className={styles.staticPageContent}>
-        <header className={styles.staticPageHeader}>
-          <h1>{t.title}</h1>
-          {t.notice && <p>{t.notice}</p>}
-        </header>
-        <section className={styles.staticPageSection}>
+    <InfoPage kicker={t.kicker} title={t.title} notice={t.notice || undefined} lead={t.lead} toc>
+        <section>
           <p><strong>Date de dernière mise à jour :</strong> [Date]</p>
 
           <h2>Article 1 : Objet</h2>
           <p>
             Les présentes Conditions Générales d'Utilisation (ci-après "CGU") ont pour objet de définir les modalités et conditions
             dans lesquelles THE BOX (ci-après "l'Éditeur") met à la disposition de ses utilisateurs (ci-après "l'Utilisateur")
-            le site et les services accessibles à partir de l'URL https://context.reverso.net/translation/french-english/de+votre (ci-après "le Site" ou "l'Application").
+            le site et les services accessibles à partir de l'URL [adresse du site] (ci-après "le Site" ou "l'Application").
             L'accès et l'utilisation du Site impliquent l'acceptation sans réserve des présentes CGU par l'Utilisateur.
           </p>
 
@@ -88,7 +88,7 @@ const CguPage: React.FC = () => {
           <h2>Article 8 : Cookies</h2>
           <p>
             L’Utilisateur est informé que lors de ses visites sur le site, un cookie peut s’installer automatiquement sur son logiciel de navigation.
-            Les cookies sont de petits fichiers stockés temporairement sur le disque dur de l’ordinateur de l’Utilisateur par votre navigateur et qui sont nécessaires à l’utilisation du site https://context.reverso.net/translation/french-english/de+votre. Les cookies ne contiennent pas d’information personnelle et ne peuvent pas être utilisés pour identifier quelqu’un. Un cookie contient un identifiant unique, généré aléatoirement et donc anonyme. Certains cookies expirent à la fin de la visite de l’Utilisateur, d’autres restent.
+            Les cookies sont de petits fichiers stockés temporairement sur le disque dur de l’ordinateur de l’Utilisateur par votre navigateur et qui sont nécessaires à l’utilisation du site [adresse du site]. Les cookies ne contiennent pas d’information personnelle et ne peuvent pas être utilisés pour identifier quelqu’un. Un cookie contient un identifiant unique, généré aléatoirement et donc anonyme. Certains cookies expirent à la fin de la visite de l’Utilisateur, d’autres restent.
             L’information contenue dans les cookies est utilisée pour améliorer le site.
             En naviguant sur le site, L’Utilisateur les accepte. L’Utilisateur pourra désactiver ces cookies par l’intermédiaire des paramètres figurant au sein de son logiciel de navigation.
             Pour plus d'informations sur l'utilisation des cookies, veuillez consulter notre <Link to="/confidentialite" className={styles.inlineLink}>Politique de Confidentialité</Link>.
@@ -113,8 +113,7 @@ const CguPage: React.FC = () => {
             </em>
           </p>
         </section>
-      </div>
-    </div>
+    </InfoPage>
   );
 };
 

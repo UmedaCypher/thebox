@@ -1,6 +1,8 @@
+import type React from 'react';
 import { Link } from 'react-router-dom';
 import { FREE_WATCH_LIMIT } from '../lib/features';
-import { PageHeader } from '../components/ui';
+import { MessageCircle } from 'lucide-react';
+import InfoPage from '../components/InfoPage/InfoPage';
 import { defineStrings, useStrings } from '../i18n';
 import s from './FaqPage.module.css';
 
@@ -40,6 +42,17 @@ const S = defineStrings({
   deleteAfter: " avec l'adresse de votre compte. Toutes vos données et photos sont supprimées sous 7 jours.",
   more: 'Une autre question ?',
   write: 'Écrivez-nous',
+  kicker: 'Aide',
+  lead: "Tout ce qu'il faut savoir pour tenir le registre de vos montres, les porter, et les vendre entre collectionneurs.",
+  groups: { collection: 'Votre collection', wear: 'Portage et Premium', market: 'Marché et messages', account: 'Compte' },
+  extra: {
+    cpw: { q: "Qu'est-ce que le coût par port ?", a: "Le prix d'achat d'une montre divisé par le nombre de jours où vous l'avez portée. Il montre ce que chaque montre vous coûte vraiment, et il baisse à chaque port." },
+    sell: { q: 'Comment vendre ou échanger une montre ?', a: "Dans la fiche de la montre, choisissez « À vendre » ou « À échanger », avec un prix et une ville si vous le souhaitez. L'annonce apparaît dans le Marché ; les intéressés vous écrivent par la messagerie." },
+    fee: { q: 'The Box prend-elle une commission ?', a: "Non. La vente se fait directement entre membres : The Box n'encaisse rien et n'intervient pas dans la transaction. Préférez une remise en main propre dans un lieu sûr, ou chez un horloger." },
+    who: { q: 'Qui peut m\'écrire ?', a: "Les membres, depuis vos annonces et votre profil public, si vous acceptez les messages (réglage dans votre profil). Vous pouvez bloquer un membre ou signaler un message à tout moment." },
+  },
+  asideTitle: 'Besoin d\'aide ?',
+  asideText: 'Nous lisons et répondons nous-mêmes à chaque message.',
 }, {
   title: 'Frequently asked questions',
   items: [
@@ -76,28 +89,56 @@ const S = defineStrings({
   deleteAfter: ' page using your account email address. All your data and photos are deleted within 7 days.',
   more: 'Another question?',
   write: 'Write to us',
+  kicker: 'Help',
+  lead: 'Everything you need to keep a record of your watches, wear them, and sell them among collectors.',
+  groups: { collection: 'Your collection', wear: 'Wear and Premium', market: 'Market and messages', account: 'Account' },
+  extra: {
+    cpw: { q: 'What is cost per wear?', a: 'The purchase price of a watch divided by the number of days you wore it. It shows what each watch really costs you, and it drops every time you wear it.' },
+    sell: { q: 'How do I sell or trade a watch?', a: 'On the watch page, choose "For sale" or "For trade", with a price and a city if you like. The listing appears on the Market and interested members write to you through Messages.' },
+    fee: { q: 'Does The Box take a commission?', a: 'No. Sales happen directly between members: The Box takes no money and is not part of the transaction. Prefer meeting in person in a safe place, or at a watchmaker.' },
+    who: { q: 'Who can write to me?', a: 'Members, from your listings and your public profile, if you accept messages (a setting in your profile). You can block a member or report a message at any time.' },
+  },
+  asideTitle: 'Need help?',
+  asideText: 'We read and answer every message ourselves.',
 });
 
 export default function FaqPage() {
   const t = useStrings(S);
-  const faq: { q: string; a: React.ReactNode }[] = [
-    t.items[0],
-    { q: t.freeQ, a: t.freeA(FREE_WATCH_LIMIT) },
-    ...t.items.slice(1),
-    { q: t.deleteQ, a: <>{t.deleteBefore}<Link to="/contact">{t.contact}</Link>{t.deleteAfter}</> },
+  const [what, who, photos, value, calendar, wrist] = t.items;
+  const groups: { title: string; items: { q: string; a: React.ReactNode }[] }[] = [
+    { title: t.groups.collection, items: [what, who, photos, value, wrist] },
+    { title: t.groups.wear, items: [calendar, t.extra.cpw, { q: t.freeQ, a: t.freeA(FREE_WATCH_LIMIT) }] },
+    { title: t.groups.market, items: [t.extra.sell, t.extra.fee, t.extra.who] },
+    { title: t.groups.account, items: [{ q: t.deleteQ, a: <>{t.deleteBefore}<Link to="/contact">{t.contact}</Link>{t.deleteAfter}</> }] },
   ];
   return (
-    <div className="page page--narrow">
-      <PageHeader title={t.title} />
-      <div className={s.list}>
-        {faq.map(item => (
-          <details key={item.q} className={s.item}>
-            <summary>{item.q}</summary>
-            <p>{item.a}</p>
-          </details>
-        ))}
-      </div>
+    <InfoPage
+      kicker={t.kicker}
+      title={t.title}
+      lead={t.lead}
+      aside={(
+        <div className={s.help}>
+          <MessageCircle size={20} strokeWidth={1.6} aria-hidden="true" />
+          <strong>{t.asideTitle}</strong>
+          <p>{t.asideText}</p>
+          <Link to="/contact" className={s.helpLink}>{t.write}</Link>
+        </div>
+      )}
+    >
+      {groups.map(g => (
+        <section key={g.title} className={s.group}>
+          <h2 className={s.groupTitle}>{g.title}</h2>
+          <div className={s.list}>
+            {g.items.map(item => (
+              <details key={item.q} className={s.item}>
+                <summary>{item.q}</summary>
+                <p>{item.a}</p>
+              </details>
+            ))}
+          </div>
+        </section>
+      ))}
       <p className={s.more}>{t.more} <Link to="/contact">{t.write}</Link>.</p>
-    </div>
+    </InfoPage>
   );
 }

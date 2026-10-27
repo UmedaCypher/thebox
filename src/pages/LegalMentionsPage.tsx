@@ -1,13 +1,18 @@
 // client/src/pages/LegalMentionsPage.tsx
 import React from 'react';
+import InfoPage from '../components/InfoPage/InfoPage';
 import styles from './StaticPage.module.css';
 import { Link } from 'react-router-dom';
 import { defineStrings, useStrings } from '../i18n';
 
 const S = defineStrings({
+  kicker: 'Informations légales',
+  lead: 'Texte provisoire, en cours de finalisation avant le lancement.',
   title: 'Mentions Légales',
   notice: '',
 }, {
+  kicker: 'Legal',
+  lead: 'Draft text, being finalised before launch.',
   title: 'Legal Notice',
   notice: 'This document is currently available in French only.',
 });
@@ -15,13 +20,8 @@ const S = defineStrings({
 const LegalMentionsPage: React.FC = () => {
   const t = useStrings(S);
   return (
-    <div className={styles.staticPageContainer}>
-      <div className={styles.staticPageContent}>
-        <header className={styles.staticPageHeader}>
-          <h1>{t.title}</h1>
-          {t.notice && <p>{t.notice}</p>}
-        </header>
-        <section className={styles.staticPageSection}>
+    <InfoPage kicker={t.kicker} title={t.title} notice={t.notice || undefined} lead={t.lead} toc>
+        <section>
           <p>Conformément aux dispositions des Articles 6-III et 19 de la Loi n°2004-575 du 21 juin 2004 pour la Confiance dans l’économie numérique, dite L.C.E.N., il est porté à la connaissance des utilisateurs et visiteurs de l'application THE BOX les présentes mentions légales.</p>
 
           <h2>1. Éditeur de l'Application</h2>
@@ -77,8 +77,7 @@ const LegalMentionsPage: React.FC = () => {
             </em>
           </p>
         </section>
-      </div>
-    </div>
+    </InfoPage>
   );
 };
 
