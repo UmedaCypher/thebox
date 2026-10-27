@@ -32,6 +32,7 @@ const S = defineStrings({
   freePlan: 'Collection gratuite',
   viewPublic: 'Voir mon profil public',
   info: 'Informations',
+  helpInfo: 'Aide et informations',
   username: 'Pseudo',
   usernameHint: 'Votre adresse publique : /profil/pseudo',
   name: 'Nom',
@@ -91,7 +92,8 @@ const S = defineStrings({
   changePhoto: 'Change profile photo',
   freePlan: 'Free collection',
   viewPublic: 'View my public profile',
-  info: 'Information',
+  info: 'Details',
+  helpInfo: 'Help and information',
   username: 'Username',
   usernameHint: 'Your public address: /profil/username',
   name: 'Name',
@@ -331,8 +333,8 @@ export default function AccountPage() {
         </p>
       </section>
 
-      <section className={s.section}>
-        <h2 className={s.h}>{t.info}</h2>
+      <section className={`${s.section} ${s.helpSection}`}>
+        <h2 className={s.h}>{t.helpInfo}</h2>
         <ul className={s.links}>
           <li><Link to="/actualites">{t.news}</Link></li>
           <li><Link to="/faq">{t.faq}</Link></li>

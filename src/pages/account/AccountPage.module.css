@@ -15,7 +15,13 @@
 .plan { font-size: var(--fs-sm); color: var(--text-2); }
 .link { color: var(--brass); font-size: var(--fs-sm); font-weight: 600; }
 
-.section { display: flex; flex-direction: column; gap: var(--sp-4); padding: var(--sp-6) 0; border-top: 1px solid var(--line); }
+.section {
+  display: flex; flex-direction: column; gap: var(--sp-4); padding: var(--sp-5); margin-top: var(--sp-4);
+  border-radius: var(--r-cushion); background: var(--surface); border: 1px solid var(--line);
+}
+@media (max-width: 639px) { .section { padding: var(--sp-5) var(--sp-4); } }
+.helpSection { }
+@media (min-width: 860px) { .helpSection { display: none; } }
 .h { font-size: var(--fs-xl); }
 .muted { color: var(--text-2); }
 .small { color: var(--text-3); font-size: var(--fs-sm); }

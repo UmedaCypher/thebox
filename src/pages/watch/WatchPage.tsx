@@ -51,6 +51,10 @@ const S = defineStrings({
   forSale: 'En vente',
   seeListing: "Voir l'annonce",
   sellOrTrade: "Mettre en vente ou proposer à l'échange",
+  glanceDays: (n: number) => (n > 1 ? `${n} jours au poignet` : `${n} jour au poignet`),
+  glanceNever: 'Jamais portée',
+  glanceLast: (d: string) => `dernier port ${d}`,
+  glanceToday: "portée aujourd'hui",
   sections: 'Sections',
   premiumCost: 'Le coût par port fait partie des statistiques Premium.',
   premiumService: "Le carnet d'entretien et ses rappels font partie de Premium.",
@@ -125,6 +129,10 @@ const S = defineStrings({
   edit: 'Edit',
   forSale: 'For sale',
   seeListing: 'View listing',
+  glanceDays: n => (n === 1 ? '1 day on the wrist' : `${n} days on the wrist`),
+  glanceNever: 'Never worn',
+  glanceLast: d => `last worn ${d}`,
+  glanceToday: 'worn today',
   sellOrTrade: 'Sell it or offer it for trade',
   sections: 'Sections',
   premiumCost: 'Cost per wear is part of the Premium stats.',
@@ -248,6 +256,17 @@ export default function WatchPage() {
             title={watch.model}
             subtitle={[watch.brand, watch.reference_number, watch.year_of_production].filter(Boolean).join(', ')}
           />
+
+          {/* En un coup d'œil : combien de fois portée, et quand pour la dernière fois */}
+          <p className={s.glance}>
+            {wornDays.size === 0 ? t.glanceNever : (
+              <>
+                <strong className="num">{t.glanceDays(wornDays.size)}</strong>
+                <span aria-hidden="true">·</span>
+                <span>{wornToday ? t.glanceToday : t.glanceLast(formatDate([...wornDays].sort().pop()!, { day: 'numeric', month: 'long' }))}</span>
+              </>
+            )}
+          </p>
 
           <div className={s.quick}>
             <Button variant={wornToday ? 'secondary' : 'primary'} onClick={toggleToday}>

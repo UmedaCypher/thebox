@@ -73,6 +73,8 @@ select.control {
   font-size: var(--fs-sm); font-weight: 600; color: var(--text-2); white-space: nowrap;
 }
 .segment[aria-selected='true'] { background: var(--cushion); color: var(--text); }
+.segment { transition: background-color var(--dur) var(--ease), color var(--dur-fast) var(--ease); }
+@media (max-width: 420px) { .segment { padding: 0 var(--sp-3); } }
 
 /* ---------- Feuille (modale) ---------- */
 .sheetBackdrop {

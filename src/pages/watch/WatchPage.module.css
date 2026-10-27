@@ -61,3 +61,6 @@
 .listingLinks a { color: var(--text-2); }
 .sellLink { font-size: var(--fs-sm); color: var(--text-2); align-self: flex-start; }
 .sellLink:hover { color: var(--brass); }
+
+.glance { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-2); margin-top: calc(var(--sp-3) * -1); font-size: var(--fs-sm); color: var(--text-2); }
+.glance strong { color: var(--brass); font-weight: 600; }
