@@ -1,0 +1,12 @@
+// Déploiement sur Cloudflare Workers (site statique construit par Vite).
+// Les variables VITE_… se règlent dans Cloudflare → Worker → Settings → Build → « Build variables and secrets » :
+// elles sont lues au moment de la construction, pas à l'exécution.
+{
+  "name": "thebox",
+  "compatibility_date": "2026-10-28",
+  "assets": {
+    "directory": "./dist/",
+    // Application d'une seule page : toute adresse inconnue (/collection, /montre/…) renvoie index.html.
+    "not_found_handling": "single-page-application"
+  }
+}
