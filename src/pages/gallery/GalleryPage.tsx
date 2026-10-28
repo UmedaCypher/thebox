@@ -110,9 +110,9 @@ function GalleryView() {
         </EmptyState>
       ) : (
         <div className={s.wall}><ul className={s.masonry}>
-          {shots.data.map(p => (
+          {shots.data.map((p, i) => (
             <li key={p.id} className={s.item} data-reveal data-parallax>
-              <Cushion src={p.thumb} fallbackSrc={p.url} alt={t.onWrist(`${p.brand} ${p.model}`)} ratio="portrait" className={s.shot}>
+              <Cushion src={i % 9 === 0 || i % 9 === 5 ? p.url : p.thumb} fallbackSrc={i % 9 === 0 || i % 9 === 5 ? p.thumb : p.url} alt={t.onWrist(`${p.brand} ${p.model}`)} ratio="portrait" className={s.shot}>
                 {p.wrist_size_cm && <span className={`${s.wrist} num`}>{formatDecimal(p.wrist_size_cm)} cm</span>}
                 <div className={s.caption}>
                   <span className={s.capModel}>{p.brand} {p.model}</span>

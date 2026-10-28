@@ -13,18 +13,38 @@ section.wall, section.try, section.passport, section.strip { padding: var(--sp-8
 .figures div { display: flex; flex-direction: column-reverse; }
 .figures dt { color: var(--text-2); font-size: var(--fs-sm); }
 .figures dd { font-family: var(--font-display); font-size: var(--fs-3xl); line-height: 1.05; }
-.calendar { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: clamp(6px, 1.2vw, 12px); }
-.wd { text-align: center; font-size: var(--fs-xs); color: var(--text-3); }
-.day {
-  aspect-ratio: 1; border-radius: 50%; overflow: hidden; display: grid; place-items: center;
-  border: 1px solid var(--line); color: var(--text-3); font-size: var(--fs-xs);
-  /* Les jours se remplissent un par un avec le défilement */
-  --on: clamp(0, calc(var(--p) * 42 - var(--i)), 1);
-  opacity: calc(0.25 + var(--on) * 0.75);
+/* Une semaine : sept bracelets debout, la montre du jour au centre de chacun ; ils se lèvent un à un au défilement */
+.week {
+  list-style: none; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: clamp(6px, 1.4vw, 14px);
+  align-items: end; padding: var(--sp-5) 0 var(--sp-3);
 }
-.day[data-worn='true'] { border-color: var(--seam); box-shadow: 0 0 0 1px rgba(194, 160, 114, calc(var(--on) * 0.6)); }
-.day img { width: 100%; height: 100%; object-fit: cover; transform: scale(calc(0.4 + var(--on) * 0.6)); opacity: var(--on); filter: saturate(calc(0.6 + var(--on) * 0.4)); }
-@media (prefers-reduced-motion: reduce) { .day { --on: 1; } }
+.weekDay {
+  display: flex; flex-direction: column; align-items: center; gap: var(--sp-2); min-width: 0;
+  --on: clamp(0, calc(var(--p) * 14 - var(--i) * 1.4), 1);
+  opacity: calc(0.15 + var(--on) * 0.85);
+  transform: translateY(calc((1 - var(--on)) * 40px));
+}
+/* Hauteurs légèrement différentes : une semaine vivante plutôt qu'un tableau */
+.weekDay:nth-child(odd) .strap { aspect-ratio: 1 / 2.5; }
+.weekDay:nth-child(even) .strap { aspect-ratio: 1 / 2.2; }
+.weekLabel { font-size: var(--fs-xs); font-weight: 600; color: var(--text-3); white-space: nowrap; }
+.weekDay[data-today='true'] .weekLabel { color: var(--lume); }
+.strap {
+  position: relative; width: 100%; border-radius: var(--r-pill); overflow: hidden; isolation: isolate;
+  display: grid; place-items: center;
+  background:
+    linear-gradient(90deg, rgba(0, 0, 0, 0.35), rgba(255, 255, 255, 0.05) 30%, rgba(255, 255, 255, 0.05) 70%, rgba(0, 0, 0, 0.35)),
+    var(--cushion);
+  border: 1px solid var(--glass-border);
+  box-shadow: inset 0 1px 0 var(--glass-hi), var(--shadow-md);
+}
+.strap img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform: scale(calc(1.25 - var(--on) * 0.25)); }
+.rest { writing-mode: vertical-rl; transform: rotate(180deg); font-size: var(--fs-xs); letter-spacing: 0.08em; color: var(--text-3); }
+.weekDay[data-today='true'] .strap {
+  border-color: var(--lume);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--lume) 45%, transparent), 0 0 30px 6px color-mix(in srgb, var(--lume) 28%, transparent), 0 0 80px 18px color-mix(in srgb, var(--lume) 12%, transparent);
+}
+@media (prefers-reduced-motion: reduce) { .weekDay { --on: 1; } }
 
 /* ---------- Essai au poignet ---------- */
 .try { display: grid; gap: var(--sp-7); align-items: center; }

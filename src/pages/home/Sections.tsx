@@ -18,15 +18,17 @@ const S = defineStrings({
     'Zenith Defy Classic, céramique blanche',
   ],
   wall: {
-    title: 'Un mois au poignet.',
-    text: 'Chaque matin, un geste pour noter la montre du jour. À la fin du mois, vous savez enfin lesquelles vous portez, et lesquelles dorment.',
+    title: 'Une semaine au poignet.',
+    text: 'Chaque matin, un geste pour noter la montre du jour. Semaine après semaine, vous savez enfin lesquelles vous portez, et lesquelles dorment.',
     days: 'jours notés',
     watches: 'montres portées',
     top: 'la plus portée',
     topDays: (n: number) => `${n} jours`,
-    note: "Exemple de collection. L'image du mois se partage en un geste.",
-    aria: (n: number) => `Calendrier d'un mois : ${n} jours notés sur 31`,
-    weekdays: ['L', 'M', 'M', 'J', 'V', 'S', 'D'],
+    note: "Exemple de collection. Le bilan du mois se partage en un geste.",
+    aria: (n: number) => `Une semaine de portage : ${n} jours notés sur 7`,
+    weekdays: ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'],
+    today: "Aujourd'hui",
+    rest: 'Repos',
   },
   verdict: {
     over: { title: 'Les cornes dépassent du poignet', text: 'La montre paraîtra grande, surtout de profil. Regardez les photos portées avant de vous décider.' },
@@ -69,15 +71,17 @@ const S = defineStrings({
     'Zenith Defy Classic, white ceramic',
   ],
   wall: {
-    title: 'A month on the wrist.',
-    text: 'Each morning, one tap to log the watch of the day. By the end of the month, you finally know which ones you wear, and which ones sleep.',
+    title: 'A week on the wrist.',
+    text: 'Each morning, one tap to log the watch of the day. Week after week, you finally know which ones you wear, and which ones sleep.',
     days: 'days logged',
     watches: 'watches worn',
     top: 'most worn',
     topDays: n => (n === 1 ? '1 day' : `${n} days`),
-    note: "An example collection. Share the month's picture in one tap.",
-    aria: n => `One month calendar: ${n} of 31 days logged`,
-    weekdays: ['M', 'T', 'W', 'T', 'F', 'S', 'S'],
+    note: "An example collection. Share the month's summary in one tap.",
+    aria: n => `One week of wear: ${n} of 7 days logged`,
+    weekdays: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+    today: 'Today',
+    rest: 'Rest',
   },
   verdict: {
     over: { title: 'The lugs overhang the wrist', text: 'The watch will look large, especially from the side. Check wrist shots before you decide.' },
@@ -118,15 +122,15 @@ const face = (k: string) => `/landing/${k}-face.webp`;
 /* ------------------------------------------------------------------ mur de portage */
 
 // Un mois d'exemple : index de la montre portée chaque jour, -1 = rien noté.
-const MONTH = [0, 1, 0, 2, -1, 3, 3, 0, 1, 0, 4, -1, 2, 0, 1, 1, 0, 3, -1, 0, 2, 0, 1, -1, 4, 0, 3, 0, 1, 2, 0];
-const OFFSET = 2; // le 1er tombe un mercredi
+// Une semaine d'exemple : l'indice de la montre portée chaque jour, -1 pour un jour sans montre. Le dimanche est « aujourd'hui ».
+const WEEK = [0, 1, 0, -1, 2, 3, 4];
 
 export function WearWall() {
   const t = useStrings(S).wall;
   const ref = useRef<HTMLElement>(null);
   useScrollVar(ref, { mode: 'enter' });
   const stats = useMemo(() => {
-    const worn = MONTH.filter(i => i >= 0);
+    const worn = WEEK.filter(i => i >= 0);
     const counts = PHOTOS.map((_, i) => worn.filter(w => w === i).length);
     const top = counts.indexOf(Math.max(...counts));
     return { days: worn.length, watches: new Set(worn).size, top, topDays: counts[top] };
@@ -144,15 +148,19 @@ export function WearWall() {
         </dl>
         <p className={s.note}>{t.note}</p>
       </div>
-      <div className={s.calendar} role="img" aria-label={t.aria(stats.days)}>
-        {t.weekdays.map((d, i) => <span key={i} className={s.wd}>{d}</span>)}
-        {Array.from({ length: OFFSET }, (_, i) => <span key={`o${i}`} />)}
-        {MONTH.map((w, i) => (
-          <span key={i} className={s.day} style={{ '--i': i } as CSSProperties} data-worn={w >= 0}>
-            {w >= 0 ? <img src={face(PHOTOS[w].key)} alt="" loading="lazy" decoding="async" /> : <span>{i + 1}</span>}
-          </span>
-        ))}
-      </div>
+      <ol className={s.week} role="img" aria-label={t.aria(stats.days)}>
+        {WEEK.map((w, i) => {
+          const today = i === WEEK.length - 1;
+          return (
+            <li key={i} className={s.weekDay} style={{ '--i': i } as CSSProperties} data-worn={w >= 0} data-today={today}>
+              <span className={s.weekLabel}>{today ? t.today : t.weekdays[i]}</span>
+              <span className={s.strap}>
+                {w >= 0 ? <img src={face(PHOTOS[w].key)} alt="" loading="lazy" decoding="async" /> : <span className={s.rest}>{t.rest}</span>}
+              </span>
+            </li>
+          );
+        })}
+      </ol>
     </section>
   );
 }

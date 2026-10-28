@@ -1,23 +1,44 @@
 /* ---------- Boutons ---------- */
 .btn {
+  position: relative; isolation: isolate;
   display: inline-flex; align-items: center; justify-content: center; gap: var(--sp-2);
   min-height: 44px; padding: 0 var(--sp-5);
   border-radius: var(--r-pill); border: 1px solid transparent;
   font-size: var(--fs-md); font-weight: 600; letter-spacing: 0.005em;
   text-decoration: none; white-space: nowrap;
-  transition: background-color var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease);
+  transition: background-color var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease),
+    box-shadow var(--dur) var(--ease), transform 420ms cubic-bezier(0.34, 1.56, 0.64, 1);
 }
-/* Retour au toucher : le bouton s'enfonce légèrement */
-.btn:active:not(:disabled) { transform: scale(0.98); }
+/* Retour au toucher : le bouton s'écrase un peu, puis rebondit (ressort) */
+.btn:active:not(:disabled) { transform: scale(0.96); transition-duration: 90ms; }
 .btn:disabled, .btn[aria-disabled='true'] { opacity: 0.5; cursor: not-allowed; }
+
+/* ---------- Verre liquide (principal et secondaire) ----------
+   ::before : le liseré du verre, plus clair en haut et en bas comme une bulle épaisse.
+   ::after  : le reflet, qui suit le pointeur (variables --mx / --my posées par le script de mouvement). */
+.primary::before, .secondary::before {
+  content: ''; position: absolute; inset: -1px; z-index: -1; border-radius: inherit; padding: 1px; pointer-events: none;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.75) 0%, rgba(255, 255, 255, 0.08) 38%, rgba(0, 0, 0, 0.15) 62%, rgba(255, 255, 255, 0.4) 100%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); mask-composite: exclude;
+}
+.primary::after, .secondary::after {
+  content: ''; position: absolute; inset: 0; z-index: -1; border-radius: inherit; pointer-events: none;
+  background:
+    radial-gradient(90px circle at var(--mx, 50%) var(--my, -20%), rgba(255, 255, 255, 0.5), transparent 70%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0) 48%);
+  mix-blend-mode: soft-light; opacity: 0.7; transition: opacity var(--dur) var(--ease);
+}
+@media (hover: hover) { .primary:hover::after, .secondary:hover::after { opacity: 1; } }
+
+/* Principal : laiton */
 .primary {
   background: var(--brass-fill); color: var(--brass-ink);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28), inset 0 -1px 0 rgba(0, 0, 0, 0.12);
-  transition: background-color var(--dur-fast) var(--ease), box-shadow var(--dur) var(--ease), transform var(--dur-fast) var(--ease);
+  box-shadow: inset 0 -6px 12px -6px rgba(0, 0, 0, 0.25), 0 6px 18px -10px color-mix(in srgb, var(--brass-fill) 80%, transparent);
 }
 .primary:hover:not(:disabled) {
   background: var(--brass-fill-hover); color: var(--brass-ink);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.32), 0 10px 26px -12px color-mix(in srgb, var(--brass-fill) 90%, transparent);
+  box-shadow: inset 0 -6px 12px -6px rgba(0, 0, 0, 0.2), 0 14px 32px -12px color-mix(in srgb, var(--brass-fill) 95%, transparent);
 }
 /* Pastille ronde autour de l'icône d'un bouton principal (« + Ajouter ») */
 .primary > svg:first-child {
@@ -25,17 +46,22 @@
   background: color-mix(in srgb, var(--brass-ink) 12%, transparent);
 }
 .small.primary > svg:first-child { padding: 4px; margin-left: -6px; }
-/* Secondaire : verre liquide, liseré lumineux en haut, ombre interne en bas */
+
+/* Secondaire : verre rubis, translucide, qui laisse voir le fond */
 .secondary {
-  position: relative; color: var(--text); border-color: rgba(255, 255, 255, 0.16);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.10) 0%, rgba(255, 255, 255, 0.02) 46%, rgba(255, 255, 255, 0) 54%, rgba(255, 255, 255, 0.04) 100%),
-    color-mix(in srgb, var(--surface) 46%, transparent);
+  color: #fff;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--ruby) 42%, transparent), color-mix(in srgb, var(--ruby) 20%, transparent));
   -webkit-backdrop-filter: blur(16px) saturate(1.6); backdrop-filter: blur(16px) saturate(1.6);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22), inset 0 -1px 0 rgba(0, 0, 0, 0.25), 0 8px 20px -14px rgba(0, 0, 0, 0.7);
+  box-shadow: inset 0 -6px 12px -6px rgba(0, 0, 0, 0.3), 0 8px 22px -12px color-mix(in srgb, var(--ruby) 75%, transparent);
 }
-:root[data-theme='soie'] .secondary { border-color: rgba(255, 255, 255, 0.8); background: linear-gradient(180deg, rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0.35)); box-shadow: inset 0 1px 0 #fff, 0 8px 20px -14px rgba(60, 30, 20, 0.35); }
-.secondary:hover:not(:disabled) { color: var(--text); border-color: color-mix(in srgb, var(--brass) 60%, transparent); }
+.secondary:hover:not(:disabled) {
+  color: #fff;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--ruby) 56%, transparent), color-mix(in srgb, var(--ruby) 30%, transparent));
+  box-shadow: inset 0 -6px 12px -6px rgba(0, 0, 0, 0.25), 0 14px 32px -12px color-mix(in srgb, var(--ruby) 90%, transparent);
+}
+:root[data-theme='soie'] .secondary { background: linear-gradient(180deg, color-mix(in srgb, var(--ruby) 88%, #fff 12%), var(--ruby)); }
+:root[data-theme='soie'] .secondary:hover:not(:disabled) { background: var(--ruby); }
+@media (prefers-reduced-motion: reduce) { .btn { transition-property: background-color, border-color, color, box-shadow; } }
 .ghost { background: transparent; color: var(--text-2); padding: 0 var(--sp-3); }
 .ghost:hover:not(:disabled) { color: var(--text); }
 .danger { background: transparent; color: var(--danger); border-color: color-mix(in srgb, var(--danger) 45%, transparent); }

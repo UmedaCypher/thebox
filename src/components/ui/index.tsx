@@ -17,11 +17,11 @@ const btnClass = ({ variant = 'primary', size = 'md', block }: BtnStyle, extra?:
   cx(s.btn, s[variant], size === 'small' && s.small, block && s.block, extra);
 
 export function Button({ variant, size, block, className, ...rest }: ButtonHTMLAttributes<HTMLButtonElement> & BtnStyle) {
-  return <button type="button" className={btnClass({ variant, size, block }, className)} {...rest} />;
+  return <button type="button" className={btnClass({ variant, size, block }, className)} data-liquid {...rest} />;
 }
 
 export function LinkButton({ variant, size, block, className, ...rest }: LinkProps & BtnStyle) {
-  return <Link className={btnClass({ variant, size, block }, className)} {...rest} />;
+  return <Link className={btnClass({ variant, size, block }, className)} data-liquid {...rest} />;
 }
 
 export function IconButton({ label, className, ...rest }: ButtonHTMLAttributes<HTMLButtonElement> & { label: string }) {

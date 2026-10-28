@@ -59,6 +59,17 @@ export function useMotion() {
     const mo = new MutationObserver(scan);
     mo.observe(document.body, { childList: true, subtree: true });
 
+    // --- Reflet des boutons en verre liquide : il suit le pointeur ---
+    const onMove = (e: PointerEvent) => {
+      const el = (e.target as Element | null)?.closest?.('[data-liquid]') as HTMLElement | null;
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      el.style.setProperty('--mx', `${e.clientX - r.left}px`);
+      el.style.setProperty('--my', `${e.clientY - r.top}px`);
+    };
+    document.addEventListener('pointermove', onMove, { passive: true });
+    document.addEventListener('pointerdown', onMove, { passive: true });
+
     // --- Inertie et parallaxe (ordinateur seulement) ---
     let raf = 0;
     const desktop = window.matchMedia(DESKTOP).matches;
@@ -91,6 +102,7 @@ export function useMotion() {
 
     return () => {
       io.disconnect(); mo.disconnect(); cancelAnimationFrame(raf);
+      document.removeEventListener('pointermove', onMove); document.removeEventListener('pointerdown', onMove);
       lenis?.destroy(); lenis = null;
       root.classList.remove('motion', 'parallax');
     };

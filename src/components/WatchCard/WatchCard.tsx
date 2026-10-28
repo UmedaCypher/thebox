@@ -1,4 +1,4 @@
-import { Children } from 'react';
+import { Children, cloneElement, isValidElement, type ReactElement } from 'react';
 import { Link } from 'react-router-dom';
 import { Watch as WatchIcon } from 'lucide-react';
 import { Img } from '../ui';
@@ -24,6 +24,8 @@ interface Props {
   feature?: boolean;
   /** Petite mention au-dessus du nom de la pièce maîtresse. */
   featureLabel?: string | null;
+  /** Grande case de la mosaïque : on charge la photo en pleine définition plutôt que la miniature. */
+  large?: boolean;
 }
 
 /** Reflet qui suit la souris sur le verre de la carte (ordinateur). */
@@ -38,13 +40,15 @@ function sheen(e: React.PointerEvent<HTMLAnchorElement>) {
  * Une montre en plein cadre : la photo remplit la carte, le nom repose sur un voile de verre dépoli,
  * et la photo diffuse sa propre couleur autour de la carte.
  */
-export default function WatchCard({ to, brand, model, photo, photoFallback, meta, metaTone, badge, badgeTone = 'ruby', price, feature, featureLabel }: Props) {
+export default function WatchCard({ to, brand, model, photo, photoFallback, meta, metaTone, badge, badgeTone = 'ruby', price, feature, featureLabel, large }: Props) {
   return (
     <Link to={to} className={s.card} data-feature={feature || undefined} data-reveal onPointerMove={sheen}>
       {photo && <img className={s.glow} src={photo} alt="" aria-hidden="true" loading="lazy" decoding="async" />}
       <span className={s.frame} data-parallax>
         {photo
-          ? <Img key={photo} src={photo} fallback={photoFallback} alt={`${brand} ${model}`} className={s.photo} />
+          ? (large && photoFallback
+            ? <Img key={photoFallback} src={photoFallback} fallback={photo} alt={`${brand} ${model}`} className={s.photo} />
+            : <Img key={photo} src={photo} fallback={photoFallback} alt={`${brand} ${model}`} className={s.photo} />)
           : <span className={s.empty}><WatchIcon size={feature ? 56 : 36} strokeWidth={1.1} aria-hidden="true" /></span>}
         {(badge || price || (feature && featureLabel)) && (
           <span className={s.top}>
@@ -72,7 +76,13 @@ export function WatchGrid({ children, cols }: { children: React.ReactNode; cols?
   const mosaic = Children.count(children) >= 5;
   return (
     <div className={s.wrap}>
-      <div className={s.grid} data-variant={mosaic ? 'mosaic' : undefined} data-cols={cols}>{children}</div>
+      <div className={s.grid} data-variant={mosaic ? 'mosaic' : undefined} data-cols={cols}>
+        {mosaic
+          ? Children.map(children, (child, i) => (isValidElement(child) && (i % 10 === 0 || i % 10 === 6)
+            ? cloneElement(child as ReactElement<Props>, { large: true })
+            : child))
+          : children}
+      </div>
     </div>
   );
 }
