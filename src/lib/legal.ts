@@ -9,14 +9,15 @@ export const LEGAL = {
   /** Adresse du site, sans « / » final. */
   siteUrl: '',
 
-  // ---------- Société éditrice (SASU) ----------
-  companyName: '',            // dénomination sociale, ex. « Maison Mahé SAS »
-  legalForm: 'SASU',          // ou « SAS »
-  capital: '',                // ex. « 1 000 € »
-  address: '',                // adresse de domiciliation complète
-  rcs: '',                    // ex. « RCS Paris 123 456 789 »
-  vatNumber: '',              // ex. « FR12 123456789 » (laisser vide si non assujettie)
-  director: '',               // président(e), directeur(trice) de la publication
+  // ---------- Société éditrice (SIREN 104 672 431) ----------
+  companyName: 'Mahé Fine Collectibles',
+  legalForm: 'SAS',
+  capital: '5 000 €',
+  address: '47 rue Vivienne, 75002 Paris',
+  rcs: 'RCS Paris 104 672 431',
+  /** Calculé à partir du SIREN : à confirmer sur l'espace professionnel impots.gouv.fr ou sur VIES ; vider si la société est en franchise de TVA. */
+  vatNumber: 'FR78 104672431',
+  director: 'Quentin Mahé, président',
   phone: '',                  // numéro joignable (obligatoire pour une société)
   email: 'contact@maison-mahe.com',
   privacyEmail: '',           // adresse dédiée aux données personnelles (sinon l'adresse de contact)
