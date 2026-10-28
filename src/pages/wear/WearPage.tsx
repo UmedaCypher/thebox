@@ -175,9 +175,14 @@ export default function WearPage() {
             return (
               <li key={w.id}>
                 <button className={s.pick} aria-pressed={on} onClick={() => toggle(w.id, today)}>
-                  <Cushion src={thumbFor(w).src} fallbackSrc={thumbFor(w).fallback} alt="">{on && <span className={s.check}><Check size={18} strokeWidth={2.4} /></span>}</Cushion>
-                  <span className={s.pickName}>{w.model}</span>
-                  <span className={s.pickBrand}>{w.brand}</span>
+                  <Cushion src={thumbFor(w).src} fallbackSrc={thumbFor(w).fallback} alt="" ratio="portrait" className={s.pickFrame}>
+                    {on && <span className={s.check}><Check size={16} strokeWidth={2.6} /></span>}
+                    <span className={s.pickVeil} aria-hidden="true" />
+                    <span className={s.pickText}>
+                      <span className={s.pickBrand}>{w.brand}</span>
+                      <span className={s.pickName}>{w.model}</span>
+                    </span>
+                  </Cushion>
                 </button>
               </li>
             );

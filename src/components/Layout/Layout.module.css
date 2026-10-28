@@ -1,13 +1,14 @@
 .shell { min-height: 100vh; display: flex; flex-direction: column; }
 .main { flex: 1; display: flex; flex-direction: column; }
-.withTabbar { padding-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom)); }
+.withTabbar { padding-bottom: calc(var(--tabbar-h) + 10px + env(safe-area-inset-bottom)); }
 
 /* En-tête */
 .header {
   position: sticky; top: 0; z-index: 50;
-  background: color-mix(in srgb, var(--bg) 88%, transparent);
-  backdrop-filter: saturate(1.2) blur(12px); -webkit-backdrop-filter: saturate(1.2) blur(12px);
-  border-bottom: 1px solid var(--line);
+  background: color-mix(in srgb, var(--bg) 62%, transparent);
+  backdrop-filter: saturate(1.5) blur(22px); -webkit-backdrop-filter: saturate(1.5) blur(22px);
+  border-bottom: 1px solid var(--glass-border);
+  box-shadow: 0 1px 0 0 var(--glass-hi) inset;
   padding-top: env(safe-area-inset-top);
 }
 .headerInner {
@@ -70,14 +71,16 @@ a.avatar::after { content: ''; position: absolute; inset: -6px; border-radius: 5
   .withTabbar { padding-bottom: 0; }
 }
 
-/* Barre d'onglets (mobile, connecté) : grandes cibles, libellés lisibles */
+/* Barre d'onglets (mobile, connecté) : un dock de verre flottant, grandes cibles, libellés lisibles */
 .tabbar {
-  position: fixed; left: 0; right: 0; bottom: 0; z-index: 60;
+  position: fixed; left: 10px; right: 10px; bottom: calc(10px + env(safe-area-inset-bottom)); z-index: 60;
   display: grid; grid-template-columns: repeat(5, 1fr);
-  height: calc(var(--tabbar-h) + env(safe-area-inset-bottom)); padding: 0 4px env(safe-area-inset-bottom);
-  background: color-mix(in srgb, var(--surface) 94%, transparent);
-  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
-  border-top: 1px solid var(--line);
+  height: calc(var(--tabbar-h) - 10px); padding: 0 4px;
+  border-radius: 26px;
+  background: color-mix(in srgb, var(--surface) 58%, transparent);
+  backdrop-filter: blur(24px) saturate(1.6); -webkit-backdrop-filter: blur(24px) saturate(1.6);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow), var(--shadow-lg);
 }
 .tab {
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; min-width: 0;
@@ -135,7 +138,7 @@ a.avatar::after { content: ''; position: absolute; inset: -6px; border-radius: 5
   padding: 6px 12px; font: inherit; font-size: var(--fs-xs); font-weight: 600;
 }
 
-.tabIcon .iconBadge { top: -3px; right: 6px; border-color: var(--surface); }
+.tabIcon .iconBadge { top: -3px; right: 6px; border-color: transparent; box-shadow: 0 0 0 2px color-mix(in srgb, var(--surface) 80%, transparent); }
 /* L'icône Messages de l'en-tête n'existe que sur ordinateur (sur mobile, Messages est dans la barre du bas). */
 .iconLink.desktopOnly { display: none; }
 @media (min-width: 860px) { .iconLink.desktopOnly { display: grid; } }

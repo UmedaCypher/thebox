@@ -206,6 +206,16 @@ export function Img({ src, fallback, alt, className }: { src: string; fallback?:
   );
 }
 
+/** Lueur d'ambiance : la photo diffuse sa propre couleur autour de ce qu'elle entoure. */
+export function Glow({ src, children, className }: { src?: string | null; children: ReactNode; className?: string }) {
+  return (
+    <div className={cx(s.glowWrap, className)}>
+      {src && <img className={s.glowImg} src={src} alt="" aria-hidden="true" decoding="async" />}
+      {children}
+    </div>
+  );
+}
+
 export function Cushion({ src, fallbackSrc, alt, ratio = 'square', className, children }:
   { src?: string | null; fallbackSrc?: string | null; alt: string; ratio?: 'square' | 'portrait' | 'wide'; className?: string; children?: ReactNode }) {
   const r = ratio === 'portrait' ? s.ratioPortrait : ratio === 'wide' ? s.ratioWide : s.ratioSquare;

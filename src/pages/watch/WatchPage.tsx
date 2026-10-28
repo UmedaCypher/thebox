@@ -14,7 +14,7 @@ import { COMMON } from '../../i18n/common';
 import { listingPrice, statusKind } from '../../lib/listing';
 import type { MaintenanceEntry, MaintenanceKind, Watch } from '../../types';
 import {
-  Button, Cushion, IconButton, Notice, PageHeader, PremiumTag, Segmented, SelectField, Sheet, Stat, TextArea, TextField, Toggle,
+  Button, Cushion, Glow, IconButton, Notice, PageHeader, PremiumTag, Segmented, SelectField, Sheet, Stat, TextArea, TextField, Toggle,
 } from '../../components/ui';
 import WearStrip from '../../components/WearStrip/WearStrip';
 import Sparkline from '../../components/Sparkline/Sparkline';
@@ -238,7 +238,9 @@ export default function WatchPage() {
     <div className="page">
       <div className={s.layout}>
         <div className={s.media}>
-          <Cushion src={photoUrl(current?.storage_path)} alt={`${watch.brand} ${watch.model}`} ratio="portrait" className={s.hero} />
+          <Glow src={thumbSrc(current?.storage_path).src}>
+            <Cushion src={photoUrl(current?.storage_path)} alt={`${watch.brand} ${watch.model}`} ratio="portrait" className={s.hero} />
+          </Glow>
           {photos.length > 1 && (
             <div className={s.thumbs} role="tablist" aria-label={t.photos}>
               {photos.map((p, i) => (

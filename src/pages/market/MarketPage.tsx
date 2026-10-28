@@ -226,7 +226,7 @@ export default function MarketPage() {
             </EmptyState>
           ) : (
             <>
-              <WatchGrid>
+              <WatchGrid variant="stagger" cols={3}>
                 {items.map(m => {
                   const th = thumbSrc(m.main_photo_path);
                   return (
@@ -237,9 +237,10 @@ export default function MarketPage() {
                       model={m.model}
                       photo={th.src}
                       photoFallback={th.fallback}
-                      badge={m.is_mine ? c.listing.mine : m.kind === 'exchange' ? c.listing.forTrade : null}
+                      badge={m.is_mine ? c.listing.mine : null}
+                      badgeTone="brass"
                       price={listingPrice(m.kind, m.sale_price)}
-                      meta={[m.condition, m.sale_city, `@${m.seller_username}`].filter(Boolean).join(' · ')}
+                      meta={[m.sale_city, `@${m.seller_username}`].filter(Boolean).join(' · ')}
                     />
                   );
                 })}

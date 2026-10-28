@@ -46,8 +46,27 @@
   --r-xs: 6px; --r-sm: 10px; --r-md: 14px; --r-lg: 18px; --r-xl: 22px; --r-pill: 999px;
   /* Élévations : posé, flottant, en avant-plan */
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.22), 0 2px 8px -4px rgba(0, 0, 0, 0.3);
-  --shadow-md: var(--shadow-md);
-  --shadow-lg: var(--shadow-lg);
+  --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.2), 0 12px 28px -12px rgba(0, 0, 0, 0.55);
+  --shadow-lg: 0 4px 10px rgba(0, 0, 0, 0.22), 0 28px 56px -20px rgba(0, 0, 0, 0.7);
+
+  /* Accents horlogers : chacun a un rôle
+     laiton = actions et Premium · lume = aujourd'hui, porté · saphir = Marché, prix, échange */
+  --lume: #c9e7a7;
+  --lume-ink: #16210c;
+  --saphir: #8fb4e8;
+  --saphir-ink: #0d1726;
+
+  /* Verre dépoli */
+  --glass-bg: rgba(42, 20, 24, 0.52);
+  --glass-bg-strong: rgba(31, 14, 17, 0.72);
+  --glass-border: rgba(239, 232, 220, 0.14);
+  --glass-hi: rgba(255, 245, 230, 0.10);     /* reflet en haut des panneaux */
+  --glass-blur: 18px;
+  --glass-shadow: 0 1px 0 0 var(--glass-hi) inset, 0 18px 40px -22px rgba(0, 0, 0, 0.75);
+  /* Lumière d'écrin derrière le verre */
+  --aura-1: rgba(194, 160, 114, 0.16);
+  --aura-2: rgba(143, 180, 232, 0.09);
+  --aura-3: rgba(140, 40, 60, 0.32);
   /* Durées : rapide (survol), standard (états), lente (apparitions) */
   --dur-fast: 150ms; --dur: 220ms; --dur-slow: 380ms;
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
@@ -117,6 +136,21 @@
   --danger: #9d3e32;
   --ok: #4f7042;
   --overlay: rgba(42, 20, 24, 0.45);
+  --shadow-sm: 0 1px 2px rgba(60, 30, 20, 0.08), 0 2px 8px -4px rgba(60, 30, 20, 0.12);
+  --shadow-md: 0 2px 4px rgba(60, 30, 20, 0.06), 0 12px 28px -12px rgba(60, 30, 20, 0.28);
+  --shadow-lg: 0 4px 10px rgba(60, 30, 20, 0.08), 0 28px 56px -20px rgba(60, 30, 20, 0.38);
+  --lume: #3f6b1f;
+  --lume-ink: #f4f9ee;
+  --saphir: #2f5a92;
+  --saphir-ink: #f2f6fc;
+  --glass-bg: rgba(250, 246, 239, 0.58);
+  --glass-bg-strong: rgba(250, 246, 239, 0.8);
+  --glass-border: rgba(255, 255, 255, 0.6);
+  --glass-hi: rgba(255, 255, 255, 0.75);
+  --glass-shadow: 0 1px 0 0 var(--glass-hi) inset, 0 18px 40px -24px rgba(60, 30, 20, 0.35);
+  --aura-1: rgba(194, 160, 114, 0.28);
+  --aura-2: rgba(143, 180, 232, 0.2);
+  --aura-3: rgba(214, 170, 160, 0.35);
   color-scheme: light;
 }
 
@@ -143,7 +177,29 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 
-#root { min-height: 100vh; display: flex; flex-direction: column; }
+#root { min-height: 100vh; display: flex; flex-direction: column; position: relative; isolation: isolate; }
+
+/* Lumière d'écrin : trois halos fixes derrière tout le contenu, pour que le verre dépoli ait de la matière à flouter. */
+body::before {
+  content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(42vmax 34vmax at 8% -6%, var(--aura-1), transparent 70%),
+    radial-gradient(38vmax 30vmax at 104% 18%, var(--aura-2), transparent 70%),
+    radial-gradient(60vmax 40vmax at 50% 110%, var(--aura-3), transparent 72%);
+}
+body { isolation: isolate; }
+
+/* Panneau de verre dépoli réutilisable */
+.glass {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.4);
+  backdrop-filter: blur(var(--glass-blur)) saturate(1.4);
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass { background: var(--glass-bg-strong); }
+}
 
 h1, h2, h3 {
   font-family: var(--font-display);

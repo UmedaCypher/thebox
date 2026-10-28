@@ -35,6 +35,7 @@ const S = defineStrings({
   freeFull: 'Collection gratuite complète.',
   goPremium: 'Passer à Premium',
   quota: (n: number, max: number) => `${n} sur ${max} montres de la collection gratuite`,
+  mostWorn: 'La plus portée',
   serviceOverdue: 'Entretien en retard depuis le',
   serviceDue: 'Entretien prévu le',
   premiumReason: (max: number) => `La collection gratuite accueille ${max} montres. Premium la rend illimitée et ajoute les outils du collectionneur.`,
@@ -56,6 +57,7 @@ const S = defineStrings({
   freeFull: 'Your free collection is full.',
   goPremium: 'Go Premium',
   quota: (n, max) => `${n} of ${max} watches in the free collection`,
+  mostWorn: 'Most worn',
   serviceOverdue: 'Service overdue since',
   serviceDue: 'Service due on',
   premiumReason: max => `The free collection holds ${max} watches. Premium makes it unlimited and adds the collector's tools.`,
@@ -92,6 +94,22 @@ export default function CollectionPage() {
     for (const w of data?.wears ?? []) if (!m.has(w.watch_id) || m.get(w.watch_id)! < w.worn_on) m.set(w.watch_id, w.worn_on);
     return m;
   }, [data]);
+
+  // Pièce maîtresse : la montre la plus portée sur 90 jours, mise en avant en grand quand la collection en compte au moins quatre.
+  const featureId = useMemo(() => {
+    if (watches.length < 4) return null;
+    const since = new Date(); since.setDate(since.getDate() - 90);
+    const from = since.toISOString().slice(0, 10);
+    const counts = new Map<string, number>();
+    for (const w of data?.wears ?? []) if (w.worn_on >= from) counts.set(w.watch_id, (counts.get(w.watch_id) ?? 0) + 1);
+    let best: string | null = null; let max = 0;
+    for (const [id, n] of counts) if (n > max) { best = id; max = n; }
+    return best;
+  }, [data, watches.length]);
+  const ordered = useMemo(
+    () => (featureId ? [...watches].sort((a, b) => Number(b.id === featureId) - Number(a.id === featureId)) : watches),
+    [watches, featureId],
+  );
 
   const totalValue = watches.reduce((sum, w) => sum + (Number(w.current_estimated_value) || 0), 0);
   const brands = new Set(watches.map(w => w.brand)).size;
@@ -164,10 +182,13 @@ export default function CollectionPage() {
             </div>
           )}
 
-          <WatchGrid>
-            {watches.map(w => (
+          <WatchGrid variant={featureId ? 'bento' : 'stagger'}>
+            {ordered.map(w => (
               <WatchCard
                 key={w.id}
+                feature={w.id === featureId}
+                featureLabel={t.mostWorn}
+                metaTone={lastWorn.get(w.id) && daysBetween(lastWorn.get(w.id)!) <= 0 ? 'lume' : null}
                 to={`/montre/${w.id}`}
                 brand={w.brand}
                 model={w.model}

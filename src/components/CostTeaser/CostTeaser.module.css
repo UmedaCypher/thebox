@@ -1,10 +1,14 @@
 .card {
   position: relative; display: flex; flex-direction: column; gap: var(--sp-3);
   padding: var(--sp-5); border-radius: var(--r-cushion); margin-bottom: var(--sp-6);
+  overflow: hidden; isolation: isolate;
   background:
-    radial-gradient(120% 140% at 100% 0%, color-mix(in srgb, var(--brass) 14%, transparent) 0%, transparent 55%),
-    var(--surface);
-  border: 1px solid var(--seam);
+    radial-gradient(90% 120% at 100% 0%, color-mix(in srgb, var(--brass) 22%, transparent) 0%, transparent 60%),
+    radial-gradient(70% 90% at 0% 100%, color-mix(in srgb, var(--saphir) 10%, transparent) 0%, transparent 65%),
+    var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.4); backdrop-filter: blur(var(--glass-blur)) saturate(1.4);
 }
 .kicker { font-size: var(--fs-xs); font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--brass); }
 .title { font-size: clamp(var(--fs-xl), 4.5vw, var(--fs-2xl)); line-height: 1.2; max-width: 30ch; }

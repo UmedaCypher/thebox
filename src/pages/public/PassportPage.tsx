@@ -4,7 +4,7 @@ import { useLoad } from '../../hooks/useLoad';
 import { getPassport, mainPhoto, photoUrl, thumbSrc } from '../../lib/api';
 import { formatDate, formatMm } from '../../lib/format';
 import { listingPrice } from '../../lib/listing';
-import { Cushion, LinkButton, Notice } from '../../components/ui';
+import { Cushion, Glow, LinkButton, Notice } from '../../components/ui';
 import ContactButton from '../../components/ContactButton/ContactButton';
 import { defineStrings, useLang, useStrings } from '../../i18n';
 import { COMMON, movementLabel } from '../../i18n/common';
@@ -96,7 +96,9 @@ export default function PassportPage() {
     <div className="page">
       <article className={s.passport}>
         <div className={s.media}>
-          <Cushion src={photoUrl(current?.storage_path)} alt={`${p.brand} ${p.model}`} ratio="portrait" />
+          <Glow src={thumbSrc(current?.storage_path).src}>
+            <Cushion src={photoUrl(current?.storage_path)} alt={`${p.brand} ${p.model}`} ratio="portrait" />
+          </Glow>
           {photos.length > 1 && (
             <div className={s.thumbs}>
               {photos.map((ph, i) => (
