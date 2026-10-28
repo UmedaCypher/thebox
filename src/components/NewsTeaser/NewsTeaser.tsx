@@ -14,7 +14,7 @@ const S = defineStrings(
 );
 
 /** Les trois derniers articles des sites horlogers, les plus récents d'abord. Rien ne s'affiche si les flux sont indisponibles. */
-async function latest(n: number): Promise<(NewsItem & { source: string })[]> {
+export async function latestNews(n: number): Promise<(NewsItem & { source: string })[]> {
   // Deux sources en parallèle : si l'une ne répond pas, l'autre suffit.
   const results = await Promise.allSettled(NEWS_FEEDS.slice(0, 2).map(f => fetchNews(f.value).then(items => items.map(i => ({ ...i, source: f.label })))));
   const items = results.flatMap(r => (r.status === 'fulfilled' ? r.value : []));
@@ -28,7 +28,7 @@ async function latest(n: number): Promise<(NewsItem & { source: string })[]> {
 
 export default function NewsTeaser() {
   const t = useStrings(S);
-  const q = useLoad(() => latest(3), []);
+  const q = useLoad(() => latestNews(3), []);
   if (q.loading || !q.data?.length) return null;
 
   return (

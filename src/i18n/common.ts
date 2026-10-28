@@ -13,7 +13,7 @@ export const COMMON = defineStrings({
   retry: 'Réessayer',
   error: 'Une erreur est survenue.',
   premium: 'Premium',
-  tabs: { collection: 'Collection', wear: 'Portage', market: 'Marché', messages: 'Messages', gallery: 'Galerie', profile: 'Profil' },
+  tabs: { home: 'Accueil', collection: 'Collection', wear: 'Portage', market: 'Marché', messages: 'Messages', gallery: 'Galerie', profile: 'Profil' },
   listing: {
     forSale: 'À vendre',
     forTrade: 'À échanger',
@@ -59,7 +59,7 @@ export const COMMON = defineStrings({
   retry: 'Try again',
   error: 'Something went wrong.',
   premium: 'Premium',
-  tabs: { collection: 'Collection', wear: 'Wear', market: 'Market', messages: 'Messages', gallery: 'Gallery', profile: 'Profile' },
+  tabs: { home: 'Home', collection: 'Collection', wear: 'Wear', market: 'Market', messages: 'Messages', gallery: 'Gallery', profile: 'Profile' },
   listing: {
     forSale: 'For sale',
     forTrade: 'For trade',

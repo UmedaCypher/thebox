@@ -282,7 +282,7 @@ export default function OnboardingPage() {
             <p className={s.lead}>{t.firstLead}</p>
             <div className={s.actions}>
               <LinkButton to="/ajouter-montre" block replace>{t.addFirst}</LinkButton>
-              <Button variant="ghost" onClick={() => navigate('/collection', { replace: true })}>{t.later}</Button>
+              <Button variant="ghost" onClick={() => navigate('/accueil', { replace: true })}>{t.later}</Button>
             </div>
           </section>
         )}

@@ -130,7 +130,7 @@ export function LoginPage() {
   const t = useStrings(S);
   const navigate = useNavigate();
   const location = useLocation();
-  const from = (location.state as { from?: { pathname: string } } | null)?.from?.pathname ?? '/collection';
+  const from = (location.state as { from?: { pathname: string } } | null)?.from?.pathname ?? '/accueil';
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [busy, setBusy] = useState(false);
@@ -241,7 +241,7 @@ export function NewPasswordPage() {
     const { error: err } = await supabase.auth.updateUser({ password });
     setBusy(false);
     if (err) setError(err.message.includes('session') ? t.errors.linkExpired : err.message);
-    else navigate('/collection', { replace: true });
+    else navigate('/accueil', { replace: true });
   };
 
   return (
