@@ -1,3 +1,4 @@
+import { lockScroll } from '../../lib/motion';
 import { useEffect, useId, useRef } from 'react';
 import type { ButtonHTMLAttributes, InputHTMLAttributes, ReactNode, SelectHTMLAttributes, TextareaHTMLAttributes } from 'react';
 import { Link } from 'react-router-dom';
@@ -121,10 +122,12 @@ export function Sheet({ open, onClose, title, children }: { open: boolean; onClo
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
     document.addEventListener('keydown', onKey);
     document.body.style.overflow = 'hidden';
+    lockScroll(true);
     ref.current?.focus();
     return () => {
       document.removeEventListener('keydown', onKey);
       document.body.style.overflow = '';
+      lockScroll(false);
       prev?.focus?.();
     };
   }, [open, onClose]);

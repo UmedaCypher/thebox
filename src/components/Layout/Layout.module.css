@@ -104,8 +104,9 @@ a.avatar::after { content: ''; position: absolute; inset: -6px; border-radius: 5
 .iconLink[aria-current='page'] { color: var(--brass); background: var(--surface); }
 .iconBadge {
   position: absolute; top: 2px; right: 0; z-index: 1; min-width: 18px; height: 18px; padding: 0 5px; border-radius: var(--r-pill);
-  display: grid; place-items: center; background: var(--brass); color: var(--brass-ink);
+  display: grid; place-items: center; background: var(--ruby); color: var(--ruby-ink);
   font-size: var(--fs-xs); font-weight: 700; line-height: 1; border: 2px solid var(--bg);
+  box-shadow: 0 0 12px -2px color-mix(in srgb, var(--ruby) 70%, transparent);
 }
 @media (max-width: 359px) { .tab { font-size: 0.75rem; } .tabIcon { width: 48px; } }
 @media (min-width: 860px) { .tabbar { display: none; } }

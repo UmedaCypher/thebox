@@ -11,7 +11,7 @@
 }
 @media (prefers-reduced-motion: reduce) { .home::after { animation: none; } }
 
-.inner { width: 100%; max-width: var(--page-max); margin: 0 auto; padding: 0 var(--gutter); position: relative; z-index: 1; background: var(--bg); }
+.inner { width: 100%; max-width: var(--page-max); margin: 0 auto; padding: 0 var(--gutter); position: relative; z-index: 1; background: transparent; }
 
 .privacy { padding: var(--sp-8) 0; border-top: 1px solid var(--line); display: grid; gap: var(--sp-3); }
 @media (min-width: 860px) { .privacy { grid-template-columns: 1fr 2fr; gap: var(--sp-7); } }
@@ -21,7 +21,8 @@
 .offer {
   display: flex; flex-direction: column; gap: var(--sp-5); align-items: flex-start;
   padding: var(--sp-6); margin: var(--sp-5) 0; border-radius: var(--r-cushion);
-  border: 1px dashed var(--seam); background: var(--surface);
+  border: 1px solid var(--glass-border); background: var(--glass-bg); box-shadow: var(--glass-shadow);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.4); backdrop-filter: blur(var(--glass-blur)) saturate(1.4);
 }
 .offer h2 { margin-bottom: var(--sp-2); }
 .offer p { color: var(--text-2); }

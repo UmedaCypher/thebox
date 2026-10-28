@@ -1,3 +1,4 @@
+import { scrollToElement, scrollToTop, useMotion } from '../../lib/motion';
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
 import { CalendarDays, Images, MessageCircle, Newspaper, Sparkles, Store, Watch } from 'lucide-react';
 import { useEffect } from 'react';
@@ -185,10 +186,19 @@ export default function Layout() {
   // Dans une conversation sur téléphone, la zone de saisie remplace la barre d'onglets.
   const inThread = /^\/messages\/[^/]+/.test(pathname);
   const t = useStrings(S);
+  useMotion();
+
+  // La lumière de fond prend la couleur de la rubrique
+  useEffect(() => {
+    const seg = pathname.split('/')[1] || 'accueil';
+    const section = seg === 'passeport' ? 'marche' : seg;
+    document.documentElement.dataset.section = section;
+  }, [pathname]);
 
   useEffect(() => {
-    if (hash) document.getElementById(hash.slice(1))?.scrollIntoView({ behavior: 'smooth' });
-    else window.scrollTo(0, 0);
+    const target = hash ? document.getElementById(hash.slice(1)) : null;
+    if (target) scrollToElement(target);
+    else scrollToTop();
   }, [pathname, hash]);
 
   return (

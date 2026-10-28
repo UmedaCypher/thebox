@@ -65,7 +65,7 @@ export default function PublicProfilePage() {
       ) : p.watches.length === 0 ? (
         <EmptyState title={t.emptyTitle} />
       ) : (
-        <WatchGrid variant="stagger">
+        <WatchGrid>
           {p.watches.map(w => (
             <WatchCard key={w.id} to={`/passeport/${w.id}`} brand={w.brand} model={w.model}
               photo={thumbSrc(w.main_photo_path).src} photoFallback={thumbSrc(w.main_photo_path).fallback}

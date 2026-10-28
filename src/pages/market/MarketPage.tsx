@@ -226,7 +226,7 @@ export default function MarketPage() {
             </EmptyState>
           ) : (
             <>
-              <WatchGrid variant="stagger" cols={3}>
+              <WatchGrid cols={3}>
                 {items.map(m => {
                   const th = thumbSrc(m.main_photo_path);
                   return (

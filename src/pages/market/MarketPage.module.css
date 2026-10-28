@@ -11,7 +11,7 @@
 .filterBtn { min-height: 46px; }
 .count {
   display: inline-grid; place-items: center; min-width: 20px; height: 20px; padding: 0 6px; border-radius: var(--r-pill);
-  background: var(--saphir); color: var(--saphir-ink); font-size: var(--fs-xs); font-weight: 700;
+  background: var(--ruby); color: var(--ruby-ink); font-size: var(--fs-xs); font-weight: 700;
 }
 .sort {
   min-height: 46px; padding: 0 var(--sp-4); border-radius: var(--r-pill); background: var(--glass-bg); color: var(--text);
@@ -21,10 +21,10 @@
 .chips { display: flex; flex-wrap: wrap; gap: var(--sp-2); margin-bottom: var(--sp-5); align-items: center; }
 .chip {
   display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px 6px 14px; border-radius: var(--r-pill);
-  background: color-mix(in srgb, var(--saphir) 14%, transparent); color: var(--text); font-size: var(--fs-sm); font-weight: 600;
-  border: 1px solid color-mix(in srgb, var(--saphir) 38%, transparent);
+  background: color-mix(in srgb, var(--ruby) 14%, transparent); color: var(--text); font-size: var(--fs-sm); font-weight: 600;
+  border: 1px solid color-mix(in srgb, var(--ruby) 38%, transparent);
 }
-.chip:hover { border-color: var(--saphir); }
+.chip:hover { border-color: var(--ruby); }
 .clear { color: var(--text-2); font-size: var(--fs-sm); text-decoration: underline; padding: 6px; }
 
 .layout { display: grid; gap: var(--sp-6); }

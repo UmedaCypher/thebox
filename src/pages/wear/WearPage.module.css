@@ -15,15 +15,17 @@
 .pick[aria-pressed='true'] .pickFrame {
   box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--lume), 0 10px 30px -8px color-mix(in srgb, var(--lume) 55%, transparent);
 }
-.pickVeil {
-  position: absolute; z-index: 1; left: 0; right: 0; bottom: 0; height: 60%;
-  background: linear-gradient(to top, rgba(18, 7, 9, 0.86) 0%, rgba(18, 7, 9, 0.62) 50%, rgba(18, 7, 9, 0) 100%);
-  -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
-  -webkit-mask-image: linear-gradient(to top, #000 35%, transparent 95%); mask-image: linear-gradient(to top, #000 35%, transparent 95%);
+.pickVeil { display: none; }
+.pickText {
+  position: absolute; z-index: 2; left: 6px; right: 6px; bottom: 6px; padding: 7px 10px 8px; border-radius: calc(var(--r-xl) - 6px);
+  display: flex; flex-direction: column; color: #fbf6ee; min-width: 0;
+  background: rgba(20, 8, 10, 0.3); border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14);
+  -webkit-backdrop-filter: blur(18px) saturate(1.5) brightness(0.8); backdrop-filter: blur(18px) saturate(1.5) brightness(0.8);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
 }
-.pickText { position: absolute; z-index: 2; left: 0; right: 0; bottom: 0; padding: var(--sp-3); display: flex; flex-direction: column; color: #f6efe4; min-width: 0; }
 .pickName { font-family: var(--font-display); font-size: var(--fs-md); line-height: 1.15; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.pickBrand { font-size: var(--fs-xs); font-weight: 600; color: rgba(246, 239, 228, 0.88); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pickBrand { font-size: var(--fs-xs); font-weight: 600; color: rgba(251, 246, 238, 0.86); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .check {
   position: absolute; z-index: 3; right: 8px; top: 8px; width: 28px; height: 28px; border-radius: 50%;
   display: grid; place-items: center; background: var(--lume); color: var(--lume-ink);
@@ -49,7 +51,23 @@
 }
 .day:hover:not(:disabled) { border-color: var(--brass); }
 .day:disabled { opacity: 0.3; cursor: default; }
-.day[data-today='true'] { border-color: var(--lume); color: var(--text); box-shadow: 0 0 0 3px color-mix(in srgb, var(--lume) 18%, transparent), 0 0 16px -2px color-mix(in srgb, var(--lume) 45%, transparent); }
+/* Aujourd'hui : un cadran de lume qui luit doucement, halo large et diffus */
+.day[data-today='true'] {
+  z-index: 1; border-color: color-mix(in srgb, var(--lume) 70%, transparent); color: var(--lume-ink); font-weight: 700;
+  background: radial-gradient(circle at 50% 40%, color-mix(in srgb, var(--lume) 100%, #fff 20%) 0%, var(--lume) 55%, color-mix(in srgb, var(--lume) 80%, #000 10%) 100%);
+  box-shadow:
+    0 0 14px 2px color-mix(in srgb, var(--lume) 45%, transparent),
+    0 0 42px 10px color-mix(in srgb, var(--lume) 22%, transparent),
+    0 0 90px 24px color-mix(in srgb, var(--lume) 10%, transparent);
+  animation: lumeGlow 3.6s var(--ease) infinite alternate;
+}
+.day[data-today='true'][data-worn='true'] { background: var(--lume); }
+.day[data-today='true'] .dayPhoto { inset: 3px; }
+@keyframes lumeGlow {
+  from { box-shadow: 0 0 12px 1px color-mix(in srgb, var(--lume) 40%, transparent), 0 0 36px 8px color-mix(in srgb, var(--lume) 18%, transparent), 0 0 80px 20px color-mix(in srgb, var(--lume) 8%, transparent); }
+  to { box-shadow: 0 0 18px 3px color-mix(in srgb, var(--lume) 52%, transparent), 0 0 52px 14px color-mix(in srgb, var(--lume) 26%, transparent), 0 0 110px 30px color-mix(in srgb, var(--lume) 12%, transparent); }
+}
+:root[data-theme='soie'] .day[data-today='true'] { --lume: #9fd27a; color: #16210c; }
 .day[data-worn='true'] { border-color: var(--seam); background: var(--cushion); }
 .dayNum { font-size: var(--fs-sm); font-variant-numeric: tabular-nums; }
 .dayPhoto { position: absolute; inset: 2px; border-radius: 50%; overflow: hidden; display: grid; place-items: center; color: var(--text); font-size: var(--fs-sm); }

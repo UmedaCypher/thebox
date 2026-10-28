@@ -190,7 +190,7 @@ export default function WearPage() {
         </ul>
       </section>
 
-      <section className={s.month} aria-labelledby="month-title">
+      <section className={s.month} aria-labelledby="month-title" data-reveal>
         <div className={s.monthHead}>
           <IconButton label={t.prevMonth} onClick={() => setCursor(new Date(year, month - 1, 1))}><ChevronLeft size={20} strokeWidth={1.6} /></IconButton>
           <h2 id="month-title" className={s.monthTitle}>{monthTitle}</h2>

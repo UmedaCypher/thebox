@@ -50,11 +50,11 @@
   --shadow-lg: 0 4px 10px rgba(0, 0, 0, 0.22), 0 28px 56px -20px rgba(0, 0, 0, 0.7);
 
   /* Accents horlogers : chacun a un rôle
-     laiton = actions et Premium · lume = aujourd'hui, porté · saphir = Marché, prix, échange */
+     laiton = actions et Premium · lume = aujourd'hui, porté · rubis = Marché, prix, messages */
   --lume: #c9e7a7;
   --lume-ink: #16210c;
-  --saphir: #8fb4e8;
-  --saphir-ink: #0d1726;
+  --ruby: #ee6f86;
+  --ruby-ink: #2a0910;
 
   /* Verre dépoli */
   --glass-bg: rgba(42, 20, 24, 0.52);
@@ -65,7 +65,7 @@
   --glass-shadow: 0 1px 0 0 var(--glass-hi) inset, 0 18px 40px -22px rgba(0, 0, 0, 0.75);
   /* Lumière d'écrin derrière le verre */
   --aura-1: rgba(194, 160, 114, 0.16);
-  --aura-2: rgba(143, 180, 232, 0.09);
+  --aura-2: rgba(238, 111, 134, 0.10);
   --aura-3: rgba(140, 40, 60, 0.32);
   /* Durées : rapide (survol), standard (états), lente (apparitions) */
   --dur-fast: 150ms; --dur: 220ms; --dur-slow: 380ms;
@@ -141,15 +141,15 @@
   --shadow-lg: 0 4px 10px rgba(60, 30, 20, 0.08), 0 28px 56px -20px rgba(60, 30, 20, 0.38);
   --lume: #3f6b1f;
   --lume-ink: #f4f9ee;
-  --saphir: #2f5a92;
-  --saphir-ink: #f2f6fc;
+  --ruby: #a3304a;
+  --ruby-ink: #fbf1f3;
   --glass-bg: rgba(250, 246, 239, 0.58);
   --glass-bg-strong: rgba(250, 246, 239, 0.8);
   --glass-border: rgba(255, 255, 255, 0.6);
   --glass-hi: rgba(255, 255, 255, 0.75);
   --glass-shadow: 0 1px 0 0 var(--glass-hi) inset, 0 18px 40px -24px rgba(60, 30, 20, 0.35);
   --aura-1: rgba(194, 160, 114, 0.28);
-  --aura-2: rgba(143, 180, 232, 0.2);
+  --aura-2: rgba(214, 110, 130, 0.18);
   --aura-3: rgba(214, 170, 160, 0.35);
   color-scheme: light;
 }
@@ -275,3 +275,27 @@ button { cursor: pointer; background: none; border: 0; }
 .reveal > :nth-child(n + 6) { animation-delay: 200ms; }
 @keyframes revealIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) { .reveal > * { animation: none; } }
+
+/* Défilement avec inertie (ordinateur) */
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-smooth [data-lenis-prevent], .lenis.lenis-smooth [data-scroll-own] { overscroll-behavior: contain; }
+.lenis.lenis-stopped { overflow: hidden; }
+
+/* Apparition au défilement : seulement quand le script de mouvement est actif */
+.motion [data-reveal] {
+  opacity: 0; transform: translateY(28px) scale(0.985);
+  transition: opacity 700ms var(--ease-out), transform 900ms var(--ease-out);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+.motion [data-reveal][data-in] { opacity: 1; transform: none; }
+
+/* Chaque rubrique a sa propre lumière d'écrin : la couleur du halo principal suit la rubrique, en fondu. */
+@property --aura-1 { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --aura-3 { syntax: '<color>'; inherits: true; initial-value: transparent; }
+:root { transition: --aura-1 1.2s var(--ease), --aura-3 1.2s var(--ease); }
+:root[data-section='portage'] { --aura-1: rgba(201, 231, 167, 0.13); }
+:root[data-section='marche'], :root[data-section='messages'] { --aura-1: rgba(238, 111, 134, 0.16); --aura-3: rgba(150, 36, 62, 0.36); }
+:root[data-section='galerie'] { --aura-1: rgba(238, 160, 134, 0.15); }
+:root[data-theme='soie'][data-section='portage'] { --aura-1: rgba(120, 170, 80, 0.2); }
+:root[data-theme='soie'][data-section='marche'], :root[data-theme='soie'][data-section='messages'] { --aura-1: rgba(214, 110, 130, 0.24); }

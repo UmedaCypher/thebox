@@ -1,9 +1,10 @@
+import { Children } from 'react';
 import { Link } from 'react-router-dom';
 import { Watch as WatchIcon } from 'lucide-react';
 import { Img } from '../ui';
 import s from './WatchCard.module.css';
 
-export type CardTone = 'brass' | 'saphir' | 'lume';
+export type CardTone = 'brass' | 'ruby' | 'lume';
 
 interface Props {
   to: string;
@@ -25,15 +26,23 @@ interface Props {
   featureLabel?: string | null;
 }
 
+/** Reflet qui suit la souris sur le verre de la carte (ordinateur). */
+function sheen(e: React.PointerEvent<HTMLAnchorElement>) {
+  if (e.pointerType !== 'mouse') return;
+  const r = e.currentTarget.getBoundingClientRect();
+  e.currentTarget.style.setProperty('--mx', `${((e.clientX - r.left) / r.width) * 100}%`);
+  e.currentTarget.style.setProperty('--my', `${((e.clientY - r.top) / r.height) * 100}%`);
+}
+
 /**
  * Une montre en plein cadre : la photo remplit la carte, le nom repose sur un voile de verre dépoli,
  * et la photo diffuse sa propre couleur autour de la carte.
  */
-export default function WatchCard({ to, brand, model, photo, photoFallback, meta, metaTone, badge, badgeTone = 'saphir', price, feature, featureLabel }: Props) {
+export default function WatchCard({ to, brand, model, photo, photoFallback, meta, metaTone, badge, badgeTone = 'ruby', price, feature, featureLabel }: Props) {
   return (
-    <Link to={to} className={s.card} data-feature={feature || undefined}>
+    <Link to={to} className={s.card} data-feature={feature || undefined} data-reveal onPointerMove={sheen}>
       {photo && <img className={s.glow} src={photo} alt="" aria-hidden="true" loading="lazy" decoding="async" />}
-      <span className={s.frame}>
+      <span className={s.frame} data-parallax>
         {photo
           ? <Img key={photo} src={photo} fallback={photoFallback} alt={`${brand} ${model}`} className={s.photo} />
           : <span className={s.empty}><WatchIcon size={feature ? 56 : 36} strokeWidth={1.1} aria-hidden="true" /></span>}
@@ -58,6 +67,12 @@ export default function WatchCard({ to, brand, model, photo, photoFallback, meta
   );
 }
 
-export function WatchGrid({ children, variant, cols }: { children: React.ReactNode; variant?: 'stagger' | 'bento'; cols?: 3 }) {
-  return <div className={s.grid} data-variant={variant} data-cols={cols}>{children}</div>;
+/** Grille de cartes : en mosaïque (grandes et petites cartes) dès cinq montres, simple en dessous. */
+export function WatchGrid({ children, cols }: { children: React.ReactNode; cols?: 3 }) {
+  const mosaic = Children.count(children) >= 5;
+  return (
+    <div className={s.wrap}>
+      <div className={s.grid} data-variant={mosaic ? 'mosaic' : undefined} data-cols={cols}>{children}</div>
+    </div>
+  );
 }

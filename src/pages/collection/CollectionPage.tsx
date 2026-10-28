@@ -97,7 +97,7 @@ export default function CollectionPage() {
 
   // Pièce maîtresse : la montre la plus portée sur 90 jours, mise en avant en grand quand la collection en compte au moins quatre.
   const featureId = useMemo(() => {
-    if (watches.length < 4) return null;
+    if (watches.length < 5) return null;
     const since = new Date(); since.setDate(since.getDate() - 90);
     const from = since.toISOString().slice(0, 10);
     const counts = new Map<string, number>();
@@ -150,7 +150,7 @@ export default function CollectionPage() {
         </EmptyState>
       ) : (
         <>
-          <section className={s.summary} aria-label={t.summaryAria}>
+          <section className={s.summary} aria-label={t.summaryAria} data-reveal>
             <Stat value={<span className="num">{watches.length}</span>} label={t.watches(watches.length)} />
             <Stat value={<span className="num">{formatEuros(totalValue)}</span>} label={t.declaredValue} />
             <Stat value={<span className="num">{brands}</span>} label={t.brands(brands)} />
@@ -182,7 +182,7 @@ export default function CollectionPage() {
             </div>
           )}
 
-          <WatchGrid variant={featureId ? 'bento' : 'stagger'}>
+          <WatchGrid>
             {ordered.map(w => (
               <WatchCard
                 key={w.id}

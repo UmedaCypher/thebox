@@ -1,152 +1,141 @@
-/* ---------- Grille ---------- */
+/* ---------- Grille mosaïque ----------
+   Des rangées alignées, mais des cartes de tailles différentes : une grande (2 × 2), puis une large (2 × 1),
+   motif qui se répète toutes les dix cartes. La hauteur des rangées suit la largeur des colonnes (unités de conteneur),
+   ce qui garde le ratio portrait des petites cartes quel que soit l'écran. */
+.wrap { container-type: inline-size; }
 .grid {
-  display: grid; gap: var(--sp-4) var(--sp-3);
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  --cols: 2; --gap: 12px;
+  display: grid; gap: var(--gap);
+  grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+  grid-auto-rows: calc((100cqi - (var(--cols) - 1) * var(--gap)) / var(--cols) * 1.25);
   grid-auto-flow: row dense;
 }
-@media (min-width: 640px) { .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--sp-5) var(--sp-4); } }
-@media (min-width: 1000px) { .grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--sp-6) var(--sp-5); } }
+@media (min-width: 640px) { .grid { --cols: 3; --gap: 16px; } }
+@media (min-width: 1000px) { .grid { --cols: 4; --gap: 20px; } }
+@media (min-width: 1000px) { .grid[data-cols='3'] { --cols: 3; } }
+/* Repli pour les navigateurs sans unités de conteneur */
+@supports not (width: 1cqi) { .grid { grid-auto-rows: auto; } .frame { aspect-ratio: 4 / 5; } }
 
-/* Colonnes décalées : une colonne sur deux descend d'un demi-pas, comme des montres posées à la main. */
-.grid[data-variant='stagger'] { --offset: 28px; padding-bottom: var(--offset); }
-.grid[data-variant='stagger'] > :nth-child(even) { translate: 0 var(--offset); }
-@media (min-width: 640px) {
-  .grid[data-variant='stagger'] { --offset: 44px; }
-  .grid[data-variant='stagger'] > :nth-child(even) { translate: none; }
-  .grid[data-variant='stagger'] > :nth-child(3n + 2) { translate: 0 var(--offset); }
-}
-@media (min-width: 1000px) {
-  .grid[data-variant='stagger'] { --offset: 56px; }
-  .grid[data-variant='stagger'] > :nth-child(3n + 2) { translate: none; }
-  .grid[data-variant='stagger'] > :nth-child(even) { translate: 0 var(--offset); }
-}
-
-/* Trois colonnes au plus, pour les pages qui ont déjà une colonne latérale */
-@media (min-width: 1000px) {
-  .grid[data-cols='3'] { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .grid[data-cols='3'][data-variant='stagger'] > :nth-child(even) { translate: none; }
-  .grid[data-cols='3'][data-variant='stagger'] > :nth-child(3n + 2) { translate: 0 var(--offset); }
-}
+.grid[data-variant='mosaic'] > :nth-child(10n + 1) { grid-column: span 2; grid-row: span 2; }
+.grid[data-variant='mosaic'] > :nth-child(10n + 7) { grid-column: span 2; }
 
 /* ---------- Carte plein cadre ---------- */
 .card {
   position: relative; display: block; isolation: isolate; text-decoration: none; color: inherit;
-  border-radius: var(--r-xl);
+  border-radius: var(--r-xl); min-width: 0;
 }
 .card:hover { color: inherit; }
-.card[data-feature] { grid-column: span 2; }
-@media (min-width: 640px) { .card[data-feature] { grid-row: span 2; } }
 
-/* La photo diffuse sa couleur autour de la carte */
+/* La photo diffuse une lueur douce de sa couleur, juste sous la carte */
 .glow {
-  position: absolute; z-index: -1; top: 16%; left: 8%; width: 84%; height: 84%; object-fit: cover;
-  border-radius: var(--r-xl); filter: blur(28px) saturate(1.7); opacity: 0.5;
+  position: absolute; z-index: -1; top: 24%; left: 14%; width: 72%; height: 70%; object-fit: cover;
+  border-radius: 50%; filter: blur(42px) saturate(1.8); opacity: 0.38;
   transition: opacity var(--dur-slow) var(--ease), transform var(--dur-slow) var(--ease);
   pointer-events: none;
 }
-:root[data-theme='soie'] .glow { opacity: 0.42; }
+:root[data-theme='soie'] .glow { opacity: 0.32; }
 
 .frame {
   position: relative; display: block; overflow: hidden; isolation: isolate;
-  aspect-ratio: 4 / 5; border-radius: var(--r-xl);
+  height: 100%; border-radius: var(--r-xl);
   background: radial-gradient(120% 85% at 50% 30%, color-mix(in srgb, var(--cushion) 82%, #fff 9%) 0%, var(--cushion) 55%, var(--cushion-edge) 100%);
   box-shadow: var(--shadow-md);
-  transition: transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+  transition: transform 500ms var(--ease-out), box-shadow 500ms var(--ease-out);
 }
-.card[data-feature] .frame { aspect-ratio: 1 / 1; }
-@media (min-width: 640px) { .card[data-feature] .frame { aspect-ratio: auto; height: 100%; min-height: 360px; } }
-/* Liseré lumineux : le bord du verre */
+/* Liseré lumineux (le bord du verre) et reflet qui suit la souris */
 .frame::after {
   content: ''; position: absolute; inset: 0; z-index: 4; border-radius: inherit; pointer-events: none;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.10), inset 0 1px 0 0 rgba(255, 255, 255, 0.16);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.10), inset 0 1px 0 0 rgba(255, 255, 255, 0.18);
+  background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 0%), rgba(255, 255, 255, 0.16), transparent 45%);
+  opacity: 0; transition: opacity var(--dur-slow) var(--ease);
 }
-.photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform 700ms var(--ease-out); }
+@media (hover: hover) { .card:hover .frame::after { opacity: 1; } }
+.photo {
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+  transition: transform 900ms var(--ease-out);
+}
+/* Parallaxe (ordinateur) : la photo glisse un peu moins vite que la page */
+:global(.parallax) .photo { transform: translate3d(0, calc(var(--p, 0) * -5%), 0) scale(1.12); transition: none; }
 .empty { position: absolute; inset: 0; display: grid; place-items: center; padding-bottom: 30%; color: var(--text-3); }
 
-/* Voile de verre : il naît au-dessus du texte et fond la photo dans un flou teinté, à la hauteur du contenu. */
+/* Bloc de légende : un panneau de verre dépoli, légèrement fumé, posé en bas de la photo */
 .caption {
-  position: absolute; z-index: 2; left: 0; right: 0; bottom: 0; isolation: isolate;
-  display: flex; flex-direction: column; gap: 1px; padding: var(--sp-3);
-  color: #f6efe4; min-width: 0; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+  position: absolute; z-index: 2; left: 6px; right: 6px; bottom: 6px;
+  display: flex; flex-direction: column; gap: 1px; min-width: 0;
+  padding: 8px 10px 9px; border-radius: calc(var(--r-xl) - 6px);
+  color: #fbf6ee; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+  background: rgba(20, 8, 10, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 8px 24px -12px rgba(0, 0, 0, 0.5);
+  -webkit-backdrop-filter: blur(18px) saturate(1.5) brightness(0.8);
+  backdrop-filter: blur(18px) saturate(1.5) brightness(0.8);
 }
-.caption::before {
-  content: ''; position: absolute; z-index: -1; left: 0; right: 0; bottom: 0; top: -36px;
-  background: linear-gradient(to top, rgba(18, 7, 9, 0.86) 0%, rgba(18, 7, 9, 0.64) 60%, rgba(18, 7, 9, 0) 100%);
-  -webkit-backdrop-filter: blur(12px) saturate(1.3); backdrop-filter: blur(12px) saturate(1.3);
-  -webkit-mask-image: linear-gradient(to top, #000 0%, #000 calc(100% - 36px), transparent 100%);
-  mask-image: linear-gradient(to top, #000 0%, #000 calc(100% - 36px), transparent 100%);
-}
-@media (min-width: 640px) { .caption { padding: var(--sp-4); } }
-.brand { font-size: var(--fs-xs); font-weight: 600; letter-spacing: 0.02em; color: rgba(246, 239, 228, 0.88); }
+@media (max-width: 639px) { .model { font-size: var(--fs-md); } .meta { font-size: 0.6875rem; } }
+@media (min-width: 640px) { .caption { left: 8px; right: 8px; bottom: 8px; padding: 10px 12px 11px; border-radius: calc(var(--r-xl) - 8px); } }
+.brand { font-size: var(--fs-xs); font-weight: 600; letter-spacing: 0.02em; color: rgba(251, 246, 238, 0.86); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .model {
   font-family: var(--font-display); font-size: var(--fs-lg); line-height: 1.15;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
-.card[data-feature] .brand { font-size: var(--fs-sm); }
-.card[data-feature] .model { font-size: clamp(var(--fs-xl), 3.4vw, var(--fs-3xl)); white-space: normal; text-wrap: balance; }
-.card[data-feature] .caption { padding: var(--sp-5); gap: 2px; }
+/* Grande carte : titre plus présent */
+.grid[data-variant='mosaic'] > :nth-child(10n + 1) .caption { padding: 14px 18px 16px; }
+.grid[data-variant='mosaic'] > :nth-child(10n + 1) .brand { font-size: var(--fs-sm); }
+.grid[data-variant='mosaic'] > :nth-child(10n + 1) .model { font-size: clamp(var(--fs-xl), 3.2vw, var(--fs-3xl)); white-space: normal; text-wrap: balance; }
+@media (min-width: 640px) {
+  .grid[data-variant='mosaic'] > :nth-child(10n + 1) .caption { left: 12px; right: auto; bottom: 12px; max-width: calc(100% - 24px); min-width: 55%; padding: 16px 22px 18px; }
+}
 
-.footer { display: flex; align-items: center; gap: var(--sp-2); margin-top: 4px; min-width: 0; }
-/* Étiquette et prix posés sur la photo ; le prix passe sous l'étiquette quand la carte est étroite */
+.footer { display: flex; align-items: center; gap: var(--sp-2); margin-top: 3px; min-width: 0; }
+/* Étiquettes et prix posés sur la photo ; le prix passe sous l'étiquette quand la carte est étroite */
 .top {
   position: absolute; z-index: 3; top: 10px; left: 10px; right: 10px;
   display: flex; flex-wrap: wrap; align-items: flex-start; gap: 6px; pointer-events: none;
 }
-/* Prix : une pastille de verre fumé, liseré saphir (couleur du Marché) */
+/* Prix : pastille de verre fumé, liseré rubis (couleur du Marché) */
 .price {
-  margin-left: auto; padding: 4px 10px; border-radius: var(--r-pill); font-size: var(--fs-sm); font-weight: 700; color: #fff;
-  white-space: nowrap; background: rgba(18, 7, 9, 0.46); border: 1px solid rgba(143, 180, 232, 0.45);
-  -webkit-backdrop-filter: blur(12px) saturate(1.4); backdrop-filter: blur(12px) saturate(1.4);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16);
+  margin-left: auto; padding: 4px 11px; border-radius: var(--r-pill); font-size: var(--fs-sm); font-weight: 700; color: #fff;
+  white-space: nowrap; background: rgba(20, 8, 10, 0.34); border: 1px solid rgba(238, 111, 134, 0.55);
+  -webkit-backdrop-filter: blur(14px) saturate(1.5) brightness(0.85); backdrop-filter: blur(14px) saturate(1.5) brightness(0.85);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 0 18px -6px rgba(238, 111, 134, 0.7);
 }
 .meta {
   display: inline-flex; align-items: center; gap: 6px; min-width: 0;
-  font-size: var(--fs-xs); color: rgba(246, 239, 228, 0.88);
+  font-size: var(--fs-xs); color: rgba(251, 246, 238, 0.86);
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 .meta[data-tone]::before { content: ''; flex: none; width: 6px; height: 6px; border-radius: 50%; background: var(--dot); box-shadow: 0 0 8px var(--dot); }
-.meta[data-tone='lume'] { --dot: #c9e7a7; color: #dff0c9; }
-.meta[data-tone='saphir'] { --dot: #8fb4e8; }
+.meta[data-tone='lume'] { --dot: #c9e7a7; color: #e4f3d2; }
+.meta[data-tone='ruby'] { --dot: #ee6f86; }
 .meta[data-tone='brass'] { --dot: #d4b688; }
 
 /* Étiquette sur la photo : pastille de verre avec une puce de couleur */
 .badge {
   display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
   padding: 4px 10px 4px 8px; border-radius: var(--r-pill); font-size: var(--fs-xs); font-weight: 600; letter-spacing: 0.01em;
-  color: #f6efe4; background: rgba(24, 10, 12, 0.42); border: 1px solid rgba(255, 255, 255, 0.18);
-  -webkit-backdrop-filter: blur(12px) saturate(1.4); backdrop-filter: blur(12px) saturate(1.4);
+  color: #fbf6ee; background: rgba(20, 8, 10, 0.32); border: 1px solid rgba(255, 255, 255, 0.2);
+  -webkit-backdrop-filter: blur(14px) saturate(1.5) brightness(0.85); backdrop-filter: blur(14px) saturate(1.5) brightness(0.85);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16);
 }
-.badge i { width: 7px; height: 7px; border-radius: 50%; background: var(--dot, #8fb4e8); box-shadow: 0 0 8px var(--dot, #8fb4e8); }
+.badge i { width: 7px; height: 7px; border-radius: 50%; background: var(--dot, #ee6f86); box-shadow: 0 0 8px var(--dot, #ee6f86); }
 .badge[data-tone='brass'] { --dot: #d4b688; }
 .badge[data-tone='lume'] { --dot: #c9e7a7; }
 
 /* Survol : la carte se soulève, la photo avance, la lueur s'intensifie */
 @media (hover: hover) {
-  .card:hover .frame { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
-  .card:hover .photo { transform: scale(1.045); }
-  .card:hover .glow { opacity: 0.75; transform: translateY(6px) scale(1.04); }
+  .card:hover .frame { transform: translateY(-6px); box-shadow: var(--shadow-lg); }
+  .card:hover .photo { transform: scale(1.05); }
+  :global(.parallax) .card:hover .photo { transform: translate3d(0, calc(var(--p, 0) * -5%), 0) scale(1.17); transition: transform 900ms var(--ease-out); }
+  .card:hover .glow { opacity: 0.62; transform: translateY(10px) scale(1.06); }
 }
+.card:active .frame { transform: scale(0.985); }
 .card:focus-visible { outline: none; }
 .card:focus-visible .frame { outline: 2px solid var(--brass); outline-offset: 3px; }
 
-/* Arrivée en cascade */
-.grid > * { animation: cardIn var(--dur-slow) var(--ease-out) backwards; }
-.grid > :nth-child(2) { animation-delay: 35ms; }
-.grid > :nth-child(3) { animation-delay: 70ms; }
-.grid > :nth-child(4) { animation-delay: 105ms; }
-.grid > :nth-child(5) { animation-delay: 140ms; }
-.grid > :nth-child(6) { animation-delay: 175ms; }
-.grid > :nth-child(7) { animation-delay: 210ms; }
-.grid > :nth-child(8) { animation-delay: 245ms; }
-.grid > :nth-child(n + 9) { animation-delay: 280ms; }
-@keyframes cardIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
-
 @media (prefers-reduced-motion: reduce) {
-  .grid > * { animation: none; }
   .frame, .photo, .glow { transition: none; }
-  .card:hover .frame, .card:hover .photo, .card:hover .glow { transform: none; }
+  .card:hover .frame, .card:hover .photo, .card:hover .glow, .card:active .frame { transform: none; }
 }
-/* Pas de flou d'arrière-plan : le voile reste lisible grâce à son dégradé plus dense */
+/* Sans flou d'arrière-plan : panneau plus dense pour rester lisible */
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .caption::before { background: linear-gradient(to top, rgba(18, 7, 9, 0.92) 0%, rgba(18, 7, 9, 0.72) 55%, rgba(18, 7, 9, 0) 100%); }
+  .caption, .badge, .price { background: rgba(20, 8, 10, 0.72); }
 }

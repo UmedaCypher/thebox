@@ -4,7 +4,7 @@
   overflow: hidden; isolation: isolate;
   background:
     radial-gradient(90% 120% at 100% 0%, color-mix(in srgb, var(--brass) 22%, transparent) 0%, transparent 60%),
-    radial-gradient(70% 90% at 0% 100%, color-mix(in srgb, var(--saphir) 10%, transparent) 0%, transparent 65%),
+    radial-gradient(70% 90% at 0% 100%, color-mix(in srgb, var(--ruby) 10%, transparent) 0%, transparent 65%),
     var(--glass-bg);
   border: 1px solid var(--glass-border);
   box-shadow: var(--glass-shadow);

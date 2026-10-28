@@ -62,7 +62,7 @@ export default function CostTeaser({ analysis, compact = false }: { analysis: Co
   if (!a.priciest && !a.dormant.length) {
     if (!a.rows.length) return null;
     return (
-      <aside className={s.card} data-compact={compact}>
+      <aside className={s.card} data-compact={compact} data-reveal>
         <p className={s.kicker}>{t.kicker}</p>
         <h2 className={s.title}>{t.emptyTitle}</h2>
         <p className={s.text}>
@@ -78,7 +78,7 @@ export default function CostTeaser({ analysis, compact = false }: { analysis: Co
   }
 
   return (
-    <aside className={s.card} data-compact={compact}>
+    <aside className={s.card} data-compact={compact} data-reveal>
       <p className={s.kicker}>{t.kickerFull}</p>
       {a.priciest && (
         <h2 className={s.title}>
