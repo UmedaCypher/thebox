@@ -36,7 +36,7 @@ const S = defineStrings({
     login: 'Se connecter',
     busy: 'Création…',
     submit: 'Créer mon compte',
-    legalBefore: 'En créant un compte, vous acceptez les ',
+    legalBefore: 'En créant un compte, vous confirmez avoir 18 ans ou plus et acceptez les ',
     terms: "conditions d'utilisation",
     legalMiddle: ' et la ',
     privacy: 'politique de confidentialité',
@@ -84,7 +84,7 @@ const S = defineStrings({
     login: 'Sign in',
     busy: 'Creating…',
     submit: 'Create my account',
-    legalBefore: 'By creating an account, you accept the ',
+    legalBefore: 'By creating an account, you confirm you are 18 or older and accept the ',
     terms: 'terms of use',
     legalMiddle: ' and the ',
     privacy: 'privacy policy',
@@ -130,7 +130,7 @@ export function LoginPage() {
   const t = useStrings(S);
   const navigate = useNavigate();
   const location = useLocation();
-  const from = (location.state as { from?: { pathname: string } } | null)?.from?.pathname ?? '/collection';
+  const from = (location.state as { from?: { pathname: string } } | null)?.from?.pathname ?? '/accueil';
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [busy, setBusy] = useState(false);
@@ -241,7 +241,7 @@ export function NewPasswordPage() {
     const { error: err } = await supabase.auth.updateUser({ password });
     setBusy(false);
     if (err) setError(err.message.includes('session') ? t.errors.linkExpired : err.message);
-    else navigate('/collection', { replace: true });
+    else navigate('/accueil', { replace: true });
   };
 
   return (

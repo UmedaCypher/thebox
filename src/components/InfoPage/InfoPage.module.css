@@ -66,3 +66,9 @@
 .tocMobile[open] summary::after { content: '−'; }
 .tocMobile .tocList { padding-bottom: var(--sp-3); }
 @media (min-width: 1000px) { .tocMobile { display: none; } }
+
+/* Tableaux des pages légales (finalités, durées de conservation…) */
+.body table { width: 100%; border-collapse: collapse; font-size: var(--fs-sm); margin: var(--sp-2) 0; display: block; overflow-x: auto; }
+.body th, .body td { text-align: left; vertical-align: top; padding: var(--sp-2) var(--sp-3); border-bottom: 1px solid var(--line); }
+.body th { color: var(--text); font-weight: 600; white-space: nowrap; }
+.body td { color: var(--text-2); }

@@ -1,6 +1,6 @@
 import { scrollToElement, scrollToTop, useMotion } from '../../lib/motion';
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
-import { CalendarDays, Images, MessageCircle, Newspaper, Sparkles, Store, Watch } from 'lucide-react';
+import { CalendarDays, Images, MessageCircle, Newspaper, Sparkles, Store, Watch, LayoutGrid } from 'lucide-react';
 import { useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { LinkButton } from '../ui';
@@ -27,6 +27,7 @@ const S = defineStrings({
 
 /* Navigation du membre sur ordinateur, avec les mêmes icônes que la barre mobile. Messages et profil sont à droite. */
 const APP_TABS = [
+  { to: '/accueil', key: 'home', icon: LayoutGrid },
   { to: '/collection', key: 'collection', icon: Watch },
   { to: '/portage', key: 'wear', icon: CalendarDays },
   { to: '/galerie', key: 'gallery', icon: Images },
@@ -35,11 +36,11 @@ const APP_TABS = [
 
 /* Sur mobile, tout reste dans la barre du bas, Messages compris. */
 const MOBILE_TABS = [
+  { to: '/accueil', key: 'home', icon: LayoutGrid },
   { to: '/collection', key: 'collection', icon: Watch },
   { to: '/portage', key: 'wear', icon: CalendarDays },
   { to: '/marche', key: 'market', icon: Store },
   { to: '/messages', key: 'messages', icon: MessageCircle },
-  { to: '/galerie', key: 'gallery', icon: Images },
 ] as const;
 
 const badgeText = (n: number) => (n > 99 ? '99+' : String(n));
@@ -53,7 +54,7 @@ function Header({ unread }: { unread: number }) {
   return (
     <header className={s.header}>
       <div className={s.headerInner}>
-        <Link to={user ? '/collection' : '/'} className={s.wordmark}>The Box</Link>
+        <Link to={user ? '/accueil' : '/'} className={s.wordmark}>The Box</Link>
 
         <div className={s.searchSlot}><GlobalSearch /></div>
 

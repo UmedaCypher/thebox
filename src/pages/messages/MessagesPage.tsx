@@ -15,6 +15,7 @@ import { listingPrice } from '../../lib/listing';
 import type { ConversationSummary, Message } from '../../types';
 import { Button, Cushion, EmptyState, IconButton, LinkButton, Notice, Sheet } from '../../components/ui';
 import { useToast } from '../../components/Toast/Toast';
+import PushPrompt from '../../components/Notifications/PushPrompt';
 import s from './MessagesPage.module.css';
 import { SkeletonList } from '../../components/Skeleton/Skeleton';
 
@@ -140,6 +141,7 @@ export default function MessagesPage() {
     <div className={s.page} data-thread={Boolean(conversationId)}>
       <aside className={s.listPane} aria-label={t.conversations}>
         <div className={s.listHead}><h1>{cm.tabs.messages}</h1></div>
+        {items.length > 0 && <div className={s.promptWrap}><PushPrompt /></div>}
         {list.loading && !list.data ? <div className={s.listEmpty}><SkeletonList rows={5} round /></div> : list.error ? <Notice tone="error">{list.error}</Notice> : !items.length ? (
           <div className={s.listEmpty}>
             <EmptyState title={t.noConversations} action={<LinkButton to="/marche" variant="secondary">{t.browseMarket}</LinkButton>}>

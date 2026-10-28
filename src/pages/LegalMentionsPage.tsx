@@ -1,84 +1,82 @@
-// client/src/pages/LegalMentionsPage.tsx
-import React from 'react';
-import InfoPage from '../components/InfoPage/InfoPage';
-import styles from './StaticPage.module.css';
 import { Link } from 'react-router-dom';
+import InfoPage from '../components/InfoPage/InfoPage';
+import Fill from '../components/InfoPage/Fill';
+import { LEGAL, contactEmail } from '../lib/legal';
 import { defineStrings, useStrings } from '../i18n';
 
 const S = defineStrings({
   kicker: 'Informations légales',
-  lead: 'Texte provisoire, en cours de finalisation avant le lancement.',
-  title: 'Mentions Légales',
+  title: 'Mentions légales',
+  lead: `Mises à jour le ${LEGAL.updatedAt}.`,
   notice: '',
 }, {
   kicker: 'Legal',
-  lead: 'Draft text, being finalised before launch.',
-  title: 'Legal Notice',
-  notice: 'This document is currently available in French only.',
+  title: 'Legal notice',
+  lead: `Last updated ${LEGAL.updatedAt}.`,
+  notice: 'This document is available in French only.',
 });
 
-const LegalMentionsPage: React.FC = () => {
+export default function LegalMentionsPage() {
   const t = useStrings(S);
+  const L = LEGAL;
   return (
     <InfoPage kicker={t.kicker} title={t.title} notice={t.notice || undefined} lead={t.lead} toc>
-        <section>
-          <p>Conformément aux dispositions des Articles 6-III et 19 de la Loi n°2004-575 du 21 juin 2004 pour la Confiance dans l’économie numérique, dite L.C.E.N., il est porté à la connaissance des utilisateurs et visiteurs de l'application THE BOX les présentes mentions légales.</p>
+      <p>
+        Conformément à l'article 6 de la loi n° 2004-575 du 21 juin 2004 pour la confiance dans l'économie numérique,
+        voici les informations relatives à l'éditeur et aux hébergeurs du site et des applications {L.appName}.
+      </p>
 
-          <h2>1. Éditeur de l'Application</h2>
-          <p>
-            <strong>Nom de la société :</strong> THE BOX / [Votre Nom si entreprise individuelle]<br />
-            <strong>Forme juridique :</strong> [Ex : SAS, SARL, Auto-entrepreneur, etc.]<br />
-            <strong>Capital social :</strong> [Montant du capital social] euros (si applicable)<br />
-            <strong>Adresse du siège social :</strong> [Votre adresse complète]<br />
-            <strong>Numéro de téléphone :</strong> [Votre numéro de téléphone professionnel]<br />
-            <strong>Adresse e-mail :</strong> [Votre adresse e-mail de contact, ex: contact@thebox.com]<br />
-            <strong>Numéro RCS :</strong> Immatriculée au RCS de [Ville d'immatriculation] sous le numéro [Votre numéro RCS] (si applicable)<br />
-            <strong>Numéro de TVA intracommunautaire :</strong> [Votre numéro de TVA] (si applicable)<br />
-            <strong>Directeur de la publication :</strong> [Nom et prénom du directeur de la publication / Votre nom]
-          </p>
+      <h2>Éditeur</h2>
+      <p>
+        <Fill v={L.companyName} label="dénomination sociale" />, {L.legalForm} au capital de <Fill v={L.capital} label="capital social" /><br />
+        Siège social : <Fill v={L.address} label="adresse de domiciliation" /><br />
+        Immatriculation : <Fill v={L.rcs} label="RCS et numéro SIREN" /><br />
+        {L.vatNumber && <>TVA intracommunautaire : {L.vatNumber}<br /></>}
+        Téléphone : <Fill v={L.phone} label="téléphone" /><br />
+        E-mail : <a href={`mailto:${L.email}`}>{L.email}</a>
+      </p>
+      <p>Directeur de la publication : <Fill v={L.director} label="président(e) de la société" />.</p>
 
-          <h2>2. Hébergement</h2>
-          <p>
-            L'Application est hébergée par :<br />
-            <strong>Nom de l'hébergeur :</strong> [Nom de votre hébergeur (ex: Supabase, Vercel, Netlify, AWS, OVH, etc.)]<br />
-            <strong>Adresse :</strong> [Adresse de l'hébergeur]<br />
-            <strong>Numéro de téléphone / Contact :</strong> [Numéro de téléphone de l'hébergeur ou lien vers leur support/contact]
-          </p>
+      <h2>Hébergement</h2>
+      <p>
+        <strong>Site et applications</strong> : Cloudflare, Inc., 101 Townsend Street, San Francisco, CA 94107, États-Unis
+        (<a href="https://www.cloudflare.com" target="_blank" rel="noreferrer">cloudflare.com</a>).
+      </p>
+      <p>
+        <strong>Comptes, données et photos</strong> : Supabase Pte. Ltd., 65 Chulia Street #38-02/03, OCBC Centre, Singapour 049513
+        (<a href="https://supabase.com" target="_blank" rel="noreferrer">supabase.com</a>). Les données sont stockées
+        dans la région <Fill v={L.dataRegion} label="région Supabase" />.
+      </p>
 
-          <h2>3. Accès à l'Application</h2>
-          <p>L'Application est accessible par tout endroit, 7j/7, 24h/24 sauf cas de force majeure, interruption programmée ou non et pouvant découler d’une nécessité de maintenance.</p>
-          <p>En cas de modification, interruption ou suspension des services, l'Éditeur ne saurait être tenu responsable.</p>
+      <h2>Signaler un contenu</h2>
+      <p>
+        {L.appName} héberge des contenus publiés par ses membres (annonces du Marché, photos, messages). Pour signaler
+        un contenu illicite, utilisez le bouton « Signaler » dans la messagerie ou écrivez à <a href={`mailto:${L.email}`}>{L.email}</a> en
+        précisant l'adresse du contenu, sa nature et la raison du signalement. Cette adresse est aussi le point de contact
+        unique des autorités et des utilisateurs au sens du règlement européen sur les services numériques (DSA) ;
+        les échanges peuvent avoir lieu en français ou en anglais.
+      </p>
 
-          <h2>4. Collecte des données</h2>
-          <p>
-            L'application assure à l'Utilisateur une collecte et un traitement d'informations personnelles dans le respect de la vie privée conformément à la loi n°78-17 du 6 janvier 1978 relative à l'informatique, aux fichiers et aux libertés.
-            Pour plus d'informations sur la manière dont nous collectons et utilisons vos données personnelles, veuillez consulter notre <Link to="/confidentialite" className={styles.inlineLink}>Politique de Confidentialité</Link>.
-          </p>
-          <p>
-            En vertu de la loi Informatique et Libertés, en date du 6 janvier 1978, l'Utilisateur dispose d'un droit d'accès, de rectification, de suppression et d'opposition de ses données personnelles. L'Utilisateur exerce ce droit :
-          </p>
-          <ul>
-            <li>par mail à l'adresse email [Votre adresse e-mail de contact pour la protection des données, ex: privacy@thebox.com]</li>
-            <li>via son espace personnel dans l'Application (si les fonctionnalités le permettent).</li>
-          </ul>
+      <h2>Propriété intellectuelle</h2>
+      <p>
+        La marque, le nom, le design, les textes et le code de {L.appName} sont protégés. Toute reproduction sans autorisation
+        est interdite. Les photos et textes publiés par les membres restent leur propriété (voir les <Link to="/cgu">CGU</Link>).
+        Les noms de marques horlogères sont cités à titre descriptif et appartiennent à leurs titulaires ;
+        {' '}{L.appName} n'est affilié à aucune d'entre elles.
+      </p>
 
+      <h2>Données personnelles</h2>
+      <p>
+        Le traitement des données est décrit dans la <Link to="/confidentialite">politique de confidentialité</Link>.
+        Contact : <a href={`mailto:${contactEmail()}`}>{contactEmail()}</a>.
+      </p>
 
-          <h2>5. Propriété Intellectuelle</h2>
-          <p>
-            Toute utilisation, reproduction, diffusion, commercialisation, modification de toute ou partie de l'Application THE BOX, sans autorisation de l’Éditeur est prohibée et pourra entraîner des actions et poursuites judiciaires telles que notamment prévues par le Code de la propriété intellectuelle et le Code civil.
-          </p>
-          <p>
-            Pour plus d'informations, se reporter aux <Link to="/cgu" className={styles.inlineLink}>CGU</Link> de l'application.
-          </p>
-           <p className={styles.legalDisclaimer}>
-            <em>
-              Ce document est un modèle et doit être adapté et complété par des conseils juridiques professionnels
-              pour correspondre aux spécificités de votre activité et aux réglementations en vigueur.
-            </em>
-          </p>
-        </section>
+      <h2>Médiation de la consommation</h2>
+      <p>
+        En cas de litige non résolu avec notre service client, vous pouvez saisir gratuitement le médiateur de la consommation :
+        {' '}<Fill v={L.mediatorName} label="nom du médiateur" />
+        {L.mediatorUrl && <> (<a href={L.mediatorUrl} target="_blank" rel="noreferrer">{L.mediatorUrl.replace(/^https?:\/\//, '')}</a>)</>}.
+      </p>
     </InfoPage>
   );
-};
-
-export default LegalMentionsPage;
+}

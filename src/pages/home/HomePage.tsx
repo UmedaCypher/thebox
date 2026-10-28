@@ -38,7 +38,7 @@ const S = defineStrings({
 export default function HomePage() {
   const t = useStrings(S);
   const { user, loading } = useAuth();
-  if (!loading && user) return <Navigate to="/collection" replace />;
+  if (!loading && user) return <Navigate to="/accueil" replace />;
 
   return (
     <div className={s.home}>

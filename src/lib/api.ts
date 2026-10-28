@@ -493,7 +493,7 @@ async function invokeForUrl(fn: 'create-checkout-session' | 'create-portal-sessi
 
 /** Envoie vers la page de paiement Stripe, au mois ou à l'année. */
 export async function startCheckout(interval: 'month' | 'year') {
-  window.location.assign(await invokeForUrl('create-checkout-session', { interval }));
+  window.location.assign(await invokeForUrl('create-checkout-session', { interval, lang: getLang() }));
 }
 
 /** Envoie vers l'espace client Stripe (carte, factures, résiliation). */

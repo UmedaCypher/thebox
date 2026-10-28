@@ -7,6 +7,7 @@ import { defineStrings, useStrings } from './i18n';
 
 import HomePage from './pages/home/HomePage';
 import CollectionPage from './pages/collection/CollectionPage';
+import DashboardPage from './pages/dashboard/DashboardPage';
 import WatchPage from './pages/watch/WatchPage';
 import WatchEditorPage from './pages/watch/WatchEditorPage';
 import WearPage from './pages/wear/WearPage';
@@ -96,6 +97,7 @@ export default function App() {
             <Route path="/mentions-legales" element={<LegalMentionsPage />} />
 
             {/* Membre */}
+            <Route path="/accueil" element={P(<DashboardPage />)} />
             <Route path="/collection" element={P(<CollectionPage />)} />
             <Route path="/ajouter-montre" element={P(<WatchEditorPage />)} />
             <Route path="/montre/:watchId" element={P(<WatchPage />)} />

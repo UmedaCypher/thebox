@@ -22,3 +22,8 @@ verify_jwt = true
 [functions.stripe-webhook]
 enabled = true
 verify_jwt = false
+
+# Appelée par la base de données (pg_net), pas par l'app : la sécurité repose sur l'en-tête x-push-secret.
+[functions.send-push]
+enabled = true
+verify_jwt = false

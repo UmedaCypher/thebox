@@ -8,6 +8,10 @@
 //   STRIPE_PRICE_MONTHLY  identifiant du prix mensuel (price_…, 2 €/mois)
 //   STRIPE_PRICE_YEARLY   identifiant du prix annuel (price_…, 20 €/an)
 //   SITE_URL           adresse publique de l'app, sans / final (ex. https://thebox.app)
+// Facultatifs :
+//   STRIPE_TAX_RATE      taux de TVA Stripe (txr_…, « TVA 20 % incluse ») ajouté à l'abonnement et aux factures
+//   STRIPE_TERMS_CONSENT « on » pour faire cocher les CGV sur la page de paiement
+//                        (renseigner d'abord l'adresse des CGV dans Stripe → Paramètres → Informations publiques)
 // SUPABASE_URL, SUPABASE_ANON_KEY et SUPABASE_SERVICE_ROLE_KEY sont fournis automatiquement.
 
 import Stripe from 'npm:stripe@17.7.0';
@@ -75,15 +79,31 @@ Deno.serve(async (req) => {
       if (error) throw error;
     }
 
+    const taxRate = Deno.env.get('STRIPE_TAX_RATE');
+    const termsConsent = Deno.env.get('STRIPE_TERMS_CONSENT') === 'on';
+    const en = body?.lang === 'en';
     const session = await stripe.checkout.sessions.create({
       mode: 'subscription',
       customer: customerId,
       client_reference_id: user.id,
-      line_items: [{ price: priceId, quantity: 1 }],
-      subscription_data: { metadata: { supabase_user_id: user.id } },
+      line_items: [{ price: priceId, quantity: 1, ...(taxRate ? { tax_rates: [taxRate] } : {}) }],
+      subscription_data: {
+        metadata: { supabase_user_id: user.id },
+        ...(taxRate ? { default_tax_rates: [taxRate] } : {}),
+      },
       metadata: { supabase_user_id: user.id },
       allow_promotion_codes: true,
-      locale: 'fr',
+      locale: en ? 'en' : 'fr',
+      ...(termsConsent ? {
+        consent_collection: { terms_of_service: 'required' as const },
+        custom_text: {
+          terms_of_service_acceptance: {
+            message: en
+              ? `I accept the [terms of sale](${siteUrl}/cgv) and ask for Premium to start right away. I keep my 14-day right of withdrawal, with a pro-rata refund.`
+              : `J'accepte les [conditions générales de vente](${siteUrl}/cgv) et demande l'accès immédiat à Premium. Je garde mon droit de rétractation de 14 jours, avec un remboursement au prorata.`,
+          },
+        },
+      } : {}),
       success_url: `${siteUrl}/premium?paiement=ok`,
       cancel_url: `${siteUrl}/premium?paiement=annule`,
     });

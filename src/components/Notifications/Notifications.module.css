@@ -1,0 +1,13 @@
+.settings { display: flex; flex-direction: column; gap: var(--sp-4); }
+.lead { color: var(--text-2); }
+.prefs { display: flex; flex-direction: column; gap: var(--sp-4); padding-top: var(--sp-2); border-top: 1px solid var(--line); }
+.hour { max-width: 220px; margin-top: calc(var(--sp-2) * -1); }
+
+/* Invitation contextuelle (page Messages) */
+.prompt:global(.panel) { flex-direction: row; flex-wrap: wrap; align-items: flex-start; gap: var(--sp-2) var(--sp-3); padding: var(--sp-4); margin: 0 0 var(--sp-4); }
+.promptIcon { flex: none; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; color: var(--ruby); background: color-mix(in srgb, var(--ruby) 16%, transparent); }
+.promptText { flex: 1 1 calc(100% - 60px); min-width: 0; font-size: var(--fs-sm); color: var(--text-2); }
+.promptText strong { display: block; color: var(--text); font-weight: 600; }
+.promptActions { display: flex; align-items: center; gap: var(--sp-1); flex: 1 0 100%; padding-left: 48px; }
+.close { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; color: var(--text-3); }
+.close:hover { color: var(--text); background: var(--line); }
