@@ -109,20 +109,21 @@ function GalleryView() {
           {filtered ? t.noResultsText : t.emptyText}
         </EmptyState>
       ) : (
-        <ul className={`${s.masonry} reveal`}>
-          {shots.data.map(p => (
-            <li key={p.id} className={s.item}>
-              <Cushion src={p.thumb} fallbackSrc={p.url} alt={t.onWrist(`${p.brand} ${p.model}`)} ratio="portrait" />
-              <div className={s.caption}>
-                <span className={s.capModel}>{p.brand} {p.model}</span>
-                <span className={s.capMeta}>
-                  {p.username ? <Link to={`/profil/${p.username}`}>@{p.username}</Link> : t.member}
-                  {p.wrist_size_cm && <span className="num">{formatDecimal(p.wrist_size_cm)} cm</span>}
-                </span>
-              </div>
+        <div className={s.wall}><ul className={s.masonry}>
+          {shots.data.map((p, i) => (
+            <li key={p.id} className={s.item} data-reveal data-parallax>
+              <Cushion src={i % 9 === 0 || i % 9 === 5 ? p.url : p.thumb} fallbackSrc={i % 9 === 0 || i % 9 === 5 ? p.thumb : p.url} alt={t.onWrist(`${p.brand} ${p.model}`)} ratio="portrait" className={s.shot}>
+                {p.wrist_size_cm && <span className={`${s.wrist} num`}>{formatDecimal(p.wrist_size_cm)} cm</span>}
+                <div className={s.caption}>
+                  <span className={s.capModel}>{p.brand} {p.model}</span>
+                  <span className={s.capMeta}>
+                    {p.username ? <Link to={`/profil/${p.username}`}>@{p.username}</Link> : t.member}
+                  </span>
+                </div>
+              </Cushion>
             </li>
           ))}
-        </ul>
+        </ul></div>
       )}
     </div>
   );

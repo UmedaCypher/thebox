@@ -175,9 +175,14 @@ export default function WearPage() {
             return (
               <li key={w.id}>
                 <button className={s.pick} aria-pressed={on} onClick={() => toggle(w.id, today)}>
-                  <Cushion src={thumbFor(w).src} fallbackSrc={thumbFor(w).fallback} alt="">{on && <span className={s.check}><Check size={18} strokeWidth={2.4} /></span>}</Cushion>
-                  <span className={s.pickName}>{w.model}</span>
-                  <span className={s.pickBrand}>{w.brand}</span>
+                  <Cushion src={thumbFor(w).src} fallbackSrc={thumbFor(w).fallback} alt="" ratio="portrait" className={s.pickFrame}>
+                    {on && <span className={s.check}><Check size={16} strokeWidth={2.6} /></span>}
+                    <span className={s.pickVeil} aria-hidden="true" />
+                    <span className={s.pickText}>
+                      <span className={s.pickBrand}>{w.brand}</span>
+                      <span className={s.pickName}>{w.model}</span>
+                    </span>
+                  </Cushion>
                 </button>
               </li>
             );
@@ -185,7 +190,7 @@ export default function WearPage() {
         </ul>
       </section>
 
-      <section className={s.month} aria-labelledby="month-title">
+      <section className={s.month} aria-labelledby="month-title" data-reveal>
         <div className={s.monthHead}>
           <IconButton label={t.prevMonth} onClick={() => setCursor(new Date(year, month - 1, 1))}><ChevronLeft size={20} strokeWidth={1.6} /></IconButton>
           <h2 id="month-title" className={s.monthTitle}>{monthTitle}</h2>
@@ -222,7 +227,7 @@ export default function WearPage() {
           })}
         </div>
 
-        <div className={s.monthFoot}>
+        <div className={`panel ${s.monthFoot}`} data-tone="lume">
           <div className={s.monthStats}>
             <Stat value={<span className="num">{monthStats.daysWorn}</span>} label={t.daysLogged(monthStats.daysWorn)} />
             <Stat value={<span className="num">{monthStats.distinct}</span>} label={t.watchesWorn(monthStats.distinct)} />

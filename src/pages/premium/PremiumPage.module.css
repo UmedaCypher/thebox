@@ -1,13 +1,12 @@
 .plans { display: grid; gap: var(--sp-4); margin-bottom: var(--sp-7); }
-@media (min-width: 800px) { .plans { grid-template-columns: 1fr 1fr; gap: var(--sp-5); } }
-.plan { padding: var(--sp-6) var(--sp-5); border-radius: var(--r-cushion); border: 1px solid var(--line); display: flex; flex-direction: column; gap: var(--sp-3); }
-.premium { background: var(--surface); border: 1px dashed var(--seam); }
+@media (min-width: 800px) { .plans { grid-template-columns: 1fr 1fr; gap: var(--sp-5); align-items: start; } }
+.plan { gap: var(--sp-3); }
 .price { font-family: var(--font-display); font-size: var(--fs-3xl); line-height: 1; }
 .price span { display: block; font-family: var(--font-body); font-size: var(--fs-sm); color: var(--text-2); margin-top: var(--sp-2); }
 .includes { color: var(--text-2); font-size: var(--fs-sm); }
-.plan ul { list-style: none; display: flex; flex-direction: column; gap: var(--sp-3); margin-top: var(--sp-2); }
-.plan li { padding-left: var(--sp-4); border-left: 1px solid var(--seam); color: var(--text-2); }
-.plan li strong { display: block; color: var(--text); font-weight: 600; }
+.plan ul:not(:global(.chips)) { list-style: none; display: flex; flex-direction: column; gap: var(--sp-3); margin-top: var(--sp-2); }
+.plan ul:not(:global(.chips)) li { padding-left: var(--sp-4); border-left: 1px solid var(--seam); color: var(--text-2); }
+.plan ul:not(:global(.chips)) li strong { display: block; color: var(--text); font-weight: 600; }
 
 
 .muted { color: var(--text-2); margin-top: var(--sp-2); }
@@ -23,10 +22,10 @@
 .plan ol.highlights { list-style: none; display: flex; flex-direction: column; gap: var(--sp-2); margin: var(--sp-1) 0 var(--sp-3); }
 .plan ol.highlights li {
   display: flex; gap: var(--sp-3); align-items: flex-start; padding: var(--sp-3) var(--sp-4);
-  border: 1px solid var(--seam); border-left: 1px solid var(--seam); border-radius: var(--r-control);
-  background: color-mix(in srgb, var(--brass) 8%, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--brass) 30%, transparent); border-radius: var(--r-md);
+  background: color-mix(in srgb, var(--brass) 9%, transparent);
 }
-.plan ol.highlights li strong { color: var(--text); }
+.plan ol.highlights li strong { display: block; color: var(--text); font-weight: 600; }
 .hlIcon {
   flex: none; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center;
   background: color-mix(in srgb, var(--brass) 18%, transparent); color: var(--brass);

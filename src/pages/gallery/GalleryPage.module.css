@@ -1,7 +1,10 @@
 .filters {
   display: grid; gap: var(--sp-3); grid-template-columns: repeat(2, minmax(0, 1fr));
-  padding-bottom: var(--sp-5); margin-bottom: var(--sp-6); border-bottom: 1px solid var(--line);
+  padding: var(--sp-4); margin-bottom: var(--sp-6); border-radius: var(--r-xl);
+  background: var(--glass-bg); border: 1px solid var(--glass-border); box-shadow: var(--glass-shadow);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.4); backdrop-filter: blur(var(--glass-blur)) saturate(1.4);
 }
+@media (min-width: 860px) { .filters { padding: var(--sp-5); } }
 .filters > :first-child { grid-column: 1 / -1; }
 .filterActions { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: var(--sp-2); }
 @media (min-width: 860px) {
@@ -10,11 +13,44 @@
   .filterActions { grid-column: auto; }
 }
 
-.masonry { list-style: none; columns: 2 160px; column-gap: var(--sp-4); }
-@media (min-width: 900px) { .masonry { columns: 4 200px; column-gap: var(--sp-5); } }
-.item { break-inside: avoid; margin-bottom: var(--sp-5); display: flex; flex-direction: column; gap: var(--sp-2); }
-.caption { display: flex; flex-direction: column; gap: 1px; padding: 0 2px; }
-.capModel { font-family: var(--font-display); font-size: var(--fs-md); line-height: 1.25; }
-.capMeta { display: flex; justify-content: space-between; gap: var(--sp-2); font-size: var(--fs-xs); color: var(--text-3); }
-.capMeta a { color: var(--text-2); text-decoration: none; }
-.capMeta a:hover { color: var(--brass); }
+/* Mur de photos aligné en rangées, avec des formats qui varient : une grande (2 × 2), une large (2 × 1), puis des portraits */
+.wall { container-type: inline-size; }
+.masonry {
+  --cols: 2; --gap: 12px;
+  list-style: none; display: grid; gap: var(--gap); grid-auto-flow: row dense;
+  grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+  grid-auto-rows: calc((100cqi - (var(--cols) - 1) * var(--gap)) / var(--cols) * 1.25);
+}
+@media (min-width: 640px) { .masonry { --cols: 3; --gap: 16px; } }
+@media (min-width: 1000px) { .masonry { --cols: 4; --gap: 20px; } }
+.item { min-width: 0; }
+.item:nth-child(9n + 1) { grid-column: span 2; grid-row: span 2; }
+.item:nth-child(9n + 6) { grid-column: span 2; }
+@supports not (width: 1cqi) { .masonry { grid-auto-rows: auto; } .shot { aspect-ratio: 4 / 5; } }
+
+.shot { border-radius: var(--r-xl); height: 100%; aspect-ratio: auto !important; }
+.shot img { transition: transform 700ms var(--ease-out); }
+@media (hover: hover) { .item:hover .shot img { transform: scale(1.04); } }
+:global(.parallax) .shot img { transform: translate3d(0, calc(var(--p, 0) * -5%), 0) scale(1.12); transition: none; }
+
+.caption {
+  position: absolute; z-index: 3; left: 8px; right: 8px; bottom: 8px;
+  display: flex; flex-direction: column; gap: 1px; padding: 8px 12px 9px; border-radius: calc(var(--r-xl) - 8px);
+  color: #fbf6ee; min-width: 0;
+  background: rgba(20, 8, 10, 0.3); border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14);
+  -webkit-backdrop-filter: blur(18px) saturate(1.5) brightness(0.8); backdrop-filter: blur(18px) saturate(1.5) brightness(0.8);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+}
+.capModel { font-family: var(--font-display); font-size: var(--fs-md); line-height: 1.2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.capMeta { font-size: var(--fs-xs); color: rgba(251, 246, 238, 0.86); }
+.capMeta a { color: inherit; text-decoration: none; position: relative; }
+.capMeta a::after { content: ''; position: absolute; inset: -10px -6px; }
+.capMeta a:hover { color: #fff; text-decoration: underline; }
+/* Tour de poignet : l'information clé de la galerie, en pastille de verre */
+.wrist {
+  position: absolute; z-index: 3; top: 10px; right: 10px; padding: 3px 10px; border-radius: var(--r-pill);
+  font-size: var(--fs-xs); font-weight: 700; color: #fff; white-space: nowrap;
+  background: rgba(20, 8, 10, 0.32); border: 1px solid rgba(255, 255, 255, 0.2);
+  -webkit-backdrop-filter: blur(14px) saturate(1.5) brightness(0.85); backdrop-filter: blur(14px) saturate(1.5) brightness(0.85);
+}

@@ -1,4 +1,4 @@
 .form { display: flex; flex-direction: column; gap: var(--sp-4); max-width: 440px; }
 .form button[type='submit'] { align-self: flex-start; }
-.done { display: flex; flex-direction: column; gap: var(--sp-1); padding: var(--sp-4); border: 1px dashed var(--seam); border-radius: var(--r-control); max-width: 440px; }
+.done { gap: var(--sp-1); max-width: 440px; }
 .done span { color: var(--text-2); font-size: var(--fs-sm); }

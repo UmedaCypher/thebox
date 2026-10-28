@@ -46,8 +46,27 @@
   --r-xs: 6px; --r-sm: 10px; --r-md: 14px; --r-lg: 18px; --r-xl: 22px; --r-pill: 999px;
   /* Élévations : posé, flottant, en avant-plan */
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.22), 0 2px 8px -4px rgba(0, 0, 0, 0.3);
-  --shadow-md: var(--shadow-md);
-  --shadow-lg: var(--shadow-lg);
+  --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.2), 0 12px 28px -12px rgba(0, 0, 0, 0.55);
+  --shadow-lg: 0 4px 10px rgba(0, 0, 0, 0.22), 0 28px 56px -20px rgba(0, 0, 0, 0.7);
+
+  /* Accents horlogers : chacun a un rôle
+     laiton = actions et Premium · lume = aujourd'hui, porté · rubis = Marché, prix, messages */
+  --lume: #c9e7a7;
+  --lume-ink: #16210c;
+  --ruby: #ee6f86;
+  --ruby-ink: #2a0910;
+
+  /* Verre dépoli */
+  --glass-bg: rgba(42, 20, 24, 0.52);
+  --glass-bg-strong: rgba(31, 14, 17, 0.72);
+  --glass-border: rgba(239, 232, 220, 0.14);
+  --glass-hi: rgba(255, 245, 230, 0.10);     /* reflet en haut des panneaux */
+  --glass-blur: 18px;
+  --glass-shadow: 0 1px 0 0 var(--glass-hi) inset, 0 18px 40px -22px rgba(0, 0, 0, 0.75);
+  /* Lumière d'écrin derrière le verre */
+  --aura-1: rgba(194, 160, 114, 0.16);
+  --aura-2: rgba(238, 111, 134, 0.10);
+  --aura-3: rgba(140, 40, 60, 0.32);
   /* Durées : rapide (survol), standard (états), lente (apparitions) */
   --dur-fast: 150ms; --dur: 220ms; --dur-slow: 380ms;
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
@@ -117,6 +136,21 @@
   --danger: #9d3e32;
   --ok: #4f7042;
   --overlay: rgba(42, 20, 24, 0.45);
+  --shadow-sm: 0 1px 2px rgba(60, 30, 20, 0.08), 0 2px 8px -4px rgba(60, 30, 20, 0.12);
+  --shadow-md: 0 2px 4px rgba(60, 30, 20, 0.06), 0 12px 28px -12px rgba(60, 30, 20, 0.28);
+  --shadow-lg: 0 4px 10px rgba(60, 30, 20, 0.08), 0 28px 56px -20px rgba(60, 30, 20, 0.38);
+  --lume: #3f6b1f;
+  --lume-ink: #f4f9ee;
+  --ruby: #a3304a;
+  --ruby-ink: #fbf1f3;
+  --glass-bg: rgba(250, 246, 239, 0.58);
+  --glass-bg-strong: rgba(250, 246, 239, 0.8);
+  --glass-border: rgba(255, 255, 255, 0.6);
+  --glass-hi: rgba(255, 255, 255, 0.75);
+  --glass-shadow: 0 1px 0 0 var(--glass-hi) inset, 0 18px 40px -24px rgba(60, 30, 20, 0.35);
+  --aura-1: rgba(194, 160, 114, 0.28);
+  --aura-2: rgba(214, 110, 130, 0.18);
+  --aura-3: rgba(214, 170, 160, 0.35);
   color-scheme: light;
 }
 
@@ -143,7 +177,29 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 
-#root { min-height: 100vh; display: flex; flex-direction: column; }
+#root { min-height: 100vh; display: flex; flex-direction: column; position: relative; isolation: isolate; }
+
+/* Lumière d'écrin : trois halos fixes derrière tout le contenu, pour que le verre dépoli ait de la matière à flouter. */
+body::before {
+  content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(42vmax 34vmax at 8% -6%, var(--aura-1), transparent 70%),
+    radial-gradient(38vmax 30vmax at 104% 18%, var(--aura-2), transparent 70%),
+    radial-gradient(60vmax 40vmax at 50% 110%, var(--aura-3), transparent 72%);
+}
+body { isolation: isolate; }
+
+/* Panneau de verre dépoli réutilisable */
+.glass {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.4);
+  backdrop-filter: blur(var(--glass-blur)) saturate(1.4);
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass { background: var(--glass-bg-strong); }
+}
 
 h1, h2, h3 {
   font-family: var(--font-display);
@@ -219,3 +275,63 @@ button { cursor: pointer; background: none; border: 0; }
 .reveal > :nth-child(n + 6) { animation-delay: 200ms; }
 @keyframes revealIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) { .reveal > * { animation: none; } }
+
+/* Défilement avec inertie (ordinateur) */
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-smooth [data-lenis-prevent], .lenis.lenis-smooth [data-scroll-own] { overscroll-behavior: contain; }
+.lenis.lenis-stopped { overflow: hidden; }
+
+/* Apparition au défilement : seulement quand le script de mouvement est actif */
+.motion [data-reveal] {
+  opacity: 0; transform: translateY(28px) scale(0.985);
+  transition: opacity 700ms var(--ease-out), transform 900ms var(--ease-out);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+.motion [data-reveal][data-in] { opacity: 1; transform: none; }
+
+/* Chaque rubrique a sa propre lumière d'écrin : la couleur du halo principal suit la rubrique, en fondu. */
+@property --aura-1 { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --aura-3 { syntax: '<color>'; inherits: true; initial-value: transparent; }
+:root { transition: --aura-1 1.2s var(--ease), --aura-3 1.2s var(--ease); }
+:root[data-section='portage'] { --aura-1: rgba(201, 231, 167, 0.13); }
+:root[data-section='marche'], :root[data-section='messages'] { --aura-1: rgba(238, 111, 134, 0.16); --aura-3: rgba(150, 36, 62, 0.36); }
+:root[data-section='galerie'] { --aura-1: rgba(238, 160, 134, 0.15); }
+:root[data-theme='soie'][data-section='portage'] { --aura-1: rgba(120, 170, 80, 0.2); }
+:root[data-theme='soie'][data-section='marche'], :root[data-theme='soie'][data-section='messages'] { --aura-1: rgba(214, 110, 130, 0.24); }
+
+/* ---------- Encadré « écrin de verre » (réutilisable) ----------
+   Un panneau de verre dépoli éclairé d'un halo de couleur dans un coin.
+   data-tone donne son rôle : lume = gratuit, aujourd'hui, réussi · laiton = Premium, valeur · rubis = Marché, échanges, contact. */
+.panel {
+  --tone: var(--brass); --tone-2: transparent;
+  position: relative; isolation: isolate; overflow: hidden;
+  display: flex; flex-direction: column; gap: var(--sp-4);
+  padding: var(--sp-5); border-radius: var(--r-cushion);
+  background:
+    radial-gradient(85% 100% at var(--halo-x, 0%) 0%, color-mix(in srgb, var(--tone) 24%, transparent), transparent 72%),
+    radial-gradient(60% 80% at 100% 100%, color-mix(in srgb, var(--tone-2) 14%, transparent), transparent 70%),
+    var(--glass-bg);
+  border: 1px solid color-mix(in srgb, var(--tone) 34%, var(--glass-border));
+  box-shadow: var(--glass-shadow);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.4); backdrop-filter: blur(var(--glass-blur)) saturate(1.4);
+}
+@media (min-width: 640px) { .panel { padding: var(--sp-6); } }
+.panel[data-tone='lume'] { --tone: var(--lume); }
+.panel[data-tone='brass'] { --tone: var(--brass); --tone-2: var(--ruby); --halo-x: 100%; border-color: var(--glass-border); }
+.panel[data-tone='ruby'] { --tone: var(--ruby); }
+.panel[data-tone='plain'] { --tone: transparent; border-color: var(--glass-border); }
+.panel-kicker { font-size: var(--fs-sm); font-weight: 600; color: var(--tone); }
+.panel > :is(a, button):last-child { align-self: flex-start; }
+
+/* Pastilles à puce lumineuse, dans la couleur de l'encadré */
+.chips { list-style: none; display: flex; flex-wrap: wrap; gap: 8px; --tone: var(--brass); }
+.chips li {
+  display: inline-flex; align-items: center; gap: 7px; padding: 6px 12px 6px 10px; border-radius: 16px; line-height: 1.35;
+  font-size: var(--fs-sm); font-weight: 600; color: var(--text);
+  background: color-mix(in srgb, var(--tone) 12%, transparent); border: 1px solid color-mix(in srgb, var(--tone) 32%, transparent);
+}
+.chips li::before { content: ''; flex: none; width: 6px; height: 6px; border-radius: 50%; background: var(--tone); box-shadow: 0 0 8px var(--tone); }
+.chips[data-tone='lume'] { --tone: var(--lume); }
+.chips[data-tone='ruby'] { --tone: var(--ruby); }
+.panel .chips:not([data-tone]) { --tone: inherit; }

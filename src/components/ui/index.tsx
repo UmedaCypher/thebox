@@ -1,3 +1,4 @@
+import { lockScroll } from '../../lib/motion';
 import { useEffect, useId, useRef } from 'react';
 import type { ButtonHTMLAttributes, InputHTMLAttributes, ReactNode, SelectHTMLAttributes, TextareaHTMLAttributes } from 'react';
 import { Link } from 'react-router-dom';
@@ -16,11 +17,11 @@ const btnClass = ({ variant = 'primary', size = 'md', block }: BtnStyle, extra?:
   cx(s.btn, s[variant], size === 'small' && s.small, block && s.block, extra);
 
 export function Button({ variant, size, block, className, ...rest }: ButtonHTMLAttributes<HTMLButtonElement> & BtnStyle) {
-  return <button type="button" className={btnClass({ variant, size, block }, className)} {...rest} />;
+  return <button type="button" className={btnClass({ variant, size, block }, className)} data-liquid {...rest} />;
 }
 
 export function LinkButton({ variant, size, block, className, ...rest }: LinkProps & BtnStyle) {
-  return <Link className={btnClass({ variant, size, block }, className)} {...rest} />;
+  return <Link className={btnClass({ variant, size, block }, className)} data-liquid {...rest} />;
 }
 
 export function IconButton({ label, className, ...rest }: ButtonHTMLAttributes<HTMLButtonElement> & { label: string }) {
@@ -121,10 +122,12 @@ export function Sheet({ open, onClose, title, children }: { open: boolean; onClo
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
     document.addEventListener('keydown', onKey);
     document.body.style.overflow = 'hidden';
+    lockScroll(true);
     ref.current?.focus();
     return () => {
       document.removeEventListener('keydown', onKey);
       document.body.style.overflow = '';
+      lockScroll(false);
       prev?.focus?.();
     };
   }, [open, onClose]);
@@ -203,6 +206,16 @@ export function Img({ src, fallback, alt, className }: { src: string; fallback?:
         if (fallback && img.dataset.fallback !== '1') { img.dataset.fallback = '1'; img.src = fallback; }
       }}
     />
+  );
+}
+
+/** Lueur d'ambiance : la photo diffuse sa propre couleur autour de ce qu'elle entoure. */
+export function Glow({ src, children, className }: { src?: string | null; children: ReactNode; className?: string }) {
+  return (
+    <div className={cx(s.glowWrap, className)}>
+      {src && <img className={s.glowImg} src={src} alt="" aria-hidden="true" decoding="async" />}
+      {children}
+    </div>
   );
 }
 

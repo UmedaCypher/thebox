@@ -3,23 +3,43 @@
 /* Choix du jour : un rang de coussins à faire défiler */
 .today { margin-bottom: var(--sp-7); }
 .picker {
-  list-style: none; display: grid; grid-auto-flow: column; grid-auto-columns: 112px; gap: var(--sp-4);
-  overflow-x: auto; scroll-snap-type: x mandatory; padding: 4px 4px var(--sp-2); margin: 0 -4px;
+  list-style: none; display: grid; grid-auto-flow: column; grid-auto-columns: 136px; gap: var(--sp-3);
+  overflow-x: auto; scroll-snap-type: x mandatory; padding: 8px 8px var(--sp-4); margin: 0 -8px;
   scrollbar-width: thin;
 }
+@media (min-width: 640px) { .picker { grid-auto-columns: 156px; gap: var(--sp-4); } }
 .picker li { scroll-snap-align: start; }
-.pick { display: flex; flex-direction: column; gap: 2px; width: 100%; text-align: left; border-radius: var(--r-cushion); }
-.pick > div { margin-bottom: var(--sp-2); transition: box-shadow var(--dur-fast) var(--ease); }
-.pick[aria-pressed='true'] > div { box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--brass); }
-.pickName { font-family: var(--font-display); font-size: var(--fs-md); line-height: 1.2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.pickBrand { font-size: var(--fs-xs); color: var(--text-3); }
-.check {
-  position: absolute; z-index: 3; right: 8px; bottom: 8px; width: 30px; height: 30px; border-radius: 50%;
-  display: grid; place-items: center; background: var(--brass); color: var(--brass-ink);
+/* Chaque montre en plein cadre, son nom sur un voile de verre */
+.pick { display: block; width: 100%; text-align: left; border-radius: var(--r-xl); }
+.pickFrame { border-radius: var(--r-xl); transition: box-shadow var(--dur) var(--ease), transform var(--dur-fast) var(--ease); }
+.pick[aria-pressed='true'] .pickFrame {
+  box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--lume), 0 10px 30px -8px color-mix(in srgb, var(--lume) 55%, transparent);
 }
+.pickVeil { display: none; }
+.pickText {
+  position: absolute; z-index: 2; left: 6px; right: 6px; bottom: 6px; padding: 7px 10px 8px; border-radius: calc(var(--r-xl) - 6px);
+  display: flex; flex-direction: column; color: #fbf6ee; min-width: 0;
+  background: rgba(20, 8, 10, 0.3); border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14);
+  -webkit-backdrop-filter: blur(18px) saturate(1.5) brightness(0.8); backdrop-filter: blur(18px) saturate(1.5) brightness(0.8);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+}
+.pickName { font-family: var(--font-display); font-size: var(--fs-md); line-height: 1.15; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pickBrand { font-size: var(--fs-xs); font-weight: 600; color: rgba(251, 246, 238, 0.86); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.check {
+  position: absolute; z-index: 3; right: 8px; top: 8px; width: 28px; height: 28px; border-radius: 50%;
+  display: grid; place-items: center; background: var(--lume); color: var(--lume-ink);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--lume) 28%, transparent), 0 0 18px color-mix(in srgb, var(--lume) 60%, transparent);
+}
+:root[data-theme='soie'] .check { background: #c9e7a7; color: #16210c; }
 
 /* Mois */
-.month { max-width: 640px; }
+.month {
+  max-width: 640px; padding: var(--sp-4); border-radius: var(--r-xl);
+  background: var(--glass-bg); border: 1px solid var(--glass-border); box-shadow: var(--glass-shadow);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.4); backdrop-filter: blur(var(--glass-blur)) saturate(1.4);
+}
+@media (min-width: 640px) { .month { padding: var(--sp-5); } }
 .monthHead { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--sp-3); }
 .monthTitle { font-size: var(--fs-xl); }
 .calendar { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
@@ -31,8 +51,24 @@
 }
 .day:hover:not(:disabled) { border-color: var(--brass); }
 .day:disabled { opacity: 0.3; cursor: default; }
-.day[data-today='true'] { border-color: var(--brass); color: var(--text); }
-.day[data-worn='true'] { border-color: var(--brass); background: var(--cushion); }
+/* Aujourd'hui : un cadran de lume qui luit doucement, halo large et diffus */
+.day[data-today='true'] {
+  z-index: 1; border-color: color-mix(in srgb, var(--lume) 70%, transparent); color: var(--lume-ink); font-weight: 700;
+  background: radial-gradient(circle at 50% 40%, color-mix(in srgb, var(--lume) 100%, #fff 20%) 0%, var(--lume) 55%, color-mix(in srgb, var(--lume) 80%, #000 10%) 100%);
+  box-shadow:
+    0 0 14px 2px color-mix(in srgb, var(--lume) 45%, transparent),
+    0 0 42px 10px color-mix(in srgb, var(--lume) 22%, transparent),
+    0 0 90px 24px color-mix(in srgb, var(--lume) 10%, transparent);
+  animation: lumeGlow 3.6s var(--ease) infinite alternate;
+}
+.day[data-today='true'][data-worn='true'] { background: var(--lume); }
+.day[data-today='true'] .dayPhoto { inset: 3px; }
+@keyframes lumeGlow {
+  from { box-shadow: 0 0 12px 1px color-mix(in srgb, var(--lume) 40%, transparent), 0 0 36px 8px color-mix(in srgb, var(--lume) 18%, transparent), 0 0 80px 20px color-mix(in srgb, var(--lume) 8%, transparent); }
+  to { box-shadow: 0 0 18px 3px color-mix(in srgb, var(--lume) 52%, transparent), 0 0 52px 14px color-mix(in srgb, var(--lume) 26%, transparent), 0 0 110px 30px color-mix(in srgb, var(--lume) 12%, transparent); }
+}
+:root[data-theme='soie'] .day[data-today='true'] { --lume: #9fd27a; color: #16210c; }
+.day[data-worn='true'] { border-color: var(--seam); background: var(--cushion); }
 .dayNum { font-size: var(--fs-sm); font-variant-numeric: tabular-nums; }
 .dayPhoto { position: absolute; inset: 2px; border-radius: 50%; overflow: hidden; display: grid; place-items: center; color: var(--text); font-size: var(--fs-sm); }
 .dayPhoto img { width: 100%; height: 100%; object-fit: cover; }
@@ -41,7 +77,7 @@
   background: var(--brass); color: var(--brass-ink); font-size: var(--fs-xs); font-weight: 700; display: grid; place-items: center;
 }
 
-.monthFoot { margin-top: var(--sp-5); display: flex; flex-direction: column; gap: var(--sp-5); }
+.monthFoot { margin-top: var(--sp-5); gap: var(--sp-5); }
 .monthStats { display: flex; flex-wrap: wrap; gap: var(--sp-4) var(--sp-7); }
 .monthActions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-4); }
 .statsLink { color: var(--brass); font-size: var(--fs-sm); font-weight: 600; }
@@ -54,21 +90,22 @@
 .dayRowText strong { font-weight: 600; }
 .dayRowText span { color: var(--text-3); font-size: var(--fs-sm); }
 .dayRowCheck { width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--line-strong); display: grid; place-items: center; flex: none; }
-.dayRow[aria-pressed='true'] .dayRowCheck { background: var(--brass); color: var(--brass-ink); border-color: var(--brass); }
+.dayRow[aria-pressed='true'] .dayRowCheck { background: var(--lume); color: var(--lume-ink); border-color: var(--lume); }
 
 /* Grand écran : le calendrier à gauche, le bilan du mois à droite. */
 @media (min-width: 1000px) {
   .month { max-width: none; display: grid; grid-template-columns: minmax(0, 560px) minmax(0, 1fr); column-gap: var(--sp-8); }
   .monthHead, .calendar { grid-column: 1; }
-  .monthFoot { grid-column: 2; grid-row: 1 / span 2; margin-top: 56px; align-self: start; }
+  .monthFoot {
+    grid-column: 2; grid-row: 1 / span 2; margin-top: 0; align-self: stretch; justify-content: space-between;
+  }
   .monthStats { flex-direction: column; gap: var(--sp-5); }
 }
 
 /* Micro-interactions : la coche et la photo du jour « se posent » quand on note un port */
 .check { animation: pop var(--dur-slow) var(--ease-out) backwards; }
 .dayPhoto { animation: settle var(--dur-slow) var(--ease-out) backwards; }
-.pick:active > div { transform: scale(0.97); }
-.pick > div { transition: box-shadow var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease); }
+.pick:active .pickFrame { transform: scale(0.97); }
 .day { transition: border-color var(--dur) var(--ease), background-color var(--dur) var(--ease), transform var(--dur-fast) var(--ease); }
 .day:active:not(:disabled) { transform: scale(0.94); }
 .dayRowCheck { transition: background-color var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease); }
