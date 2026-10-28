@@ -33,7 +33,7 @@
 .story h3 { font-size: var(--fs-lg); margin-bottom: var(--sp-2); }
 .story p { color: var(--text-2); white-space: pre-line; }
 
-.shareBox { padding: var(--sp-4); border-radius: var(--r-control); border: 1px dashed var(--seam); display: flex; flex-direction: column; gap: var(--sp-4); }
+.shareBox { padding: var(--sp-5); }
 .shareRow { display: flex; align-items: center; gap: var(--sp-4); flex-wrap: wrap; }
 
 .statsRow { display: flex; flex-wrap: wrap; gap: var(--sp-5) var(--sp-7); }

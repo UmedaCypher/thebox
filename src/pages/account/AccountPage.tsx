@@ -275,7 +275,7 @@ export default function AccountPage() {
         <div><Button type="submit" disabled={saving}>{saving ? c.saving : c.save}</Button></div>
       </form>
 
-      <section className={s.section}>
+      <section className={`panel ${s.section}`} data-tone="brass">
         <h2 className={s.h}>{t.plan}</h2>
         {isPremium && sub.data && (
           <p className={s.muted}>

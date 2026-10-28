@@ -169,13 +169,13 @@ export default function PremiumPage() {
       {error && <Notice tone="error">{error}</Notice>}
 
       <div className={s.plans}>
-        <section className={s.plan}>
+        <section className={`panel ${s.plan}`} data-tone="lume">
           <h2>{t.freePlan}</h2>
           <p className={s.price}>{formatEuros(0)}</p>
-          <ul>{FREE.map(f => <li key={f}>{f}</li>)}</ul>
+          <ul className="chips">{FREE.map(f => <li key={f}>{f}</li>)}</ul>
         </section>
 
-        <section className={`${s.plan} ${s.premium}`}>
+        <section className={`panel ${s.plan}`} data-tone="brass">
           <h2>Premium</h2>
           <Segmented label={t.billing} value={interval} onChange={setInterval_}
             options={[{ value: 'year', label: t.yearly }, { value: 'month', label: t.monthly }]} />

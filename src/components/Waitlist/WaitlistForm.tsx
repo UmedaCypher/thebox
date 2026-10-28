@@ -59,7 +59,7 @@ export default function WaitlistForm({ premiumDefault = false, compact = false }
 
   if (state === 'done') {
     return (
-      <div className={s.done} role="status">
+      <div className={`panel ${s.done}`} data-tone="lume" role="status">
         <strong>{t.doneTitle}</strong>
         <span>{t.doneText(email.trim())}</span>
       </div>

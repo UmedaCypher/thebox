@@ -56,20 +56,20 @@ export default function HomePage() {
         </section>
 
         <section className={s.offer} data-reveal>
-          <div className={s.offerFree}>
+          <div className={`panel ${s.offerPanel}`} data-tone="lume">
             <span className={s.indices} aria-hidden="true">
               {Array.from({ length: FREE_WATCH_LIMIT }, (_, i) => <i key={i} style={{ '--i': i } as CSSProperties} />)}
             </span>
             <h2>{t.offerTitle(FREE_WATCH_LIMIT)}</h2>
-            <ul className={s.chips} data-tone="lume">{t.offerFree.map(f => <li key={f}>{f}</li>)}</ul>
+            <ul className="chips" data-tone="lume">{t.offerFree.map(f => <li key={f}>{f}</li>)}</ul>
             {LAUNCH_MODE === 'waitlist'
               ? <LinkButton to="/#liste" variant="secondary">{t.startFree}</LinkButton>
               : <LinkButton to="/signup" variant="secondary">{t.startFreeOpen}</LinkButton>}
           </div>
-          <div className={s.offerPremium}>
+          <div className={`panel ${s.offerPanel}`} data-tone="brass">
             <p className={s.offerPrice}><strong className="num">{premiumPrices().year.amount}</strong> {premiumPrices().year.period}</p>
             <h3>{t.offerPremiumTitle}</h3>
-            <ul className={s.chips} data-tone="brass">{t.offerPremium.map(f => <li key={f}>{f}</li>)}</ul>
+            <ul className="chips">{t.offerPremium.map(f => <li key={f}>{f}</li>)}</ul>
             <LinkButton to="/premium">{t.compare}</LinkButton>
           </div>
         </section>

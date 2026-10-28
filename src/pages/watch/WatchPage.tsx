@@ -376,7 +376,7 @@ function PassportTab({ watch, uid, onUpdate }: { watch: Watch; uid: string; onUp
           <p>{watch.notes_history}</p>
         </section>
       )}
-      <section className={s.shareBox}>
+      <section className={`panel ${s.shareBox}`} data-tone="ruby">
         <Toggle
           label={t.sharePassport}
           description={t.sharePassportHint}

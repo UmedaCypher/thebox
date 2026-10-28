@@ -52,10 +52,7 @@
 .sheetBody { display: flex; flex-direction: column; gap: var(--sp-5); }
 .sheetActions { display: flex; flex-direction: column; gap: var(--sp-2); position: sticky; bottom: 0; padding-top: var(--sp-3); background: var(--surface); }
 
-.safety {
-  padding: var(--sp-5); border-radius: var(--r-cushion); border: 1px dashed var(--seam);
-  color: var(--text-2); font-size: var(--fs-sm); display: flex; flex-direction: column; gap: var(--sp-2);
-}
+.safety { gap: var(--sp-2); color: var(--text-2); font-size: var(--fs-sm); }
 .safety h2 { font-size: var(--fs-lg); color: var(--text); }
 /* Les choix de filtres passent à la ligne dans la colonne étroite plutôt que d'être coupés. */
 .fields [role='tablist'] { flex-wrap: wrap; border-radius: var(--r-lg); overflow: visible; }

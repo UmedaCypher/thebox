@@ -77,7 +77,7 @@
   background: var(--brass); color: var(--brass-ink); font-size: var(--fs-xs); font-weight: 700; display: grid; place-items: center;
 }
 
-.monthFoot { margin-top: var(--sp-5); display: flex; flex-direction: column; gap: var(--sp-5); }
+.monthFoot { margin-top: var(--sp-5); gap: var(--sp-5); }
 .monthStats { display: flex; flex-wrap: wrap; gap: var(--sp-4) var(--sp-7); }
 .monthActions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-4); }
 .statsLink { color: var(--brass); font-size: var(--fs-sm); font-weight: 600; }
@@ -98,9 +98,6 @@
   .monthHead, .calendar { grid-column: 1; }
   .monthFoot {
     grid-column: 2; grid-row: 1 / span 2; margin-top: 0; align-self: stretch; justify-content: space-between;
-    padding: var(--sp-5); border-radius: var(--r-lg);
-    background: radial-gradient(100% 70% at 100% 0%, color-mix(in srgb, var(--lume) 10%, transparent), transparent 70%), color-mix(in srgb, var(--text) 4%, transparent);
-    border: 1px solid var(--glass-border);
   }
   .monthStats { flex-direction: column; gap: var(--sp-5); }
 }

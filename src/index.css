@@ -299,3 +299,39 @@ html.lenis, html.lenis body { height: auto; }
 :root[data-section='galerie'] { --aura-1: rgba(238, 160, 134, 0.15); }
 :root[data-theme='soie'][data-section='portage'] { --aura-1: rgba(120, 170, 80, 0.2); }
 :root[data-theme='soie'][data-section='marche'], :root[data-theme='soie'][data-section='messages'] { --aura-1: rgba(214, 110, 130, 0.24); }
+
+/* ---------- Encadré « écrin de verre » (réutilisable) ----------
+   Un panneau de verre dépoli éclairé d'un halo de couleur dans un coin.
+   data-tone donne son rôle : lume = gratuit, aujourd'hui, réussi · laiton = Premium, valeur · rubis = Marché, échanges, contact. */
+.panel {
+  --tone: var(--brass); --tone-2: transparent;
+  position: relative; isolation: isolate; overflow: hidden;
+  display: flex; flex-direction: column; gap: var(--sp-4);
+  padding: var(--sp-5); border-radius: var(--r-cushion);
+  background:
+    radial-gradient(85% 100% at var(--halo-x, 0%) 0%, color-mix(in srgb, var(--tone) 24%, transparent), transparent 72%),
+    radial-gradient(60% 80% at 100% 100%, color-mix(in srgb, var(--tone-2) 14%, transparent), transparent 70%),
+    var(--glass-bg);
+  border: 1px solid color-mix(in srgb, var(--tone) 34%, var(--glass-border));
+  box-shadow: var(--glass-shadow);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.4); backdrop-filter: blur(var(--glass-blur)) saturate(1.4);
+}
+@media (min-width: 640px) { .panel { padding: var(--sp-6); } }
+.panel[data-tone='lume'] { --tone: var(--lume); }
+.panel[data-tone='brass'] { --tone: var(--brass); --tone-2: var(--ruby); --halo-x: 100%; border-color: var(--glass-border); }
+.panel[data-tone='ruby'] { --tone: var(--ruby); }
+.panel[data-tone='plain'] { --tone: transparent; border-color: var(--glass-border); }
+.panel-kicker { font-size: var(--fs-sm); font-weight: 600; color: var(--tone); }
+.panel > :is(a, button):last-child { align-self: flex-start; }
+
+/* Pastilles à puce lumineuse, dans la couleur de l'encadré */
+.chips { list-style: none; display: flex; flex-wrap: wrap; gap: 8px; --tone: var(--brass); }
+.chips li {
+  display: inline-flex; align-items: center; gap: 7px; padding: 6px 12px 6px 10px; border-radius: 16px; line-height: 1.35;
+  font-size: var(--fs-sm); font-weight: 600; color: var(--text);
+  background: color-mix(in srgb, var(--tone) 12%, transparent); border: 1px solid color-mix(in srgb, var(--tone) 32%, transparent);
+}
+.chips li::before { content: ''; flex: none; width: 6px; height: 6px; border-radius: 50%; background: var(--tone); box-shadow: 0 0 8px var(--tone); }
+.chips[data-tone='lume'] { --tone: var(--lume); }
+.chips[data-tone='ruby'] { --tone: var(--ruby); }
+.panel .chips:not([data-tone]) { --tone: inherit; }

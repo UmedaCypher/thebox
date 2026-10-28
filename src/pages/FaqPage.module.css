@@ -21,11 +21,8 @@
 @keyframes open { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) { .item p { animation: none; } }
 
-.help {
-  display: flex; flex-direction: column; gap: var(--sp-2); padding: var(--sp-5); border-radius: var(--r-cushion);
-  background: var(--surface); border: 1px solid var(--seam); color: var(--text-2);
-}
-.help svg { color: var(--brass); }
+.help { gap: var(--sp-2); color: var(--text-2); }
+.help svg { color: var(--ruby); }
 .help strong { font-family: var(--font-display); font-size: var(--fs-xl); font-weight: 500; color: var(--text); }
 .help p { font-size: var(--fs-sm); }
 .helpLink { color: var(--brass); font-weight: 600; font-size: var(--fs-sm); margin-top: var(--sp-2); }

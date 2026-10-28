@@ -116,7 +116,7 @@ export default function PassportPage() {
           <p className={s.brand}>{p.brand}</p>
 
           {p.listing && (
-            <section className={s.listing} aria-label={t.listing}>
+            <section className={`panel ${s.listing}`} data-tone="ruby" aria-label={t.listing}>
               <div className={s.listingHead}>
                 <strong className={`${s.listingPrice} num`}>{listingPrice(p.listing.kind, p.listing.price)}</strong>
                 <span className={s.listingMeta}>

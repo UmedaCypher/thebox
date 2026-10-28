@@ -117,7 +117,7 @@ export default function FaqPage() {
       title={t.title}
       lead={t.lead}
       aside={(
-        <div className={s.help}>
+        <div className={`panel ${s.help}`} data-tone="ruby">
           <MessageCircle size={20} strokeWidth={1.6} aria-hidden="true" />
           <strong>{t.asideTitle}</strong>
           <p>{t.asideText}</p>
