@@ -127,3 +127,7 @@
 .options { display: flex; flex-direction: column; gap: var(--sp-2); }
 .options button, .options a { justify-content: center; }
 .optionsHint { font-size: var(--fs-xs); color: var(--text-3); margin-top: var(--sp-2); }
+
+/* Invitation à activer les notifications, sous le titre de la liste */
+.promptWrap { padding: 0 var(--gutter); }
+.promptWrap:empty { display: none; }

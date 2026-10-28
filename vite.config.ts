@@ -37,6 +37,8 @@ export default defineConfig({
         prefer_related_applications: false
       },
       workbox: {
+        // Réception des notifications push et ouverture de la bonne page au toucher (public/push-sw.js)
+        importScripts: ['push-sw.js'],
         globPatterns: ['**/*.{js,css,html,ico,png,svg,webmanifest}'],
         runtimeCaching: [
           {

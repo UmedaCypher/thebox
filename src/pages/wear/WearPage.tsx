@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { Check, ChevronLeft, ChevronRight, Share2 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useLoad } from '../../hooks/useLoad';
@@ -62,7 +62,13 @@ export default function WearPage() {
   const { user, profile, isPremium } = useAuth();
   const uid = user!.id;
   const today = todayISO();
-  const [cursor, setCursor] = useState(() => { const d = new Date(); return new Date(d.getFullYear(), d.getMonth(), 1); });
+  // ?mois=AAAA-MM ouvre directement un mois (lien du bilan mensuel envoyé en notification)
+  const [params] = useSearchParams();
+  const [cursor, setCursor] = useState(() => {
+    const m = /^(\d{4})-(\d{2})$/.exec(params.get('mois') ?? '');
+    if (m) return new Date(Number(m[1]), Number(m[2]) - 1, 1);
+    const d = new Date(); return new Date(d.getFullYear(), d.getMonth(), 1);
+  });
   const [openDay, setOpenDay] = useState<string | null>(null);
   const [sharing, setSharing] = useState(false);
   const [error, setError] = useState<string | null>(null);

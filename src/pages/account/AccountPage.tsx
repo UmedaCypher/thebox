@@ -16,6 +16,7 @@ import type { LangChoice } from '../../i18n';
 import { COMMON } from '../../i18n/common';
 import { formatDecimal } from '../../lib/format';
 import { useToast } from '../../components/Toast/Toast';
+import NotificationSettings, { NOTIF } from '../../components/Notifications/NotificationSettings';
 import s from './AccountPage.module.css';
 
 const S = defineStrings({
@@ -144,6 +145,7 @@ const S = defineStrings({
 
 export default function AccountPage() {
   const t = useStrings(S);
+  const n = useStrings(NOTIF);
   const c = useStrings(COMMON);
   const toast = useToast();
   const { user, profile, isPremium, refreshProfile, signOut } = useAuth();
@@ -302,6 +304,11 @@ export default function AccountPage() {
             <div><LinkButton to="/premium" variant="secondary">{t.discoverPremium}</LinkButton></div>
           </>
         )}
+      </section>
+
+      <section className={s.section} id="notifications">
+        <h2 className={s.h}>{n.title}</h2>
+        <NotificationSettings />
       </section>
 
       <section className={s.section}>

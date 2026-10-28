@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { saveProfile } from '../lib/api';
+import { syncPushLanguage } from '../lib/push';
 import { useLang } from '.';
 import type { LangChoice } from '.';
 
@@ -12,6 +13,8 @@ export function useLanguageSetting() {
   const change = useCallback(async (c: LangChoice) => {
     setChoice(c);
     if (!user) return;
+    // Les notifications de cet appareil suivent la nouvelle langue (une fois l'app remontée dans cette langue).
+    setTimeout(() => { syncPushLanguage().catch(() => {}); }, 0);
     try {
       await saveProfile(user.id, { preferred_language: c === 'auto' ? null : c }, Boolean(profile));
       await refreshProfile();
