@@ -39,7 +39,7 @@
 .subLink[aria-current='page'] svg { color: var(--brass); opacity: 1; }
 .subLink::after {
   content: ''; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; border-radius: 2px;
-  background: var(--brass); transform: scaleX(0); transition: transform 220ms var(--ease);
+  background: var(--brass); transform: scaleX(0); transition: transform var(--dur) var(--ease);
 }
 .subLink[aria-current='page']::after { transform: scaleX(1); }
 .premiumLink { color: var(--brass); }
@@ -53,6 +53,9 @@
   border: 1px solid var(--seam);
 }
 .avatar:hover { color: var(--text); }
+/* Zone à toucher élargie autour de l'avatar, sans changer sa taille visible */
+a.avatar { position: relative; }
+a.avatar::after { content: ''; position: absolute; inset: -6px; border-radius: 50%; }
 .desktopOnly { display: none; }
 .textLink { color: var(--text-2); font-size: var(--fs-sm); font-weight: 600; text-decoration: none; padding: 8px 4px; }
 .textLink:hover { color: var(--text); }
@@ -82,8 +85,8 @@
   -webkit-tap-highlight-color: transparent;
 }
 .tabIcon {
-  position: relative; display: grid; place-items: center; width: 58px; height: 34px; border-radius: 999px;
-  transition: background 200ms var(--ease);
+  position: relative; display: grid; place-items: center; width: 58px; height: 34px; border-radius: var(--r-pill);
+  transition: background var(--dur) var(--ease);
 }
 .tabLabel { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .tab[aria-current='page'] { color: var(--brass); }
@@ -97,9 +100,9 @@
 .iconLink:hover { color: var(--text); background: var(--surface); }
 .iconLink[aria-current='page'] { color: var(--brass); background: var(--surface); }
 .iconBadge {
-  position: absolute; top: 2px; right: 0; z-index: 1; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 999px;
+  position: absolute; top: 2px; right: 0; z-index: 1; min-width: 18px; height: 18px; padding: 0 5px; border-radius: var(--r-pill);
   display: grid; place-items: center; background: var(--brass); color: var(--brass-ink);
-  font-size: 0.6875rem; font-weight: 700; line-height: 1; border: 2px solid var(--bg);
+  font-size: var(--fs-xs); font-weight: 700; line-height: 1; border: 2px solid var(--bg);
 }
 @media (max-width: 359px) { .tab { font-size: 0.75rem; } .tabIcon { width: 48px; } }
 @media (min-width: 860px) { .tabbar { display: none; } }
@@ -128,7 +131,7 @@
 }
 .footerBottom { display: flex; justify-content: space-between; align-items: center; gap: var(--sp-4); }
 .langSwitch select {
-  background: var(--surface); color: var(--text-2); border: 1px solid var(--line-strong); border-radius: 999px;
+  background: var(--surface); color: var(--text-2); border: 1px solid var(--line-strong); border-radius: var(--r-pill);
   padding: 6px 12px; font: inherit; font-size: var(--fs-xs); font-weight: 600;
 }
 
@@ -136,3 +139,8 @@
 /* L'icône Messages de l'en-tête n'existe que sur ordinateur (sur mobile, Messages est dans la barre du bas). */
 .iconLink.desktopOnly { display: none; }
 @media (min-width: 860px) { .iconLink.desktopOnly { display: grid; } }
+
+/* Transition de page : la nouvelle page apparaît en fondu en remontant à peine */
+.route { flex: 1; display: flex; flex-direction: column; min-width: 0; animation: routeIn var(--dur-slow) var(--ease-out) backwards; }
+@keyframes routeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .route { animation: none; } }

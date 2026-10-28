@@ -42,7 +42,7 @@ section.wall, section.try, section.passport, section.strip { padding: var(--sp-8
 .verdict strong { font-family: var(--font-display); font-size: var(--fs-xl); font-weight: 500; }
 .verdict span { color: var(--text-2); font-size: var(--fs-sm); }
 .trySvg { width: 100%; max-width: 480px; justify-self: center; border-radius: var(--r-cushion); background: radial-gradient(90% 90% at 50% 40%, var(--cushion), var(--surface)); }
-.anim { transition: all 260ms var(--ease); }
+.anim { transition: all var(--dur) var(--ease); }
 .measure line { stroke: var(--brass); stroke-width: 1.5; }
 .measure line[data-over='true'] { stroke: var(--danger); }
 .measure text { fill: var(--text-2); font-size: 13px; font-family: var(--font-body); }
@@ -55,18 +55,18 @@ section.wall, section.try, section.passport, section.strip { padding: var(--sp-8
 .card {
   --rx: 0deg; --ry: 0deg; --gx: 30%; --gy: 20%;
   position: relative; width: min(100%, 520px); display: grid; grid-template-columns: 2fr 3fr; overflow: hidden;
-  border-radius: 18px; background: linear-gradient(160deg, #f6f0e6, #e8dfd0); color: #2a1418;
+  border-radius: var(--r-lg); background: linear-gradient(160deg, #f6f0e6, #e8dfd0); color: #2a1418;
   box-shadow: 0 40px 70px -30px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(194, 160, 114, 0.5);
-  transform: rotateX(var(--rx)) rotateY(var(--ry)); transition: transform 380ms var(--ease);
+  transform: rotateX(var(--rx)) rotateY(var(--ry)); transition: transform var(--dur-slow) var(--ease);
   transform-style: preserve-3d;
 }
 .cardWrap:hover .card { transition-duration: 80ms; }
 .cardPhoto img { width: 100%; height: 100%; object-fit: cover; aspect-ratio: 4 / 5; }
 .cardBody { padding: 22px 22px 18px; display: flex; flex-direction: column; gap: 10px; outline: 1px dashed rgba(138, 102, 53, 0.45); outline-offset: -8px; }
-.cardKind { font-size: 11px; color: #8a6635; font-weight: 600; }
+.cardKind { font-size: 12px; color: #75572d; font-weight: 600; }
 .cardTitle { font-family: var(--font-display); font-size: 1.7rem; font-weight: 500; line-height: 1.05; }
 .cardSpecs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 12px; margin-top: 4px; }
-.cardSpecs dt { font-size: 10px; color: #7d6862; }
+.cardSpecs dt { font-size: 12px; color: #6b5954; }
 .cardSpecs dd { font-size: 13px; }
 .cardFoot { margin-top: auto; display: flex; justify-content: space-between; align-items: flex-end; }
 .serial { font-size: 12px; letter-spacing: 0.08em; color: #5f4b46; }
@@ -94,3 +94,8 @@ section.wall, section.try, section.passport, section.strip { padding: var(--sp-8
 @keyframes slide { to { transform: translateX(calc(-50% - var(--sp-4) / 2)); } }
 @media (prefers-reduced-motion: reduce) { .track { animation: none; } .marquee { overflow-x: auto; } }
 .stripFoot { display: flex; }
+
+@media (pointer: coarse) {
+  .range input::-webkit-slider-thumb { width: 28px; height: 28px; margin-top: -13px; }
+  .range input::-moz-range-thumb { width: 28px; height: 28px; }
+}

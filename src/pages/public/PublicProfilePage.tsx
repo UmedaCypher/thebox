@@ -4,11 +4,12 @@ import { useLoad } from '../../hooks/useLoad';
 import { getPublicCollection, thumbSrc } from '../../lib/api';
 import { formatDate } from '../../lib/format';
 import { listingBadge, listingPrice } from '../../lib/listing';
-import { EmptyState, LinkButton, Loading, Notice, PageHeader } from '../../components/ui';
+import { EmptyState, LinkButton, Notice, PageHeader } from '../../components/ui';
 import ContactButton from '../../components/ContactButton/ContactButton';
 import WatchCard, { WatchGrid } from '../../components/WatchCard/WatchCard';
 import { defineStrings, useStrings } from '../../i18n';
 import s from './PublicProfilePage.module.css';
+import { SkeletonGrid, SkeletonHeader } from '../../components/Skeleton/Skeleton';
 
 const S = defineStrings({
   notFoundTitle: 'Profil introuvable',
@@ -38,7 +39,7 @@ export default function PublicProfilePage() {
   const { profile: me } = useAuth();
   const q = useLoad(() => getPublicCollection(username!), [username]);
 
-  if (q.loading) return <div className="page"><Loading /></div>;
+  if (q.loading) return <div className="page"><SkeletonHeader /><SkeletonGrid count={8} /></div>;
   if (q.error) return <div className="page"><Notice tone="error">{q.error}</Notice></div>;
   const p = q.data;
   if (!p) return <div className="page"><EmptyState title={t.notFoundTitle}>{t.notFoundText}</EmptyState></div>;

@@ -7,7 +7,7 @@ import { listMaintenance, listWatches, listWearLogs, mainPhoto, thumbSrc } from 
 import { FREE_WATCH_LIMIT } from '../../lib/features';
 import { daysBetween, formatDate, formatEuros, plural, todayISO } from '../../lib/format';
 import { listingBadge, statusKind } from '../../lib/listing';
-import { Button, EmptyState, LinkButton, Loading, Notice, PageHeader, Stat } from '../../components/ui';
+import { Button, EmptyState, LinkButton, Notice, PageHeader, Stat } from '../../components/ui';
 import WatchCard, { WatchGrid } from '../../components/WatchCard/WatchCard';
 import PremiumSheet from '../../components/PremiumSheet/PremiumSheet';
 import CostTeaser from '../../components/CostTeaser/CostTeaser';
@@ -15,6 +15,7 @@ import { analyseCosts } from '../../lib/costPerWear';
 import { defineStrings, useStrings } from '../../i18n';
 import { COMMON } from '../../i18n/common';
 import s from './CollectionPage.module.css';
+import { SkeletonGrid, SkeletonHeader } from '../../components/Skeleton/Skeleton';
 
 const S = defineStrings({
   neverWorn: 'Jamais portée',
@@ -110,7 +111,7 @@ export default function CollectionPage() {
 
   const onAdd = () => (atLimit ? setPremiumOpen(true) : navigate('/ajouter-montre'));
 
-  if (loading && !data) return <div className="page"><Loading label={t.opening} /></div>;
+  if (loading && !data) return <div className="page"><SkeletonHeader withStats /><SkeletonGrid count={8} /></div>;
   if (error) return <div className="page"><Notice tone="error">{error}</Notice><Button variant="secondary" onClick={reload}>{c.retry}</Button></div>;
 
   return (

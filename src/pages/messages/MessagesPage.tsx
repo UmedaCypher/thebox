@@ -13,8 +13,10 @@ import { defineStrings, getLocale, tr, useStrings } from '../../i18n';
 import { COMMON } from '../../i18n/common';
 import { listingPrice } from '../../lib/listing';
 import type { ConversationSummary, Message } from '../../types';
-import { Button, Cushion, EmptyState, IconButton, LinkButton, Loading, Notice, Sheet } from '../../components/ui';
+import { Button, Cushion, EmptyState, IconButton, LinkButton, Notice, Sheet } from '../../components/ui';
+import { useToast } from '../../components/Toast/Toast';
 import s from './MessagesPage.module.css';
+import { SkeletonList } from '../../components/Skeleton/Skeleton';
 
 const S = defineStrings({
   yesterdayShort: 'hier',
@@ -138,14 +140,14 @@ export default function MessagesPage() {
     <div className={s.page} data-thread={Boolean(conversationId)}>
       <aside className={s.listPane} aria-label={t.conversations}>
         <div className={s.listHead}><h1>{cm.tabs.messages}</h1></div>
-        {list.loading && !list.data ? <Loading /> : list.error ? <Notice tone="error">{list.error}</Notice> : !items.length ? (
+        {list.loading && !list.data ? <div className={s.listEmpty}><SkeletonList rows={5} round /></div> : list.error ? <Notice tone="error">{list.error}</Notice> : !items.length ? (
           <div className={s.listEmpty}>
             <EmptyState title={t.noConversations} action={<LinkButton to="/marche" variant="secondary">{t.browseMarket}</LinkButton>}>
               {t.noConversationsText}
             </EmptyState>
           </div>
         ) : (
-          <ul className={s.list}>
+          <ul className={`${s.list} reveal`}>
             {items.map(c => (
               <li key={c.conversation_id}>
                 <Link to={`/messages/${c.conversation_id}`} className={s.row} aria-current={c.conversation_id === conversationId ? 'page' : undefined}>
@@ -186,6 +188,7 @@ type Pending = Message & { pending?: boolean; failed?: boolean };
 function Thread({ id, onActivity }: { id: string; onActivity: () => void }) {
   const t = useStrings(S);
   const cm = useStrings(COMMON);
+  const toast = useToast();
   const { user } = useAuth();
   const me = user!.id;
   const navigate = useNavigate();
@@ -272,6 +275,7 @@ function Thread({ id, onActivity }: { id: string; onActivity: () => void }) {
 
   const toggleBlock = async () => {
     await setBlocked(id, !blocked);
+    toast(blocked ? cm.toast.unblocked : cm.toast.blocked);
     setOptionsOpen(false);
     summary.reload();
     onActivity();
@@ -280,6 +284,7 @@ function Thread({ id, onActivity }: { id: string; onActivity: () => void }) {
   const report = async (messageId: string) => {
     await reportMessage(messageId);
     setReported(r => new Set(r).add(messageId));
+    toast(cm.toast.reported);
     setSelected(null);
   };
 
@@ -296,7 +301,7 @@ function Thread({ id, onActivity }: { id: string; onActivity: () => void }) {
     return out;
   }, [messages]);
 
-  if (summary.loading && !c) return <Loading />;
+  if (summary.loading && !c) return <div className={s.placeholder}><SkeletonList rows={4} thumb={0} /></div>;
   if (!c) return <div className={s.placeholder}><Notice tone="error">{summary.error ?? t.notFound}</Notice></div>;
 
   const th = thumbSrc(c.watch_photo_path);
@@ -329,7 +334,7 @@ function Thread({ id, onActivity }: { id: string; onActivity: () => void }) {
 
       <div className={s.messages} ref={scroller} role="log" aria-live="polite" aria-label={cm.tabs.messages}>
         {loadError && <Notice tone="error">{loadError}</Notice>}
-        {messages === null ? <Loading /> : !messages.length ? (
+        {messages === null ? <SkeletonList rows={4} thumb={0} /> : !messages.length ? (
           <p className={s.firstHint}>
             {t.firstHint}
           </p>

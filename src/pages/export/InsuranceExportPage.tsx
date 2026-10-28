@@ -3,11 +3,12 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useLoad } from '../../hooks/useLoad';
 import { listWatches, mainPhoto, photoUrl } from '../../lib/api';
 import { formatDate, formatEuros, formatMm } from '../../lib/format';
-import { Button, Loading, Notice, PageHeader } from '../../components/ui';
+import { Button, Notice, PageHeader } from '../../components/ui';
 import PremiumGate from '../../components/PremiumGate/PremiumGate';
 import { defineStrings, useLang, useStrings } from '../../i18n';
 import { COMMON, movementLabel } from '../../i18n/common';
 import s from './InsuranceExportPage.module.css';
+import { SkeletonHeader, SkeletonList } from '../../components/Skeleton/Skeleton';
 
 const S = defineStrings({
   title: 'Inventaire pour l\'assurance',
@@ -52,7 +53,7 @@ function ExportContent() {
   const { user, profile } = useAuth();
   const q = useLoad(() => listWatches(user!.id), [user]);
 
-  if (q.loading) return <div className="page"><Loading /></div>;
+  if (q.loading) return <div className="page"><SkeletonHeader /><SkeletonList rows={4} thumb={72} /></div>;
   if (q.error) return <div className="page"><Notice tone="error">{q.error}</Notice></div>;
   const watches = q.data ?? [];
   const total = watches.reduce((a, w) => a + (Number(w.current_estimated_value) || 0), 0);

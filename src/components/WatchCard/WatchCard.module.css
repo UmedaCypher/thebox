@@ -7,7 +7,7 @@
 
 .card { display: flex; flex-direction: column; gap: var(--sp-3); text-decoration: none; color: inherit; }
 .card:hover { color: inherit; }
-.card img { transition: transform 400ms var(--ease); }
+.card img { transition: transform var(--dur-slow) var(--ease); }
 .card:hover img { transform: scale(1.03); }
 
 .text { display: flex; flex-direction: column; gap: 1px; padding: 0 2px; min-width: 0; }
@@ -20,7 +20,31 @@
 .price { font-size: var(--fs-md); font-weight: 600; color: var(--brass); margin-top: 2px; }
 .badge {
   position: absolute; top: 10px; left: 10px; z-index: 3;
-  padding: 4px 10px; border-radius: 999px; font-size: var(--fs-xs); font-weight: 600; letter-spacing: 0.02em;
+  padding: 4px 10px; border-radius: var(--r-pill); font-size: var(--fs-xs); font-weight: 600; letter-spacing: 0.02em;
   background: color-mix(in srgb, var(--bg) 78%, transparent); color: var(--brass);
   border: 1px solid var(--seam); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+}
+
+/* Les cartes arrivent en cascade, puis se soulèvent au survol */
+.grid > * { animation: cardIn var(--dur-slow) var(--ease-out) backwards; }
+.grid > :nth-child(2) { animation-delay: 35ms; }
+.grid > :nth-child(3) { animation-delay: 70ms; }
+.grid > :nth-child(4) { animation-delay: 105ms; }
+.grid > :nth-child(5) { animation-delay: 140ms; }
+.grid > :nth-child(6) { animation-delay: 175ms; }
+.grid > :nth-child(7) { animation-delay: 210ms; }
+.grid > :nth-child(8) { animation-delay: 245ms; }
+.grid > :nth-child(9) { animation-delay: 280ms; }
+.grid > :nth-child(10) { animation-delay: 315ms; }
+.grid > :nth-child(11) { animation-delay: 350ms; }
+.grid > :nth-child(12) { animation-delay: 385ms; }
+.grid > :nth-child(n + 13) { animation-delay: 420ms; }
+@keyframes cardIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+.card > :first-child { transition: transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease); }
+@media (hover: hover) {
+  .card:hover > :first-child { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .grid > * { animation: none; }
+  .card > :first-child, .card:hover > :first-child { transition: none; transform: none; }
 }

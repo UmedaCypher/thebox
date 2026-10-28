@@ -9,9 +9,10 @@ import { listingPrice } from '../../lib/listing';
 import { defineStrings, useStrings } from '../../i18n';
 import { COMMON } from '../../i18n/common';
 import type { MarketFilterOptions, MarketFilters, MarketItem } from '../../types';
-import { Button, EmptyState, LinkButton, Loading, Notice, PageHeader, Segmented, Sheet, SelectField, TextField } from '../../components/ui';
+import { Button, EmptyState, LinkButton, Notice, PageHeader, Segmented, Sheet, SelectField, TextField } from '../../components/ui';
 import WatchCard, { WatchGrid } from '../../components/WatchCard/WatchCard';
 import s from './MarketPage.module.css';
+import { SkeletonGrid } from '../../components/Skeleton/Skeleton';
 
 const S = defineStrings({
   subtitleCount: (n: string) => `${n} à vendre ou à échanger, directement entre collectionneurs.`,
@@ -215,7 +216,7 @@ export default function MarketPage() {
         </aside>
 
         <section className={s.results} aria-live="polite">
-          {results.loading ? <Loading label={t.opening} /> : results.error ? <Notice tone="error">{results.error}</Notice> : !items.length ? (
+          {results.loading ? <SkeletonGrid count={8} /> : results.error ? <Notice tone="error">{results.error}</Notice> : !items.length ? (
             <EmptyState
               title={chips.length || filters.query ? t.noResultsTitle : t.emptyTitle}
               action={chips.length || filters.query ? <Button variant="secondary" onClick={clearAll}>{t.clearFilters}</Button>

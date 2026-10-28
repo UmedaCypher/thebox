@@ -1,7 +1,7 @@
 .toolbar { display: flex; gap: var(--sp-2); align-items: center; margin-bottom: var(--sp-4); flex-wrap: wrap; }
 .search {
   flex: 1 1 260px; display: flex; align-items: center; gap: var(--sp-2); min-height: 46px;
-  padding: 0 var(--sp-4); border-radius: 999px; background: var(--surface); border: 1px solid var(--line-strong);
+  padding: 0 var(--sp-4); border-radius: var(--r-pill); background: var(--surface); border: 1px solid var(--line-strong);
   color: var(--text-3);
 }
 .search:focus-within { border-color: var(--brass); }
@@ -9,17 +9,17 @@
 .search input::placeholder { color: var(--text-3); }
 .filterBtn { min-height: 46px; }
 .count {
-  display: inline-grid; place-items: center; min-width: 20px; height: 20px; padding: 0 6px; border-radius: 999px;
+  display: inline-grid; place-items: center; min-width: 20px; height: 20px; padding: 0 6px; border-radius: var(--r-pill);
   background: var(--brass); color: var(--brass-ink); font-size: var(--fs-xs); font-weight: 700;
 }
 .sort {
-  min-height: 46px; padding: 0 var(--sp-4); border-radius: 999px; background: var(--surface); color: var(--text);
+  min-height: 46px; padding: 0 var(--sp-4); border-radius: var(--r-pill); background: var(--surface); color: var(--text);
   border: 1px solid var(--line-strong); font: inherit; font-size: var(--fs-sm); font-weight: 600;
 }
 
 .chips { display: flex; flex-wrap: wrap; gap: var(--sp-2); margin-bottom: var(--sp-5); align-items: center; }
 .chip {
-  display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px 6px 14px; border-radius: 999px;
+  display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px 6px 14px; border-radius: var(--r-pill);
   background: var(--cushion); color: var(--text); font-size: var(--fs-sm); font-weight: 600; border: 1px solid var(--seam);
 }
 .chip:hover { border-color: var(--brass); }
@@ -54,5 +54,5 @@
 }
 .safety h2 { font-size: var(--fs-lg); color: var(--text); }
 /* Les choix de filtres passent à la ligne dans la colonne étroite plutôt que d'être coupés. */
-.fields [role='tablist'] { flex-wrap: wrap; border-radius: 18px; overflow: visible; }
+.fields [role='tablist'] { flex-wrap: wrap; border-radius: var(--r-lg); overflow: visible; }
 .fields [role='tab'] { flex: 1 0 auto; }

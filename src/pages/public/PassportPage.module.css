@@ -2,8 +2,8 @@
 @media (min-width: 900px) { .passport { grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: var(--sp-8); align-items: start; } }
 .media { display: flex; flex-direction: column; gap: var(--sp-3); max-width: 460px; width: 100%; justify-self: center; }
 .thumbs { display: flex; gap: var(--sp-2); }
-.thumbs button { width: 60px; border-radius: 14px; opacity: 0.6; }
-.thumbs button > div { border-radius: 14px; }
+.thumbs button { width: 60px; border-radius: var(--r-md); opacity: 0.6; }
+.thumbs button > div { border-radius: var(--r-md); }
 .thumbs button[aria-pressed='true'] { opacity: 1; outline: 1px solid var(--brass); outline-offset: 2px; }
 
 .body { display: flex; flex-direction: column; gap: var(--sp-4); }

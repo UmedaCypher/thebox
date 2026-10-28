@@ -14,12 +14,14 @@ import { COMMON } from '../../i18n/common';
 import { listingPrice, statusKind } from '../../lib/listing';
 import type { MaintenanceEntry, MaintenanceKind, Watch } from '../../types';
 import {
-  Button, Cushion, IconButton, Loading, Notice, PageHeader, PremiumTag, Segmented, SelectField, Sheet, Stat, TextArea, TextField, Toggle,
+  Button, Cushion, IconButton, Notice, PageHeader, PremiumTag, Segmented, SelectField, Sheet, Stat, TextArea, TextField, Toggle,
 } from '../../components/ui';
 import WearStrip from '../../components/WearStrip/WearStrip';
 import Sparkline from '../../components/Sparkline/Sparkline';
 import PremiumSheet from '../../components/PremiumSheet/PremiumSheet';
 import s from './WatchPage.module.css';
+import { SkeletonDetail, SkeletonList } from '../../components/Skeleton/Skeleton';
+import { useToast } from '../../components/Toast/Toast';
 
 const S = defineStrings({
   tabs: { passeport: 'Passeport', portage: 'Portage', entretien: 'Entretien', valeur: 'Valeur' },
@@ -49,6 +51,10 @@ const S = defineStrings({
   forSale: 'En vente',
   seeListing: "Voir l'annonce",
   sellOrTrade: "Mettre en vente ou proposer à l'échange",
+  glanceDays: (n: number) => (n > 1 ? `${n} jours au poignet` : `${n} jour au poignet`),
+  glanceNever: 'Jamais portée',
+  glanceLast: (d: string) => `dernier port ${d}`,
+  glanceToday: "portée aujourd'hui",
   sections: 'Sections',
   premiumCost: 'Le coût par port fait partie des statistiques Premium.',
   premiumService: "Le carnet d'entretien et ses rappels font partie de Premium.",
@@ -123,6 +129,10 @@ const S = defineStrings({
   edit: 'Edit',
   forSale: 'For sale',
   seeListing: 'View listing',
+  glanceDays: n => (n === 1 ? '1 day on the wrist' : `${n} days on the wrist`),
+  glanceNever: 'Never worn',
+  glanceLast: d => `last worn ${d}`,
+  glanceToday: 'worn today',
   sellOrTrade: 'Sell it or offer it for trade',
   sections: 'Sections',
   premiumCost: 'Cost per wear is part of the Premium stats.',
@@ -186,6 +196,7 @@ const formatPercent = (n: number) =>
 export default function WatchPage() {
   const t = useStrings(S);
   const c = useStrings(COMMON);
+  const toast = useToast();
   const { watchId } = useParams();
   const { user, isPremium } = useAuth();
   const uid = user!.id;
@@ -202,7 +213,7 @@ export default function WatchPage() {
   const wornDays = useMemo(() => new Set((wears.data ?? []).map(w => w.worn_on)), [wears.data]);
   const wornToday = wornDays.has(todayISO());
 
-  if (loading) return <div className="page"><Loading /></div>;
+  if (loading) return <div className="page"><SkeletonDetail /></div>;
   if (error || !watch) return <div className="page"><Notice tone="error">{error ?? t.notFound}</Notice></div>;
 
   const photos = [...(watch.photos ?? [])].sort((a, b) => Number(b.is_main_photo) - Number(a.is_main_photo));
@@ -212,12 +223,14 @@ export default function WatchPage() {
     const day = todayISO();
     if (wornToday) await removeWear(uid, watch.id, day);
     else await addWear(uid, watch.id, day);
+    toast(wornToday ? c.toast.unworn : c.toast.wornToday);
     wears.reload();
   };
 
   const onDelete = async () => {
     if (!window.confirm(t.confirmDelete(`${watch.brand} ${watch.model}`))) return;
     await deleteWatch(uid, watch);
+    toast(c.toast.watchDeleted);
     navigate('/collection', { replace: true });
   };
 
@@ -243,6 +256,17 @@ export default function WatchPage() {
             title={watch.model}
             subtitle={[watch.brand, watch.reference_number, watch.year_of_production].filter(Boolean).join(', ')}
           />
+
+          {/* En un coup d'œil : combien de fois portée, et quand pour la dernière fois */}
+          <p className={s.glance}>
+            {wornDays.size === 0 ? t.glanceNever : (
+              <>
+                <strong className="num">{t.glanceDays(wornDays.size)}</strong>
+                <span aria-hidden="true">·</span>
+                <span>{wornToday ? t.glanceToday : t.glanceLast(formatDate([...wornDays].sort().pop()!, { day: 'numeric', month: 'long' }))}</span>
+              </>
+            )}
+          </p>
 
           <div className={s.quick}>
             <Button variant={wornToday ? 'secondary' : 'primary'} onClick={toggleToday}>
@@ -320,6 +344,8 @@ function passportRows(t: T, w: Pick<Watch, 'movement' | 'case_diameter_mm' | 'lu
 }
 
 function PassportTab({ watch, uid, onUpdate }: { watch: Watch; uid: string; onUpdate: (w: Watch) => void }) {
+  const toast = useToast();
+  const tc = useStrings(COMMON);
   const t = useStrings(S);
   const [copied, setCopied] = useState(false);
   const url = `${window.location.origin}/passeport/${watch.id}`;
@@ -330,6 +356,7 @@ function PassportTab({ watch, uid, onUpdate }: { watch: Watch; uid: string; onUp
     }
     await navigator.clipboard.writeText(url);
     setCopied(true);
+    toast(tc.toast.linkCopied);
     setTimeout(() => setCopied(false), 2000);
   };
 
@@ -392,6 +419,8 @@ function WearTab({ watch, days, isPremium, onPremium }: { watch: Watch; days: Se
 /* ---------- Entretien ---------- */
 
 function MaintenanceTab({ watch, uid, isPremium, onPremium }: { watch: Watch; uid: string; isPremium: boolean; onPremium: () => void }) {
+  const toast = useToast();
+  const tc = useStrings(COMMON);
   const t = useStrings(S);
   const list = useLoad(() => listMaintenance(uid, watch.id), [uid, watch.id]);
   const [open, setOpen] = useState(false);
@@ -410,8 +439,8 @@ function MaintenanceTab({ watch, uid, isPremium, onPremium }: { watch: Watch; ui
         </Button>
       </div>
 
-      {list.loading ? <Loading /> : entries.length > 0 && (
-        <ol className={s.timeline}>
+      {list.loading ? <SkeletonList rows={2} thumb={0} /> : entries.length > 0 && (
+        <ol className={`${s.timeline} reveal`}>
           {entries.map(e => (
             <li key={e.id}>
               <div className={s.timelineHead}>
@@ -431,7 +460,7 @@ function MaintenanceTab({ watch, uid, isPremium, onPremium }: { watch: Watch; ui
         </ol>
       )}
 
-      <MaintenanceSheet open={open} onClose={() => setOpen(false)} onSaved={() => { setOpen(false); list.reload(); }} uid={uid} watchId={watch.id} />
+      <MaintenanceSheet open={open} onClose={() => setOpen(false)} onSaved={() => { setOpen(false); list.reload(); toast(tc.toast.serviceAdded); }} uid={uid} watchId={watch.id} />
     </div>
   );
 }

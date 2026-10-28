@@ -4,7 +4,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useLoad } from '../../hooks/useLoad';
 import { listValueHistory, listWatches, listWearLogs, mainPhoto, thumbSrc } from '../../lib/api';
 import { daysBetween, formatEuros, plural, toISODate } from '../../lib/format';
-import { Cushion, LinkButton, Loading, Notice, PageHeader, Segmented, Stat } from '../../components/ui';
+import { Cushion, LinkButton, Notice, PageHeader, Segmented, Stat } from '../../components/ui';
 import Sparkline from '../../components/Sparkline/Sparkline';
 import CostTeaser from '../../components/CostTeaser/CostTeaser';
 import { analyseCosts } from '../../lib/costPerWear';
@@ -12,6 +12,7 @@ import { PAYMENTS_ENABLED, premiumPrices } from '../../lib/features';
 import { defineStrings, useStrings } from '../../i18n';
 import { COMMON } from '../../i18n/common';
 import s from './StatsPage.module.css';
+import { SkeletonHeader, SkeletonList } from '../../components/Skeleton/Skeleton';
 
 const S = defineStrings({
   title: 'Statistiques',
@@ -131,7 +132,7 @@ function StatsContent() {
     });
   }, [q.data]);
 
-  if (q.loading) return <div className="page"><Loading /></div>;
+  if (q.loading) return <div className="page"><SkeletonHeader withStats /><SkeletonList rows={5} thumb={44} /></div>;
   if (q.error || !stats) return <div className="page"><Notice tone="error">{q.error}</Notice></div>;
 
   const totalBought = q.data!.watches.reduce((a, w) => a + (Number(w.purchase_price) || 0), 0);
@@ -151,7 +152,7 @@ function StatsContent() {
 
       <section className={s.block}>
         <h2>{t.rotation}</h2>
-        <ul className={s.bars}>
+        <ul className={`${s.bars} reveal`}>
           {stats.rows.map(r => (
             <li key={r.w.id}>
               <Link to={`/montre/${r.w.id}?onglet=portage`} className={s.barRow}>
@@ -223,7 +224,7 @@ function StatsPreview() {
   }, [uid]);
   const a = useMemo(() => (q.data ? analyseCosts(q.data.watches, q.data.wears) : null), [q.data]);
 
-  if (q.loading || !profile) return <div className="page"><Loading /></div>;
+  if (q.loading || !profile) return <div className="page"><SkeletonHeader withStats /><SkeletonList rows={4} thumb={0} /></div>;
   if (q.error || !a) return <div className="page"><Notice tone="error">{q.error}</Notice></div>;
 
   const since = toISODate(new Date(Date.now() - 365 * 86_400_000));

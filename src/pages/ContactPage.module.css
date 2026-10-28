@@ -1,0 +1,18 @@
+.cards { display: grid; gap: var(--sp-3); }
+@media (min-width: 640px) { .cards { grid-template-columns: 1fr 1fr; } }
+.card {
+  position: relative; display: flex; flex-direction: column; gap: var(--sp-2); padding: var(--sp-5);
+  border-radius: var(--r-cushion); background: var(--surface); border: 1px solid var(--line);
+  color: var(--text-2) !important; text-decoration: none; line-height: 1.5;
+  transition: border-color var(--dur) var(--ease), transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+}
+.card strong { font-family: var(--font-display); font-size: var(--fs-xl); font-weight: 500; color: var(--text); }
+.card span:last-of-type { font-size: var(--fs-sm); }
+@media (hover: hover) { .card:hover { border-color: var(--seam); transform: translateY(-2px); box-shadow: var(--shadow-md); } }
+.icon { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; background: color-mix(in srgb, var(--brass) 16%, transparent); color: var(--brass); margin-bottom: var(--sp-2); }
+.arrow { position: absolute; top: var(--sp-5); right: var(--sp-5); color: var(--text-3); transition: color var(--dur-fast); }
+.card:hover .arrow { color: var(--brass); }
+.address { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-2) var(--sp-3); margin-top: var(--sp-6) !important; font-size: var(--fs-sm); color: var(--text-3); }
+.address svg { color: var(--brass); }
+.address a { color: var(--text); font-weight: 600; }
+@media (prefers-reduced-motion: reduce) { .card { transition: none; } .card:hover { transform: none; } }

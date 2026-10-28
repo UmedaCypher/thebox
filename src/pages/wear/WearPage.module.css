@@ -9,7 +9,7 @@
 }
 .picker li { scroll-snap-align: start; }
 .pick { display: flex; flex-direction: column; gap: 2px; width: 100%; text-align: left; border-radius: var(--r-cushion); }
-.pick > div { margin-bottom: var(--sp-2); transition: box-shadow 160ms var(--ease); }
+.pick > div { margin-bottom: var(--sp-2); transition: box-shadow var(--dur-fast) var(--ease); }
 .pick[aria-pressed='true'] > div { box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--brass); }
 .pickName { font-family: var(--font-display); font-size: var(--fs-md); line-height: 1.2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .pickBrand { font-size: var(--fs-xs); color: var(--text-3); }
@@ -37,8 +37,8 @@
 .dayPhoto { position: absolute; inset: 2px; border-radius: 50%; overflow: hidden; display: grid; place-items: center; color: var(--text); font-size: var(--fs-sm); }
 .dayPhoto img { width: 100%; height: 100%; object-fit: cover; }
 .more {
-  position: absolute; right: -2px; bottom: -2px; min-width: 20px; height: 20px; padding: 0 4px; border-radius: 10px;
-  background: var(--brass); color: var(--brass-ink); font-size: 0.6875rem; font-weight: 700; display: grid; place-items: center;
+  position: absolute; right: -2px; bottom: -2px; min-width: 20px; height: 20px; padding: 0 4px; border-radius: var(--r-sm);
+  background: var(--brass); color: var(--brass-ink); font-size: var(--fs-xs); font-weight: 700; display: grid; place-items: center;
 }
 
 .monthFoot { margin-top: var(--sp-5); display: flex; flex-direction: column; gap: var(--sp-5); }
@@ -49,7 +49,7 @@
 /* Feuille du jour */
 .dayList { list-style: none; display: flex; flex-direction: column; }
 .dayRow { width: 100%; display: flex; align-items: center; gap: var(--sp-4); padding: var(--sp-2) 0; text-align: left; border-bottom: 1px solid var(--line); }
-.dayRowPhoto { width: 56px; flex: none; border-radius: 14px; }
+.dayRowPhoto { width: 56px; flex: none; border-radius: var(--r-md); }
 .dayRowText { display: flex; flex-direction: column; flex: 1; min-width: 0; }
 .dayRowText strong { font-weight: 600; }
 .dayRowText span { color: var(--text-3); font-size: var(--fs-sm); }
@@ -62,4 +62,19 @@
   .monthHead, .calendar { grid-column: 1; }
   .monthFoot { grid-column: 2; grid-row: 1 / span 2; margin-top: 56px; align-self: start; }
   .monthStats { flex-direction: column; gap: var(--sp-5); }
+}
+
+/* Micro-interactions : la coche et la photo du jour « se posent » quand on note un port */
+.check { animation: pop var(--dur-slow) var(--ease-out) backwards; }
+.dayPhoto { animation: settle var(--dur-slow) var(--ease-out) backwards; }
+.pick:active > div { transform: scale(0.97); }
+.pick > div { transition: box-shadow var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease); }
+.day { transition: border-color var(--dur) var(--ease), background-color var(--dur) var(--ease), transform var(--dur-fast) var(--ease); }
+.day:active:not(:disabled) { transform: scale(0.94); }
+.dayRowCheck { transition: background-color var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease); }
+@keyframes pop { 0% { transform: scale(0.4); opacity: 0; } 70% { transform: scale(1.12); opacity: 1; } 100% { transform: scale(1); } }
+@keyframes settle { from { transform: scale(0.85); opacity: 0; } to { transform: none; opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  .check, .dayPhoto { animation: none; }
+  .pick:active > div, .day:active:not(:disabled) { transform: none; }
 }

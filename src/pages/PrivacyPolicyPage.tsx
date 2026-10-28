@@ -1,13 +1,18 @@
 // client/src/pages/PrivacyPolicyPage.tsx
 import React from 'react';
+import InfoPage from '../components/InfoPage/InfoPage';
 import styles from './StaticPage.module.css';
 import { Link } from 'react-router-dom';
 import { defineStrings, useStrings } from '../i18n';
 
 const S = defineStrings({
+  kicker: 'Informations légales',
+  lead: 'Texte provisoire, en cours de finalisation avant le lancement.',
   title: 'Politique de Confidentialité',
   notice: '',
 }, {
+  kicker: 'Legal',
+  lead: 'Draft text, being finalised before launch.',
   title: 'Privacy Policy',
   notice: 'This document is currently available in French only.',
 });
@@ -15,13 +20,8 @@ const S = defineStrings({
 const PrivacyPolicyPage: React.FC = () => {
   const t = useStrings(S);
   return (
-    <div className={styles.staticPageContainer}>
-      <div className={styles.staticPageContent}>
-        <header className={styles.staticPageHeader}>
-          <h1>{t.title}</h1>
-          {t.notice && <p>{t.notice}</p>}
-        </header>
-        <section className={styles.staticPageSection}>
+    <InfoPage kicker={t.kicker} title={t.title} notice={t.notice || undefined} lead={t.lead} toc>
+        <section>
           <p><strong>Date de dernière mise à jour :</strong> [Date]</p>
 
           <h2>Introduction</h2>
@@ -161,8 +161,7 @@ const PrivacyPolicyPage: React.FC = () => {
             Pour plus d'informations sur les conditions d'utilisation de notre service, veuillez consulter nos <Link to="/cgu" className={styles.inlineLink}>Conditions Générales d'Utilisation</Link>.
           </p>
         </section>
-      </div>
-    </div>
+    </InfoPage>
   );
 };
 

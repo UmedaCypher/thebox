@@ -46,7 +46,7 @@
 .preview { flex: 1; min-width: 0; font-size: var(--fs-sm); color: var(--text-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .preview[data-unread='true'] { color: var(--text); font-weight: 600; }
 .unread {
-  flex: none; min-width: 22px; height: 22px; padding: 0 7px; border-radius: 999px; display: grid; place-items: center;
+  flex: none; min-width: 22px; height: 22px; padding: 0 7px; border-radius: var(--r-pill); display: grid; place-items: center;
   background: var(--brass); color: var(--brass-ink); font-size: var(--fs-xs); font-weight: 700;
 }
 
@@ -70,7 +70,7 @@
   border-bottom: 1px solid var(--line); background: var(--surface); text-decoration: none; color: inherit;
 }
 .context:hover { color: inherit; background: var(--cushion); }
-.contextPhoto { width: 44px; flex: none; border-radius: 12px; }
+.contextPhoto { width: 44px; flex: none; border-radius: var(--r-md); }
 .contextText { flex: 1; min-width: 0; display: flex; flex-direction: column; }
 .contextText strong { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .contextLabel { font-size: var(--fs-xs); color: var(--text-3); }
@@ -80,7 +80,7 @@
 .firstHint { margin: auto; max-width: 34ch; text-align: center; color: var(--text-3); font-size: var(--fs-sm); }
 .day { display: flex; flex-direction: column; gap: 3px; }
 .dayLabel { text-align: center; margin: var(--sp-3) 0; }
-.dayLabel span { font-size: var(--fs-xs); color: var(--text-3); padding: 3px 10px; border-radius: 999px; background: var(--surface); }
+.dayLabel span { font-size: var(--fs-xs); color: var(--text-3); padding: 3px 10px; border-radius: var(--r-pill); background: var(--surface); }
 
 .bubbleRow { display: flex; flex-direction: column; align-items: flex-start; }
 .bubbleRow[data-mine='true'] { align-items: flex-end; }
@@ -96,7 +96,7 @@
 .bubble[data-tail='true'] { margin-bottom: var(--sp-2); }
 .bubble[data-state='pending'] { opacity: 0.6; }
 .bubble[data-state='failed'] { outline: 1px solid var(--danger); }
-.bubbleTime { display: block; margin-top: 2px; font-size: 0.6875rem; opacity: 0.7; text-align: right; }
+.bubbleTime { display: block; margin-top: 2px; font-size: var(--fs-xs); opacity: 0.7; text-align: right; }
 .bubbleActions { font-size: var(--fs-xs); color: var(--text-2); margin: -4px 0 var(--sp-2) var(--sp-2); }
 .bubbleActions button { display: inline-flex; align-items: center; gap: 4px; color: var(--danger); font-size: var(--fs-xs); font-weight: 600; padding: 4px 0; }
 

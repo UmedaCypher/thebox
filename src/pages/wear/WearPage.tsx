@@ -7,10 +7,11 @@ import { addWear, listWatches, listWearLogs, mainPhoto, photoUrl, removeWear, th
 import { formatDate, formatNumber, plural, toISODate, todayISO } from '../../lib/format';
 import { drawMonthCard, shareImage } from '../../lib/shareCard';
 import type { Watch } from '../../types';
-import { Button, Cushion, EmptyState, IconButton, Img, LinkButton, Loading, Notice, PageHeader, Sheet, Stat } from '../../components/ui';
+import { Button, Cushion, EmptyState, IconButton, Img, LinkButton, Notice, PageHeader, Sheet, Stat } from '../../components/ui';
 import { defineStrings, getLocale, useStrings } from '../../i18n';
 import NewsTeaser from '../../components/NewsTeaser/NewsTeaser';
 import s from './WearPage.module.css';
+import { SkeletonCalendar, SkeletonHeader } from '../../components/Skeleton/Skeleton';
 
 const S = defineStrings({
   weekdays: ['lun.', 'mar.', 'mer.', 'jeu.', 'ven.', 'sam.', 'dim.'],
@@ -145,7 +146,7 @@ export default function WearPage() {
     }
   };
 
-  if (watchesQ.loading || logsQ.loading) return <div className="page"><Loading /></div>;
+  if (watchesQ.loading || logsQ.loading) return <div className="page"><SkeletonHeader /><SkeletonCalendar /></div>;
   if (watchesQ.error) return <div className="page"><Notice tone="error">{watchesQ.error}</Notice></div>;
 
   if (!watches.length) {
