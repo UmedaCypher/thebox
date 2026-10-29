@@ -29,13 +29,28 @@ export const PAYMENTS_ENABLED = false;
  */
 export type BillingInterval = 'month' | 'year';
 const PRICES = defineStrings<Record<BillingInterval, { amount: string; period: string; note?: string }>>({
-  month: { amount: '2 €', period: 'par mois' },
-  year: { amount: '20 €', period: 'par an', note: '2 mois offerts' },
+  month: { amount: '3 €', period: 'par mois' },
+  year: { amount: '30 €', period: 'par an', note: '2 mois offerts' },
 }, {
-  month: { amount: '€2', period: 'per month' },
-  year: { amount: '€20', period: 'per year', note: '2 months free' },
+  month: { amount: '€3', period: 'per month' },
+  year: { amount: '€30', period: 'per year', note: '2 months free' },
 });
 export const premiumPrices = () => tr(PRICES);
+/** Prix TTC en euros, pour les calculs (coût par port, affiliation). Garder identique aux prix Stripe. */
+export const PREMIUM_YEAR_EUR = 30;
+export const PREMIUM_MONTH_EUR = 3;
+
+/* ---------- Programme d'affiliation (mêmes valeurs que la migration et le webhook) ---------- */
+/** Part de la première année d'abonnement annuel reversée à l'affilié, sur le prix hors taxes. */
+export const AFFILIATE_RATE = 0.3;
+/** Délai avant qu'une commission soit payable (après les 14 jours de rétractation). */
+export const AFFILIATE_HOLD_DAYS = 30;
+/** Montant minimum pour un virement ; en dessous, le solde est reporté au mois suivant. */
+export const AFFILIATE_MIN_PAYOUT_EUR = 50;
+/** TVA française incluse dans le prix affiché, pour estimer la commission par abonné. */
+export const VAT_RATE = 0.2;
+/** Commission estimée par abonné annuel, en euros (7,50 € pour 30 € TTC). */
+export const affiliateCommissionPerYear = () => Math.round((PREMIUM_YEAR_EUR / (1 + VAT_RATE)) * AFFILIATE_RATE * 100) / 100;
 
 /**
  * Adresse affichée sur la page Contact (lien mailto).

@@ -2,6 +2,7 @@
 import { supabase } from './supabaseClient';
 import { preparePhoto, preparePhotoWithThumb } from './images';
 import { getLang } from '../i18n';
+import { readRef } from './source';
 import type {
   ConversationSummary, GalleryShot, MaintenanceEntry, MarketFilterOptions, MarketFilters, MarketItem, Message,
   Passport, Photo, Profile, PublicCollection, Subscription, ValuePoint, Watch, WatchInput, WearLog, WishlistItem,
@@ -26,6 +27,7 @@ const EN_MESSAGES: Record<string, string> = {
   "Chargement de la wishlist impossible.": "Couldn't load your wishlist.",
   "Chargement des filtres impossible.": "Couldn't load the filters.",
   "Chargement des marques impossible.": "Couldn't load the brands.",
+  "Chargement impossible.": "Couldn't load.",
   "Chargement des messages impossible.": "Couldn't load your messages.",
   "Chargement du calendrier impossible.": "Couldn't load the calendar.",
   "Chargement du carnet d'entretien impossible.": "Couldn't load the service log.",
@@ -64,6 +66,12 @@ const DB_ERRORS_EN: Record<string, string> = {
   SELF: 'This is your own watch.',
   NOT_FOUND: 'Conversation or listing not found.',
   AUTH_REQUIRED: 'Please log in to continue.',
+  CODE_TAKEN: 'This code is already taken. Try another one.',
+  INVALID_CODE: 'Your code needs 3 to 30 characters: lowercase letters, digits, dot, dash or underscore.',
+  INVALID_IBAN: 'This IBAN does not look right. Check it and try again.',
+  NOT_AFFILIATE: 'Join the affiliate programme first.',
+  NOTHING_DUE: 'Nothing is due to this affiliate.',
+  FORBIDDEN: 'Access restricted.',
 };
 
 const DB_ERRORS: Record<string, string> = {
@@ -75,6 +83,12 @@ const DB_ERRORS: Record<string, string> = {
   SELF: 'Il s\'agit de votre propre montre.',
   NOT_FOUND: 'Conversation ou annonce introuvable.',
   AUTH_REQUIRED: 'Connectez-vous pour continuer.',
+  CODE_TAKEN: 'Ce code est déjà pris. Essayez-en un autre.',
+  INVALID_CODE: 'Le code compte de 3 à 30 caractères : lettres minuscules, chiffres, point, tiret ou tiret bas.',
+  INVALID_IBAN: 'Cet IBAN ne semble pas valide. Vérifiez-le et réessayez.',
+  NOT_AFFILIATE: "Rejoignez d'abord le programme d'affiliation.",
+  NOTHING_DUE: "Rien n'est dû à cet affilié.",
+  FORBIDDEN: 'Accès réservé.',
 };
 
 export class AppError extends Error {
@@ -491,9 +505,10 @@ async function invokeForUrl(fn: 'create-checkout-session' | 'create-portal-sessi
   return data.url as string;
 }
 
-/** Envoie vers la page de paiement Stripe, au mois ou à l'année. */
+/** Envoie vers la page de paiement Stripe, au mois ou à l'année (avec le code d'affilié éventuel). */
 export async function startCheckout(interval: 'month' | 'year') {
-  window.location.assign(await invokeForUrl('create-checkout-session', { interval, lang: getLang() }));
+  const ref = interval === 'year' ? readRef() : null;
+  window.location.assign(await invokeForUrl('create-checkout-session', { interval, lang: getLang(), ...(ref ? { ref } : {}) }));
 }
 
 /** Envoie vers l'espace client Stripe (carte, factures, résiliation). */
@@ -506,4 +521,53 @@ export async function getSubscription(userId: string): Promise<Subscription | nu
     .select('status, current_period_end, cancel_at_period_end').eq('user_id', userId).maybeSingle();
   if (error) return null; // table absente tant que la migration n'est pas passée
   return (data as Subscription) ?? null;
+}
+
+
+/* ---------- Programme d'affiliation ---------- */
+
+export type AffiliateCommission = {
+  created_at: string; amount_cents: number; available_at: string; paid_at: string | null;
+  status: 'pending' | 'due' | 'paid' | 'cancelled';
+};
+export type Affiliate = {
+  code: string; status: 'active' | 'suspended'; payout_holder: string | null; payout_iban_last4: string | null; created_at: string;
+  referrals: number; pending_cents: number; due_cents: number; paid_cents: number; commissions: AffiliateCommission[];
+};
+export type AffiliatePayoutDue = {
+  affiliate_id: string; code: string; username: string | null; payout_holder: string | null; payout_iban: string | null;
+  due_cents: number; commissions: number;
+};
+
+/** Fiche de l'affilié connecté, ou null s'il n'a pas rejoint le programme (ou si la migration n'est pas passée). */
+export async function getMyAffiliate(): Promise<Affiliate | null> {
+  const { data, error } = await supabase.rpc('get_my_affiliate');
+  if (error) { console.warn(error.message); return null; }
+  return (data as Affiliate) ?? null;
+}
+
+export async function joinAffiliateProgram(code: string): Promise<string> {
+  const { data, error } = await supabase.rpc('join_affiliate_program', { p_code: code });
+  fail(error, 'Enregistrement impossible.');
+  return data as string;
+}
+
+/** `iban` à null : l'IBAN déjà enregistré est conservé. */
+export async function updateAffiliatePayout(holder: string, iban: string | null) {
+  const { error } = await supabase.rpc('update_affiliate_payout', { p_holder: holder, p_iban: iban });
+  fail(error, 'Enregistrement impossible.');
+}
+
+/** Administration : affiliés à qui un virement est dû (50 € minimum par défaut). */
+export async function getAffiliatePayoutsDue(minCents = 5000): Promise<AffiliatePayoutDue[]> {
+  const { data, error } = await supabase.rpc('get_affiliate_payouts_due', { p_min_cents: minCents });
+  fail(error, 'Chargement impossible.');
+  return (data as AffiliatePayoutDue[]) ?? [];
+}
+
+/** Administration : à appeler une fois le virement fait. Renvoie le montant marqué comme versé, en centimes. */
+export async function recordAffiliatePayout(affiliateId: string, reference: string): Promise<number> {
+  const { data, error } = await supabase.rpc('record_affiliate_payout', { p_affiliate: affiliateId, p_reference: reference });
+  fail(error, 'Enregistrement impossible.');
+  return Number(data);
 }

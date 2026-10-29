@@ -27,8 +27,8 @@ On travaille d'abord en **mode test** (interrupteur « Mode test » en haut du t
 
 1. **Catalogue de produits → Ajouter un produit** « Premium » avec **deux prix récurrents**, en cochant
    « Le prix inclut les taxes » (prix TTC) :
-   - 2 € **par mois** ;
-   - 20 € **par an**.
+   - 3 € **par mois** ;
+   - 30 € **par an**.
 
    Copier l'identifiant de chaque prix (`price_…`).
 2. **TVA** (à confirmer avec le comptable) :
@@ -92,7 +92,8 @@ Stripe → Développeurs → **Webhooks** → Ajouter une destination :
 
 - URL : `https://gwotvurtiyeaslmxnqcw.supabase.co/functions/v1/stripe-webhook`
 - Événements : `checkout.session.completed`, `customer.subscription.created`,
-  `customer.subscription.updated`, `customer.subscription.deleted`
+  `customer.subscription.updated`, `customer.subscription.deleted`,
+  et pour le programme d'affiliation `invoice.paid`, `charge.refunded`, `charge.dispute.created`
 
 Copier le **secret de signature** (`whsec_…`) dans le secret Supabase `STRIPE_WEBHOOK_SECRET`.
 

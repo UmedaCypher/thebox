@@ -4,10 +4,11 @@ import App from './App';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { LangProvider } from './i18n';
 import { ToastProvider } from './components/Toast/Toast';
-import { captureSource } from './lib/source';
+import { captureRef, captureSource } from './lib/source';
 import './index.css';
 
 captureSource();
+captureRef();
 
 // eslint-disable-next-line react-refresh/only-export-components
 function WithLang() {

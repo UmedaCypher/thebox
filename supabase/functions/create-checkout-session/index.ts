@@ -5,13 +5,17 @@
 //
 // Secrets nécessaires (Supabase → Edge Functions → Secrets) :
 //   STRIPE_SECRET_KEY  clé secrète Stripe (sk_test_… puis sk_live_…)
-//   STRIPE_PRICE_MONTHLY  identifiant du prix mensuel (price_…, 2 €/mois)
-//   STRIPE_PRICE_YEARLY   identifiant du prix annuel (price_…, 20 €/an)
+//   STRIPE_PRICE_MONTHLY  identifiant du prix mensuel (price_…, 3 €/mois)
+//   STRIPE_PRICE_YEARLY   identifiant du prix annuel (price_…, 30 €/an)
 //   SITE_URL           adresse publique de l'app, sans / final (ex. https://thebox.app)
 // Facultatifs :
 //   STRIPE_TAX_RATE      taux de TVA Stripe (txr_…, « TVA 20 % incluse ») ajouté à l'abonnement et aux factures
 //   STRIPE_TERMS_CONSENT « on » pour faire cocher les CGV sur la page de paiement
 //                        (renseigner d'abord l'adresse des CGV dans Stripe → Paramètres → Informations publiques)
+//
+// Affiliation : l'app peut envoyer `ref` (code d'un affilié, mémorisé quand le visiteur est arrivé par son lien).
+// Il n'est retenu que pour l'abonnement annuel, un premier abonnement, un affilié actif et différent de l'acheteur.
+// L'affilié est alors inscrit dans les métadonnées de l'abonnement ; le webhook calcule la commission.
 // SUPABASE_URL, SUPABASE_ANON_KEY et SUPABASE_SERVICE_ROLE_KEY sont fournis automatiquement.
 
 import Stripe from 'npm:stripe@17.7.0';
@@ -79,6 +83,17 @@ Deno.serve(async (req) => {
       if (error) throw error;
     }
 
+    // Parrainage : uniquement l'annuel, uniquement un premier abonnement, jamais soi-même.
+    let affiliateId: string | null = null;
+    const ref = typeof body?.ref === 'string' ? body.ref.trim().toLowerCase().slice(0, 30) : '';
+    if (ref && interval === 'year' && /^[a-z0-9][a-z0-9._-]{2,29}$/.test(ref)) {
+      const { data: aff } = await admin.from('affiliates').select('user_id').eq('code', ref).eq('status', 'active').maybeSingle();
+      if (aff && aff.user_id !== user.id) {
+        const earlier = await stripe.subscriptions.list({ customer: customerId, status: 'all', limit: 1 });
+        if (!earlier.data.length) affiliateId = aff.user_id as string;
+      }
+    }
+
     const taxRate = Deno.env.get('STRIPE_TAX_RATE');
     const termsConsent = Deno.env.get('STRIPE_TERMS_CONSENT') === 'on';
     const en = body?.lang === 'en';
@@ -88,7 +103,7 @@ Deno.serve(async (req) => {
       client_reference_id: user.id,
       line_items: [{ price: priceId, quantity: 1, ...(taxRate ? { tax_rates: [taxRate] } : {}) }],
       subscription_data: {
-        metadata: { supabase_user_id: user.id },
+        metadata: { supabase_user_id: user.id, ...(affiliateId ? { affiliate_id: affiliateId, affiliate_code: ref } : {}) },
         ...(taxRate ? { default_tax_rates: [taxRate] } : {}),
       },
       metadata: { supabase_user_id: user.id },

@@ -1,5 +1,5 @@
 import { daysBetween, formatEuros } from './format';
-import { premiumPrices } from './features';
+import { premiumPrices, PREMIUM_YEAR_EUR } from './features';
 import { defineStrings, tr } from '../i18n';
 
 const S = defineStrings({
@@ -73,8 +73,8 @@ export function analyseCosts(watches: Watch[], wears: WearLog[]): CostAnalysis {
 /** Phrase de comparaison avec le prix de Premium, à partir d'un vrai chiffre de la collection. */
 export function premiumAnchor(a: CostAnalysis): string {
   const year = premiumPrices().year.amount;
-  if (a.priciest && a.priciest.costPerWear! > 20) {
+  if (a.priciest && a.priciest.costPerWear! > PREMIUM_YEAR_EUR) {
     return tr(S).lessThanOneWear(year, a.priciest.watch.model);
   }
-  return tr(S).perMonth(year, formatEuros(20 / 12, true));
+  return tr(S).perMonth(year, formatEuros(PREMIUM_YEAR_EUR / 12, true));
 }

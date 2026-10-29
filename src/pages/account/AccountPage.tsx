@@ -7,8 +7,8 @@ import { useTheme } from '../../hooks/useTheme';
 import { getSubscription, openBillingPortal, saveProfile, uploadAvatar } from '../../lib/api';
 import { useLoad } from '../../hooks/useLoad';
 import { supabase } from '../../lib/supabaseClient';
-import { FREE_WATCH_LIMIT, PAYMENTS_ENABLED } from '../../lib/features';
-import { formatDate } from '../../lib/format';
+import { FREE_WATCH_LIMIT, PAYMENTS_ENABLED, affiliateCommissionPerYear } from '../../lib/features';
+import { formatDate, formatEuros } from '../../lib/format';
 import { Button, LinkButton, Notice, PageHeader, PremiumTag, Segmented, TextField, Toggle } from '../../components/ui';
 import { useLanguageSetting } from '../../i18n/useLanguageSetting';
 import { defineStrings, tr, useStrings } from '../../i18n';
@@ -55,6 +55,9 @@ const S = defineStrings({
   insurance: 'Inventaire pour l\'assurance',
   freeText: (n: number) => `La collection gratuite accueille ${n} montres, avec la galerie, le calendrier de portage et le passeport.`,
   discoverPremium: 'Découvrir Premium',
+  affiliate: 'Affiliation',
+  affiliateText: (amount: string) => `Recommandez The Box : vous touchez ${amount} pour chaque abonné annuel venu par votre lien.`,
+  affiliateOpen: 'Mon espace affilié',
   appearance: 'Apparence',
   theme: 'Thème',
   themeDark: 'Écrin (sombre)',
@@ -116,6 +119,9 @@ const S = defineStrings({
   insurance: 'Insurance inventory',
   freeText: n => `The free collection holds ${n} watches, with the gallery, the wear calendar and the passport.`,
   discoverPremium: 'Discover Premium',
+  affiliate: 'Affiliate programme',
+  affiliateText: amount => `Recommend The Box: earn ${amount} for every yearly subscriber who comes through your link.`,
+  affiliateOpen: 'My affiliate space',
   appearance: 'Appearance',
   theme: 'Theme',
   themeDark: 'Écrin (dark)',
@@ -304,6 +310,12 @@ export default function AccountPage() {
             <div><LinkButton to="/premium" variant="secondary">{t.discoverPremium}</LinkButton></div>
           </>
         )}
+      </section>
+
+      <section className={`panel ${s.section}`} data-tone="ruby">
+        <h2 className={s.h}>{t.affiliate}</h2>
+        <p className={s.muted}>{t.affiliateText(formatEuros(affiliateCommissionPerYear(), true))}</p>
+        <div><LinkButton to="/affiliation" variant="secondary">{t.affiliateOpen}</LinkButton></div>
       </section>
 
       <section className={s.section} id="notifications">

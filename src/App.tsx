@@ -32,6 +32,8 @@ const CguPage = lazy(() => import('./pages/CguPage'));
 const CgvPage = lazy(() => import('./pages/CgvPage'));
 const PrivacyPolicyPage = lazy(() => import('./pages/PrivacyPolicyPage'));
 const LegalMentionsPage = lazy(() => import('./pages/LegalMentionsPage'));
+const AffiliateTermsPage = lazy(() => import('./pages/AffiliateTermsPage'));
+const AffiliatePage = lazy(() => import('./pages/affiliate/AffiliatePage'));
 const MarketPage = lazy(() => import('./pages/market/MarketPage'));
 const MessagesPage = lazy(() => import('./pages/messages/MessagesPage'));
 const OnboardingPage = lazy(() => import('./pages/onboarding/OnboardingPage'));
@@ -95,6 +97,7 @@ export default function App() {
             <Route path="/cgv" element={<CgvPage />} />
             <Route path="/confidentialite" element={<PrivacyPolicyPage />} />
             <Route path="/mentions-legales" element={<LegalMentionsPage />} />
+            <Route path="/affiliation/conditions" element={<AffiliateTermsPage />} />
 
             {/* Membre */}
             <Route path="/accueil" element={P(<DashboardPage />)} />
@@ -105,6 +108,7 @@ export default function App() {
             <Route path="/portage" element={P(<WearPage />)} />
             <Route path="/profil" element={P(<AccountPage />)} />
             <Route path="/stats" element={P(<StatsPage />)} />
+            <Route path="/affiliation" element={P(<AffiliatePage />)} />
             <Route path="/wishlist" element={P(<WishlistPage />)} />
             <Route path="/export/assurance" element={P(<InsuranceExportPage />)} />
             <Route path="/bienvenue" element={P(<OnboardingPage />)} />
