@@ -65,11 +65,14 @@ function footer(ctx: CanvasRenderingContext2D, username: string | null) {
   ctx.textAlign = 'left';
   ctx.fillStyle = C.text;
   ctx.font = `500 44px ${DISPLAY}`;
-  ctx.fillText('The Box', 96, H - 104);
-  ctx.textAlign = 'right';
+  ctx.fillText('Arcora', 96, H - 104);
+  // Signature : l'adresse de l'app sous le nom, pour qui voit l'image sans le lien
   ctx.fillStyle = C.text2;
+  ctx.font = `500 24px ${BODY}`;
+  ctx.fillText(window.location.host, 96, H - 66);
+  ctx.textAlign = 'right';
   ctx.font = `500 30px ${BODY}`;
-  ctx.fillText(username ? `@${username}` : window.location.host, W - 96, H - 106);
+  if (username) ctx.fillText(`@${username}`, W - 96, H - 106);
 }
 
 const toBlob = (canvas: HTMLCanvasElement) =>

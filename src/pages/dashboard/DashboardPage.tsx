@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  ArrowUpRight, BarChart3, Bell, CalendarDays, Check, Heart, Images, MessageCircle, Newspaper, Plus,
+  ArrowUpRight, BarChart3, CalendarDays, Check, HandCoins, Heart, Images, MessageCircle, Newspaper, Plus,
   ShieldCheck, Sparkles, Store, Tag, UserRound, Watch as WatchIcon,
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
@@ -53,7 +53,7 @@ const S = defineStrings({
   sell: 'Vendre',
   wishlist: 'Wishlist',
   insurance: 'Assurance',
-  notifications: 'Notifications',
+  affiliate: 'Parrainage',
   profile: 'Profil',
 }, {
   hello: h => (h < 12 && h >= 5 ? 'Good morning' : h < 18 && h >= 12 ? 'Good afternoon' : 'Good evening'),
@@ -88,7 +88,7 @@ const S = defineStrings({
   sell: 'Sell',
   wishlist: 'Wishlist',
   insurance: 'Insurance',
-  notifications: 'Notifications',
+  affiliate: 'Referrals',
   profile: 'Profile',
 });
 
@@ -332,7 +332,7 @@ export default function DashboardPage() {
             <Link to="/collection"><Tag size={20} strokeWidth={1.7} aria-hidden="true" />{t.sell}</Link>
             <Link to="/wishlist"><Heart size={20} strokeWidth={1.7} aria-hidden="true" />{t.wishlist}</Link>
             <Link to="/export/assurance"><ShieldCheck size={20} strokeWidth={1.7} aria-hidden="true" />{t.insurance}</Link>
-            <Link to="/profil#notifications"><Bell size={20} strokeWidth={1.7} aria-hidden="true" />{t.notifications}</Link>
+            <Link to="/affiliation"><HandCoins size={20} strokeWidth={1.7} aria-hidden="true" />{t.affiliate}</Link>
             <Link to="/profil"><UserRound size={20} strokeWidth={1.7} aria-hidden="true" />{t.profile}</Link>
           </nav>
         </section>

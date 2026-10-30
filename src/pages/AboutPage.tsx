@@ -8,8 +8,8 @@ const S = defineStrings({
   kicker: 'La maison',
   heroAlt: 'Un écrin ouvert, ses coussins de velours',
   title: 'À propos',
-  lead: "The Box est né d'une question simple : laquelle de mes montres est-ce que je porte vraiment ?",
-  intro: "Une collection vit dans un tiroir, une boîte, parfois un coffre. Ses papiers sont ailleurs, ses factures d'entretien dans une boîte mail, et son histoire dans la tête de son propriétaire. The Box rassemble tout cela au même endroit.",
+  lead: "Arcora est né d'une question simple : laquelle de mes montres est-ce que je porte vraiment ?",
+  intro: "Une collection vit dans un tiroir, une boîte, parfois un coffre. Ses papiers sont ailleurs, ses factures d'entretien dans une boîte mail, et son histoire dans la tête de son propriétaire. Arcora rassemble tout cela au même endroit.",
   whatTitle: "Ce que fait l'application",
   what: [
     'Une fiche complète pour chaque montre, partageable sous forme de passeport.',
@@ -28,8 +28,8 @@ const S = defineStrings({
   kicker: 'The house',
   heroAlt: 'An open watch box with velvet cushions',
   title: 'About',
-  lead: 'The Box began with a simple question: which of my watches do I actually wear?',
-  intro: 'A collection lives in a drawer, a box, sometimes a safe. Its papers are somewhere else, its service invoices in an inbox, and its story in its owner\'s head. The Box brings all of it together in one place.',
+  lead: 'Arcora began with a simple question: which of my watches do I actually wear?',
+  intro: 'A collection lives in a drawer, a box, sometimes a safe. Its papers are somewhere else, its service invoices in an inbox, and its story in its owner\'s head. Arcora brings all of it together in one place.',
   whatTitle: 'What the app does',
   what: [
     'A full page for every watch, shareable as a passport.',

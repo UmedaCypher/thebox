@@ -7,12 +7,12 @@ import s from './PressPage.module.css';
 const S = defineStrings({
   kicker: 'Presse',
   title: 'Espace presse',
-  lead: "The Box est l'écrin numérique des collectionneurs de montres : une fiche par montre, le calendrier de ce qu'on porte, et un Marché entre passionnés.",
+  lead: "Arcora est l'écrin numérique des collectionneurs de montres : une fiche par montre, le calendrier de ce qu'on porte, et un Marché entre passionnés.",
   factsTitle: "L'essentiel",
   facts: [
     { k: 'Pour qui', v: 'Les collectionneurs de montres, de la première pièce à la collection établie.' },
     { k: 'Ce que fait l\'app', v: "Registre de collection, calendrier de portage et coût par port, galerie au poignet, passeport partageable, Marché et messagerie entre membres." },
-    { k: 'Modèle', v: `Gratuit jusqu'à ${FREE_WATCH_LIMIT} montres. Premium à 20 € par an pour la collection illimitée et les outils du collectionneur.` },
+    { k: 'Modèle', v: `Gratuit jusqu'à ${FREE_WATCH_LIMIT} montres. Premium à 30 € par an pour la collection illimitée et les outils du collectionneur.` },
     { k: 'Confidentialité', v: "Collection privée par défaut ; prix et valeurs jamais publiés ; position GPS retirée des photos avant l'envoi." },
     { k: 'Langues', v: 'Français et anglais.' },
   ],
@@ -25,12 +25,12 @@ const S = defineStrings({
 }, {
   kicker: 'Press',
   title: 'Press room',
-  lead: 'The Box is the digital watch box for collectors: a page for every watch, a calendar of what you wear, and a Market among enthusiasts.',
+  lead: 'Arcora is the digital watch box for collectors: a page for every watch, a calendar of what you wear, and a Market among enthusiasts.',
   factsTitle: 'Key facts',
   facts: [
     { k: 'For whom', v: 'Watch collectors, from the first piece to an established collection.' },
     { k: 'What it does', v: 'Collection register, wear calendar and cost per wear, wrist gallery, shareable passport, Market and messages between members.' },
-    { k: 'Model', v: `Free up to ${FREE_WATCH_LIMIT} watches. Premium at €20 a year for an unlimited collection and the collector's tools.` },
+    { k: 'Model', v: `Free up to ${FREE_WATCH_LIMIT} watches. Premium at €30 a year for an unlimited collection and the collector's tools.` },
     { k: 'Privacy', v: 'Collections are private by default; prices and values are never published; GPS location is removed from photos before upload.' },
     { k: 'Languages', v: 'French and English.' },
   ],

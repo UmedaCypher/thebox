@@ -2,7 +2,8 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import type { ReactNode } from 'react';
 import type { AuthError, Session, User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabaseClient';
-import { fetchProfile } from '../lib/api';
+import { fetchProfile, getMyReferrals, recordSignup } from '../lib/api';
+import { readRef, readSource } from '../lib/source';
 import type { Profile } from '../types';
 
 interface AuthContextType {
@@ -12,6 +13,11 @@ interface AuthContextType {
   authError: AuthError | null;
   profile: Profile | null;
   isPremium: boolean;
+  /** Fin du Premium offert (parrainage, geste), s'il y en a un en cours. */
+  premiumUntil: string | null;
+  /** Inscrit pendant la bêta : badge « membre fondateur ». */
+  founder: boolean;
+  refreshPerks: () => Promise<void>;
   signOut: () => Promise<void>;
   refreshUser: () => Promise<void>;
   refreshProfile: () => Promise<void>;
@@ -51,6 +57,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => { refreshProfile(); }, [refreshProfile]);
 
+  // Premium offert et statut fondateur. À la première connexion, on enregistre l'inscription
+  // (provenance, lien de parrainage suivi) : c'est elle qui déclenche le Premium de bienvenue.
+  const [perks, setPerks] = useState<{ premiumUntil: string | null; founder: boolean }>({ premiumUntil: null, founder: false });
+  const refreshPerks = useCallback(async () => {
+    if (!user) { setPerks({ premiumUntil: null, founder: false }); return; }
+    const flag = `arcora-signup-${user.id}`;
+    let recorded = false;
+    try { recorded = localStorage.getItem(flag) === '1'; } catch { /* stockage indisponible */ }
+    if (!recorded && await recordSignup(readRef(), readSource())) {
+      try { localStorage.setItem(flag, '1'); } catch { /* stockage indisponible */ }
+    }
+    const r = await getMyReferrals();
+    setPerks({ premiumUntil: r?.premium_until ?? null, founder: Boolean(r?.founder) });
+  }, [user]);
+  useEffect(() => { refreshPerks(); }, [refreshPerks]);
+
   const refreshUser = useCallback(async () => {
     const { data, error } = await supabase.auth.refreshSession();
     if (error) setAuthError(error);
@@ -65,9 +87,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo<AuthContextType>(() => ({
     session, user, loading, authError, profile,
-    isPremium: profile?.plan === 'premium' || profile?.account_type === 'admin',
-    signOut, refreshUser, refreshProfile,
-  }), [session, user, loading, authError, profile, signOut, refreshUser, refreshProfile]);
+    isPremium: profile?.plan === 'premium' || profile?.account_type === 'admin'
+      || (perks.premiumUntil !== null && new Date(perks.premiumUntil).getTime() > Date.now()),
+    premiumUntil: perks.premiumUntil,
+    founder: perks.founder,
+    signOut, refreshUser, refreshProfile, refreshPerks,
+  }), [session, user, loading, authError, profile, perks, signOut, refreshUser, refreshProfile, refreshPerks]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

@@ -9,8 +9,8 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       manifest: {
-        name: 'The Box',
-        short_name: 'The Box',
+        name: 'Arcora',
+        short_name: 'Arcora',
         description: "L'écrin de votre collection de montres : passeport, calendrier de portage, galerie au poignet.",
         lang: 'fr-FR',
         start_url: '/',

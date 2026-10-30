@@ -5,7 +5,7 @@
  */
 export const LEGAL = {
   /** Nom de l'app tel qu'affiché au public (provisoire). */
-  appName: 'The Box',
+  appName: 'Arcora',
   /** Adresse du site, sans « / » final. */
   siteUrl: '',
 

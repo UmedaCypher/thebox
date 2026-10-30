@@ -10,7 +10,7 @@ const S = defineStrings({
   title: 'Questions fréquentes',
   items: [
     {
-      q: 'À quoi sert The Box ?',
+      q: 'À quoi sert Arcora ?',
       a: "À tenir le registre de votre collection de montres : une fiche complète par montre, un calendrier de ce que vous portez, l'historique des entretiens, et une galerie de photos au poignet pour comparer avec d'autres collectionneurs.",
     },
     {
@@ -23,7 +23,7 @@ const S = defineStrings({
     },
     {
       q: "D'où vient la valeur de mes montres ?",
-      a: "De vous. Vous indiquez la valeur estimée, et The Box garde l'historique de chaque mise à jour. Aucune cotation automatique n'est utilisée pour l'instant.",
+      a: "De vous. Vous indiquez la valeur estimée, et Arcora garde l'historique de chaque mise à jour. Aucune cotation automatique n'est utilisée pour l'instant.",
     },
     {
       q: 'À quoi sert le calendrier de portage ?',
@@ -48,7 +48,7 @@ const S = defineStrings({
   extra: {
     cpw: { q: "Qu'est-ce que le coût par port ?", a: "Le prix d'achat d'une montre divisé par le nombre de jours où vous l'avez portée. Il montre ce que chaque montre vous coûte vraiment, et il baisse à chaque port." },
     sell: { q: 'Comment vendre ou échanger une montre ?', a: "Dans la fiche de la montre, choisissez « À vendre » ou « À échanger », avec un prix et une ville si vous le souhaitez. L'annonce apparaît dans le Marché ; les intéressés vous écrivent par la messagerie." },
-    fee: { q: 'The Box prend-elle une commission ?', a: "Non. La vente se fait directement entre membres : The Box n'encaisse rien et n'intervient pas dans la transaction. Préférez une remise en main propre dans un lieu sûr, ou chez un horloger." },
+    fee: { q: 'Arcora prend-elle une commission ?', a: "Non. La vente se fait directement entre membres : Arcora n'encaisse rien et n'intervient pas dans la transaction. Préférez une remise en main propre dans un lieu sûr, ou chez un horloger." },
     who: { q: 'Qui peut m\'écrire ?', a: "Les membres, depuis vos annonces et votre profil public, si vous acceptez les messages (réglage dans votre profil). Vous pouvez bloquer un membre ou signaler un message à tout moment." },
   },
   asideTitle: 'Besoin d\'aide ?',
@@ -57,7 +57,7 @@ const S = defineStrings({
   title: 'Frequently asked questions',
   items: [
     {
-      q: 'What is The Box for?',
+      q: 'What is Arcora for?',
       a: 'Keeping a record of your watch collection: a full page for every watch, a calendar of what you wear, service history, and a gallery of wrist shots to compare with other collectors.',
     },
     {
@@ -70,7 +70,7 @@ const S = defineStrings({
     },
     {
       q: 'Where does the value of my watches come from?',
-      a: 'From you. You enter the estimated value, and The Box keeps a history of every update. No automatic pricing is used for now.',
+      a: 'From you. You enter the estimated value, and Arcora keeps a history of every update. No automatic pricing is used for now.',
     },
     {
       q: 'What is the wear calendar for?',
@@ -95,7 +95,7 @@ const S = defineStrings({
   extra: {
     cpw: { q: 'What is cost per wear?', a: 'The purchase price of a watch divided by the number of days you wore it. It shows what each watch really costs you, and it drops every time you wear it.' },
     sell: { q: 'How do I sell or trade a watch?', a: 'On the watch page, choose "For sale" or "For trade", with a price and a city if you like. The listing appears on the Market and interested members write to you through Messages.' },
-    fee: { q: 'Does The Box take a commission?', a: 'No. Sales happen directly between members: The Box takes no money and is not part of the transaction. Prefer meeting in person in a safe place, or at a watchmaker.' },
+    fee: { q: 'Does Arcora take a commission?', a: 'No. Sales happen directly between members: Arcora takes no money and is not part of the transaction. Prefer meeting in person in a safe place, or at a watchmaker.' },
     who: { q: 'Who can write to me?', a: 'Members, from your listings and your public profile, if you accept messages (a setting in your profile). You can block a member or report a message at any time.' },
   },
   asideTitle: 'Need help?',

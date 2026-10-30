@@ -24,7 +24,7 @@ const S = defineStrings({
     boxPapers: 'Boîte et papiers', purchaseDate: 'Date d\'achat', purchasePrice: 'Prix d\'achat', lastService: 'Dernière révision',
   },
   declaredValue: 'Valeur déclarée',
-  footer: 'Valeurs déclarées par le propriétaire. Document généré avec The Box.',
+  footer: 'Valeurs déclarées par le propriétaire. Document généré avec Arcora.',
 }, {
   title: 'Insurance inventory',
   subtitle: 'A document with a photo, the reference and the declared value of each watch. Choose “Save as PDF” in the print window.',
@@ -39,7 +39,7 @@ const S = defineStrings({
     boxPapers: 'Box & papers', purchaseDate: 'Purchase date', purchasePrice: 'Purchase price', lastService: 'Last service',
   },
   declaredValue: 'Declared value',
-  footer: 'Values declared by the owner. Document generated with The Box.',
+  footer: 'Values declared by the owner. Document generated with Arcora.',
 });
 
 /**

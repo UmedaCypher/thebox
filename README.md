@@ -1,4 +1,4 @@
-# The Box
+# Arcora
 
 L'écrin numérique des collectionneurs de montres : une fiche (passeport) par montre, un calendrier de portage,
 une galerie de photos au poignet filtrable par tour de poignet. Application web installable (PWA).
