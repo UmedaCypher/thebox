@@ -52,7 +52,7 @@ const S = defineStrings({
   reportLast: 'Signaler le dernier message reçu',
   unblockMember: 'Débloquer ce membre',
   blockMember: 'Bloquer ce membre',
-  optionsHint: 'Un membre bloqué ne peut plus vous écrire et ses annonces disparaissent de votre marché. Il n\'en est pas informé. Les signalements sont lus par l\'équipe The Box.',
+  optionsHint: 'Un membre bloqué ne peut plus vous écrire et ses annonces disparaissent de votre marché. Il n\'en est pas informé. Les signalements sont lus par l\'équipe Arcora.',
 }, {
   yesterdayShort: 'yesterday',
   today: 'Today',
@@ -86,7 +86,7 @@ const S = defineStrings({
   reportLast: 'Report the last message received',
   unblockMember: 'Unblock this member',
   blockMember: 'Block this member',
-  optionsHint: 'A blocked member can no longer write to you, and their listings disappear from your Market. They are not notified. Reports are read by The Box team.',
+  optionsHint: 'A blocked member can no longer write to you, and their listings disappear from your Market. They are not notified. Reports are read by Arcora team.',
 });
 
 const POLL_MS = 20_000;

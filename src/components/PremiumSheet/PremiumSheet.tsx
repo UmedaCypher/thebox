@@ -8,7 +8,7 @@ const S = defineStrings({ discover: 'Découvrir Premium' }, { discover: 'Discove
 export default function PremiumSheet({ open, onClose, reason }: { open: boolean; onClose: () => void; reason?: string }) {
   const t = useStrings(S);
   return (
-    <Sheet open={open} onClose={onClose} title="The Box Premium">
+    <Sheet open={open} onClose={onClose} title="Arcora Premium">
       {reason && <p className={s.reason}>{reason}</p>}
       <ul className={s.list}>
         {allPremiumFeatures().map(f => (

@@ -68,7 +68,7 @@ export function plaqueTexture() {
   ctx.fillStyle = 'rgba(40,22,10,0.85)';
   ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
   ctx.font = `500 120px "Bodoni Moda Variable", Georgia, serif`;
-  ctx.fillText('The Box', 256, 262);
+  ctx.fillText('Arcora', 256, 262);
   return toTexture(c);
 }
 

@@ -3,7 +3,8 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { Check, ChevronLeft, ChevronRight, Share2 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useLoad } from '../../hooks/useLoad';
-import { addWear, listWatches, listWearLogs, mainPhoto, photoUrl, removeWear, thumbSrc } from '../../lib/api';
+import { addWear, listWatches, listWearLogs, mainPhoto, photoUrl, removeWear, thumbSrc, trackEvent } from '../../lib/api';
+import { withRef } from '../../lib/source';
 import { formatDate, formatNumber, plural, toISODate, todayISO } from '../../lib/format';
 import { drawMonthCard, shareImage } from '../../lib/shareCard';
 import type { Watch } from '../../types';
@@ -20,7 +21,7 @@ const S = defineStrings({
   watchesWorn: (n: number) => (n > 1 ? 'montres portées' : 'montre portée'),
   mostWorn: 'la plus portée',
   mostWornDays: (n: number) => `la plus portée (${plural(n, 'jour', 'jours')})`,
-  shareText: (month: string) => `Mon mois au poignet, ${month}`,
+  shareText: (month: string, link: string) => `Mon mois au poignet, ${month} #ArcoraWristCheck ${link}`,
   shareFailed: 'Partage impossible.',
   title: 'Portage',
   emptyTitle: "Rien à porter pour l'instant",
@@ -41,7 +42,7 @@ const S = defineStrings({
   watchesWorn: n => (n === 1 ? 'watch worn' : 'watches worn'),
   mostWorn: 'most worn',
   mostWornDays: n => `most worn (${plural(n, 'day', 'days')})`,
-  shareText: month => `My month on the wrist, ${month}`,
+  shareText: (month, link) => `My month on the wrist, ${month} #ArcoraWristCheck ${link}`,
   shareFailed: "Couldn't share.",
   title: 'Wear',
   emptyTitle: 'Nothing to wear yet',
@@ -144,7 +145,8 @@ export default function WearPage() {
           ...(monthStats.top?.watch ? [{ value: monthStats.top.watch.brand, label: t.mostWorn }] : []),
         ],
       });
-      await shareImage(blob, `the-box-${toISODate(cursor).slice(0, 7)}.png`, t.shareText(monthLabel));
+      trackEvent('month_shared');
+      await shareImage(blob, `arcora-${toISODate(cursor).slice(0, 7)}.png`, t.shareText(monthLabel, withRef(window.location.origin, profile?.username)));
     } catch (e) {
       setError(e instanceof Error ? e.message : t.shareFailed);
     } finally {

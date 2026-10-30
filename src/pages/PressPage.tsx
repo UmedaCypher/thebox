@@ -7,7 +7,7 @@ import s from './PressPage.module.css';
 const S = defineStrings({
   kicker: 'Presse',
   title: 'Espace presse',
-  lead: "The Box est l'écrin numérique des collectionneurs de montres : une fiche par montre, le calendrier de ce qu'on porte, et un Marché entre passionnés.",
+  lead: "Arcora est l'écrin numérique des collectionneurs de montres : une fiche par montre, le calendrier de ce qu'on porte, et un Marché entre passionnés.",
   factsTitle: "L'essentiel",
   facts: [
     { k: 'Pour qui', v: 'Les collectionneurs de montres, de la première pièce à la collection établie.' },
@@ -25,7 +25,7 @@ const S = defineStrings({
 }, {
   kicker: 'Press',
   title: 'Press room',
-  lead: 'The Box is the digital watch box for collectors: a page for every watch, a calendar of what you wear, and a Market among enthusiasts.',
+  lead: 'Arcora is the digital watch box for collectors: a page for every watch, a calendar of what you wear, and a Market among enthusiasts.',
   factsTitle: 'Key facts',
   facts: [
     { k: 'For whom', v: 'Watch collectors, from the first piece to an established collection.' },

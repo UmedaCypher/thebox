@@ -2,8 +2,8 @@
    Chargé par le service worker de l'app (vite.config.ts → workbox.importScripts). */
 self.addEventListener('push', event => {
   let data = {};
-  try { data = event.data ? event.data.json() : {}; } catch (e) { data = { title: 'The Box', body: event.data ? event.data.text() : '' }; }
-  const title = data.title || 'The Box';
+  try { data = event.data ? event.data.json() : {}; } catch (e) { data = { title: 'Arcora', body: event.data ? event.data.text() : '' }; }
+  const title = data.title || 'Arcora';
   event.waitUntil(self.registration.showNotification(title, {
     body: data.body || '',
     icon: '/icons/icon-192x192.png',

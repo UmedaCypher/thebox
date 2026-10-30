@@ -114,6 +114,38 @@ async function recordCommission(invoice: Stripe.Invoice) {
   console.log(`Commission de ${amount} centimes pour l'affilié ${affiliateId} (facture ${invoice.id})`);
 }
 
+/** Chaque facture payée est notée pour le backoffice (chiffre d'affaires TTC et HT, frais Stripe). */
+async function recordPayment(invoice: Stripe.Invoice) {
+  if (!invoice.amount_paid) return;
+  const subId = idOf(invoice.subscription as string | Stripe.Subscription | null);
+  let userId: string | null = null;
+  if (subId) userId = await userIdFor(await stripe.subscriptions.retrieve(subId));
+  const chargeId = idOf(invoice.charge as string | Stripe.Charge | null);
+  let fee = 0;
+  if (chargeId) {
+    try {
+      const charge = await stripe.charges.retrieve(chargeId, { expand: ['balance_transaction'] });
+      const bt = charge.balance_transaction as Stripe.BalanceTransaction | string | null;
+      if (bt && typeof bt !== 'string') fee = bt.fee;
+    } catch (e) { console.warn('Frais Stripe illisibles', e); }
+  }
+  const interval = invoice.lines.data.find(l => l.price?.recurring)?.price?.recurring?.interval;
+  const { error } = await admin.from('stripe_payments').upsert({
+    invoice_id: invoice.id,
+    user_id: userId,
+    subscription_id: subId,
+    charge_id: chargeId,
+    billing_interval: interval === 'year' || interval === 'month' ? interval : null,
+    first_payment: invoice.billing_reason === 'subscription_create',
+    amount_paid_cents: invoice.amount_paid,
+    amount_excl_tax_cents: invoice.total_excluding_tax ?? invoice.subtotal,
+    fee_cents: fee,
+    currency: invoice.currency,
+    paid_at: new Date((invoice.status_transitions?.paid_at ?? invoice.created) * 1000).toISOString(),
+  }, { onConflict: 'invoice_id' });
+  if (error) throw error;
+}
+
 /** Remboursement ou litige : la commission non versée est annulée. Une commission déjà versée est signalée dans les logs. */
 async function cancelCommission(chargeId: string | null, reason: string) {
   if (!chargeId) return;
@@ -163,14 +195,21 @@ Deno.serve(async (req) => {
         await syncSubscription(event.data.object as Stripe.Subscription);
         break;
       case 'invoice.paid':
+        await recordPayment(event.data.object as Stripe.Invoice);
         await recordCommission(event.data.object as Stripe.Invoice);
         break;
-      case 'charge.refunded':
-        await cancelCommission((event.data.object as Stripe.Charge).id, 'remboursement');
+      case 'charge.refunded': {
+        const charge = event.data.object as Stripe.Charge;
+        await admin.from('stripe_payments').update({ refunded_cents: charge.amount_refunded }).eq('charge_id', charge.id);
+        await cancelCommission(charge.id, 'remboursement');
         break;
-      case 'charge.dispute.created':
-        await cancelCommission(idOf((event.data.object as Stripe.Dispute).charge), 'litige');
+      }
+      case 'charge.dispute.created': {
+        const chargeId = idOf((event.data.object as Stripe.Dispute).charge);
+        if (chargeId) await admin.from('stripe_payments').update({ disputed: true }).eq('charge_id', chargeId);
+        await cancelCommission(chargeId, 'litige');
         break;
+      }
       default:
         // Événement non utilisé : on répond OK pour que Stripe ne le renvoie pas.
         break;

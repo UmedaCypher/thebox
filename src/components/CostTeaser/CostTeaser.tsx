@@ -10,7 +10,7 @@ import s from './CostTeaser.module.css';
 const S = defineStrings({
   kicker: 'Coût par port',
   emptyTitle: 'Combien vous coûte chaque port ?',
-  needPrice: "Renseignez le prix d'achat de vos montres et notez les jours où vous les portez : The Box calcule ce que chacune vous coûte vraiment.",
+  needPrice: "Renseignez le prix d'achat de vos montres et notez les jours où vous les portez : Arcora calcule ce que chacune vous coûte vraiment.",
   needWears: 'Notez les jours où vous portez vos montres dans le calendrier : le coût par port apparaîtra ici.',
   completeWatches: 'Compléter mes montres',
   openCalendar: 'Ouvrir le calendrier',
@@ -30,7 +30,7 @@ const S = defineStrings({
 }, {
   kicker: 'Cost per wear',
   emptyTitle: 'What does each wear really cost you?',
-  needPrice: 'Add the purchase price of your watches and log the days you wear them: The Box works out what each one really costs you.',
+  needPrice: 'Add the purchase price of your watches and log the days you wear them: Arcora works out what each one really costs you.',
   needWears: 'Log the days you wear your watches in the calendar: your cost per wear will appear here.',
   completeWatches: 'Complete my watches',
   openCalendar: 'Open the calendar',

@@ -1,0 +1,95 @@
+.page { display: flex; flex-direction: column; gap: var(--sp-4); }
+.section { display: flex; flex-direction: column; gap: var(--sp-4); margin-top: var(--sp-5); min-width: 0; }
+.h { font-size: var(--fs-2xl); }
+.h3 { font-size: var(--fs-lg); font-family: var(--font-display); font-weight: 500; }
+.muted { color: var(--text-2); }
+.small { color: var(--text-3); font-size: var(--fs-sm); }
+.block { gap: var(--sp-3); min-width: 0; }
+.pos { color: var(--lume); }
+.neg { color: var(--ruby); }
+
+/* Tuiles */
+.tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--sp-3); }
+@media (min-width: 900px) { .tiles { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.tile { gap: 4px; padding: var(--sp-4) !important; min-width: 0; }
+.tileValue { font-family: var(--font-display); font-size: var(--fs-2xl); line-height: 1.1; font-variant-numeric: lining-nums tabular-nums; overflow-wrap: anywhere; }
+.tileLabel { font-size: var(--fs-sm); color: var(--text); font-weight: 600; }
+.tileSub { font-size: var(--fs-xs); color: var(--text-3); }
+.tile[data-tone='lume'] .tileValue { color: var(--lume); }
+.tile[data-tone='brass'] .tileValue { color: var(--brass); }
+.tile[data-tone='ruby'] .tileValue { color: var(--ruby); }
+
+/* Graphiques */
+.charts { display: grid; gap: var(--sp-4); }
+@media (min-width: 900px) { .charts { grid-template-columns: 1fr 1fr; } }
+.chartPanel { gap: var(--sp-3); min-width: 0; }
+.chart { position: relative; width: 100%; min-width: 0; }
+.chart svg { display: block; overflow: visible; }
+.axis { stroke: var(--line); stroke-width: 1; }
+.tick { fill: var(--text-3); font-size: 11px; font-variant-numeric: tabular-nums; }
+.bar { fill: var(--brass); transition: opacity var(--dur); }
+.barPos { fill: var(--lume); transition: opacity var(--dur); }
+.barNeg { fill: var(--ruby); transition: opacity var(--dur); }
+.bar[data-dim='true'], .barPos[data-dim='true'], .barNeg[data-dim='true'] { opacity: 0.4; }
+.line { fill: none; stroke: var(--brass); stroke-width: 2; stroke-linejoin: round; }
+.area { fill: color-mix(in srgb, var(--brass) 14%, transparent); }
+.crosshair { stroke: var(--text-3); stroke-width: 1; stroke-dasharray: 3 3; }
+.dot { fill: var(--brass); stroke: var(--bg); stroke-width: 2; }
+.tooltip {
+  position: absolute; top: 0; width: 170px; padding: 8px 10px; border-radius: 10px; pointer-events: none; z-index: 2;
+  font-size: var(--fs-xs); line-height: 1.4; color: var(--text); background: var(--surface, var(--bg));
+  border: 1px solid var(--glass-border); box-shadow: var(--glass-shadow);
+}
+
+/* Tables */
+.tableWrap { overflow-x: auto; margin: 0 calc(-1 * var(--sp-2)); padding: 0 var(--sp-2); }
+.table { width: 100%; border-collapse: collapse; font-size: var(--fs-sm); font-variant-numeric: tabular-nums; }
+.table th, .table td { padding: 10px 8px; text-align: right; border-bottom: 1px solid var(--line); white-space: nowrap; vertical-align: middle; }
+.table th:first-child, .table td:first-child { text-align: left; }
+.table thead th { color: var(--text-3); font-weight: 600; font-size: var(--fs-xs); }
+.table tbody th { font-weight: 500; }
+.table tr[data-status='pending'] { background: color-mix(in srgb, var(--brass) 8%, transparent); }
+.table a { color: var(--brass); }
+.status { display: inline-block; padding: 3px 9px; border-radius: 10px; font-size: var(--fs-xs); font-weight: 600; border: 1px solid var(--line); }
+.status[data-status='pending'] { color: var(--brass); border-color: color-mix(in srgb, var(--brass) 40%, transparent); }
+.status[data-status='active'] { color: var(--lume); border-color: color-mix(in srgb, var(--lume) 40%, transparent); }
+.status[data-status='suspended'] { color: var(--ruby); border-color: color-mix(in srgb, var(--ruby) 40%, transparent); }
+.actions { display: flex; gap: 6px; justify-content: flex-end; }
+.inlineSelect {
+  padding: 5px 8px; border-radius: 8px; font: inherit; color: var(--text);
+  background: color-mix(in srgb, var(--bg) 50%, transparent); border: 1px solid var(--glass-border);
+}
+
+/* Listes */
+.list { list-style: none; display: flex; flex-direction: column; }
+.row {
+  display: grid; grid-template-columns: auto 1fr auto auto; gap: var(--sp-3); align-items: center;
+  padding: var(--sp-2) 0; border-bottom: 1px solid var(--line); font-variant-numeric: tabular-nums;
+}
+.row:last-child { border-bottom: 0; }
+.rowDate { color: var(--text-3); font-size: var(--fs-sm); white-space: nowrap; }
+.rowAmount { font-weight: 700; white-space: nowrap; }
+
+.expenseForm { display: grid; gap: var(--sp-3); align-items: end; }
+@media (min-width: 760px) { .expenseForm { grid-template-columns: 150px 1fr 1.4fr 120px auto; } }
+.inline { display: flex; flex-wrap: wrap; gap: var(--sp-3); align-items: flex-end; }
+.inline > :first-child { flex: 1 1 160px; }
+.inline > :nth-child(2) { flex: 0 1 90px; }
+
+/* Barres horizontales (provenance, marques) */
+.hbars { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.hbars li { display: grid; grid-template-columns: minmax(0, 7.5em) 1fr auto; gap: var(--sp-3); align-items: center; font-size: var(--fs-sm); }
+.hbarLabel { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-2); }
+.hbarTrack { height: 10px; border-radius: 5px; background: color-mix(in srgb, var(--text) 6%, transparent); overflow: hidden; }
+.hbar { display: block; height: 100%; border-radius: 5px; background: var(--brass); min-width: 4px; }
+.hbarValue { font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.hbarValue small { color: var(--text-3); font-weight: 400; }
+
+/* Virements */
+.payouts { list-style: none; display: flex; flex-direction: column; gap: var(--sp-3); }
+.payout { gap: var(--sp-3); }
+.payoutHead { display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--sp-2); align-items: baseline; }
+.payoutAmount { font-family: var(--font-display); font-size: var(--fs-xl); color: var(--brass); font-variant-numeric: tabular-nums; }
+.iban { font: 600 var(--fs-sm) / 1.4 inherit; font-variant-numeric: tabular-nums; letter-spacing: 0.06em; overflow-wrap: anywhere; user-select: all; }
+.payoutActions { display: flex; flex-wrap: wrap; gap: var(--sp-3); align-items: flex-end; }
+.payoutActions > :first-child { flex: 1 1 220px; }

@@ -72,6 +72,8 @@ const DB_ERRORS_EN: Record<string, string> = {
   NOT_AFFILIATE: 'Join the affiliate programme first.',
   NOTHING_DUE: 'Nothing is due to this affiliate.',
   FORBIDDEN: 'Access restricted.',
+  INVALID_KIND: 'Choose a programme type.',
+  INVALID_DAYS: 'Enter a number of days between 1 and 3,650.',
 };
 
 const DB_ERRORS: Record<string, string> = {
@@ -89,6 +91,8 @@ const DB_ERRORS: Record<string, string> = {
   NOT_AFFILIATE: "Rejoignez d'abord le programme d'affiliation.",
   NOTHING_DUE: "Rien n'est dû à cet affilié.",
   FORBIDDEN: 'Accès réservé.',
+  INVALID_KIND: 'Choisissez un type de programme.',
+  INVALID_DAYS: 'Indiquez un nombre de jours entre 1 et 3 650.',
 };
 
 export class AppError extends Error {
@@ -524,6 +528,31 @@ export async function getSubscription(userId: string): Promise<Subscription | nu
 }
 
 
+/* ---------- Parrainage ---------- */
+
+export type MyReferrals = {
+  invited: number; active: number; days_earned: number; rewards_left: number; premium_until: string | null; founder: boolean;
+};
+
+/** À appeler une fois après la création du compte : provenance, parrain, statut fondateur, Premium de bienvenue. */
+export async function recordSignup(ref: string | null, source: string | null) {
+  const { data, error } = await supabase.rpc('record_signup', { p_ref: ref, p_source: source });
+  if (error) { console.warn(error.message); return null; }
+  return data as { founder: boolean; referrer_kind: string | null; welcome_days: number };
+}
+
+/** Chiffres du parrainage du membre connecté, ou null si la migration n'est pas passée. */
+export async function getMyReferrals(): Promise<MyReferrals | null> {
+  const { data, error } = await supabase.rpc('get_my_referrals');
+  if (error) return null;
+  return data as MyReferrals;
+}
+
+/** Compte un partage (passeport, image du mois, lien), pour le suivi de l'activation. Sans effet en cas d'échec. */
+export function trackEvent(event: 'passport_shared' | 'month_shared' | 'link_shared') {
+  supabase.rpc('track_event', { p_event: event }).then(() => {}, () => {});
+}
+
 /* ---------- Programme d'affiliation ---------- */
 
 export type AffiliateCommission = {
@@ -531,7 +560,7 @@ export type AffiliateCommission = {
   status: 'pending' | 'due' | 'paid' | 'cancelled';
 };
 export type Affiliate = {
-  code: string; status: 'active' | 'suspended'; payout_holder: string | null; payout_iban_last4: string | null; created_at: string;
+  code: string; kind: 'creator' | 'pro'; status: 'pending' | 'active' | 'suspended'; website: string | null; signups: number; payout_holder: string | null; payout_iban_last4: string | null; created_at: string;
   referrals: number; pending_cents: number; due_cents: number; paid_cents: number; commissions: AffiliateCommission[];
 };
 export type AffiliatePayoutDue = {
@@ -546,8 +575,8 @@ export async function getMyAffiliate(): Promise<Affiliate | null> {
   return (data as Affiliate) ?? null;
 }
 
-export async function joinAffiliateProgram(code: string): Promise<string> {
-  const { data, error } = await supabase.rpc('join_affiliate_program', { p_code: code });
+export async function joinAffiliateProgram(code: string, kind: 'creator' | 'pro', website: string): Promise<string> {
+  const { data, error } = await supabase.rpc('join_affiliate_program', { p_code: code, p_kind: kind, p_website: website || null });
   fail(error, 'Enregistrement impossible.');
   return data as string;
 }
@@ -570,4 +599,76 @@ export async function recordAffiliatePayout(affiliateId: string, reference: stri
   const { data, error } = await supabase.rpc('record_affiliate_payout', { p_affiliate: affiliateId, p_reference: reference });
   fail(error, 'Enregistrement impossible.');
   return Number(data);
+}
+
+/* ---------- Backoffice ---------- */
+
+export type AdminWeek = { week: string; signups: number; members: number; activated: number; watches: number; premium_starts: number };
+export type AdminMonth = {
+  month: string; revenue_cents: number; revenue_excl_tax_cents: number; refunds_cents: number; stripe_fees_cents: number;
+  commissions_cents: number; payouts_cents: number; expenses_cents: number;
+};
+export type AdminExpense = { id: string; spent_on: string; category: ExpenseCategory; label: string; amount_cents: number };
+export type ExpenseCategory = 'ads' | 'tools' | 'hosting' | 'design' | 'legal' | 'other';
+export type AdminDashboard = {
+  generated_at: string;
+  founders_open: boolean;
+  totals: {
+    members: number; members_7d: number; members_30d: number; founders: number; premium_paying: number; premium_offered: number;
+    mrr_cents: number; watches: number; watches_value_eur: number; collectors_3plus: number; listings: number;
+    wears_30d: number; wearers_30d: number; messages_30d: number;
+  };
+  rates: {
+    activation: number | null; activation_base: number; sharing: number | null; retention: number | null;
+    retention_base: number; conversion: number | null;
+  };
+  weekly: AdminWeek[];
+  monthly: AdminMonth[];
+  sources: { label: string; n: number; activated: number }[];
+  brands: { brand: string; n: number }[];
+  expenses: AdminExpense[];
+};
+export type AdminAffiliate = {
+  user_id: string; code: string; kind: 'creator' | 'pro'; status: 'pending' | 'active' | 'suspended'; website: string | null;
+  username: string | null; created_at: string; has_iban: boolean; signups: number; activated: number; subscriptions: number;
+  pending_cents: number; due_cents: number; paid_cents: number;
+};
+export type AdminAffiliates = { affiliates: AdminAffiliate[]; top_members: { username: string; invited: number; activated: number }[] };
+
+export async function getAdminDashboard(): Promise<AdminDashboard> {
+  const { data, error } = await supabase.rpc('admin_dashboard');
+  fail(error, 'Chargement impossible.');
+  return data as AdminDashboard;
+}
+
+export async function getAdminAffiliates(): Promise<AdminAffiliates> {
+  const { data, error } = await supabase.rpc('admin_affiliates');
+  fail(error, 'Chargement impossible.');
+  return data as AdminAffiliates;
+}
+
+export async function adminUpdateAffiliate(userId: string, kind: 'creator' | 'pro', status: 'pending' | 'active' | 'suspended') {
+  const { error } = await supabase.rpc('admin_update_affiliate', { p_user: userId, p_kind: kind, p_status: status });
+  fail(error, 'Mise à jour impossible.');
+}
+
+export async function adminSetFoundersOpen(open: boolean) {
+  const { error } = await supabase.rpc('admin_set_founders_open', { p_open: open });
+  fail(error, 'Mise à jour impossible.');
+}
+
+export async function adminAddExpense(spentOn: string, category: ExpenseCategory, label: string, amountCents: number) {
+  const { error } = await supabase.rpc('admin_add_expense', { p_spent_on: spentOn, p_category: category, p_label: label, p_amount_cents: amountCents });
+  fail(error, 'Enregistrement impossible.');
+}
+
+export async function adminDeleteExpense(id: string) {
+  const { error } = await supabase.rpc('admin_delete_expense', { p_id: id });
+  fail(error, 'Suppression impossible.');
+}
+
+export async function adminGrantPremium(username: string, days: number): Promise<string> {
+  const { data, error } = await supabase.rpc('admin_grant_premium', { p_username: username.replace(/^@/, ''), p_days: days });
+  fail(error, 'Enregistrement impossible.');
+  return data as string;
 }

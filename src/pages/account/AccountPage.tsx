@@ -7,8 +7,8 @@ import { useTheme } from '../../hooks/useTheme';
 import { getSubscription, openBillingPortal, saveProfile, uploadAvatar } from '../../lib/api';
 import { useLoad } from '../../hooks/useLoad';
 import { supabase } from '../../lib/supabaseClient';
-import { FREE_WATCH_LIMIT, PAYMENTS_ENABLED, affiliateCommissionPerYear } from '../../lib/features';
-import { formatDate, formatEuros } from '../../lib/format';
+import { FREE_WATCH_LIMIT, PAYMENTS_ENABLED } from '../../lib/features';
+import { formatDate } from '../../lib/format';
 import { Button, LinkButton, Notice, PageHeader, PremiumTag, Segmented, TextField, Toggle } from '../../components/ui';
 import { useLanguageSetting } from '../../i18n/useLanguageSetting';
 import { defineStrings, tr, useStrings } from '../../i18n';
@@ -55,9 +55,13 @@ const S = defineStrings({
   insurance: 'Inventaire pour l\'assurance',
   freeText: (n: number) => `La collection gratuite accueille ${n} montres, avec la galerie, le calendrier de portage et le passeport.`,
   discoverPremium: 'Découvrir Premium',
-  affiliate: 'Affiliation',
-  affiliateText: (amount: string) => `Recommandez The Box : vous touchez ${amount} pour chaque abonné annuel venu par votre lien.`,
-  affiliateOpen: 'Mon espace affilié',
+  affiliate: 'Parrainage',
+  affiliateText: 'Offrez un mois de Premium à vos amis collectionneurs, et gagnez-en un quand ils ont ajouté 3 montres. Créateurs et boutiques : découvrez le programme ambassadeur.',
+  affiliateOpen: 'Parrainer',
+  founder: 'Membre fondateur',
+  admin: 'Backoffice',
+  adminText: 'Membres, activité, argent, affiliés et virements.',
+  adminOpen: 'Ouvrir le backoffice',
   appearance: 'Apparence',
   theme: 'Thème',
   themeDark: 'Écrin (sombre)',
@@ -119,9 +123,13 @@ const S = defineStrings({
   insurance: 'Insurance inventory',
   freeText: n => `The free collection holds ${n} watches, with the gallery, the wear calendar and the passport.`,
   discoverPremium: 'Discover Premium',
-  affiliate: 'Affiliate programme',
-  affiliateText: amount => `Recommend The Box: earn ${amount} for every yearly subscriber who comes through your link.`,
-  affiliateOpen: 'My affiliate space',
+  affiliate: 'Referrals',
+  affiliateText: 'Give your collector friends a month of Premium, and earn one when they add 3 watches. Creators and shops: see the ambassador programme.',
+  affiliateOpen: 'Invite friends',
+  founder: 'Founding member',
+  admin: 'Back office',
+  adminText: 'Members, activity, money, affiliates and transfers.',
+  adminOpen: 'Open the back office',
   appearance: 'Appearance',
   theme: 'Theme',
   themeDark: 'Écrin (dark)',
@@ -154,7 +162,7 @@ export default function AccountPage() {
   const n = useStrings(NOTIF);
   const c = useStrings(COMMON);
   const toast = useToast();
-  const { user, profile, isPremium, refreshProfile, signOut } = useAuth();
+  const { user, profile, isPremium, founder, refreshProfile, signOut } = useAuth();
   const { theme, setTheme } = useTheme();
   const language = useLanguageSetting();
   const navigate = useNavigate();
@@ -257,7 +265,7 @@ export default function AccountPage() {
         </label>
         <div className={s.identityText}>
           <strong className={s.name}>{profile?.username ? `@${profile.username}` : user?.email}</strong>
-          <span className={s.plan}>{isPremium ? <PremiumTag /> : t.freePlan}</span>
+          <span className={s.plan}>{isPremium ? <PremiumTag /> : t.freePlan}{founder && <span className={s.founder}>{t.founder}</span>}</span>
           {profile?.is_public && profile.username && <Link to={`/profil/${profile.username}`} className={s.link}>{t.viewPublic}</Link>}
         </div>
       </section>
@@ -314,9 +322,17 @@ export default function AccountPage() {
 
       <section className={`panel ${s.section}`} data-tone="ruby">
         <h2 className={s.h}>{t.affiliate}</h2>
-        <p className={s.muted}>{t.affiliateText(formatEuros(affiliateCommissionPerYear(), true))}</p>
+        <p className={s.muted}>{t.affiliateText}</p>
         <div><LinkButton to="/affiliation" variant="secondary">{t.affiliateOpen}</LinkButton></div>
       </section>
+
+      {profile?.account_type === 'admin' && (
+        <section className={`panel ${s.section}`} data-tone="lume">
+          <h2 className={s.h}>{t.admin}</h2>
+          <p className={s.muted}>{t.adminText}</p>
+          <div><LinkButton to="/admin" variant="secondary">{t.adminOpen}</LinkButton></div>
+        </section>
+      )}
 
       <section className={s.section} id="notifications">
         <h2 className={s.h}>{n.title}</h2>
@@ -367,7 +383,7 @@ export default function AccountPage() {
           <li><Link to="/confidentialite">{t.privacy}</Link></li>
           <li><Link to="/mentions-legales">{t.legal}</Link></li>
         </ul>
-        <p className={s.small}>© {new Date().getFullYear()} The Box</p>
+        <p className={s.small}>© {new Date().getFullYear()} Arcora</p>
       </section>
     </div>
   );

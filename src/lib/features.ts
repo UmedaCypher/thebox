@@ -40,9 +40,23 @@ export const premiumPrices = () => tr(PRICES);
 export const PREMIUM_YEAR_EUR = 30;
 export const PREMIUM_MONTH_EUR = 3;
 
-/* ---------- Programme d'affiliation (mêmes valeurs que la migration et le webhook) ---------- */
-/** Part de la première année d'abonnement annuel reversée à l'affilié, sur le prix hors taxes. */
-export const AFFILIATE_RATE = 0.3;
+/* ---------- Parrainage et affiliation (mêmes valeurs que la migration et le webhook) ---------- */
+export type AffiliateKind = 'member' | 'creator' | 'pro';
+/**
+ * Les trois types. Garder identique à private.affiliate_perks() dans la migration du 29/10.
+ *  commission : part de la première année d'abonnement annuel, hors taxes
+ *  welcomeDays : Premium offert au filleul à l'inscription
+ *  rewardDays : Premium offert au parrain quand le filleul a ajouté 3 montres
+ */
+export const AFFILIATE_TYPES: Record<AffiliateKind, { commission: number; welcomeDays: number; rewardDays: number }> = {
+  member: { commission: 0, welcomeDays: 30, rewardDays: 30 },
+  creator: { commission: 0.3, welcomeDays: 90, rewardDays: 0 },
+  pro: { commission: 0, welcomeDays: 90, rewardDays: 0 },
+};
+/** Nombre maximum de mois gagnés par un membre en parrainant, par an. */
+export const MEMBER_REWARDS_PER_YEAR = 12;
+/** Part de la première année d'abonnement annuel reversée à l'ambassadeur, sur le prix hors taxes. */
+export const AFFILIATE_RATE = AFFILIATE_TYPES.creator.commission;
 /** Délai avant qu'une commission soit payable (après les 14 jours de rétractation). */
 export const AFFILIATE_HOLD_DAYS = 30;
 /** Montant minimum pour un virement ; en dessous, le solde est reporté au mois suivant. */

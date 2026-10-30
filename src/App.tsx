@@ -4,6 +4,7 @@ import Layout from './components/Layout/Layout';
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
 import { EmptyState, LinkButton } from './components/ui';
 import { defineStrings, useStrings } from './i18n';
+import { SHORT_LINKS, rememberSource } from './lib/source';
 
 import HomePage from './pages/home/HomePage';
 import CollectionPage from './pages/collection/CollectionPage';
@@ -34,6 +35,7 @@ const PrivacyPolicyPage = lazy(() => import('./pages/PrivacyPolicyPage'));
 const LegalMentionsPage = lazy(() => import('./pages/LegalMentionsPage'));
 const AffiliateTermsPage = lazy(() => import('./pages/AffiliateTermsPage'));
 const AffiliatePage = lazy(() => import('./pages/affiliate/AffiliatePage'));
+const AdminPage = lazy(() => import('./pages/admin/AdminPage'));
 const MarketPage = lazy(() => import('./pages/market/MarketPage'));
 const MessagesPage = lazy(() => import('./pages/messages/MessagesPage'));
 const OnboardingPage = lazy(() => import('./pages/onboarding/OnboardingPage'));
@@ -44,6 +46,12 @@ const OnboardingPage = lazy(() => import('./pages/onboarding/OnboardingPage'));
  */
 
 const P = (el: React.ReactElement) => <ProtectedRoute>{el}</ProtectedRoute>;
+
+/** Liens courts des médias (arcora.app/yt…) : retient la provenance, puis ouvre l'accueil. */
+function ShortLink({ source }: { source: string }) {
+  rememberSource(source);
+  return <Navigate to="/" replace />;
+}
 
 function LegacyWatchRedirect() {
   const { watchId } = useParams();
@@ -109,6 +117,7 @@ export default function App() {
             <Route path="/profil" element={P(<AccountPage />)} />
             <Route path="/stats" element={P(<StatsPage />)} />
             <Route path="/affiliation" element={P(<AffiliatePage />)} />
+            <Route path="/admin" element={P(<AdminPage />)} />
             <Route path="/wishlist" element={P(<WishlistPage />)} />
             <Route path="/export/assurance" element={P(<InsuranceExportPage />)} />
             <Route path="/bienvenue" element={P(<OnboardingPage />)} />
@@ -126,6 +135,9 @@ export default function App() {
               <Route key={p} path={p} element={<Navigate to="/collection" replace />} />
             ))}
 
+            {Object.entries(SHORT_LINKS).map(([path, source]) => (
+              <Route key={path} path={`/${path}`} element={<ShortLink source={source} />} />
+            ))}
             <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>

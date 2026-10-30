@@ -7,7 +7,9 @@ import { useLoad } from '../../hooks/useLoad';
 import {
   addMaintenance, addWear, deleteMaintenance, deleteWatch, getWatch, listMaintenance, listValueHistory,
   listWearLogs, mainPhoto, photoUrl, removeWear, setPassportPublic, thumbSrc,
+  trackEvent,
 } from '../../lib/api';
+import { withRef } from '../../lib/source';
 import { formatDate, formatEuros, formatMm, plural, todayISO } from '../../lib/format';
 import { defineStrings, getLocale, useStrings } from '../../i18n';
 import { COMMON } from '../../i18n/common';
@@ -350,13 +352,17 @@ function PassportTab({ watch, uid, onUpdate }: { watch: Watch; uid: string; onUp
   const tc = useStrings(COMMON);
   const t = useStrings(S);
   const [copied, setCopied] = useState(false);
+  const { profile } = useAuth();
   const url = `${window.location.origin}/passeport/${watch.id}`;
+  // Le lien partagé porte le code de parrainage du membre : un visiteur qui s'inscrit reçoit un mois offert.
+  const shareUrl = withRef(url, profile?.username);
 
   const share = async () => {
+    trackEvent('passport_shared');
     if (navigator.share) {
-      try { await navigator.share({ title: `${watch.brand} ${watch.model}`, url }); return; } catch { /* annulé */ }
+      try { await navigator.share({ title: `${watch.brand} ${watch.model}`, url: shareUrl }); return; } catch { /* annulé */ }
     }
-    await navigator.clipboard.writeText(url);
+    await navigator.clipboard.writeText(shareUrl);
     setCopied(true);
     toast(tc.toast.linkCopied);
     setTimeout(() => setCopied(false), 2000);

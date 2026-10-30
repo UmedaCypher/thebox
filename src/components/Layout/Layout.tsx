@@ -17,12 +17,12 @@ const S = defineStrings({
   mainNav: 'Navigation principale', tabsNav: 'Onglets', questions: 'Questions', myProfile: 'Mon profil',
   login: 'Se connecter', joinList: 'Rejoindre la liste', signup: 'Créer un compte', skip: 'Aller au contenu',
   info: 'Informations', legal: 'Légal', about: 'À propos', faq: 'Questions fréquentes', news: 'Actualités', press: 'Presse',
-  contact: 'Contact', affiliate: 'Affiliation', cgu: 'CGU', cgv: 'CGV', privacy: 'Confidentialité', mentions: 'Mentions légales', language: 'Langue',
+  contact: 'Contact', affiliate: 'Parrainage', cgu: 'CGU', cgv: 'CGV', privacy: 'Confidentialité', mentions: 'Mentions légales', language: 'Langue',
 }, {
   mainNav: 'Main navigation', tabsNav: 'Tabs', questions: 'FAQ', myProfile: 'My profile',
   login: 'Log in', joinList: 'Join the waitlist', signup: 'Create an account', skip: 'Skip to content',
   info: 'Information', legal: 'Legal', about: 'About', faq: 'FAQ', news: 'News', press: 'Press',
-  contact: 'Contact', affiliate: 'Affiliates', cgu: 'Terms of use', cgv: 'Terms of sale', privacy: 'Privacy', mentions: 'Legal notice', language: 'Language',
+  contact: 'Contact', affiliate: 'Referrals', cgu: 'Terms of use', cgv: 'Terms of sale', privacy: 'Privacy', mentions: 'Legal notice', language: 'Language',
 });
 
 /* Navigation du membre sur ordinateur, avec les mêmes icônes que la barre mobile. Messages et profil sont à droite. */
@@ -54,7 +54,7 @@ function Header({ unread }: { unread: number }) {
   return (
     <header className={s.header}>
       <div className={s.headerInner}>
-        <Link to={user ? '/accueil' : '/'} className={s.wordmark}>The Box</Link>
+        <Link to={user ? '/accueil' : '/'} className={s.wordmark}>Arcora</Link>
 
         <div className={s.searchSlot}><GlobalSearch /></div>
 
@@ -163,7 +163,7 @@ function Footer({ loggedIn }: { loggedIn: boolean }) {
           <Link to="/mentions-legales">{t.mentions}</Link>
         </nav>
         <div className={s.footerBottom}>
-          <p className={s.footerNote}>© {new Date().getFullYear()} The Box</p>
+          <p className={s.footerNote}>© {new Date().getFullYear()} Arcora</p>
           <LanguageSwitch />
         </div>
       </div>

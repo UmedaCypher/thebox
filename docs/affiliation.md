@@ -1,38 +1,53 @@
-# Programme d'affiliation
+# Parrainage, affiliation et backoffice
 
-Un membre rejoint le programme depuis **Profil → Affiliation** (`/affiliation`), choisit un code et reçoit un lien `https://<domaine>/?ref=<code>`.
-Quand une personne arrivée par ce lien (dans les 60 jours, le dernier lien suivi l'emporte) souscrit l'**abonnement annuel**,
-l'affilié touche **30 % du montant hors taxes de la première année** (7,50 € pour 30 € TTC).
+Tout est fait dans l'app, sans outil externe. Un seul lien : `https://arcora.app/?ref=<code>`.
 
-## Règles appliquées par le code
+## Les trois types
 
-| Règle | Où |
-| --- | --- |
-| Lien mémorisé 60 jours dans le navigateur | `src/lib/source.ts` (`captureRef`, `readRef`) |
-| Annuel seulement, premier abonnement seulement, pas d'auto-parrainage, affilié actif | `create-checkout-session` |
-| 30 % de `total_excluding_tax`, factures annuelles de la première année | `stripe-webhook` (`invoice.paid`) |
-| Payable 30 jours après le paiement | `available_at` dans `affiliate_commissions` |
-| Annulée si remboursement ou litige avant versement | `stripe-webhook` (`charge.refunded`, `charge.dispute.created`) |
-| Virement manuel dès 50 € | section Administration de `/affiliation` |
+| Type | Qui | Code | Ce que gagne le parrain | Ce que gagne le filleul |
+| --- | --- | --- | --- | --- |
+| Parrainage membre | tout membre avec un pseudo | son pseudo | 1 mois de Premium quand le filleul a ajouté 3 montres (12 mois par an au plus) | 1 mois de Premium à l'inscription |
+| Ambassadeur créateur | sur demande, validé dans le backoffice | choisi à la demande | 30 % du prix HT de la première année de chaque abonnement annuel (7,50 € pour 30 € TTC) | 3 mois de Premium à l'inscription |
+| Partenaire pro | sur demande, validé dans le backoffice | choisi à la demande, avec QR code | visibilité (pas de commission) | 3 mois de Premium à l'inscription |
+
+Pas de prime par palier. Les valeurs sont dans `private.affiliate_perks()` (migration du 29/10) et `AFFILIATE_TYPES` (`src/lib/features.ts`) : les changer aux deux endroits.
+
+Pendant la bêta, chaque inscrit devient **membre fondateur** (badge à vie). Interrupteur dans le backoffice → Réglages.
+
+## Comment ça marche
+
+1. Le visiteur arrive par `?ref=code` (ou un lien court `/yt`, `/podcast`, `/ig`, `/tiktok`, `/discord`, ou `?src=` / `?utm_source=`).
+   L'app retient le code 60 jours et la provenance.
+2. À la première connexion après l'inscription, l'app appelle `record_signup` : provenance, parrain, fondateur,
+   et Premium de bienvenue offert (table `premium_grants`).
+3. Quand le filleul ajoute sa 3e montre (déclencheur sur `watches`), il compte comme « activé » et son parrain membre reçoit son mois.
+4. Au paiement annuel, `create-checkout-session` retient l'ambassadeur créateur (dernier lien suivi, sinon celui de l'inscription,
+   dans les 12 mois). Le webhook calcule la commission, payable 30 jours après, annulée si remboursement ou litige.
+5. Les partages de passeport et d'image du mois portent le lien de parrainage du membre et sont comptés (`product_events`).
+
+## Backoffice (`/admin`)
+
+Réservé au compte administrateur. Il montre :
+
+- membres, Premium payants et offerts, revenu mensuel récurrent, fondateurs, montres, activité, Marché ;
+- les 4 indicateurs du plan de lancement (activation, partage, rétention, conversion) avec leurs objectifs ;
+- inscriptions par semaine et membres au total ;
+- argent sur 12 mois : CA TTC et HT, remboursements, frais Stripe, commissions, dépenses, résultat ;
+- saisie des dépenses (publicité, outils…) ;
+- affiliés : demandes à valider ou refuser, type, suspension, chiffres ; meilleurs parrains membres ;
+- virements à faire (dès 50 €) ;
+- provenance des inscrits, marques les plus enregistrées ;
+- réglages : inscriptions fondateurs, Premium offert à un membre.
 
 ## Mise en service
 
-1. Exécuter `supabase/migrations/20261029100000_affiliation.sql` dans le SQL Editor.
-2. Redéployer `create-checkout-session` et `stripe-webhook` (voir `docs/stripe.md`).
-3. Dans le webhook Stripe, cocher en plus `invoice.paid`, `charge.refunded`, `charge.dispute.created`.
-4. Pour voir la section Administration : `update profiles set account_type = 'admin' where username = '<ton pseudo>';`
+1. SQL Editor : exécuter les migrations dans l'ordre (voir le fichier combiné envoyé, ou `supabase/migrations/`) :
+   `20261023100000`, `20261023200000`, `20261028100000`, `20261029100000`, `20261030100000`.
+2. Te passer administrateur : `update profiles set account_type = 'admin' where username = '<ton pseudo>';`
+3. Redéployer `create-checkout-session` et `stripe-webhook`, et cocher dans le webhook Stripe
+   `invoice.paid`, `charge.refunded`, `charge.dispute.created` (voir `docs/stripe.md`).
 
 ## Chaque mois
 
-1. Ouvrir `/affiliation` avec le compte administrateur : la liste montre les affiliés à qui 50 € ou plus sont dus, avec leur IBAN.
-2. Faire chaque virement depuis la banque de la société.
-3. Cliquer **Marquer comme versé** : les commissions passent en « versée » et le versement est enregistré.
-
-Un remboursement après versement n'est pas repris automatiquement : il apparaît dans les logs du webhook (« À régulariser »)
-et se déduit à la main du versement suivant.
-
-## Points à valider
-
-- Si la société est en franchise de TVA, la base HT est égale au prix payé : la commission devient 9 € au lieu de 7,50 €.
-- Faire relire les conditions (`/affiliation/conditions`) par un professionnel, comme les CGU et CGV.
-- Les commissions versées sont une charge pour la société : garder les références de virement pour la comptabilité.
+Backoffice → Virements à faire : virer depuis la banque, puis **Marquer comme versé**.
+Un remboursement après versement n'est pas repris automatiquement : il apparaît dans les logs du webhook (« À régulariser »).

@@ -16,7 +16,7 @@ const S = defineStrings({
   steps: ['Bienvenue', 'Découverte', 'Profil', 'Première montre'],
   stepOf: (i: number, n: number) => `Étape ${i} sur ${n}`,
   welcomeTitle: 'Bienvenue dans votre écrin',
-  welcomeLead: 'The Box garde la trace de vos montres, de leur histoire et du temps passé au poignet.',
+  welcomeLead: 'Arcora garde la trace de vos montres, de leur histoire et du temps passé au poignet.',
   heroAlt: 'Un écrin ouvert, ses coussins de velours',
   tour: [
     { kicker: 'Portage', title: 'Notez la montre du jour', text: "Un geste chaque matin. À la fin du mois, vous voyez lesquelles vous portez, et ce que chacune vous coûte à chaque port." },
@@ -53,7 +53,7 @@ const S = defineStrings({
   steps: ['Welcome', 'Discover', 'Profile', 'First watch'],
   stepOf: (i, n) => `Step ${i} of ${n}`,
   welcomeTitle: 'Welcome to your watch box',
-  welcomeLead: 'The Box keeps track of your watches, their story and the time they spend on your wrist.',
+  welcomeLead: 'Arcora keeps track of your watches, their story and the time they spend on your wrist.',
   heroAlt: 'An open watch box with velvet cushions',
   tour: [
     { kicker: 'Wear', title: "Log today's watch", text: 'One tap each morning. By the end of the month you see which ones you wear, and what each one costs you per wear.' },

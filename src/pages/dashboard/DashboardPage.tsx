@@ -53,7 +53,7 @@ const S = defineStrings({
   sell: 'Vendre',
   wishlist: 'Wishlist',
   insurance: 'Assurance',
-  affiliate: 'Affiliation',
+  affiliate: 'Parrainage',
   profile: 'Profil',
 }, {
   hello: h => (h < 12 && h >= 5 ? 'Good morning' : h < 18 && h >= 12 ? 'Good afternoon' : 'Good evening'),
@@ -88,7 +88,7 @@ const S = defineStrings({
   sell: 'Sell',
   wishlist: 'Wishlist',
   insurance: 'Insurance',
-  affiliate: 'Affiliates',
+  affiliate: 'Referrals',
   profile: 'Profile',
 });
 
