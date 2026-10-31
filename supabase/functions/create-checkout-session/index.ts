@@ -7,7 +7,7 @@
 //   STRIPE_SECRET_KEY  clé secrète Stripe (sk_test_… puis sk_live_…)
 //   STRIPE_PRICE_MONTHLY  identifiant du prix mensuel (price_…, 3 €/mois)
 //   STRIPE_PRICE_YEARLY   identifiant du prix annuel (price_…, 30 €/an)
-//   SITE_URL           adresse publique de l'app, sans / final (ex. https://arcora.app)
+//   SITE_URL           adresse publique de l'app, sans / final (ex. https://arcorawatch.com)
 // Facultatifs :
 //   STRIPE_TAX_RATE      taux de TVA Stripe (txr_…, « TVA 20 % incluse ») ajouté à l'abonnement et aux factures
 //   STRIPE_TERMS_CONSENT « on » pour faire cocher les CGV sur la page de paiement

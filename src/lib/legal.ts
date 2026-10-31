@@ -7,7 +7,7 @@ export const LEGAL = {
   /** Nom de l'app tel qu'affiché au public (provisoire). */
   appName: 'Arcora',
   /** Adresse du site, sans « / » final. */
-  siteUrl: '',
+  siteUrl: 'https://arcorawatch.com',
 
   // ---------- Société éditrice (SIREN 104 672 431) ----------
   companyName: 'Mahé Fine Collectibles',

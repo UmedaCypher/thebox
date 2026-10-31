@@ -47,7 +47,7 @@ const OnboardingPage = lazy(() => import('./pages/onboarding/OnboardingPage'));
 
 const P = (el: React.ReactElement) => <ProtectedRoute>{el}</ProtectedRoute>;
 
-/** Liens courts des médias (arcora.app/yt…) : retient la provenance, puis ouvre l'accueil. */
+/** Liens courts des médias (arcorawatch.com/yt…) : retient la provenance, puis ouvre l'accueil. */
 function ShortLink({ source }: { source: string }) {
   rememberSource(source);
   return <Navigate to="/" replace />;

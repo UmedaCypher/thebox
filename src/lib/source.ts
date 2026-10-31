@@ -1,6 +1,6 @@
 const SRC_KEY = 'thebox-src';
 
-/** Liens courts à donner dans les médias : arcora.app/yt, arcora.app/podcast… */
+/** Liens courts à donner dans les médias : arcorawatch.com/yt, arcorawatch.com/podcast… */
 export const SHORT_LINKS: Record<string, string> = {
   yt: 'youtube', podcast: 'podcast', ig: 'instagram', tiktok: 'tiktok', discord: 'discord',
 };

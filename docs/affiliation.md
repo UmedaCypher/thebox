@@ -1,6 +1,6 @@
 # Parrainage, affiliation et backoffice
 
-Tout est fait dans l'app, sans outil externe. Un seul lien : `https://arcora.app/?ref=<code>`.
+Tout est fait dans l'app, sans outil externe. Un seul lien : `https://arcorawatch.com/?ref=<code>`.
 
 ## Les trois types
 
