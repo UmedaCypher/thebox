@@ -3,11 +3,11 @@ import type { FormEvent } from 'react';
 import { Download, RefreshCw, Trash2 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import {
-  adminAddExpense, adminDeleteExpense, adminDeleteWaitlist, exportAdminWaitlist, getAdminWaitlist, adminGrantPremium, adminSetFoundersOpen, adminUpdateAffiliate,
+  adminAddExpense, adminDeleteExpense, adminDeleteWaitlist, exportAdminWaitlist, getAdminMembers, getAdminWaitlist, adminGrantPremium, adminSetFoundersOpen, adminUpdateAffiliate,
   getAdminAffiliates, getAdminDashboard, getAffiliatePayoutsDue, recordAffiliatePayout,
 } from '../../lib/api';
 import type {
-  AdminAffiliate, AdminAffiliates, AdminDashboard, AdminMonth, AdminWaitlist, AffiliatePayoutDue, ExpenseCategory,
+  AdminAffiliate, AdminAffiliates, AdminDashboard, AdminMember, AdminMonth, AdminWaitlist, AffiliatePayoutDue, ExpenseCategory,
 } from '../../lib/api';
 import { AFFILIATE_MIN_PAYOUT_EUR } from '../../lib/features';
 import { Button, EmptyState, IconButton, Loading, Notice, PageHeader, SelectField, TextField, Toggle } from '../../components/ui';
@@ -68,6 +68,7 @@ export default function AdminPage() {
         <>
           <Overview d={data} />
           <Growth d={data} />
+          <Members />
           <Waitlist />
           <Money d={data} onChange={load} />
           <Affiliates onChange={load} />
@@ -143,6 +144,69 @@ function Growth({ d }: { d: AdminDashboard }) {
             data={d.weekly.map(w => ({ label: weekLabel(w.week), value: w.members, tip: `${weekLabel(w.week)} : ${formatNumber(w.members)} membres` }))} />
         </div>
       </div>
+    </section>
+  );
+}
+
+/* ---------- Derniers membres (comptes créés) ---------- */
+const PLAN = { paying: 'Premium payant', offered: 'Premium offert', admin: 'Admin', free: 'Gratuit' } as const;
+const REFERRER = { member: 'parrain', creator: 'ambassadeur', pro: 'partenaire' } as const;
+
+function Members() {
+  const [rows, setRows] = useState<AdminMember[] | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [query, setQuery] = useState('');
+  const [limit, setLimit] = useState(100);
+
+  // Recherche côté base, 300 ms après la dernière frappe
+  useEffect(() => {
+    const id = setTimeout(() => {
+      getAdminMembers(query.trim(), limit).then(r => { setRows(r); setError(null); }).catch(e => setError(e instanceof Error ? e.message : String(e)));
+    }, 300);
+    return () => clearTimeout(id);
+  }, [query, limit]);
+
+  const when = (iso: string | null) => (iso ? formatDate(iso, { day: 'numeric', month: 'short', year: 'numeric' }) : '—');
+
+  return (
+    <section className={s.section}>
+      <div className={s.sectionHead}>
+        <h2 className={s.h}>Derniers membres</h2>
+        <TextField label="Rechercher" value={query} onChange={e => setQuery(e.target.value)} placeholder="e-mail, pseudo ou provenance" className={s.search} />
+      </div>
+      <p className={s.small}>Les comptes créés dans l'app, du plus récent au plus ancien.</p>
+      {error && <Notice tone="error">{error}</Notice>}
+      {rows === null ? (!error && <Loading />) : rows.length === 0 ? <p className={s.muted}>Aucun membre ne correspond.</p> : (
+        <div className={`panel ${s.block}`} data-tone="plain">
+          <div className={s.tableWrap}>
+            <table className={s.table}>
+              <thead><tr><th>Membre</th><th>Inscrit le</th><th>Provenance</th><th>Montres</th><th>Offre</th><th>Dernière connexion</th></tr></thead>
+              <tbody>
+                {rows.map(m => (
+                  <tr key={m.id}>
+                    <th scope="row">
+                      <span className={s.member}>
+                        <b>{m.username ? `@${m.username}` : <span className={s.small}>sans pseudo</span>}</b>
+                        {m.founder && <span className={s.founderDot} title="Membre fondateur" aria-label="Membre fondateur" />}
+                      </span>
+                      <span className={s.small}><a href={`mailto:${m.email}`}>{m.email}</a>{!m.confirmed && ' · e-mail non confirmé'}</span>
+                    </th>
+                    <td>{when(m.created_at)}</td>
+                    <td>{m.referrer ? <>{REFERRER[m.referrer_kind ?? 'member']} @{m.referrer}</> : (m.source ?? 'direct')}</td>
+                    <td className={m.watches >= 3 ? s.pos : undefined}>{m.watches}</td>
+                    <td><span className={s.status} data-status={m.plan === 'paying' ? 'active' : m.plan === 'offered' ? 'pending' : undefined}>{PLAN[m.plan]}</span></td>
+                    <td>{when(m.last_sign_in_at)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p className={s.small}>
+            Point vert : membre fondateur. Montres en vert : membre activé (3 montres ou plus).
+            {rows.length === limit && limit < 500 && <> <button type="button" className={s.more} onClick={() => setLimit(limit + 100)}>Afficher 100 de plus</button></>}
+          </p>
+        </div>
+      )}
     </section>
   );
 }
@@ -234,7 +298,7 @@ function Waitlist() {
           )}
           <div className={`panel ${s.block}`} data-tone="plain">
             <div className={s.sectionHead}>
-              <h3 className={s.h3}>Dernières inscriptions</h3>
+              <h3 className={s.h3}>Dernières inscriptions à la liste d'attente</h3>
               <TextField label="Rechercher" value={query} onChange={e => setQuery(e.target.value)} placeholder="e-mail ou provenance" className={s.search} />
             </div>
             {w.total === 0 ? <p className={s.muted}>Personne pour le moment. Les inscriptions du formulaire « Premium » apparaîtront ici.</p> : (

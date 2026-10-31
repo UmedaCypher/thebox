@@ -700,3 +700,16 @@ export async function adminDeleteWaitlist(id: string) {
   const { error } = await supabase.rpc('admin_delete_waitlist', { p_id: id });
   fail(error, 'Suppression impossible.');
 }
+
+export type AdminMember = {
+  id: string; email: string; username: string | null; created_at: string; last_sign_in_at: string | null; confirmed: boolean;
+  source: string | null; referrer_kind: 'member' | 'creator' | 'pro' | null; referrer: string | null; founder: boolean;
+  watches: number; plan: 'paying' | 'offered' | 'admin' | 'free';
+};
+
+/** Derniers comptes créés (100 par défaut), avec recherche par e-mail, pseudo ou provenance. */
+export async function getAdminMembers(search = '', limit = 100): Promise<AdminMember[]> {
+  const { data, error } = await supabase.rpc('admin_members', { p_search: search || null, p_limit: limit });
+  fail(error, 'Chargement impossible.');
+  return (data as AdminMember[]) ?? [];
+}
