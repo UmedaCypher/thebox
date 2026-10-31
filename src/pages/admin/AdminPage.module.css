@@ -93,3 +93,6 @@
 .iban { font: 600 var(--fs-sm) / 1.4 inherit; font-variant-numeric: tabular-nums; letter-spacing: 0.06em; overflow-wrap: anywhere; user-select: all; }
 .payoutActions { display: flex; flex-wrap: wrap; gap: var(--sp-3); align-items: flex-end; }
 .payoutActions > :first-child { flex: 1 1 220px; }
+
+.sectionHead { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: var(--sp-3); }
+.search { flex: 0 1 280px; }

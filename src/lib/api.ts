@@ -672,3 +672,31 @@ export async function adminGrantPremium(username: string, days: number): Promise
   fail(error, 'Enregistrement impossible.');
   return data as string;
 }
+
+export type AdminWaitlistEntry = {
+  id: string; email: string; watch_count: string | null; premium: boolean; source: string | null; created_at: string; is_member: boolean;
+};
+export type AdminWaitlist = {
+  total: number; last_7d: number; last_30d: number; premium: number; members: number;
+  by_source: { label: string; n: number }[];
+  by_watch_count: { label: string; n: number }[];
+  recent: AdminWaitlistEntry[];
+};
+
+export async function getAdminWaitlist(): Promise<AdminWaitlist> {
+  const { data, error } = await supabase.rpc('admin_waitlist');
+  fail(error, 'Chargement impossible.');
+  return data as AdminWaitlist;
+}
+
+/** Toute la liste d'attente, pour l'export CSV. */
+export async function exportAdminWaitlist() {
+  const { data, error } = await supabase.rpc('admin_waitlist_export');
+  fail(error, 'Chargement impossible.');
+  return (data ?? []) as { email: string; watch_count: string | null; interested_in_premium: boolean; source: string | null; created_at: string; is_member: boolean }[];
+}
+
+export async function adminDeleteWaitlist(id: string) {
+  const { error } = await supabase.rpc('admin_delete_waitlist', { p_id: id });
+  fail(error, 'Suppression impossible.');
+}

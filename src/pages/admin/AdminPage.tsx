@@ -1,12 +1,14 @@
 import { useCallback, useEffect, useState } from 'react';
 import type { FormEvent } from 'react';
-import { RefreshCw, Trash2 } from 'lucide-react';
+import { Download, RefreshCw, Trash2 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import {
-  adminAddExpense, adminDeleteExpense, adminGrantPremium, adminSetFoundersOpen, adminUpdateAffiliate,
+  adminAddExpense, adminDeleteExpense, adminDeleteWaitlist, exportAdminWaitlist, getAdminWaitlist, adminGrantPremium, adminSetFoundersOpen, adminUpdateAffiliate,
   getAdminAffiliates, getAdminDashboard, getAffiliatePayoutsDue, recordAffiliatePayout,
 } from '../../lib/api';
-import type { AdminAffiliate, AdminAffiliates, AdminDashboard, AdminMonth, AffiliatePayoutDue, ExpenseCategory } from '../../lib/api';
+import type {
+  AdminAffiliate, AdminAffiliates, AdminDashboard, AdminMonth, AdminWaitlist, AffiliatePayoutDue, ExpenseCategory,
+} from '../../lib/api';
 import { AFFILIATE_MIN_PAYOUT_EUR } from '../../lib/features';
 import { Button, EmptyState, IconButton, Loading, Notice, PageHeader, SelectField, TextField, Toggle } from '../../components/ui';
 import { useToast } from '../../components/Toast/Toast';
@@ -66,6 +68,7 @@ export default function AdminPage() {
         <>
           <Overview d={data} />
           <Growth d={data} />
+          <Waitlist />
           <Money d={data} onChange={load} />
           <Affiliates onChange={load} />
           <Payouts />
@@ -140,6 +143,124 @@ function Growth({ d }: { d: AdminDashboard }) {
             data={d.weekly.map(w => ({ label: weekLabel(w.week), value: w.members, tip: `${weekLabel(w.week)} : ${formatNumber(w.members)} membres` }))} />
         </div>
       </div>
+    </section>
+  );
+}
+
+/* ---------- Liste d'attente Premium ---------- */
+const csvCell = (v: unknown) => {
+  const t = v === null || v === undefined ? '' : String(v);
+  return /[";\n]/.test(t) ? `"${t.replace(/"/g, '""')}"` : t;
+};
+
+function Waitlist() {
+  const toast = useToast();
+  const [w, setW] = useState<AdminWaitlist | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [query, setQuery] = useState('');
+  const [busy, setBusy] = useState(false);
+  const load = useCallback(() => { getAdminWaitlist().then(setW).catch(e => setError(e instanceof Error ? e.message : String(e))); }, []);
+  useEffect(() => { load(); }, [load]);
+
+  const download = async () => {
+    setBusy(true);
+    try {
+      const rows = await exportAdminWaitlist();
+      const head = ['EMAIL', 'NB_MONTRES', 'PREMIUM', 'SOURCE', 'INSCRIT_LE', 'DEJA_MEMBRE'];
+      const lines = rows.map(r => [r.email, r.watch_count, r.interested_in_premium ? 'oui' : 'non', r.source,
+        r.created_at.slice(0, 10), r.is_member ? 'oui' : 'non'].map(csvCell).join(';'));
+      // Point-virgule et BOM : s'ouvre proprement dans Excel et s'importe dans Brevo.
+      const blob = new Blob(['\ufeff' + [head.join(';'), ...lines].join('\n')], { type: 'text/csv;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = `arcora-liste-attente-${todayISO()}.csv`; a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    } catch (e) { setError(e instanceof Error ? e.message : String(e)); }
+    setBusy(false);
+  };
+  const remove = async (id: string, email: string) => {
+    if (!window.confirm(`Supprimer ${email} de la liste d'attente ?`)) return;
+    try { await adminDeleteWaitlist(id); toast('Inscription supprimée.'); load(); }
+    catch (e) { setError(e instanceof Error ? e.message : String(e)); }
+  };
+
+  const q = query.trim().toLowerCase();
+  const list = (w?.recent ?? []).filter(r => !q || r.email.toLowerCase().includes(q) || (r.source ?? '').includes(q));
+  const maxSrc = Math.max(1, ...(w?.by_source ?? []).map(x => x.n));
+  const maxCount = Math.max(1, ...(w?.by_watch_count ?? []).map(x => x.n));
+
+  return (
+    <section className={s.section}>
+      <div className={s.sectionHead}>
+        <h2 className={s.h}>Liste d'attente Premium</h2>
+        <Button variant="secondary" onClick={download} disabled={busy || !w?.total}><Download size={16} aria-hidden="true" />Exporter en CSV</Button>
+      </div>
+      {error && <Notice tone="error">{error}</Notice>}
+      {!w ? (!error && <Loading />) : (
+        <>
+          <div className={s.tiles}>
+            <Tile label="Inscrits" value={formatNumber(w.total)} sub={`+${w.last_7d} en 7 jours · +${w.last_30d} en 30 jours`} tone="brass" />
+            <Tile label="Intéressés par Premium" value={formatNumber(w.premium)} sub={w.total ? `${formatNumber((100 * w.premium) / w.total, 0)}\u00a0% de la liste` : undefined} />
+            <Tile label="Déjà membres" value={formatNumber(w.members)} sub="ont aussi créé un compte" tone="lume" />
+            <Tile label="Pas encore membres" value={formatNumber(w.total - w.members)} sub="à relancer au lancement" />
+          </div>
+          {w.total > 0 && (
+            <div className={s.charts}>
+              <div className={`panel ${s.block}`} data-tone="plain">
+                <h3 className={s.h3}>Provenance</h3>
+                <ul className={s.hbars}>
+                  {w.by_source.map(x => (
+                    <li key={x.label}>
+                      <span className={s.hbarLabel}>{x.label}</span>
+                      <span className={s.hbarTrack}><span className={s.hbar} style={{ width: `${(x.n / maxSrc) * 100}%` }} /></span>
+                      <span className={s.hbarValue}>{x.n}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className={`panel ${s.block}`} data-tone="plain">
+                <h3 className={s.h3}>Taille de collection déclarée</h3>
+                <ul className={s.hbars}>
+                  {w.by_watch_count.map(x => (
+                    <li key={x.label}>
+                      <span className={s.hbarLabel}>{x.label === 'non précisé' ? x.label : `${x.label} montres`}</span>
+                      <span className={s.hbarTrack}><span className={s.hbar} style={{ width: `${(x.n / maxCount) * 100}%` }} /></span>
+                      <span className={s.hbarValue}>{x.n}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          )}
+          <div className={`panel ${s.block}`} data-tone="plain">
+            <div className={s.sectionHead}>
+              <h3 className={s.h3}>Dernières inscriptions</h3>
+              <TextField label="Rechercher" value={query} onChange={e => setQuery(e.target.value)} placeholder="e-mail ou provenance" className={s.search} />
+            </div>
+            {w.total === 0 ? <p className={s.muted}>Personne pour le moment. Les inscriptions du formulaire « Premium » apparaîtront ici.</p> : (
+              <div className={s.tableWrap}>
+                <table className={s.table}>
+                  <thead><tr><th>E-mail</th><th>Montres</th><th>Premium</th><th>Provenance</th><th>Date</th><th>Membre</th><th /></tr></thead>
+                  <tbody>
+                    {list.map(r => (
+                      <tr key={r.id}>
+                        <th scope="row"><a href={`mailto:${r.email}`}>{r.email}</a></th>
+                        <td>{r.watch_count ?? '—'}</td>
+                        <td>{r.premium ? 'oui' : '—'}</td>
+                        <td>{r.source ?? 'direct'}</td>
+                        <td>{formatDate(r.created_at, { day: 'numeric', month: 'short', year: 'numeric' })}</td>
+                        <td>{r.is_member ? <span className={s.status} data-status="active">membre</span> : '—'}</td>
+                        <td><IconButton label={`Supprimer ${r.email}`} onClick={() => remove(r.id, r.email)}><Trash2 size={16} /></IconButton></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+            {w.total > w.recent.length && <p className={s.small}>Les 200 dernières inscriptions sont affichées ; l'export CSV contient toute la liste.</p>}
+          </div>
+        </>
+      )}
     </section>
   );
 }
