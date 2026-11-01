@@ -4,6 +4,9 @@
 .greet h1 { font-size: clamp(var(--fs-2xl), 6vw, var(--fs-4xl)); animation: rise 900ms var(--ease-out) backwards; }
 .date { color: var(--text-2); font-size: var(--fs-sm); }
 .date::first-letter { text-transform: uppercase; }
+.dateSep { margin: 0 8px; color: var(--text-3); }
+.clock { color: var(--text); font-weight: 600; font-variant-numeric: tabular-nums; letter-spacing: 0.02em; }
+.seconds { color: var(--lume); }
 @keyframes rise { from { opacity: 0; transform: translateY(0.4em); clip-path: inset(0 0 100% 0); } to { opacity: 1; transform: none; clip-path: inset(0 0 -20% 0); } }
 
 .bento {
@@ -84,6 +87,11 @@ a.tile:active { transform: scale(0.985); }
 }
 
 .heroPick, .heroEmpty { justify-content: center; gap: var(--sp-4); }
+/* Sur téléphone, le choix du jour prend la hauteur de son contenu, avec le même retrait que les autres tuiles */
+@media (max-width: 759px) {
+  .hero:has(.heroPick, .heroEmpty) { min-height: 0; }
+  .heroPick, .heroEmpty { padding: var(--sp-4); gap: var(--sp-3); }
+}
 .heroPick h2, .heroEmpty h2 { font-size: clamp(var(--fs-xl), 4vw, var(--fs-3xl)); }
 .heroPick .heroKicker { color: var(--lume-ink); }
 .heroEmpty { align-items: flex-start; color: var(--lume); }
