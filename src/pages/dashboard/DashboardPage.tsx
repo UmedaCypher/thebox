@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import {
@@ -120,6 +120,27 @@ function Tile({ to, icon, title, tone = 'plain', className, children, external }
     : <Link to={to} className={cls} data-tone={tone} data-reveal>{inner}</Link>;
 }
 
+/** Heure à la seconde près, pour régler ses montres. Recalée sur chaque changement de seconde. */
+function LiveClock() {
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    let id: ReturnType<typeof setTimeout>;
+    const tick = () => {
+      const d = new Date();
+      setNow(d);
+      id = setTimeout(tick, 1000 - d.getMilliseconds() + 5);
+    };
+    id = setTimeout(tick, 1000 - new Date().getMilliseconds() + 5);
+    return () => clearTimeout(id);
+  }, []);
+  const p = (n: number) => String(n).padStart(2, '0');
+  return (
+    <time className={s.clock} dateTime={now.toISOString()} aria-label={now.toLocaleTimeString(getLocale())}>
+      {p(now.getHours())}:{p(now.getMinutes())}<span className={s.seconds}>:{p(now.getSeconds())}</span>
+    </time>
+  );
+}
+
 export default function DashboardPage() {
   const t = useStrings(S);
   const toast = useToast();
@@ -175,7 +196,7 @@ export default function DashboardPage() {
     <div className={`page ${s.page}`}>
       <header className={s.greet}>
         <h1>{t.hello(hour)}{name ? `, ${name}` : ''}</h1>
-        <p className={s.date}>{dateLabel}</p>
+        <p className={s.date}>{dateLabel}<span className={s.dateSep} aria-hidden="true">·</span><LiveClock /></p>
       </header>
 
       <div className={s.bento}>

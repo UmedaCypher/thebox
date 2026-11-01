@@ -34,13 +34,13 @@ const APP_TABS = [
   { to: '/marche', key: 'market', icon: Store },
 ] as const;
 
-/* Sur mobile, tout reste dans la barre du bas, Messages compris. */
+/* Sur mobile : Messages est dans l'en-tête (à côté du profil), la Galerie dans la barre du bas. */
 const MOBILE_TABS = [
   { to: '/accueil', key: 'home', icon: LayoutGrid },
   { to: '/collection', key: 'collection', icon: Watch },
   { to: '/portage', key: 'wear', icon: CalendarDays },
+  { to: '/galerie', key: 'gallery', icon: Images },
   { to: '/marche', key: 'market', icon: Store },
-  { to: '/messages', key: 'messages', icon: MessageCircle },
 ] as const;
 
 const badgeText = (n: number) => (n > 99 ? '99+' : String(n));
@@ -61,7 +61,7 @@ function Header({ unread }: { unread: number }) {
         <div className={s.headerEnd}>
           {user ? (
             <>
-              <NavLink to="/messages" className={`${s.iconLink} ${s.desktopOnly}`}
+              <NavLink to="/messages" className={s.iconLink}
                 aria-label={unread > 0 ? `${c.tabs.messages}, ${c.unread(unread)}` : c.tabs.messages} title={c.tabs.messages}>
                 <MessageCircle size={22} strokeWidth={1.7} aria-hidden="true" />
                 {unread > 0 && <span className={s.iconBadge} aria-hidden="true">{badgeText(unread)}</span>}
@@ -109,7 +109,7 @@ function Header({ unread }: { unread: number }) {
   );
 }
 
-function TabBar({ unread }: { unread: number }) {
+function TabBar() {
   const t = useStrings(S);
   const c = useStrings(COMMON);
   return (
@@ -118,7 +118,6 @@ function TabBar({ unread }: { unread: number }) {
         <NavLink key={to} to={to} className={s.tab}>
           <span className={s.tabIcon}>
             <Icon size={26} strokeWidth={1.6} aria-hidden="true" />
-            {to === '/messages' && unread > 0 && <span className={s.iconBadge} aria-label={c.unread(unread)}>{badgeText(unread)}</span>}
           </span>
           <span className={s.tabLabel}>{c.tabs[key]}</span>
         </NavLink>
@@ -212,7 +211,7 @@ export default function Layout() {
         <div key={inMessages ? '/messages' : pathname} className={s.route}><Outlet /></div>
       </main>
       {!inMessages && !inOnboarding && <Footer loggedIn={Boolean(user)} />}
-      {user && !inOnboarding && <div className={inThread ? s.hideOnMobile : undefined}><TabBar unread={unread} /></div>}
+      {user && !inOnboarding && <div className={inThread ? s.hideOnMobile : undefined}><TabBar /></div>}
     </div>
   );
 }
