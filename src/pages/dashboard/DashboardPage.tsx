@@ -27,8 +27,10 @@ const S = defineStrings({
   hello: (h: number) => (h < 18 && h >= 5 ? 'Bonjour' : 'Bonsoir'),
   today: "Aujourd'hui",
   pick: 'Quelle montre aujourd\'hui ?',
-  addShot: 'Ajouter un wrist shot',
-  withPhoto: 'Wrist Check avec photo',
+  addShot: 'Prendre mon wrist shot',
+  withPhoto: 'Prendre la photo du jour',
+  nudgeBadge: (n: number, m: number) => n <= 1 ? `Dernière photo avant le badge ${m} wrist shots` : `Encore ${n} photos avant le badge ${m} wrist shots`,
+  nudgeGallery: 'Elle rejoint la page de la montre, et la Galerie si vous le souhaitez',
   logged: 'Port noté',
   change: 'Changer',
   firstWatch: 'Ajouter ma première montre',
@@ -64,8 +66,10 @@ const S = defineStrings({
   hello: h => (h < 12 && h >= 5 ? 'Good morning' : h < 18 && h >= 12 ? 'Good afternoon' : 'Good evening'),
   today: 'Today',
   pick: 'Which watch today?',
-  addShot: 'Add a wrist shot',
-  withPhoto: 'Wrist Check with a photo',
+  addShot: 'Take my wrist shot',
+  withPhoto: 'Take today’s photo',
+  nudgeBadge: (n: number, m: number) => n <= 1 ? `One last photo before the ${m} wrist shots badge` : `${n} more photos before the ${m} wrist shots badge`,
+  nudgeGallery: 'It goes on the watch page, and in the Gallery if you wish',
   logged: 'Logged',
   change: 'Change',
   firstWatch: 'Add my first watch',
@@ -199,6 +203,9 @@ export default function DashboardPage() {
     try { await addWear(uid, w.id, today); toast(`${t.logged} : ${w.model}`); streak.reload(); } catch { setJustLogged(null); }
   };
   // Photo du Wrist Check d'aujourd'hui, si elle existe : elle remplace la photo principale de la montre
+  // Petite incitation sous le bouton photo : le prochain badge photo, sinon la Galerie
+  const left = streak.data?.next_photo_milestone ? streak.data.next_photo_milestone - streak.data.photos : null;
+  const photoNudge = left !== null && left <= 10 ? t.nudgeBadge(left, streak.data!.next_photo_milestone!) : t.nudgeGallery;
   const todayShot = todayWatch?.photos?.filter(p => p.worn_on === today && p.photo_type === 'wrist_shot')
     .sort((a, b) => (b.created_at ?? '').localeCompare(a.created_at ?? ''))[0];
 
@@ -217,7 +224,7 @@ export default function DashboardPage() {
         {/* ---------- Aujourd'hui : la pièce maîtresse du tableau de bord ---------- */}
         <section className={s.hero} data-reveal aria-label={t.today}>
           {todayWatch ? (
-            <div className={s.heroWrap}>
+            <div className={s.heroWrap} data-cta={!todayShot}>
               <Link to="/portage" className={s.heroWorn}>
                 <Img key={todayShot?.id ?? todayWatch.id} src={photoUrl((todayShot ?? mainPhoto(todayWatch.photos))?.storage_path) ?? ''} fallback={thumbFor(todayWatch).src} alt={`${todayWatch.brand} ${todayWatch.model}`} className={s.heroPhoto} />
                 <span className={s.heroCaption}>
@@ -229,8 +236,12 @@ export default function DashboardPage() {
                 <span className={s.heroChange}>{t.change}</span>
               </Link>
               {!todayShot && (
-                <button type="button" className={s.heroShot} onClick={() => setCheck({ watchId: todayWatch.id, day: today })}>
-                  <Camera size={16} strokeWidth={1.9} aria-hidden="true" />{t.addShot}
+                <button type="button" className={s.shotCta} onClick={() => setCheck({ watchId: todayWatch.id, day: today })}>
+                  <span className={s.shotIcon}><Camera size={22} strokeWidth={1.9} aria-hidden="true" /></span>
+                  <span className={s.shotText}>
+                    <b>{t.addShot}</b>
+                    <small>{photoNudge}</small>
+                  </span>
                 </button>
               )}
             </div>
@@ -257,8 +268,12 @@ export default function DashboardPage() {
                   </li>
                 ))}
               </ul>
-              <button type="button" className={s.withPhoto} onClick={() => setCheck({ day: today })}>
-                <Camera size={16} strokeWidth={1.8} aria-hidden="true" />{t.withPhoto}
+              <button type="button" className={s.pickCta} onClick={() => setCheck({ day: today })}>
+                <span className={s.shotIcon}><Camera size={20} strokeWidth={1.9} aria-hidden="true" /></span>
+                <span className={s.shotText}>
+                  <b>{t.withPhoto}</b>
+                  <small>{photoNudge}</small>
+                </span>
               </button>
             </div>
           )}
