@@ -4,12 +4,13 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Camera } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTheme } from '../../hooks/useTheme';
-import { getSubscription, openBillingPortal, saveProfile, uploadAvatar } from '../../lib/api';
+import { getMyWearStreak, getSubscription, listMyWristChecks, openBillingPortal, saveProfile, thumbSrc, uploadAvatar } from '../../lib/api';
+import StreakPanel from '../../components/WristCheck/StreakPanel';
 import { useLoad } from '../../hooks/useLoad';
 import { supabase } from '../../lib/supabaseClient';
 import { FREE_WATCH_LIMIT, PAYMENTS_ENABLED } from '../../lib/features';
 import { formatDate } from '../../lib/format';
-import { Button, LinkButton, Notice, PageHeader, PremiumTag, Segmented, TextField, Toggle } from '../../components/ui';
+import { Button, Img, LinkButton, Notice, PageHeader, PremiumTag, Segmented, TextField, Toggle } from '../../components/ui';
 import { useLanguageSetting } from '../../i18n/useLanguageSetting';
 import { defineStrings, tr, useStrings } from '../../i18n';
 import type { LangChoice } from '../../i18n';
@@ -55,6 +56,8 @@ const S = defineStrings({
   insurance: 'Inventaire pour l\'assurance',
   freeText: (n: number) => `La collection gratuite accueille ${n} montres, avec la galerie, le calendrier de portage et le passeport.`,
   discoverPremium: 'Découvrir Premium',
+  wristChecks: 'Mes Wrist Checks',
+  private: 'privé',
   affiliate: 'Parrainage',
   affiliateText: 'Offrez un mois de Premium à vos amis collectionneurs, et gagnez-en un quand ils ont ajouté 3 montres. Créateurs et boutiques : découvrez le programme ambassadeur.',
   affiliateOpen: 'Parrainer',
@@ -123,6 +126,8 @@ const S = defineStrings({
   insurance: 'Insurance inventory',
   freeText: n => `The free collection holds ${n} watches, with the gallery, the wear calendar and the passport.`,
   discoverPremium: 'Discover Premium',
+  wristChecks: 'My Wrist Checks',
+  private: 'private',
   affiliate: 'Referrals',
   affiliateText: 'Give your collector friends a month of Premium, and earn one when they add 3 watches. Creators and shops: see the ambassador programme.',
   affiliateOpen: 'Invite friends',
@@ -175,6 +180,8 @@ export default function AccountPage() {
   const [newEmail, setNewEmail] = useState('');
   const [accountMsg, setAccountMsg] = useState<{ tone: 'ok' | 'error'; text: string } | null>(null);
   const sub = useLoad(() => getSubscription(uid), [uid], PAYMENTS_ENABLED);
+  const streak = useLoad(() => getMyWearStreak(), [uid]);
+  const checks = useLoad(() => listMyWristChecks(uid, 12), [uid]);
   const [portalBusy, setPortalBusy] = useState(false);
   const [portalError, setPortalError] = useState<string | null>(null);
 
@@ -319,6 +326,30 @@ export default function AccountPage() {
           </>
         )}
       </section>
+
+      {streak.data && (
+        <div className={s.wrist}>
+          <StreakPanel streak={streak.data} onCheck={() => navigate('/portage')} />
+          {(checks.data?.length ?? 0) > 0 && (
+            <section className={s.section}>
+              <h2 className={s.h}>{t.wristChecks}</h2>
+              <ul className={s.checks}>
+                {checks.data!.map(p => (
+                  <li key={p.id}>
+                    <Link to={`/montre/${p.watch_id}?onglet=portage`} className={s.check}>
+                      <Img src={thumbSrc(p.storage_path).src ?? ''} fallback={thumbSrc(p.storage_path).fallback} alt={`${p.brand} ${p.model}`} />
+                      <span className={s.checkCap}>
+                        <b>{p.model}</b>
+                        <small>{formatDate(p.worn_on, { day: 'numeric', month: 'short' })}{!p.is_public_gallery && ` · ${t.private}`}</small>
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+        </div>
+      )}
 
       <section className={`panel ${s.section}`} data-tone="ruby">
         <h2 className={s.h}>{t.affiliate}</h2>

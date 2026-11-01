@@ -210,3 +210,19 @@ a.tile:active { transform: scale(0.985); }
   .greet h1 { animation: none; }
   .tile, .shot, .heroPhoto, .pickPhoto { transition: none; }
 }
+
+/* ---------- Wrist Check ---------- */
+.heroWrap { position: relative; display: flex; flex: 1; }
+.heroWrap > a { flex: 1; }
+.heroStreak { margin-top: 4px; font-size: var(--fs-xs); font-weight: 700; color: #c9e7a7; }
+.heroShot {
+  position: absolute; top: 12px; left: 12px; z-index: 2; display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 14px; border-radius: var(--r-pill); font-size: var(--fs-xs); font-weight: 700;
+  color: var(--lume-ink); background: var(--lume); box-shadow: 0 0 18px color-mix(in srgb, var(--lume) 50%, transparent);
+}
+.heroShot:hover { filter: brightness(1.05); }
+.withPhoto {
+  align-self: flex-start; display: inline-flex; align-items: center; gap: 8px; padding: 6px 2px;
+  font-size: var(--fs-sm); font-weight: 600; color: var(--lume);
+}
+.withPhoto:hover { text-decoration: underline; }

@@ -1,0 +1,102 @@
+/* ---------- Feuille Wrist Check ---------- */
+.form { display: flex; flex-direction: column; gap: var(--sp-4); }
+.field { border: 0; padding: 0; margin: 0; display: flex; flex-direction: column; gap: var(--sp-2); min-width: 0; }
+.legend { font-size: var(--fs-sm); font-weight: 600; margin-bottom: var(--sp-1); padding: 0; }
+.hint { font-size: var(--fs-xs); color: var(--text-3); }
+
+.watchRow { list-style: none; display: flex; gap: var(--sp-3); overflow-x: auto; padding: 4px 2px 6px; scrollbar-width: none; }
+.watchRow::-webkit-scrollbar { display: none; }
+.watchBtn { display: flex; flex-direction: column; align-items: center; gap: 6px; width: 76px; color: var(--text); }
+.watchPhoto { flex: none;
+  position: relative; width: 64px; height: 64px; border-radius: 50%; overflow: visible; display: grid; place-items: center;
+  background: var(--cushion); box-shadow: 0 0 0 1px var(--glass-border);
+  transition: box-shadow var(--dur) var(--ease-out), transform var(--dur) var(--ease-out);
+}
+.watchPhoto img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+.watchBtn[aria-pressed='true'] .watchPhoto { box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--lume), 0 0 20px color-mix(in srgb, var(--lume) 40%, transparent); }
+.watchCheck {
+  position: absolute; right: -2px; bottom: -2px; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center;
+  background: var(--lume); color: var(--lume-ink); border: 2px solid var(--bg);
+}
+.watchName { max-width: 100%; font-size: var(--fs-xs); font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.photos { display: flex; gap: var(--sp-2); flex-wrap: wrap; }
+.preview { position: relative; width: 88px; height: 110px; border-radius: var(--r-md); overflow: hidden; box-shadow: var(--shadow-sm); }
+.preview img { width: 100%; height: 100%; object-fit: cover; }
+.removePhoto {
+  position: absolute; top: 4px; right: 4px; width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center;
+  background: rgba(20, 8, 10, 0.6); color: #fff; -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+}
+.addPhoto {
+  width: 88px; height: 110px; border-radius: var(--r-md); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+  padding: 6px; font-size: 11px; font-weight: 600; line-height: 1.25; text-align: center; color: var(--lume);
+  border: 1.5px dashed color-mix(in srgb, var(--lume) 55%, transparent); background: color-mix(in srgb, var(--lume) 7%, transparent);
+}
+.addPhoto:hover { background: color-mix(in srgb, var(--lume) 12%, transparent); }
+
+/* ---------- Série : ligne compacte (accueil) ---------- */
+.line { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3); flex-wrap: wrap; font-size: var(--fs-sm); }
+.lineCount { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; }
+.dot { width: 7px; height: 7px; border-radius: 50%; background: var(--lume); box-shadow: 0 0 10px var(--lume); }
+.lineNext { display: inline-flex; align-items: center; gap: 8px; color: var(--text-2); font-size: var(--fs-xs); font-variant-numeric: tabular-nums; }
+.lineNext .bar { width: 80px; }
+.lineMuted { font-size: var(--fs-sm); color: var(--text-2); }
+.bar { display: block; height: 6px; border-radius: 3px; background: color-mix(in srgb, var(--text) 10%, transparent); overflow: hidden; }
+.bar i { display: block; height: 100%; border-radius: inherit; background: var(--lume); box-shadow: 0 0 8px color-mix(in srgb, var(--lume) 60%, transparent); }
+
+/* ---------- Série : bloc complet ---------- */
+.panel { gap: var(--sp-3); }
+.head { display: flex; justify-content: space-between; align-items: flex-start; gap: var(--sp-3); flex-wrap: wrap; }
+.head button { display: inline-flex; align-items: center; gap: 8px; }
+.big { font-family: var(--font-display); font-size: var(--fs-2xl); line-height: 1.15; margin-top: 2px; }
+.msg { color: var(--text-2); font-size: var(--fs-sm); margin-top: 4px; max-width: 46ch; }
+.progress { display: flex; flex-direction: column; gap: 6px; }
+.catchUp {
+  display: flex; flex-direction: column; gap: var(--sp-2); padding: var(--sp-3); border-radius: var(--r-md); font-size: var(--fs-sm);
+  background: color-mix(in srgb, var(--lume) 9%, transparent); border: 1px solid color-mix(in srgb, var(--lume) 28%, transparent);
+}
+.catchBtns { display: flex; gap: var(--sp-2); flex-wrap: wrap; }
+.badges { list-style: none; display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: var(--sp-2); margin-top: var(--sp-2); }
+.badge {
+  display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 10px 6px; border-radius: var(--r-md); text-align: center;
+  border: 1px dashed var(--line); color: var(--text-3); opacity: 0.75;
+}
+.badge[data-earned='true'] {
+  opacity: 1; color: var(--text); border-style: solid; border-color: color-mix(in srgb, var(--lume) 45%, transparent);
+  background: color-mix(in srgb, var(--lume) 10%, transparent); box-shadow: 0 0 18px color-mix(in srgb, var(--lume) 14%, transparent);
+}
+.badge[data-earned='true'][data-kind='photo'] { border-color: color-mix(in srgb, var(--brass) 50%, transparent); background: color-mix(in srgb, var(--brass) 10%, transparent); box-shadow: none; }
+.badgeNum { display: inline-flex; align-items: center; gap: 4px; font-family: var(--font-display); font-size: var(--fs-xl); line-height: 1.1; font-variant-numeric: lining-nums; }
+.badge[data-earned='true'] .badgeNum { color: var(--lume); }
+.badge[data-earned='true'][data-kind='photo'] .badgeNum { color: var(--brass); }
+.badgeLabel { font-size: 11px; font-weight: 600; }
+
+/* ---------- « Au poignet ? » (sur une photo, verre sombre) ---------- */
+.fit {
+  display: flex; flex-direction: column; gap: 8px; padding: 10px 12px; border-radius: 16px; color: #f6eee2;
+  background: rgba(20, 8, 10, 0.44); border: 1px solid rgba(255, 255, 255, 0.16);
+  -webkit-backdrop-filter: blur(16px) saturate(1.4); backdrop-filter: blur(16px) saturate(1.4);
+}
+.fitHead { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-2); }
+.fitQuestion { font-size: var(--fs-sm); font-weight: 600; }
+.heart { display: inline-flex; align-items: center; gap: 5px; padding: 4px 6px; border-radius: 10px; font-size: var(--fs-sm); font-weight: 700; color: #f6eee2; }
+.heart[aria-pressed='true'] { color: #ee6f86; }
+.heart:disabled { cursor: default; }
+.heart:not(:disabled):hover { background: rgba(255, 255, 255, 0.08); }
+.scale { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
+.scale button {
+  height: 34px; border-radius: 10px; font-size: var(--fs-sm); font-weight: 600; color: rgba(246, 238, 226, 0.88);
+  background: rgba(255, 255, 255, 0.08); transition: background var(--dur), color var(--dur), box-shadow var(--dur);
+}
+.scale button:hover { background: rgba(255, 255, 255, 0.14); }
+.scale button[aria-pressed='true'] { background: var(--lume); color: var(--lume-ink); box-shadow: 0 0 14px rgba(201, 231, 167, 0.45); }
+.meter { display: flex; gap: 3px; height: 8px; }
+.meter i { display: block; min-width: 0; border-radius: 4px; background: rgba(246, 238, 226, 0.32); }
+.meter i[data-mid] { background: #c9e7a7; box-shadow: 0 0 10px rgba(201, 231, 167, 0.45); }
+.legend2 { display: flex; justify-content: space-between; gap: 6px; font-size: 11px; color: rgba(246, 238, 226, 0.72); font-variant-numeric: tabular-nums; }
+.legend2 [data-mine='true'] { color: #c9e7a7; font-weight: 700; }
+.change { align-self: flex-start; font-size: 11px; font-weight: 600; color: rgba(246, 238, 226, 0.75); text-decoration: underline; }
+
+/* Score compact (grille) */
+.fitBadge { display: inline-flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 700; }
+.fitLikes { display: inline-flex; align-items: center; gap: 3px; color: #ee6f86; }

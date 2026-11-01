@@ -1,7 +1,7 @@
 import { Printer } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useLoad } from '../../hooks/useLoad';
-import { listWatches, mainPhoto, photoUrl } from '../../lib/api';
+import { listWatches, listWearLogs, mainPhoto, photoUrl } from '../../lib/api';
 import { formatDate, formatEuros, formatMm } from '../../lib/format';
 import { Button, Notice, PageHeader } from '../../components/ui';
 import PremiumGate from '../../components/PremiumGate/PremiumGate';
@@ -23,6 +23,9 @@ const S = defineStrings({
     reference: 'Référence', year: 'Année', movement: 'Mouvement', diameter: 'Diamètre', case: 'Boîtier', condition: 'État',
     boxPapers: 'Boîte et papiers', purchaseDate: 'Date d\'achat', purchasePrice: 'Prix d\'achat', lastService: 'Dernière révision',
   },
+  worn: 'Portée',
+  wornText: (n: number, first: string, last: string, photos: number) =>
+    `${n} jour${n > 1 ? 's' : ''} noté${n > 1 ? 's' : ''}, du ${first} au ${last}${photos ? `, ${photos} photo${photos > 1 ? 's' : ''} au poignet datée${photos > 1 ? 's' : ''}` : ''}`,
   declaredValue: 'Valeur déclarée',
   footer: 'Valeurs déclarées par le propriétaire. Document généré avec Arcora.',
 }, {
@@ -38,6 +41,9 @@ const S = defineStrings({
     reference: 'Reference', year: 'Year', movement: 'Movement', diameter: 'Diameter', case: 'Case', condition: 'Condition',
     boxPapers: 'Box & papers', purchaseDate: 'Purchase date', purchasePrice: 'Purchase price', lastService: 'Last service',
   },
+  worn: 'Worn',
+  wornText: (n: number, first: string, last: string, photos: number) =>
+    `${n} day${n > 1 ? 's' : ''} logged, from ${first} to ${last}${photos ? `, ${photos} dated wrist photo${photos > 1 ? 's' : ''}` : ''}`,
   declaredValue: 'Declared value',
   footer: 'Values declared by the owner. Document generated with Arcora.',
 });
@@ -52,6 +58,13 @@ function ExportContent() {
   const { lang } = useLang();
   const { user, profile } = useAuth();
   const q = useLoad(() => listWatches(user!.id), [user]);
+  // Historique d'usage documenté (Wrist Check) : nombre de jours portés, période, photos datées
+  const wears = useLoad(() => listWearLogs(user!.id).catch(() => []), [user]);
+  const wearOf = (watchId: string, photos: number) => {
+    const days = (wears.data ?? []).filter(l => l.watch_id === watchId).map(l => l.worn_on).sort();
+    if (!days.length) return null;
+    return t.wornText(days.length, formatDate(days[0], { day: 'numeric', month: 'short', year: 'numeric' }), formatDate(days[days.length - 1], { day: 'numeric', month: 'short', year: 'numeric' }), photos);
+  };
 
   if (q.loading) return <div className="page"><SkeletonHeader /><SkeletonList rows={4} thumb={72} /></div>;
   if (q.error) return <div className="page"><Notice tone="error">{q.error}</Notice></div>;
@@ -91,6 +104,7 @@ function ExportContent() {
                   [t.specs.boxPapers, w.box_papers_status], [t.specs.purchaseDate, w.purchase_date ? formatDate(w.purchase_date) : null],
                   [t.specs.purchasePrice, w.purchase_price !== null ? formatEuros(Number(w.purchase_price)) : null],
                   [t.specs.lastService, w.last_service_date ? formatDate(w.last_service_date) : null],
+                  [t.worn, wearOf(w.id, (w.photos ?? []).filter(p => p.worn_on).length)],
                 ] as [string, string | number | null][]).filter(([, v]) => v !== null && v !== '').map(([k, v]) => (
                   <div key={k}><dt>{k}</dt><dd>{v}</dd></div>
                 ))}

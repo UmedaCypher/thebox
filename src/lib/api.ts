@@ -6,6 +6,7 @@ import { readRef } from './source';
 import type {
   ConversationSummary, GalleryShot, MaintenanceEntry, MarketFilterOptions, MarketFilters, MarketItem, Message,
   Passport, Photo, Profile, PublicCollection, Subscription, ValuePoint, Watch, WatchInput, WearLog, WishlistItem,
+  FitChoice, FitRankingRow, PhotoFit, WearStreak,
 } from '../types';
 
 const WATCH_BUCKET = 'watch.images';
@@ -158,7 +159,7 @@ export async function uploadAvatar(userId: string, file: File) {
 
 /* ---------- Montres ---------- */
 
-const WATCH_SELECT = '*, photos (id, storage_path, photo_type, is_main_photo, is_public_gallery, created_at)';
+const WATCH_SELECT = '*, photos (id, storage_path, photo_type, is_main_photo, is_public_gallery, created_at, worn_on)';
 
 export async function listWatches(userId: string): Promise<Watch[]> {
   const { data, error } = await supabase.from('watches').select(WATCH_SELECT)
@@ -196,7 +197,7 @@ export async function deleteWatch(userId: string, watch: Watch) {
 
 export async function addWatchPhoto(
   userId: string, watchId: string, file: File,
-  opts: { type: 'watch_only' | 'wrist_shot'; isMain?: boolean; inGallery?: boolean; wristSizeCm?: number | null },
+  opts: { type: 'watch_only' | 'wrist_shot'; isMain?: boolean; inGallery?: boolean; wristSizeCm?: number | null; wornOn?: string | null },
 ) {
   const { full: prepared, thumb } = await preparePhotoWithThumb(file);
   const path = `${userId}/${watchId}/${opts.type}/${Date.now()}_${Math.random().toString(36).slice(2, 8)}.jpg`;
@@ -218,6 +219,7 @@ export async function addWatchPhoto(
     is_main_photo: Boolean(opts.isMain),
     is_public_gallery: opts.type === 'wrist_shot' && Boolean(opts.inGallery),
     wrist_shot_on_wrist_size_cm: opts.type === 'wrist_shot' ? opts.wristSizeCm ?? null : null,
+    ...(opts.wornOn ? { worn_on: opts.wornOn } : {}),
   });
   fail(error, "Enregistrement de la photo impossible.");
 }
@@ -283,10 +285,66 @@ export async function listWearLogs(userId: string, from?: string, to?: string): 
   return (data as WearLog[]) ?? [];
 }
 
-export async function addWear(userId: string, watchId: string, day: string) {
-  const { error } = await supabase.from('wear_logs').insert({ user_id: userId, watch_id: watchId, worn_on: day });
-  if (error?.code === '23505') return; // déjà noté ce jour-là
+export async function addWear(userId: string, watchId: string, day: string, note?: string | null) {
+  const { error } = await supabase.from('wear_logs').insert({ user_id: userId, watch_id: watchId, worn_on: day, note: note || null });
+  if (error?.code === '23505') {
+    // déjà noté ce jour-là : on complète seulement la note
+    if (note) {
+      const { error: e2 } = await supabase.from('wear_logs').update({ note }).eq('user_id', userId).eq('watch_id', watchId).eq('worn_on', day);
+      fail(e2, "Impossible de noter le port.");
+    }
+    return;
+  }
   fail(error, "Impossible de noter le port.");
+}
+
+/* ---------- Wrist Check ---------- */
+
+export async function getMyWearStreak(): Promise<WearStreak | null> {
+  const { data, error } = await supabase.rpc('get_my_wear_streak');
+  if (error) { console.warn(error.message); return null; } // migration pas encore passée
+  return data as WearStreak;
+}
+
+export type WristCheckPhoto = { id: string; storage_path: string; worn_on: string; watch_id: string; brand: string; model: string; is_public_gallery: boolean };
+
+/** Derniers wrist shots du membre (photos prises lors d'un Wrist Check), du plus récent au plus ancien. */
+export async function listMyWristChecks(userId: string, limit = 24): Promise<WristCheckPhoto[]> {
+  const { data, error } = await supabase.from('photos')
+    .select('id, storage_path, worn_on, watch_id, is_public_gallery, watches (brand, model)')
+    .eq('user_id', userId).eq('photo_type', 'wrist_shot').not('worn_on', 'is', null)
+    .order('worn_on', { ascending: false }).order('created_at', { ascending: false }).limit(limit);
+  if (error) { console.warn(error.message); return []; }
+  type Row = { id: string; storage_path: string; worn_on: string; watch_id: string; is_public_gallery: boolean; watches: { brand: string; model: string } | { brand: string; model: string }[] | null };
+  return ((data as unknown as Row[]) ?? []).map(r => {
+    const w = Array.isArray(r.watches) ? r.watches[0] : r.watches;
+    return { id: r.id, storage_path: r.storage_path, worn_on: r.worn_on, watch_id: r.watch_id, is_public_gallery: r.is_public_gallery, brand: w?.brand ?? '', model: w?.model ?? '' };
+  });
+}
+
+type Social = { likes: number; liked: boolean; fit_small: number; fit_perfect: number; fit_large: number; my_fit: FitChoice | null };
+const toFit = (r: Social): PhotoFit => ({ small: Number(r.fit_small), perfect: Number(r.fit_perfect), large: Number(r.fit_large), mine: r.my_fit });
+
+/** Vote « Au poignet ? » (null : retirer son vote). Renvoie les nouveaux totaux. */
+export async function setPhotoFit(photoId: string, fit: FitChoice | null): Promise<{ likes: number; liked: boolean; fit: PhotoFit }> {
+  const { data, error } = await supabase.rpc('set_photo_fit', { p_photo: photoId, p_fit: fit });
+  fail(error, 'Enregistrement impossible.');
+  const r = data as Social;
+  return { likes: Number(r.likes), liked: r.liked, fit: toFit(r) };
+}
+
+export async function togglePhotoLike(photoId: string): Promise<{ likes: number; liked: boolean; fit: PhotoFit }> {
+  const { data, error } = await supabase.rpc('toggle_photo_like', { p_photo: photoId });
+  fail(error, 'Enregistrement impossible.');
+  const r = data as Social;
+  return { likes: Number(r.likes), liked: r.liked, fit: toFit(r) };
+}
+
+/** Classement des montres qui « tombent parfaitement » pour une fourchette de tours de poignet. */
+export async function getFitRanking(minWrist: number | null, maxWrist: number | null, minVotes = 5): Promise<FitRankingRow[]> {
+  const { data, error } = await supabase.rpc('get_fit_ranking', { p_min_wrist: minWrist, p_max_wrist: maxWrist, p_min_votes: minVotes, p_limit: 30 });
+  fail(error, 'Chargement impossible.');
+  return ((data as FitRankingRow[]) ?? []).map(r => ({ ...r, votes: Number(r.votes), photos: Number(r.photos), perfect_pct: Number(r.perfect_pct), small_pct: Number(r.small_pct), large_pct: Number(r.large_pct) }));
 }
 
 export async function removeWear(userId: string, watchId: string, day: string) {
@@ -365,16 +423,22 @@ export async function listGalleryBrands(): Promise<string[]> {
   return ((data as { brand: string }[]) ?? []).map(b => b.brand).sort((a, b) => a.localeCompare(b));
 }
 
-export async function listGalleryShots(filters: { brand: string | null; minWrist: number | null; maxWrist: number | null }): Promise<GalleryShot[]> {
+export async function listGalleryShots(filters: { brand: string | null; minWrist: number | null; maxWrist: number | null; today?: boolean }): Promise<GalleryShot[]> {
   const { data, error } = await supabase.rpc('get_public_wrist_shots', {
     selected_brand_filter: filters.brand, min_wrist_filter: filters.minWrist, max_wrist_filter: filters.maxWrist,
+    page_limit: filters.today ? 24 : 60, p_today: Boolean(filters.today),
   });
   fail(error, 'Chargement de la galerie impossible.');
-  type Row = { photo_id: string; photo_storage_path: string; watch_id: string; watch_brand: string; watch_model: string; user_username: string | null; user_wrist_size_cm: number | null };
+  type Row = Social & {
+    photo_id: string; photo_storage_path: string; watch_id: string; watch_brand: string; watch_model: string;
+    user_username: string | null; user_wrist_size_cm: number | null; worn_on: string | null; created_at: string; is_mine: boolean;
+  };
   return ((data as Row[]) ?? []).map(r => ({
     id: r.photo_id, url: photoUrl(r.photo_storage_path) ?? '', thumb: photoUrl(thumbPath(r.photo_storage_path)) ?? '',
     watch_id: r.watch_id, brand: r.watch_brand,
     model: r.watch_model, username: r.user_username, wrist_size_cm: r.user_wrist_size_cm,
+    worn_on: r.worn_on, created_at: r.created_at, is_mine: Boolean(r.is_mine),
+    likes: Number(r.likes ?? 0), liked: Boolean(r.liked), fit: toFit(r),
   })).filter(s => s.url);
 }
 

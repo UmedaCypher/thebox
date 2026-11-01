@@ -64,3 +64,16 @@
 
 .glance { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-2); margin-top: calc(var(--sp-3) * -1); font-size: var(--fs-sm); color: var(--text-2); }
 .glance strong { color: var(--brass); font-weight: 600; }
+
+/* Historique de portage (Wrist Check) */
+.history { display: flex; flex-direction: column; gap: var(--sp-3); margin-top: var(--sp-2); }
+.historyTitle { font-size: var(--fs-lg); }
+.historyList { list-style: none; display: flex; flex-direction: column; }
+.historyItem { display: flex; flex-direction: column; gap: 6px; padding: var(--sp-3) 0; border-bottom: 1px solid var(--line); }
+.historyItem:last-child { border-bottom: 0; }
+.historyDay { font-size: var(--fs-sm); font-weight: 600; }
+.historyDay::first-letter { text-transform: uppercase; }
+.historyNote { font-size: var(--fs-sm); color: var(--text-2); }
+.historyShots { display: flex; gap: 6px; flex-wrap: wrap; }
+.historyShot { width: 72px; height: 90px; border-radius: var(--r-sm); overflow: hidden; box-shadow: var(--shadow-sm); }
+.historyShot img { width: 100%; height: 100%; object-fit: cover; }

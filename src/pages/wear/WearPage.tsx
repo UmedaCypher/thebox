@@ -1,9 +1,11 @@
 import { useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { Check, ChevronLeft, ChevronRight, Share2 } from 'lucide-react';
+import { Camera, Check, ChevronLeft, ChevronRight, Share2 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useLoad } from '../../hooks/useLoad';
-import { addWear, listWatches, listWearLogs, mainPhoto, photoUrl, removeWear, thumbSrc, trackEvent } from '../../lib/api';
+import { addWear, getMyWearStreak, listWatches, listWearLogs, mainPhoto, photoUrl, removeWear, thumbSrc, trackEvent } from '../../lib/api';
+import WristCheckSheet from '../../components/WristCheck/WristCheckSheet';
+import StreakPanel from '../../components/WristCheck/StreakPanel';
 import { withRef } from '../../lib/source';
 import { formatDate, formatNumber, plural, toISODate, todayISO } from '../../lib/format';
 import { drawMonthCard, shareImage } from '../../lib/shareCard';
@@ -75,6 +77,8 @@ export default function WearPage() {
   const [error, setError] = useState<string | null>(null);
 
   const watchesQ = useLoad(() => listWatches(uid), [uid]);
+  const streak = useLoad(() => getMyWearStreak(), [uid]);
+  const [check, setCheck] = useState<{ watchId?: string | null; day?: string | null } | null>(null);
   const logsQ = useLoad(() => listWearLogs(uid), [uid]);
 
   const watches = useMemo(() => watchesQ.data ?? [], [watchesQ.data]);
@@ -97,6 +101,7 @@ export default function WearPage() {
     });
     try {
       if (worn) await removeWear(uid, watchId, day); else await addWear(uid, watchId, day);
+      streak.reload();
     } catch (e) {
       setError(e instanceof Error ? e.message : t.saveFailed);
       logsQ.reload();
@@ -125,17 +130,23 @@ export default function WearPage() {
     return { daysWorn, distinct: counts.size, top: top ? { watch: byId.get(top[0]), n: top[1] } : null };
   }, [byDay, byId, cursor]);
 
-  const pathFor = (w: Watch | undefined) => (w ? mainPhoto(w.photos)?.storage_path ?? null : null);
-  const thumbFor = (w: Watch | undefined) => thumbSrc(pathFor(w));
-  const fullFor = (w: Watch | undefined) => photoUrl(pathFor(w));
+  // Le wrist shot du jour, s'il existe, plutôt que la photo principale de la montre
+  const pathFor = (w: Watch | undefined, day?: string) => {
+    if (!w) return null;
+    const shot = day ? w.photos?.find(p => p.worn_on === day && p.photo_type === 'wrist_shot') : undefined;
+    return (shot ?? mainPhoto(w.photos))?.storage_path ?? null;
+  };
+  const thumbFor = (w: Watch | undefined, day?: string) => thumbSrc(pathFor(w, day));
+  const fullFor = (w: Watch | undefined, day?: string) => photoUrl(pathFor(w, day));
 
   const share = async () => {
     setSharing(true);
     try {
       const photoByDay = new Map<number, string | null>();
       for (let d = 1; d <= daysInMonth; d++) {
-        const ids = byDay.get(toISODate(new Date(year, month, d)));
-        if (ids?.length) photoByDay.set(d, fullFor(byId.get(ids[0])));
+        const iso = toISODate(new Date(year, month, d));
+        const ids = byDay.get(iso);
+        if (ids?.length) photoByDay.set(d, fullFor(byId.get(ids[0]), iso));
       }
       const blob = await drawMonthCard({
         title: monthTitle, year, month, photoByDay, username: profile?.username ?? null,
@@ -172,8 +183,13 @@ export default function WearPage() {
 
   return (
     <div className="page">
-      <PageHeader title={t.title} subtitle={formatDate(today, { weekday: 'long', day: 'numeric', month: 'long' })} />
+      <PageHeader title={t.title} subtitle={formatDate(today, { weekday: 'long', day: 'numeric', month: 'long' })}
+        action={<Button onClick={() => setCheck({ day: today })}><Camera size={16} strokeWidth={1.8} aria-hidden="true" />Wrist Check</Button>} />
       {error && <Notice tone="error">{error}</Notice>}
+
+      <div className={s.streak}>
+        <StreakPanel streak={streak.data ?? null} showBadges={false} showButton={false} onCheck={day => setCheck({ day: day ?? today })} />
+      </div>
 
       <section className={s.today} aria-labelledby="today-title">
         <h2 id="today-title" className={s.sectionTitle}>{t.todayTitle}</h2>
@@ -226,7 +242,7 @@ export default function WearPage() {
               >
                 {first ? (
                   <span className={s.dayPhoto}>
-                    {thumbFor(first).src ? <Img src={thumbFor(first).src!} fallback={thumbFor(first).fallback} alt="" /> : <span>{i + 1}</span>}
+                    {thumbFor(first, iso).src ? <Img src={thumbFor(first, iso).src!} fallback={thumbFor(first, iso).fallback} alt="" /> : <span>{i + 1}</span>}
                     {ids.length > 1 && <span className={s.more}>+{ids.length - 1}</span>}
                   </span>
                 ) : <span className={s.dayNum}>{i + 1}</span>}
@@ -272,6 +288,10 @@ export default function WearPage() {
           </ul>
         )}
       </Sheet>
+
+      <WristCheckSheet open={check !== null} onClose={() => setCheck(null)} watches={watches}
+        watchId={check?.watchId ?? (check?.day ? (byDay.get(check.day) ?? [])[0] : null)} day={check?.day}
+        onDone={() => { streak.reload(); logsQ.reload(); watchesQ.reload(); }} />
     </div>
   );
 }

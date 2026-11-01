@@ -2,13 +2,13 @@ import { useEffect, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  ArrowUpRight, BarChart3, CalendarDays, Check, HandCoins, Heart, Images, MessageCircle, Newspaper, Plus,
+  ArrowUpRight, BarChart3, CalendarDays, Camera, Check, HandCoins, Heart, Images, MessageCircle, Newspaper, Plus,
   ShieldCheck, Sparkles, Store, Tag, UserRound, Watch as WatchIcon,
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useLoad } from '../../hooks/useLoad';
 import {
-  addWear, listConversations, listGalleryShots, listWatches, listWearLogs, mainPhoto, photoUrl, searchMarket, thumbSrc,
+  addWear, getMyWearStreak, listConversations, listGalleryShots, listWatches, listWearLogs, mainPhoto, photoUrl, searchMarket, thumbSrc,
 } from '../../lib/api';
 import { analyseCosts } from '../../lib/costPerWear';
 import { formatEuros, toISODate, todayISO } from '../../lib/format';
@@ -16,6 +16,9 @@ import { listingPrice } from '../../lib/listing';
 import { latestNews } from '../../components/NewsTeaser/NewsTeaser';
 import { Img, LinkButton } from '../../components/ui';
 import { useToast } from '../../components/Toast/Toast';
+import WristCheckSheet from '../../components/WristCheck/WristCheckSheet';
+import { StreakLine } from '../../components/WristCheck/StreakPanel';
+import { STREAK_STRINGS } from '../../components/WristCheck/streak';
 import { defineStrings, getLocale, useStrings } from '../../i18n';
 import type { Watch } from '../../types';
 import s from './DashboardPage.module.css';
@@ -24,6 +27,8 @@ const S = defineStrings({
   hello: (h: number) => (h < 18 && h >= 5 ? 'Bonjour' : 'Bonsoir'),
   today: "Aujourd'hui",
   pick: 'Quelle montre aujourd\'hui ?',
+  addShot: 'Ajouter un wrist shot',
+  withPhoto: 'Wrist Check avec photo',
   logged: 'Port noté',
   change: 'Changer',
   firstWatch: 'Ajouter ma première montre',
@@ -59,6 +64,8 @@ const S = defineStrings({
   hello: h => (h < 12 && h >= 5 ? 'Good morning' : h < 18 && h >= 12 ? 'Good afternoon' : 'Good evening'),
   today: 'Today',
   pick: 'Which watch today?',
+  addShot: 'Add a wrist shot',
+  withPhoto: 'Wrist Check with a photo',
   logged: 'Logged',
   change: 'Change',
   firstWatch: 'Add my first watch',
@@ -143,6 +150,7 @@ function LiveClock() {
 
 export default function DashboardPage() {
   const t = useStrings(S);
+  const st = useStrings(STREAK_STRINGS);
   const toast = useToast();
   const { user, profile, isPremium } = useAuth();
   const uid = user!.id;
@@ -157,6 +165,9 @@ export default function DashboardPage() {
   const market = useLoad(() => searchMarket({ query: '', brand: '', kind: '', minPrice: '', maxPrice: '', condition: '', boxPapers: '', size: '', sort: 'recent' }).catch(() => []), []);
   const shots = useLoad(() => listGalleryShots({ brand: null, minWrist: null, maxWrist: null }).catch(() => []), []);
   const news = useLoad(() => latestNews(2).catch(() => []), []);
+
+  const streak = useLoad(() => getMyWearStreak(), [uid]);
+  const [check, setCheck] = useState<{ watchId?: string | null; day?: string | null } | null>(null);
 
   const [justLogged, setJustLogged] = useState<string | null>(null);
   const watches = mine.data?.watches ?? [];
@@ -185,8 +196,11 @@ export default function DashboardPage() {
 
   const logToday = async (w: Watch) => {
     setJustLogged(w.id);
-    try { await addWear(uid, w.id, today); toast(`${t.logged} : ${w.model}`); } catch { setJustLogged(null); }
+    try { await addWear(uid, w.id, today); toast(`${t.logged} : ${w.model}`); streak.reload(); } catch { setJustLogged(null); }
   };
+  // Photo du Wrist Check d'aujourd'hui, si elle existe : elle remplace la photo principale de la montre
+  const todayShot = todayWatch?.photos?.filter(p => p.worn_on === today && p.photo_type === 'wrist_shot')
+    .sort((a, b) => (b.created_at ?? '').localeCompare(a.created_at ?? ''))[0];
 
   const hour = new Date().getHours();
   const name = profile?.username;
@@ -203,15 +217,23 @@ export default function DashboardPage() {
         {/* ---------- Aujourd'hui : la pièce maîtresse du tableau de bord ---------- */}
         <section className={s.hero} data-reveal aria-label={t.today}>
           {todayWatch ? (
-            <Link to="/portage" className={s.heroWorn}>
-              <Img key={todayWatch.id} src={photoUrl(mainPhoto(todayWatch.photos)?.storage_path) ?? ''} fallback={thumbFor(todayWatch).src} alt={`${todayWatch.brand} ${todayWatch.model}`} className={s.heroPhoto} />
-              <span className={s.heroCaption}>
-                <span className={s.heroKicker}><Check size={14} strokeWidth={2.6} aria-hidden="true" />{t.today}</span>
-                <span className={s.heroBrand}>{todayWatch.brand}</span>
-                <span className={s.heroModel}>{todayWatch.model}</span>
-              </span>
-              <span className={s.heroChange}>{t.change}</span>
-            </Link>
+            <div className={s.heroWrap}>
+              <Link to="/portage" className={s.heroWorn}>
+                <Img key={todayShot?.id ?? todayWatch.id} src={photoUrl((todayShot ?? mainPhoto(todayWatch.photos))?.storage_path) ?? ''} fallback={thumbFor(todayWatch).src} alt={`${todayWatch.brand} ${todayWatch.model}`} className={s.heroPhoto} />
+                <span className={s.heroCaption}>
+                  <span className={s.heroKicker}><Check size={14} strokeWidth={2.6} aria-hidden="true" />{todayShot ? 'Wrist Check' : t.today}</span>
+                  <span className={s.heroBrand}>{todayWatch.brand}</span>
+                  <span className={s.heroModel}>{todayWatch.model}</span>
+                  {streak.data && streak.data.current > 1 && <span className={s.heroStreak}>{st.series(streak.data.current)}</span>}
+                </span>
+                <span className={s.heroChange}>{t.change}</span>
+              </Link>
+              {!todayShot && (
+                <button type="button" className={s.heroShot} onClick={() => setCheck({ watchId: todayWatch.id, day: today })}>
+                  <Camera size={16} strokeWidth={1.9} aria-hidden="true" />{t.addShot}
+                </button>
+              )}
+            </div>
           ) : watches.length === 0 && !mine.loading ? (
             <div className={`panel ${s.heroEmpty}`} data-tone="lume">
               <WatchIcon size={40} strokeWidth={1.1} aria-hidden="true" />
@@ -222,6 +244,7 @@ export default function DashboardPage() {
             <div className={`panel ${s.heroPick}`} data-tone="lume">
               <span className={s.heroKicker}>{t.today}</span>
               <h2>{t.pick}</h2>
+              <StreakLine streak={streak.data ?? null} />
               <ul className={s.pickRow}>
                 {pickList.map(w => (
                   <li key={w.id}>
@@ -234,6 +257,9 @@ export default function DashboardPage() {
                   </li>
                 ))}
               </ul>
+              <button type="button" className={s.withPhoto} onClick={() => setCheck({ day: today })}>
+                <Camera size={16} strokeWidth={1.8} aria-hidden="true" />{t.withPhoto}
+              </button>
             </div>
           )}
         </section>
@@ -358,6 +384,9 @@ export default function DashboardPage() {
           </nav>
         </section>
       </div>
+      <WristCheckSheet open={check !== null} onClose={() => setCheck(null)} watches={watches}
+        watchId={check?.watchId} day={check?.day}
+        onDone={() => { streak.reload(); mine.reload(); setJustLogged(null); }} />
     </div>
   );
 }

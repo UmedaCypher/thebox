@@ -51,13 +51,21 @@ function compose(row: Row, lang: Lang): Msg | null {
         url: `/messages/${d.conversation_id}`,
         tag: `conv-${d.conversation_id}`,
       };
-    case 'daily':
-      return {
-        title: en ? 'Which watch today?' : "Quelle montre aujourd'hui ?",
-        body: en ? 'Log the watch on your wrist in one tap.' : 'Notez la montre du jour en un geste.',
-        url: '/portage',
-        tag: 'daily',
-      };
+    case 'daily': {
+      // Série en cours : un rappel encourageant, jamais culpabilisant
+      const streak = Number(d.streak ?? 0);
+      return streak >= 2
+        ? {
+            title: en ? `Your ${streak}-day streak is waiting` : `Votre série de ${streak} jours vous attend`,
+            body: en ? 'Your Wrist Check of the day, in one tap.' : 'Votre Wrist Check du jour, en un geste.',
+            url: '/accueil', tag: 'daily',
+          }
+        : {
+            title: en ? 'Which watch today?' : "Quelle montre aujourd'hui ?",
+            body: en ? 'Log the watch on your wrist in one tap.' : 'Notez la montre du jour en un geste.',
+            url: '/accueil', tag: 'daily',
+          };
+    }
     case 'maintenance':
       return d.today
         ? { title: en ? 'Service due today' : 'Entretien prévu aujourd\'hui',

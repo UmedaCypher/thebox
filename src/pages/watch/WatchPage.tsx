@@ -14,9 +14,9 @@ import { formatDate, formatEuros, formatMm, plural, todayISO } from '../../lib/f
 import { defineStrings, getLocale, useStrings } from '../../i18n';
 import { COMMON } from '../../i18n/common';
 import { listingPrice, statusKind } from '../../lib/listing';
-import type { MaintenanceEntry, MaintenanceKind, Watch } from '../../types';
+import type { MaintenanceEntry, MaintenanceKind, Photo, Watch, WearLog } from '../../types';
 import {
-  Button, Cushion, Glow, IconButton, Notice, PageHeader, PremiumTag, Segmented, SelectField, Sheet, Stat, TextArea, TextField, Toggle,
+  Button, Cushion, Glow, IconButton, Img, Notice, PageHeader, PremiumTag, Segmented, SelectField, Sheet, Stat, TextArea, TextField, Toggle,
 } from '../../components/ui';
 import WearStrip from '../../components/WearStrip/WearStrip';
 import Sparkline from '../../components/Sparkline/Sparkline';
@@ -78,6 +78,9 @@ const S = defineStrings({
   costPerWear: 'coût par port',
   costPerWearLocked: 'Coût par port',
   logHintBefore: "Notez vos ports depuis l'onglet ",
+  history: 'Historique de portage',
+  shotOf: (d: string) => `Au poignet le ${d}`,
+  showMore: 'Voir plus',
   logHintTab: 'Portage',
   logHintAfter: ' ou avec le bouton ci-dessus.',
   nextDue: 'Prochaine échéance : ',
@@ -157,6 +160,9 @@ const S = defineStrings({
   costPerWear: 'cost per wear',
   costPerWearLocked: 'Cost per wear',
   logHintBefore: 'Log your wears from the ',
+  history: 'Wear history',
+  shotOf: (d: string) => `On the wrist on ${d}`,
+  showMore: 'Show more',
   logHintTab: 'Wear',
   logHintAfter: ' tab or with the button above.',
   nextDue: 'Next service due: ',
@@ -299,7 +305,7 @@ export default function WatchPage() {
           <div className={s.panel}>
             {tab === 'passeport' && <PassportTab watch={watch} uid={uid} onUpdate={setWatch} />}
             {tab === 'portage' && (
-              <WearTab watch={watch} days={wornDays} isPremium={isPremium} onPremium={() => setPremiumReason(t.premiumCost)} />
+              <WearTab watch={watch} days={wornDays} logs={wears.data ?? []} isPremium={isPremium} onPremium={() => setPremiumReason(t.premiumCost)} />
             )}
             {tab === 'entretien' && (
               <MaintenanceTab watch={watch} uid={uid} isPremium={isPremium} onPremium={() => setPremiumReason(t.premiumService)} />
@@ -404,8 +410,16 @@ function PassportTab({ watch, uid, onUpdate }: { watch: Watch; uid: string; onUp
 
 /* ---------- Portage ---------- */
 
-function WearTab({ watch, days, isPremium, onPremium }: { watch: Watch; days: Set<string>; isPremium: boolean; onPremium: () => void }) {
+function WearTab({ watch, days, logs, isPremium, onPremium }: { watch: Watch; days: Set<string>; logs: WearLog[]; isPremium: boolean; onPremium: () => void }) {
   const t = useStrings(S);
+  const [limit, setLimit] = useState(10);
+  // Historique de portage : chaque jour porté, sa note et ses wrist shots (Wrist Check)
+  const history = useMemo(() => {
+    const shots = new Map<string, Photo[]>();
+    for (const p of watch.photos ?? []) if (p.worn_on && p.photo_type === 'wrist_shot') shots.set(p.worn_on, [...(shots.get(p.worn_on) ?? []), p]);
+    const dayList = [...new Set([...logs.map(l => l.worn_on), ...shots.keys()])].sort().reverse();
+    return dayList.map(day => ({ day, note: logs.find(l => l.worn_on === day)?.note ?? null, photos: shots.get(day) ?? [] }));
+  }, [watch.photos, logs]);
   const sorted = [...days].sort();
   const last = sorted[sorted.length - 1];
   const costPerWear = watch.purchase_price && days.size ? Number(watch.purchase_price) / days.size : null;
@@ -420,6 +434,30 @@ function WearTab({ watch, days, isPremium, onPremium }: { watch: Watch; days: Se
       </div>
       <WearStrip days={days} />
       <p className={s.subtle}>{t.logHintBefore}<Link to="/portage">{t.logHintTab}</Link>{t.logHintAfter}</p>
+
+      {history.length > 0 && (
+        <section className={s.history} aria-labelledby="wear-history">
+          <h3 id="wear-history" className={s.historyTitle}>{t.history}</h3>
+          <ol className={s.historyList}>
+            {history.slice(0, limit).map(h => (
+              <li key={h.day} className={s.historyItem}>
+                <span className={s.historyDay}>{formatDate(h.day, { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                {h.note && <span className={s.historyNote}>{h.note}</span>}
+                {h.photos.length > 0 && (
+                  <span className={s.historyShots}>
+                    {h.photos.map(p => (
+                      <a key={p.id} href={photoUrl(p.storage_path) ?? '#'} target="_blank" rel="noreferrer" className={s.historyShot}>
+                        <Img src={thumbSrc(p.storage_path).src ?? ''} fallback={thumbSrc(p.storage_path).fallback} alt={t.shotOf(formatDate(h.day))} />
+                      </a>
+                    ))}
+                  </span>
+                )}
+              </li>
+            ))}
+          </ol>
+          {history.length > limit && <Button variant="ghost" size="small" onClick={() => setLimit(limit + 30)}>{t.showMore}</Button>}
+        </section>
+      )}
     </div>
   );
 }
