@@ -34,6 +34,7 @@ const CgvPage = lazy(() => import('./pages/CgvPage'));
 const PrivacyPolicyPage = lazy(() => import('./pages/PrivacyPolicyPage'));
 const LegalMentionsPage = lazy(() => import('./pages/LegalMentionsPage'));
 const AffiliateTermsPage = lazy(() => import('./pages/AffiliateTermsPage'));
+const AccountDeletionPage = lazy(() => import('./pages/AccountDeletionPage'));
 const AffiliatePage = lazy(() => import('./pages/affiliate/AffiliatePage'));
 const AdminPage = lazy(() => import('./pages/admin/AdminPage'));
 const MarketPage = lazy(() => import('./pages/market/MarketPage'));
@@ -106,6 +107,7 @@ export default function App() {
             <Route path="/confidentialite" element={<PrivacyPolicyPage />} />
             <Route path="/mentions-legales" element={<LegalMentionsPage />} />
             <Route path="/affiliation/conditions" element={<AffiliateTermsPage />} />
+            <Route path="/suppression-compte" element={<AccountDeletionPage />} />
 
             {/* Membre */}
             <Route path="/accueil" element={P(<DashboardPage />)} />

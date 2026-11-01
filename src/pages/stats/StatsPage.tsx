@@ -8,7 +8,7 @@ import { Cushion, LinkButton, Notice, PageHeader, Segmented, Stat } from '../../
 import Sparkline from '../../components/Sparkline/Sparkline';
 import CostTeaser from '../../components/CostTeaser/CostTeaser';
 import { analyseCosts } from '../../lib/costPerWear';
-import { PAYMENTS_ENABLED, premiumPrices } from '../../lib/features';
+import { canPurchase, premiumPrices } from '../../lib/features';
 import { defineStrings, useStrings } from '../../i18n';
 import { COMMON } from '../../i18n/common';
 import s from './StatsPage.module.css';
@@ -248,7 +248,7 @@ function StatsPreview() {
         </ul>
         <div>
           <LinkButton to="/premium">
-            {PAYMENTS_ENABLED ? t.goPremium(premiumPrices().year.amount) : t.discoverPremium}
+            {canPurchase() ? t.goPremium(premiumPrices().year.amount) : t.discoverPremium}
           </LinkButton>
         </div>
       </section>

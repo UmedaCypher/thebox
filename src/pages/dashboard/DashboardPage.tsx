@@ -23,7 +23,7 @@ import s from './DashboardPage.module.css';
 const S = defineStrings({
   hello: (h: number) => (h < 18 && h >= 5 ? 'Bonjour' : 'Bonsoir'),
   today: "Aujourd'hui",
-  pick: 'Quelle montre aujourd\'hui ?',
+  pick: 'Quelle montre aujourd\'hui\u00a0?',
   logged: 'Port noté',
   change: 'Changer',
   firstWatch: 'Ajouter ma première montre',

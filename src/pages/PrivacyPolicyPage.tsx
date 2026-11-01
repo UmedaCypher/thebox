@@ -107,7 +107,7 @@ export default function PrivacyPolicyPage() {
         Vous pouvez accéder à vos données, les rectifier, les effacer, en limiter le traitement, vous y opposer, demander leur portabilité,
         retirer votre consentement et définir des directives sur leur sort après votre décès. La plupart de ces actions se font
         directement dans l'app (Profil, Collection) ; pour le reste, écrivez à <a href={`mailto:${mail}`}>{mail}</a>.
-        Nous répondons sous un mois.
+        Nous répondons sous un mois. Pour supprimer votre compte, voir <Link to="/suppression-compte">Supprimer votre compte</Link>.
       </p>
       <p>
         Si vous estimez que vos droits ne sont pas respectés, vous pouvez saisir la CNIL
