@@ -253,3 +253,15 @@ a.tile:active { transform: scale(0.985); }
 .streakTop .small { margin-top: 0; }
 .streakMsg { font-size: var(--fs-sm); color: var(--text-2); display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: baseline; }
 .catchLink { font-weight: 700; color: var(--lume); text-decoration: underline; text-underline-offset: 3px; }
+
+.streakTile .tileTitle { display: inline-flex; align-items: center; gap: 4px; }
+.infoBtn { display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; color: var(--text-3); }
+.infoBtn:hover, .infoBtn[aria-expanded='true'] { color: var(--lume); background: color-mix(in srgb, var(--lume) 10%, transparent); }
+.todayChip {
+  display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: var(--r-pill); white-space: nowrap;
+  font-size: var(--fs-xs); font-weight: 700; color: var(--text-2); border: 1px dashed color-mix(in srgb, var(--lume) 45%, transparent);
+}
+.todayChip[data-done='true'] { color: var(--lume-ink); background: var(--lume); border: 0; box-shadow: 0 0 12px color-mix(in srgb, var(--lume) 40%, transparent); }
+.explain { font-size: var(--fs-sm); color: var(--text-2); padding: 10px 12px; border-radius: var(--r-md); background: color-mix(in srgb, var(--lume) 8%, transparent); }
+.streakTile .tileTitle { white-space: nowrap; flex: 1; min-width: 0; }
+.todayEmpty { width: 11px; height: 11px; border-radius: 50%; border: 1.5px dashed var(--lume); }

@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  ArrowUpRight, Award, BarChart3, CalendarDays, Camera, Check, HandCoins, Heart, Images, MessageCircle, Newspaper, Plus,
+  ArrowUpRight, Award, BarChart3, CalendarDays, Camera, Check, Info, HandCoins, Heart, Images, MessageCircle, Newspaper, Plus,
   ShieldCheck, Sparkles, Store, Tag, UserRound, Watch as WatchIcon,
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
@@ -204,6 +204,7 @@ export default function DashboardPage() {
     try { await addWear(uid, w.id, today); toast(`${t.logged} : ${w.model}`); streak.reload(); } catch { setJustLogged(null); }
   };
   // Photo du Wrist Check d'aujourd'hui, si elle existe : elle remplace la photo principale de la montre
+  const [explain, setExplain] = useState(false);
   const streakAlive = streak.data?.status === 'done' || streak.data?.status === 'open';
   const streakMessage = useStreakMessage(streak.data ?? null);
   // Petite incitation sous le bouton photo : le prochain badge photo, sinon la Galerie
@@ -280,11 +281,20 @@ export default function DashboardPage() {
         {/* ---------- Série de portage ---------- */}
         {streak.data && streak.data.status !== 'none' && (
           <section className={`panel ${s.tile} ${s.wide} ${s.streakTile}`} data-tone="lume" data-reveal aria-label={st.tileTitle}>
-            <Link to="/portage" className={s.tileHead}>
+            <div className={s.tileHead}>
               <span className={s.tileIcon}><Award size={18} strokeWidth={1.7} /></span>
-              <span className={s.tileTitle}>{st.tileTitle}</span>
-              <ArrowUpRight size={18} strokeWidth={1.6} className={s.tileArrow} aria-hidden="true" />
-            </Link>
+              <span className={s.tileTitle}>
+                {st.tileTitle}
+                <button type="button" className={s.infoBtn} aria-expanded={explain} aria-label={st.explainBtn} title={st.explainBtn}
+                  onClick={() => setExplain(!explain)}><Info size={15} strokeWidth={1.9} aria-hidden="true" /></button>
+              </span>
+              <span className={s.todayChip} data-done={streak.data.logged_today}
+                title={streak.data.logged_today ? st.todayDoneLong : st.todayTodoLong} aria-label={streak.data.logged_today ? st.todayDoneLong : st.todayTodoLong}>
+                {streak.data.logged_today ? <Check size={13} strokeWidth={2.8} aria-hidden="true" /> : <span className={s.todayEmpty} aria-hidden="true" />}
+                {streak.data.logged_today ? st.todayDone : st.todayTodo}
+              </span>
+            </div>
+            {explain && <p className={s.explain}>{st.explain}</p>}
             <div className={s.streakTop}>
               <span className={s.metric}>
                 <b className="num">{streakAlive ? streak.data.current : streak.data.paused_length}</b>
