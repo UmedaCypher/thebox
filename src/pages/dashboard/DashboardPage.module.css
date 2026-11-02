@@ -214,9 +214,16 @@ a.tile:active { transform: scale(0.985); }
 /* ---------- Wrist Check ---------- */
 .heroWrap { position: relative; display: flex; flex: 1; }
 .heroWrap > a { flex: 1; }
-.heroStreak { margin-top: 4px; font-size: var(--fs-xs); font-weight: 700; color: #c9e7a7; }
-.heroWrap[data-cta='true'] .heroCaption { bottom: 88px; }
-.heroWrap[data-cta='true'] .heroWorn { min-height: 380px; }
+/* Montre portée : infos en haut, série et bouton photo en bas, la montre reste visible au centre */
+.heroWrap .heroCaption { top: 12px; bottom: auto; max-width: calc(100% - 120px); padding: 10px 14px 11px; }
+.heroWrap .heroModel { font-size: clamp(var(--fs-xl), 3vw, var(--fs-2xl)); }
+.heroStreak {
+  position: absolute; right: 12px; bottom: 12px; z-index: 1; display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 12px; border-radius: var(--r-pill); font-size: var(--fs-xs); font-weight: 700; color: #c9e7a7;
+  background: rgba(20, 8, 10, 0.4); border: 1px solid rgba(255, 255, 255, 0.16);
+  -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+}
+.heroStreak::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: #c9e7a7; box-shadow: 0 0 8px #c9e7a7; }
 
 /* Appel à la photo du jour : bien visible, en vert lume */
 .shotCta, .pickCta {
@@ -224,10 +231,12 @@ a.tile:active { transform: scale(0.985); }
   border-radius: calc(var(--r-cushion) - 10px); transition: transform var(--dur) var(--ease-out), box-shadow var(--dur), filter var(--dur);
 }
 .shotCta {
-  position: absolute; left: 12px; right: 12px; bottom: 12px; z-index: 2; padding: 12px 16px;
-  color: var(--lume-ink); background: var(--lume);
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.25) inset, 0 10px 30px color-mix(in srgb, var(--lume) 40%, transparent);
+  position: absolute; left: 12px; bottom: 12px; z-index: 2; gap: 10px; padding: 6px 18px 6px 6px; border-radius: var(--r-pill);
+  font-size: var(--fs-sm); color: var(--lume-ink); background: var(--lume);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.25) inset, 0 8px 24px color-mix(in srgb, var(--lume) 45%, transparent);
 }
+.shotCta b { font-weight: 700; white-space: nowrap; }
+.shotCta .shotIcon { width: 34px; height: 34px; }
 .shotCta:hover { filter: brightness(1.05); transform: translateY(-1px); }
 .shotCta:active, .pickCta:active { transform: scale(0.985); }
 .shotIcon { width: 44px; height: 44px; flex: none; border-radius: 50%; display: grid; place-items: center; background: rgba(22, 33, 12, 0.12); }
@@ -243,3 +252,4 @@ a.tile:active { transform: scale(0.985); }
 .pickCta .shotIcon { width: 40px; height: 40px; background: var(--lume); color: var(--lume-ink); box-shadow: 0 0 16px color-mix(in srgb, var(--lume) 50%, transparent); }
 .pickCta small { color: var(--text-2); opacity: 1; }
 .pickCta:hover { background: color-mix(in srgb, var(--lume) 18%, transparent); }
+@media (max-width: 479px) { .streakWord { display: none; } }

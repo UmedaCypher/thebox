@@ -28,6 +28,7 @@ const S = defineStrings({
   today: "Aujourd'hui",
   pick: 'Quelle montre aujourd\'hui ?',
   addShot: 'Prendre mon wrist shot',
+  streakWord: 'Série\u00a0: ',
   withPhoto: 'Prendre la photo du jour',
   nudgeBadge: (n: number, m: number) => n <= 1 ? `Dernière photo avant le badge ${m} wrist shots` : `Encore ${n} photos avant le badge ${m} wrist shots`,
   nudgeGallery: 'Elle rejoint la page de la montre, et la Galerie si vous le souhaitez',
@@ -67,6 +68,7 @@ const S = defineStrings({
   today: 'Today',
   pick: 'Which watch today?',
   addShot: 'Take my wrist shot',
+  streakWord: 'Streak: ',
   withPhoto: 'Take today’s photo',
   nudgeBadge: (n: number, m: number) => n <= 1 ? `One last photo before the ${m} wrist shots badge` : `${n} more photos before the ${m} wrist shots badge`,
   nudgeGallery: 'It goes on the watch page, and in the Gallery if you wish',
@@ -231,17 +233,14 @@ export default function DashboardPage() {
                   <span className={s.heroKicker}><Check size={14} strokeWidth={2.6} aria-hidden="true" />{todayShot ? 'Wrist Check' : t.today}</span>
                   <span className={s.heroBrand}>{todayWatch.brand}</span>
                   <span className={s.heroModel}>{todayWatch.model}</span>
-                  {streak.data && streak.data.current > 1 && <span className={s.heroStreak}>{st.series(streak.data.current)}</span>}
                 </span>
+                {streak.data && streak.data.current > 1 && <span className={s.heroStreak} title={st.series(streak.data.current)}><span className={s.streakWord}>{t.streakWord}</span>{st.days(streak.data.current)}</span>}
                 <span className={s.heroChange}>{t.change}</span>
               </Link>
               {!todayShot && (
                 <button type="button" className={s.shotCta} onClick={() => setCheck({ watchId: todayWatch.id, day: today })}>
-                  <span className={s.shotIcon}><Camera size={22} strokeWidth={1.9} aria-hidden="true" /></span>
-                  <span className={s.shotText}>
-                    <b>{t.addShot}</b>
-                    <small>{photoNudge}</small>
-                  </span>
+                  <span className={s.shotIcon}><Camera size={18} strokeWidth={2} aria-hidden="true" /></span>
+                  <b>{t.addShot}</b>
                 </button>
               )}
             </div>
