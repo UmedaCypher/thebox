@@ -83,7 +83,7 @@ la wishlist et l'inventaire pour l'assurance.
 Conçu par un collectionneur, pour les collectionneurs.
 ```
 
-- Catégorie : **Style de vie**. E-mail de contact : `contact@maison-mahe.com`. Site : `https://arcorawatch.com`.
+- Catégorie : **Style de vie**. E-mail de contact : `contact@arcorawatch.com`. Site : `https://arcorawatch.com`.
 
 ### Contenu de l'application (questionnaires obligatoires)
 | Rubrique | Réponse |

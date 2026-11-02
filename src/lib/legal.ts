@@ -19,7 +19,7 @@ export const LEGAL = {
   vatNumber: 'FR78 104672431',
   director: 'Quentin Mahé, président',
   phone: '',                  // numéro joignable (obligatoire pour une société)
-  email: 'contact@maison-mahe.com',
+  email: 'contact@arcorawatch.com',
   privacyEmail: '',           // adresse dédiée aux données personnelles (sinon l'adresse de contact)
 
   // ---------- Médiateur de la consommation (obligatoire avant de vendre le Premium) ----------

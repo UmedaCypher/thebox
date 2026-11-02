@@ -75,4 +75,4 @@ export const affiliateCommissionPerYear = () => Math.round((PREMIUM_YEAR_EUR / (
  * Adresse affichée sur la page Contact (lien mailto).
  * Provisoire : à remplacer par l'adresse dédiée quand le nom définitif de l'app sera choisi.
  */
-export const CONTACT_EMAIL = 'contact@maison-mahe.com';
+export const CONTACT_EMAIL = 'contact@arcorawatch.com';
