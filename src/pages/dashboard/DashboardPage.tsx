@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  ArrowUpRight, BarChart3, CalendarDays, Camera, Check, HandCoins, Heart, Images, MessageCircle, Newspaper, Plus,
+  ArrowUpRight, Award, BarChart3, CalendarDays, Camera, Check, HandCoins, Heart, Images, MessageCircle, Newspaper, Plus,
   ShieldCheck, Sparkles, Store, Tag, UserRound, Watch as WatchIcon,
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
@@ -11,13 +11,14 @@ import {
   addWear, getMyWearStreak, listConversations, listGalleryShots, listWatches, listWearLogs, mainPhoto, photoUrl, searchMarket, thumbSrc,
 } from '../../lib/api';
 import { analyseCosts } from '../../lib/costPerWear';
-import { formatEuros, toISODate, todayISO } from '../../lib/format';
+import { formatDate, formatEuros, toISODate, todayISO } from '../../lib/format';
 import { listingPrice } from '../../lib/listing';
 import { latestNews } from '../../components/NewsTeaser/NewsTeaser';
 import { Img, LinkButton } from '../../components/ui';
 import { useToast } from '../../components/Toast/Toast';
 import WristCheckSheet from '../../components/WristCheck/WristCheckSheet';
-import { StreakLine } from '../../components/WristCheck/StreakPanel';
+import StreakTrack from '../../components/WristCheck/StreakTrack';
+import { useStreakMessage } from '../../components/WristCheck/StreakPanel';
 import { STREAK_STRINGS } from '../../components/WristCheck/streak';
 import { defineStrings, getLocale, useStrings } from '../../i18n';
 import type { Watch } from '../../types';
@@ -28,7 +29,6 @@ const S = defineStrings({
   today: "Aujourd'hui",
   pick: 'Quelle montre aujourd\'hui ?',
   addShot: 'Prendre mon wrist shot',
-  streakWord: 'Série\u00a0: ',
   withPhoto: 'Prendre la photo du jour',
   nudgeBadge: (n: number, m: number) => n <= 1 ? `Dernière photo avant le badge ${m} wrist shots` : `Encore ${n} photos avant le badge ${m} wrist shots`,
   nudgeGallery: 'Elle rejoint la page de la montre, et la Galerie si vous le souhaitez',
@@ -68,7 +68,6 @@ const S = defineStrings({
   today: 'Today',
   pick: 'Which watch today?',
   addShot: 'Take my wrist shot',
-  streakWord: 'Streak: ',
   withPhoto: 'Take today’s photo',
   nudgeBadge: (n: number, m: number) => n <= 1 ? `One last photo before the ${m} wrist shots badge` : `${n} more photos before the ${m} wrist shots badge`,
   nudgeGallery: 'It goes on the watch page, and in the Gallery if you wish',
@@ -205,6 +204,8 @@ export default function DashboardPage() {
     try { await addWear(uid, w.id, today); toast(`${t.logged} : ${w.model}`); streak.reload(); } catch { setJustLogged(null); }
   };
   // Photo du Wrist Check d'aujourd'hui, si elle existe : elle remplace la photo principale de la montre
+  const streakAlive = streak.data?.status === 'done' || streak.data?.status === 'open';
+  const streakMessage = useStreakMessage(streak.data ?? null);
   // Petite incitation sous le bouton photo : le prochain badge photo, sinon la Galerie
   const left = streak.data?.next_photo_milestone ? streak.data.next_photo_milestone - streak.data.photos : null;
   const photoNudge = left !== null && left <= 10 ? t.nudgeBadge(left, streak.data!.next_photo_milestone!) : t.nudgeGallery;
@@ -234,7 +235,6 @@ export default function DashboardPage() {
                   <span className={s.heroBrand}>{todayWatch.brand}</span>
                   <span className={s.heroModel}>{todayWatch.model}</span>
                 </span>
-                {streak.data && streak.data.current > 1 && <span className={s.heroStreak} title={st.series(streak.data.current)}><span className={s.streakWord}>{t.streakWord}</span>{st.days(streak.data.current)}</span>}
                 <span className={s.heroChange}>{t.change}</span>
               </Link>
               {!todayShot && (
@@ -254,7 +254,6 @@ export default function DashboardPage() {
             <div className={`panel ${s.heroPick}`} data-tone="lume">
               <span className={s.heroKicker}>{t.today}</span>
               <h2>{t.pick}</h2>
-              <StreakLine streak={streak.data ?? null} />
               <ul className={s.pickRow}>
                 {pickList.map(w => (
                   <li key={w.id}>
@@ -277,6 +276,36 @@ export default function DashboardPage() {
             </div>
           )}
         </section>
+
+        {/* ---------- Série de portage ---------- */}
+        {streak.data && streak.data.status !== 'none' && (
+          <section className={`panel ${s.tile} ${s.wide} ${s.streakTile}`} data-tone="lume" data-reveal aria-label={st.tileTitle}>
+            <Link to="/portage" className={s.tileHead}>
+              <span className={s.tileIcon}><Award size={18} strokeWidth={1.7} /></span>
+              <span className={s.tileTitle}>{st.tileTitle}</span>
+              <ArrowUpRight size={18} strokeWidth={1.6} className={s.tileArrow} aria-hidden="true" />
+            </Link>
+            <div className={s.streakTop}>
+              <span className={s.metric}>
+                <b className="num">{streakAlive ? streak.data.current : streak.data.paused_length}</b>
+                <span>{(streakAlive ? streak.data.current : streak.data.paused_length) > 1 ? st.daysInRow : st.dayInRow}</span>
+              </span>
+              {streak.data.best > 0 && <span className={s.small}>{st.best(streak.data.best)}</span>}
+            </div>
+            <StreakTrack streak={streak.data} />
+            <p className={s.streakMsg}>
+              {streakAlive && streak.data.next_milestone
+                ? st.toNext(streak.data.next_milestone - streak.data.current, st.badge[streak.data.next_milestone])
+                : streakMessage}
+              {streak.data.status === 'open' && streak.data.catch_up.length > 0 && (
+                <button type="button" className={s.catchLink} onClick={() => setCheck({ day: streak.data!.catch_up[streak.data!.catch_up.length - 1] })}>
+                  {st.catchUpBtn} {formatDate(streak.data.catch_up[streak.data.catch_up.length - 1], { weekday: 'long' })}
+                </button>
+              )}
+            </p>
+          </section>
+        )}
+
 
         {/* ---------- Collection ---------- */}
         <Tile to="/collection" icon={<WatchIcon size={18} strokeWidth={1.7} />} title={t.collection} className={s.wide}>

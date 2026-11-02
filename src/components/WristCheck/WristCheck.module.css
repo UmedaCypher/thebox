@@ -100,3 +100,39 @@
 /* Score compact (grille) */
 .fitBadge { display: inline-flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 700; }
 .fitLikes { display: inline-flex; align-items: center; gap: 3px; color: #ee6f86; }
+
+/* ---------- Frise des paliers ---------- */
+.track { --rail: 14px; --node: 30px; padding: 4px calc(var(--node) / 2) 0; }
+.trackRail {
+  position: relative; height: var(--rail); border-radius: var(--rail); margin: calc((var(--node) - var(--rail)) / 2) 0;
+  background: color-mix(in srgb, var(--text) 10%, transparent); box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.25);
+}
+.trackFill {
+  position: absolute; left: calc(var(--node) / -2); top: 0; bottom: 0; min-width: var(--rail); border-radius: inherit;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--lume) 45%, #0f3d2a), var(--lume) 75%, #e4f5cf);
+  box-shadow: 0 0 18px color-mix(in srgb, var(--lume) 55%, transparent), 0 0 4px color-mix(in srgb, var(--lume) 70%, transparent);
+  transition: width 900ms var(--ease-out);
+}
+.node {
+  position: absolute; top: 50%; width: var(--node); height: var(--node); transform: translate(-50%, -50%); border-radius: 50%;
+  display: grid; place-items: center; font-size: 11px; font-weight: 800; font-variant-numeric: tabular-nums;
+  color: var(--text-3); background: var(--surface, var(--bg)); border: 1.5px solid color-mix(in srgb, var(--text) 18%, transparent);
+}
+.node[data-state='start'] { width: 12px; height: 12px; border: 0; background: color-mix(in srgb, var(--lume) 60%, transparent); }
+.node[data-state='done'] { color: var(--lume-ink); background: var(--lume); border-color: transparent; box-shadow: 0 0 10px color-mix(in srgb, var(--lume) 60%, transparent); }
+.node[data-state='next'] {
+  width: calc(var(--node) + 8px); height: calc(var(--node) + 8px); color: var(--lume); font-size: 12px;
+  border: 2px solid var(--lume); box-shadow: 0 0 0 4px color-mix(in srgb, var(--lume) 16%, transparent), 0 0 22px color-mix(in srgb, var(--lume) 45%, transparent);
+  animation: nodePulse 2.4s ease-in-out infinite;
+}
+@keyframes nodePulse { 50% { box-shadow: 0 0 0 7px color-mix(in srgb, var(--lume) 8%, transparent), 0 0 28px color-mix(in srgb, var(--lume) 55%, transparent); } }
+.trackLabels { position: relative; height: 18px; margin-top: 6px; }
+.trackLabels span {
+  position: absolute; transform: translateX(-50%); white-space: nowrap; font-size: 11px; font-weight: 600; color: var(--text-3);
+}
+.trackLabels span:first-child { transform: none; margin-left: calc(var(--node) / -2); }
+.trackLabels span:last-child { transform: translateX(-100%); margin-left: calc(var(--node) / 2); }
+.trackLabels span[data-state='done'] { color: var(--text-2); }
+.trackLabels span[data-state='next'] { color: var(--lume); font-weight: 700; }
+.track[data-paused='true'] .trackFill { opacity: 0; }
+@media (prefers-reduced-motion: reduce) { .node[data-state='next'] { animation: none; } .trackFill { transition: none; } }

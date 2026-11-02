@@ -4,6 +4,7 @@ import { Button } from '../ui';
 import { useStrings } from '../../i18n';
 import { formatDate } from '../../lib/format';
 import { PHOTO_MILESTONES, STREAK_MILESTONES, STREAK_STRINGS } from './streak';
+import StreakTrack from './StreakTrack';
 import s from './WristCheck.module.css';
 
 /** Progression vers le prochain palier, de 0 à 1. */
@@ -68,11 +69,9 @@ export default function StreakPanel({ streak, onCheck, showBadges = true, showBu
         )}
       </div>
 
+      {streak.status !== 'none' && <StreakTrack streak={streak} />}
       {alive && streak.next_milestone && (
-        <div className={s.progress}>
-          <span className={s.bar} aria-hidden="true"><i style={{ width: `${streakProgress(streak) * 100}%` }} /></span>
-          <span className={s.hint}>{t.next(streak.next_milestone, streak.next_milestone - streak.current)}</span>
-        </div>
+        <span className={s.hint}>{t.toNext(streak.next_milestone - streak.current, t.badge[streak.next_milestone])}</span>
       )}
       {alive && !streak.next_milestone && <p className={s.hint}>{t.allDone}</p>}
 
