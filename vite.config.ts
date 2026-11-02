@@ -13,6 +13,7 @@ export default defineConfig({
         short_name: 'Arcora',
         description: "L'écrin de votre collection de montres : passeport, calendrier de portage, galerie au poignet.",
         lang: 'fr-FR',
+        id: '/',
         start_url: '/',
         display: 'standalone',
         background_color: '#1f0e11',
@@ -26,12 +27,15 @@ export default defineConfig({
           { src: 'icons/icon-152x152.png', sizes: '152x152', type: 'image/png', purpose: 'any' },
           { src: 'icons/icon-192x192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
           { src: 'icons/icon-384x384.png', sizes: '384x384', type: 'image/png', purpose: 'any' },
-          { src: 'icons/icon-512x512.png', sizes: '512x512', type: 'image/png', purpose: 'any' }
+          { src: 'icons/icon-512x512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
+          { src: 'icons/maskable-192x192.png', sizes: '192x192', type: 'image/png', purpose: 'maskable' },
+          { src: 'icons/maskable-512x512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' }
         ],
         screenshots: [
-          { src: "screenshots/screenshot1.png", sizes: "1080x1920", type: "image/png", form_factor: "narrow", label: "Ma collection de montres" },
-          { src: "screenshots/screenshot2.png", sizes: "1080x1920", type: "image/png", form_factor: "narrow", label: "Actualités horlogères" },
-          { src: "screenshots/screenshot3.png", sizes: "1080x1920", type: "image/png", form_factor: "narrow", label: "Galerie de photos de montres (triable)" }
+          { src: "screenshots/screenshot1.png", sizes: "1080x1920", type: "image/png", form_factor: "narrow", label: "Accueil : la montre du jour" },
+          { src: "screenshots/screenshot2.png", sizes: "1080x1920", type: "image/png", form_factor: "narrow", label: "Ma collection de montres" },
+          { src: "screenshots/screenshot3.png", sizes: "1080x1920", type: "image/png", form_factor: "narrow", label: "Calendrier de portage" },
+          { src: "screenshots/screenshot4.png", sizes: "1080x1920", type: "image/png", form_factor: "narrow", label: "Galerie au poignet" }
         ],
         categories: ["lifestyle", "utilities", "productivity"],
         prefer_related_applications: false

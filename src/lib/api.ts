@@ -75,6 +75,8 @@ const DB_ERRORS_EN: Record<string, string> = {
   FORBIDDEN: 'Access restricted.',
   INVALID_KIND: 'Choose a programme type.',
   INVALID_DAYS: 'Enter a number of days between 1 and 3,650.',
+  ACTIVE_SUBSCRIPTION: 'Your Premium subscription is still active: cancel it first from your profile (Manage my subscription), then delete your account.',
+  AFFILIATE_BALANCE: 'Commissions are still due to you as an ambassador: write to us so we can pay them before deleting your account.',
 };
 
 const DB_ERRORS: Record<string, string> = {
@@ -94,6 +96,8 @@ const DB_ERRORS: Record<string, string> = {
   FORBIDDEN: 'Accès réservé.',
   INVALID_KIND: 'Choisissez un type de programme.',
   INVALID_DAYS: 'Indiquez un nombre de jours entre 1 et 3 650.',
+  ACTIVE_SUBSCRIPTION: 'Votre abonnement Premium est encore actif : résiliez-le d\'abord depuis votre profil (Gérer mon abonnement), puis supprimez votre compte.',
+  AFFILIATE_BALANCE: 'Des commissions d\'ambassadeur vous sont encore dues : écrivez-nous pour que nous les versions avant de supprimer le compte.',
 };
 
 export class AppError extends Error {
@@ -776,4 +780,27 @@ export async function getAdminMembers(search = '', limit = 100): Promise<AdminMe
   const { data, error } = await supabase.rpc('admin_members', { p_search: search || null, p_limit: limit });
   fail(error, 'Chargement impossible.');
   return (data as AdminMember[]) ?? [];
+}
+
+/* ---------- Suppression du compte ---------- */
+
+/**
+ * Supprime définitivement le compte : d'abord les photos (fichiers), puis toutes les données et le compte
+ * de connexion (fonction delete_my_account). La session est fermée à la fin.
+ */
+export async function deleteMyAccount(userId: string) {
+  // Les refus (abonnement actif…) sont vérifiés par la base ; on les teste avant d'effacer les fichiers.
+  const { data: sub } = await supabase.from('subscriptions').select('status, cancel_at_period_end').eq('user_id', userId).maybeSingle();
+  if (sub && ['active', 'trialing', 'past_due'].includes(sub.status) && !sub.cancel_at_period_end) {
+    fail({ message: 'ACTIVE_SUBSCRIPTION' }, 'Suppression impossible.');
+  }
+  const { data: photos } = await supabase.from('photos').select('storage_path').eq('user_id', userId);
+  const paths = withThumbs((photos ?? []).map(p => p.storage_path as string).filter(Boolean));
+  for (let i = 0; i < paths.length; i += 100) await supabase.storage.from(WATCH_BUCKET).remove(paths.slice(i, i + 100));
+  const { data: avatars } = await supabase.storage.from('avatars').list(userId, { limit: 100 });
+  if (avatars?.length) await supabase.storage.from('avatars').remove(avatars.map(f => `${userId}/${f.name}`));
+
+  const { error } = await supabase.rpc('delete_my_account');
+  fail(error, 'Suppression impossible.');
+  await supabase.auth.signOut();
 }

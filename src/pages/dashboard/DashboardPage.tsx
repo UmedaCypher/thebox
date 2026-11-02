@@ -27,7 +27,7 @@ import s from './DashboardPage.module.css';
 const S = defineStrings({
   hello: (h: number) => (h < 18 && h >= 5 ? 'Bonjour' : 'Bonsoir'),
   today: "Aujourd'hui",
-  pick: 'Quelle montre aujourd\'hui ?',
+  pick: 'Quelle montre aujourd\'hui\u00a0?',
   addShot: 'Prendre mon wrist shot',
   withPhoto: 'Prendre la photo du jour',
   nudgeBadge: (n: number, m: number) => n <= 1 ? `Dernière photo avant le badge ${m} wrist shots` : `Encore ${n} photos avant le badge ${m} wrist shots`,

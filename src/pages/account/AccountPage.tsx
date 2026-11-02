@@ -4,13 +4,14 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Camera } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTheme } from '../../hooks/useTheme';
-import { getMyWearStreak, getSubscription, listMyWristChecks, openBillingPortal, saveProfile, thumbSrc, uploadAvatar } from '../../lib/api';
+import { deleteMyAccount, getMyWearStreak, getSubscription, listMyWristChecks, openBillingPortal, saveProfile, thumbSrc, uploadAvatar } from '../../lib/api';
 import StreakPanel from '../../components/WristCheck/StreakPanel';
 import { useLoad } from '../../hooks/useLoad';
 import { supabase } from '../../lib/supabaseClient';
 import { FREE_WATCH_LIMIT, PAYMENTS_ENABLED } from '../../lib/features';
+import { isAndroidApp } from '../../lib/platform';
 import { formatDate } from '../../lib/format';
-import { Button, Img, LinkButton, Notice, PageHeader, PremiumTag, Segmented, TextField, Toggle } from '../../components/ui';
+import { Button, Img, LinkButton, Notice, PageHeader, PremiumTag, Segmented, Sheet, TextField, Toggle } from '../../components/ui';
 import { useLanguageSetting } from '../../i18n/useLanguageSetting';
 import { defineStrings, tr, useStrings } from '../../i18n';
 import type { LangChoice } from '../../i18n';
@@ -78,9 +79,16 @@ const S = defineStrings({
   change: 'Changer',
   changePassword: 'Changer de mot de passe',
   signOut: 'Se déconnecter',
-  deleteBefore: 'Pour supprimer votre compte et toutes vos données, ',
-  deleteLink: 'écrivez-nous',
-  deleteAfter: '. Nous le faisons sous 7 jours.',
+  deleteAccount: 'Supprimer mon compte',
+  deleteTitle: 'Supprimer votre compte',
+  deleteText: 'Votre collection, vos photos, vos ports, vos messages, votre wishlist et votre profil seront effacés définitivement. Cette action ne peut pas être annulée.',
+  deleteKeep: 'Si vous avez un abonnement Premium, résiliez-le d\'abord. Les factures restent conservées par la société, comme la loi l\'exige.',
+  deleteWord: 'SUPPRIMER',
+  deleteConfirm: (w: string) => `Pour confirmer, tapez ${w}`,
+  deleteGo: 'Supprimer définitivement',
+  deleting: 'Suppression…',
+  deleted: 'Votre compte a été supprimé. Merci d\'avoir essayé Arcora.',
+  cancel: 'Annuler',
   news: 'Actualités horlogères',
   faq: 'Questions fréquentes',
   about: 'À propos',
@@ -148,9 +156,16 @@ const S = defineStrings({
   change: 'Change',
   changePassword: 'Change password',
   signOut: 'Sign out',
-  deleteBefore: 'To delete your account and all your data, ',
-  deleteLink: 'write to us',
-  deleteAfter: '. We do it within 7 days.',
+  deleteAccount: 'Delete my account',
+  deleteTitle: 'Delete your account',
+  deleteText: 'Your collection, photos, wear log, messages, wishlist and profile will be permanently erased. This cannot be undone.',
+  deleteKeep: 'If you have a Premium subscription, cancel it first. Invoices are kept by the company, as the law requires.',
+  deleteWord: 'DELETE',
+  deleteConfirm: (w: string) => `To confirm, type ${w}`,
+  deleteGo: 'Delete permanently',
+  deleting: 'Deleting…',
+  deleted: 'Your account has been deleted. Thank you for trying Arcora.',
+  cancel: 'Cancel',
   news: 'Watch news',
   faq: 'FAQ',
   about: 'About',
@@ -258,6 +273,23 @@ export default function AccountPage() {
 
   const logout = async () => { await signOut(); navigate('/', { replace: true }); };
 
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleteWord, setDeleteWord] = useState('');
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const removeAccount = async () => {
+    if (!user) return;
+    setDeleting(true); setDeleteError(null);
+    try {
+      await deleteMyAccount(user.id);
+      toast(t.deleted);
+      navigate('/', { replace: true });
+    } catch (e) {
+      setDeleteError(e instanceof Error ? e.message : String(e));
+      setDeleting(false);
+    }
+  };
+
   const initial = (profile?.username || user?.email || '?').charAt(0).toUpperCase();
 
   return (
@@ -310,7 +342,7 @@ export default function AccountPage() {
           </p>
         )}
         {portalError && <Notice tone="error">{portalError}</Notice>}
-        {isPremium && sub.data && (
+        {isPremium && sub.data && !isAndroidApp() && (
           <div><Button variant="secondary" onClick={manage} disabled={portalBusy}>{portalBusy ? t.opening : t.manage}</Button></div>
         )}
         {isPremium ? (
@@ -394,9 +426,7 @@ export default function AccountPage() {
           <Button variant="secondary" onClick={resetPassword}>{t.changePassword}</Button>
           <Button variant="ghost" onClick={logout}>{t.signOut}</Button>
         </div>
-        <p className={s.small}>
-          {t.deleteBefore}<Link to="/contact">{t.deleteLink}</Link>{t.deleteAfter}
-        </p>
+        <div><Button variant="ghost" className={s.danger} onClick={() => setDeleteOpen(true)}>{t.deleteAccount}</Button></div>
       </section>
 
       <section className={`${s.section} ${s.helpSection}`}>
@@ -416,6 +446,20 @@ export default function AccountPage() {
         </ul>
         <p className={s.small}>© {new Date().getFullYear()} Arcora</p>
       </section>
+
+      {/* En dehors des sections : leur effet de verre empêcherait la feuille de couvrir l'écran */}
+      <Sheet open={deleteOpen} onClose={() => !deleting && setDeleteOpen(false)} title={t.deleteTitle}>
+        <div className={s.deleteSheet}>
+          <p>{t.deleteText}</p>
+          <p className={s.small}>{t.deleteKeep}</p>
+          {deleteError && <Notice tone="error">{deleteError}</Notice>}
+          <TextField label={t.deleteConfirm(t.deleteWord)} value={deleteWord} onChange={e => setDeleteWord(e.target.value)} autoCapitalize="characters" autoComplete="off" />
+          <div className={s.row}>
+            <Button className={s.dangerFill} onClick={removeAccount} disabled={deleting || deleteWord.trim().toUpperCase() !== t.deleteWord}>{deleting ? t.deleting : t.deleteGo}</Button>
+            <Button variant="ghost" onClick={() => setDeleteOpen(false)} disabled={deleting}>{t.cancel}</Button>
+          </div>
+        </div>
+      </Sheet>
     </div>
   );
 }

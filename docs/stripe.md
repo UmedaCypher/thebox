@@ -19,7 +19,7 @@ On travaille d'abord en **mode test** (interrupteur « Mode test » en haut du t
 2. **Paramètres → Informations publiques** :
    - nom affiché : le nom de l'app ;
    - e-mail et téléphone du support ;
-   - adresse des **CGV** : `https://<votre-domaine>/cgv`, et de la **confidentialité** : `https://<votre-domaine>/confidentialite`.
+   - adresse des **CGV** : `https://arcorawatch.com/cgv`, et de la **confidentialité** : `https://arcorawatch.com/confidentialite`.
 3. **Paramètres → Image de marque** : icône (`public/icons/icon-512x512.png`), couleur principale `#c2a072` (laiton),
    couleur d'accent `#1f0e11`. La page de paiement et les reçus prennent ces couleurs.
 
@@ -48,7 +48,7 @@ On travaille d'abord en **mode test** (interrupteur « Mode test » en haut du t
 2. **Paramètres → Facturation → Portail client** : activer
    « Mettre à jour le moyen de paiement », « Historique des factures », « Annuler l'abonnement »
    (résiliation **à la fin de la période**), et « Changer de formule » entre mensuel et annuel.
-   Renseigner le lien de retour : `https://<votre-domaine>/profil`.
+   Renseigner le lien de retour : `https://arcorawatch.com/profil`.
 
 ## 4. Clés et secrets Supabase
 
@@ -60,7 +60,7 @@ On travaille d'abord en **mode test** (interrupteur « Mode test » en haut du t
 | `STRIPE_SECRET_KEY` | `sk_test_…` |
 | `STRIPE_PRICE_MONTHLY` | `price_…` du prix mensuel |
 | `STRIPE_PRICE_YEARLY` | `price_…` du prix annuel |
-| `SITE_URL` | l'adresse du site, sans `/` final |
+| `SITE_URL` | `https://arcorawatch.com` (sans `/` final) |
 | `STRIPE_TAX_RATE` | `txr_…` si la société est redevable de la TVA (sinon ne pas créer ce secret) |
 | `STRIPE_TERMS_CONSENT` | `on` pour faire aussi cocher les CGV sur la page Stripe (facultatif : l'app les fait déjà accepter) |
 | `STRIPE_WEBHOOK_SECRET` | ajouté à l'étape 6 |
@@ -99,8 +99,12 @@ Copier le **secret de signature** (`whsec_…`) dans le secret Supabase `STRIPE_
 
 ## 7. Activer dans l'app
 
-Dans `src/lib/features.ts` : `PAYMENTS_ENABLED = true` (je peux le faire pour toi), et vérifier que les prix affichés
-(`PRICES`) sont les mêmes que dans Stripe.
+Sans toucher au code : Cloudflare → ton Worker → **Settings → Build → Variables and secrets** → ajouter
+`VITE_PAYMENTS_ENABLED` = `true`, puis relancer un déploiement (Deployments → Retry, ou un nouvel envoi sur `main`).
+Pour couper les paiements : remettre `false` et redéployer.
+
+Vérifier que les prix affichés (`PRICES` dans `src/lib/features.ts` : 3 € et 30 €) sont les mêmes que dans Stripe.
+Dans l'application Android, rien n'est vendu (règles de Google Play) : Premium s'achète sur le site.
 
 ## 8. Tester (mode test)
 

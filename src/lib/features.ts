@@ -1,4 +1,5 @@
 import { defineStrings, tr } from '../i18n';
+import { isAndroidApp } from './platform';
 
 /**
  * Réglages produit en un seul endroit.
@@ -19,9 +20,13 @@ export const LAUNCH_MODE: 'waitlist' | 'open' = 'waitlist';
 
 /**
  * Paiement Stripe actif. false : la page Premium propose la liste d'attente.
- * Passer à true une fois les fonctions et secrets Stripe en place (voir docs/stripe.md).
+ * Réglé par la variable de build VITE_PAYMENTS_ENABLED=true (Cloudflare → Settings → Build → Variables),
+ * une fois les fonctions et secrets Stripe en place (voir docs/stripe.md). Pas besoin de toucher au code.
  */
-export const PAYMENTS_ENABLED = false;
+export const PAYMENTS_ENABLED = import.meta.env.VITE_PAYMENTS_ENABLED === 'true';
+
+/** On peut acheter ici : paiements ouverts, et pas dans l'application Android (voir lib/platform.ts). */
+export const canPurchase = () => PAYMENTS_ENABLED && !isAndroidApp();
 
 /**
  * Prix affichés. Les vrais prix sont ceux définis dans Stripe (STRIPE_PRICE_MONTHLY / STRIPE_PRICE_YEARLY) :

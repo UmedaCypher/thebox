@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { FREE_WATCH_LIMIT, PAYMENTS_ENABLED, premiumPrices } from '../../lib/features';
+import { FREE_WATCH_LIMIT, PAYMENTS_ENABLED, canPurchase, premiumPrices } from '../../lib/features';
+import { isAndroidApp } from '../../lib/platform';
 import type { BillingInterval } from '../../lib/features';
 import { premiumFeatures, premiumHighlights } from '../../lib/premium';
 import { openBillingPortal, startCheckout } from '../../lib/api';
@@ -24,6 +25,7 @@ const S = defineStrings({
   portalUnavailable: 'Espace abonnement indisponible.',
   isPremium: 'Votre compte est Premium. Merci de soutenir Arcora.',
   manage: 'Gérer mon abonnement',
+  notInApp: "L'abonnement Premium n'est pas proposé dans l'application Android. Si votre compte est déjà Premium, tout est débloqué ici aussi.",
   notOpen: "Le paiement n'est pas encore ouvert. Laissez votre adresse et nous vous écrirons une fois, au lancement.",
   signupForPremium: 'Créer un compte pour passer à Premium',
   already: 'Déjà inscrit ?',
@@ -58,6 +60,7 @@ const S = defineStrings({
   portalUnavailable: 'Subscription management is unavailable.',
   isPremium: 'Your account is Premium. Thank you for supporting Arcora.',
   manage: 'Manage my subscription',
+  notInApp: "The Premium subscription isn't offered in the Android app. If your account is already Premium, everything is unlocked here too.",
   notOpen: "Payments aren't open yet. Leave your email and we'll write to you once, at launch.",
   signupForPremium: 'Create an account to go Premium',
   already: 'Already have an account?',
@@ -122,9 +125,13 @@ export default function PremiumPage() {
       return (
         <div className={s.cta}>
           <p>{t.isPremium}</p>
-          {PAYMENTS_ENABLED && <Button variant="secondary" onClick={manage} disabled={busy}>{t.manage}</Button>}
+          {canPurchase() && <Button variant="secondary" onClick={manage} disabled={busy}>{t.manage}</Button>}
         </div>
       );
+    }
+    // Application Android : rien à vendre ni de lien vers un paiement (règles de Google Play)
+    if (isAndroidApp()) {
+      return <div className={s.cta}><p className={s.muted}>{t.notInApp}</p></div>;
     }
     if (!PAYMENTS_ENABLED) {
       return (
@@ -177,11 +184,15 @@ export default function PremiumPage() {
 
         <section className={`panel ${s.plan}`} data-tone="brass">
           <h2>Premium</h2>
-          <Segmented label={t.billing} value={interval} onChange={setInterval_}
-            options={[{ value: 'year', label: t.yearly }, { value: 'month', label: t.monthly }]} />
+          {!isAndroidApp() && (
+            <Segmented label={t.billing} value={interval} onChange={setInterval_}
+              options={[{ value: 'year', label: t.yearly }, { value: 'month', label: t.monthly }]} />
+          )}
           <p className={s.price}>
-            {price.amount}
-            <span>{price.period}{price.note && `, ${price.note}`}{!PAYMENTS_ENABLED && t.soon}</span>
+            {isAndroidApp() ? null : <>
+              {price.amount}
+              <span>{price.period}{price.note && `, ${price.note}`}{!PAYMENTS_ENABLED && t.soon}</span>
+            </>}
           </p>
           <p className={s.includes}>{t.pays}</p>
           <ol className={s.highlights}>
