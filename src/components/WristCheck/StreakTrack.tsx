@@ -11,7 +11,8 @@ import s from './WristCheck.module.css';
  */
 export default function StreakTrack({ streak }: { streak: WearStreak }) {
   const t = useStrings(STREAK_STRINGS);
-  const alive = streak.status === 'done' || streak.status === 'open';
+  // « none » : pas encore de série, la frise part du départ avec le premier palier en ligne de mire
+  const alive = streak.status !== 'paused';
   const current = alive ? streak.current : 0;
   const all = [0, ...STREAK_MILESTONES];
   const nextIdx = all.findIndex(m => m > current);

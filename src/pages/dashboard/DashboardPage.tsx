@@ -279,7 +279,7 @@ export default function DashboardPage() {
         </section>
 
         {/* ---------- Série de portage ---------- */}
-        {streak.data && streak.data.status !== 'none' && (
+        {streak.data && (
           <section className={`panel ${s.tile} ${s.wide} ${s.streakTile}`} data-tone="lume" data-reveal aria-label={st.tileTitle}>
             <div className={s.tileHead}>
               <span className={s.tileIcon}><Award size={18} strokeWidth={1.7} /></span>
@@ -304,7 +304,7 @@ export default function DashboardPage() {
             </div>
             <StreakTrack streak={streak.data} />
             <p className={s.streakMsg}>
-              {streakAlive && streak.data.next_milestone
+              {streak.data.status === 'none' ? st.firstDay : streakAlive && streak.data.next_milestone
                 ? st.toNext(streak.data.next_milestone - streak.data.current, st.badge[streak.data.next_milestone])
                 : streakMessage}
               {streak.data.status === 'open' && streak.data.catch_up.length > 0 && (
