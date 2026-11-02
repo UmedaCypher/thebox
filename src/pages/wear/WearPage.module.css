@@ -115,3 +115,4 @@
   .check, .dayPhoto { animation: none; }
   .pick:active > div, .day:active:not(:disabled) { transform: none; }
 }
+.streak { margin-bottom: var(--sp-5); }

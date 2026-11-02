@@ -41,3 +41,14 @@
   background: color-mix(in srgb, var(--lume) 12%, transparent); border: 1px solid color-mix(in srgb, var(--lume) 34%, transparent);
 }
 .founder::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--lume); box-shadow: 0 0 8px var(--lume); }
+.wrist { display: flex; flex-direction: column; margin-top: var(--sp-4); }
+.checks { list-style: none; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--sp-2); }
+@media (min-width: 640px) { .checks { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.check { position: relative; display: block; aspect-ratio: 4 / 5; border-radius: var(--r-md); overflow: hidden; color: #fbf6ee; text-decoration: none; box-shadow: var(--shadow-sm); }
+.check img { width: 100%; height: 100%; object-fit: cover; }
+.checkCap {
+  position: absolute; left: 0; right: 0; bottom: 0; display: flex; flex-direction: column; padding: 18px 8px 6px; font-size: 11px; line-height: 1.25;
+  background: linear-gradient(transparent, rgba(20, 8, 10, 0.75));
+}
+.checkCap b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.checkCap small { color: rgba(251, 246, 238, 0.8); }

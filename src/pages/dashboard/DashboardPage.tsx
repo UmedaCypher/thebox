@@ -2,20 +2,24 @@ import { useEffect, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  ArrowUpRight, BarChart3, CalendarDays, Check, HandCoins, Heart, Images, MessageCircle, Newspaper, Plus,
+  ArrowUpRight, Award, BarChart3, CalendarDays, Camera, Check, Info, HandCoins, Heart, Images, MessageCircle, Newspaper, Plus,
   ShieldCheck, Sparkles, Store, Tag, UserRound, Watch as WatchIcon,
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useLoad } from '../../hooks/useLoad';
 import {
-  addWear, listConversations, listGalleryShots, listWatches, listWearLogs, mainPhoto, photoUrl, searchMarket, thumbSrc,
+  addWear, getMyWearStreak, listConversations, listGalleryShots, listWatches, listWearLogs, mainPhoto, photoUrl, searchMarket, thumbSrc,
 } from '../../lib/api';
 import { analyseCosts } from '../../lib/costPerWear';
-import { formatEuros, toISODate, todayISO } from '../../lib/format';
+import { formatDate, formatEuros, toISODate, todayISO } from '../../lib/format';
 import { listingPrice } from '../../lib/listing';
 import { latestNews } from '../../components/NewsTeaser/NewsTeaser';
 import { Img, LinkButton } from '../../components/ui';
 import { useToast } from '../../components/Toast/Toast';
+import WristCheckSheet from '../../components/WristCheck/WristCheckSheet';
+import StreakTrack from '../../components/WristCheck/StreakTrack';
+import { useStreakMessage } from '../../components/WristCheck/StreakPanel';
+import { STREAK_STRINGS } from '../../components/WristCheck/streak';
 import { defineStrings, getLocale, useStrings } from '../../i18n';
 import type { Watch } from '../../types';
 import s from './DashboardPage.module.css';
@@ -24,6 +28,10 @@ const S = defineStrings({
   hello: (h: number) => (h < 18 && h >= 5 ? 'Bonjour' : 'Bonsoir'),
   today: "Aujourd'hui",
   pick: 'Quelle montre aujourd\'hui ?',
+  addShot: 'Prendre mon wrist shot',
+  withPhoto: 'Prendre la photo du jour',
+  nudgeBadge: (n: number, m: number) => n <= 1 ? `Dernière photo avant le badge ${m} wrist shots` : `Encore ${n} photos avant le badge ${m} wrist shots`,
+  nudgeGallery: 'Elle rejoint la page de la montre, et la Galerie si vous le souhaitez',
   logged: 'Port noté',
   change: 'Changer',
   firstWatch: 'Ajouter ma première montre',
@@ -59,6 +67,10 @@ const S = defineStrings({
   hello: h => (h < 12 && h >= 5 ? 'Good morning' : h < 18 && h >= 12 ? 'Good afternoon' : 'Good evening'),
   today: 'Today',
   pick: 'Which watch today?',
+  addShot: 'Take my wrist shot',
+  withPhoto: 'Take today’s photo',
+  nudgeBadge: (n: number, m: number) => n <= 1 ? `One last photo before the ${m} wrist shots badge` : `${n} more photos before the ${m} wrist shots badge`,
+  nudgeGallery: 'It goes on the watch page, and in the Gallery if you wish',
   logged: 'Logged',
   change: 'Change',
   firstWatch: 'Add my first watch',
@@ -143,6 +155,7 @@ function LiveClock() {
 
 export default function DashboardPage() {
   const t = useStrings(S);
+  const st = useStrings(STREAK_STRINGS);
   const toast = useToast();
   const { user, profile, isPremium } = useAuth();
   const uid = user!.id;
@@ -157,6 +170,9 @@ export default function DashboardPage() {
   const market = useLoad(() => searchMarket({ query: '', brand: '', kind: '', minPrice: '', maxPrice: '', condition: '', boxPapers: '', size: '', sort: 'recent' }).catch(() => []), []);
   const shots = useLoad(() => listGalleryShots({ brand: null, minWrist: null, maxWrist: null }).catch(() => []), []);
   const news = useLoad(() => latestNews(2).catch(() => []), []);
+
+  const streak = useLoad(() => getMyWearStreak(), [uid]);
+  const [check, setCheck] = useState<{ watchId?: string | null; day?: string | null } | null>(null);
 
   const [justLogged, setJustLogged] = useState<string | null>(null);
   const watches = mine.data?.watches ?? [];
@@ -185,8 +201,17 @@ export default function DashboardPage() {
 
   const logToday = async (w: Watch) => {
     setJustLogged(w.id);
-    try { await addWear(uid, w.id, today); toast(`${t.logged} : ${w.model}`); } catch { setJustLogged(null); }
+    try { await addWear(uid, w.id, today); toast(`${t.logged} : ${w.model}`); streak.reload(); } catch { setJustLogged(null); }
   };
+  // Photo du Wrist Check d'aujourd'hui, si elle existe : elle remplace la photo principale de la montre
+  const [explain, setExplain] = useState(false);
+  const streakAlive = streak.data?.status === 'done' || streak.data?.status === 'open';
+  const streakMessage = useStreakMessage(streak.data ?? null);
+  // Petite incitation sous le bouton photo : le prochain badge photo, sinon la Galerie
+  const left = streak.data?.next_photo_milestone ? streak.data.next_photo_milestone - streak.data.photos : null;
+  const photoNudge = left !== null && left <= 10 ? t.nudgeBadge(left, streak.data!.next_photo_milestone!) : t.nudgeGallery;
+  const todayShot = todayWatch?.photos?.filter(p => p.worn_on === today && p.photo_type === 'wrist_shot')
+    .sort((a, b) => (b.created_at ?? '').localeCompare(a.created_at ?? ''))[0];
 
   const hour = new Date().getHours();
   const name = profile?.username;
@@ -203,15 +228,23 @@ export default function DashboardPage() {
         {/* ---------- Aujourd'hui : la pièce maîtresse du tableau de bord ---------- */}
         <section className={s.hero} data-reveal aria-label={t.today}>
           {todayWatch ? (
-            <Link to="/portage" className={s.heroWorn}>
-              <Img key={todayWatch.id} src={photoUrl(mainPhoto(todayWatch.photos)?.storage_path) ?? ''} fallback={thumbFor(todayWatch).src} alt={`${todayWatch.brand} ${todayWatch.model}`} className={s.heroPhoto} />
-              <span className={s.heroCaption}>
-                <span className={s.heroKicker}><Check size={14} strokeWidth={2.6} aria-hidden="true" />{t.today}</span>
-                <span className={s.heroBrand}>{todayWatch.brand}</span>
-                <span className={s.heroModel}>{todayWatch.model}</span>
-              </span>
-              <span className={s.heroChange}>{t.change}</span>
-            </Link>
+            <div className={s.heroWrap} data-cta={!todayShot}>
+              <Link to="/portage" className={s.heroWorn}>
+                <Img key={todayShot?.id ?? todayWatch.id} src={photoUrl((todayShot ?? mainPhoto(todayWatch.photos))?.storage_path) ?? ''} fallback={thumbFor(todayWatch).src} alt={`${todayWatch.brand} ${todayWatch.model}`} className={s.heroPhoto} />
+                <span className={s.heroCaption}>
+                  <span className={s.heroKicker}><Check size={14} strokeWidth={2.6} aria-hidden="true" />{todayShot ? 'Wrist Check' : t.today}</span>
+                  <span className={s.heroBrand}>{todayWatch.brand}</span>
+                  <span className={s.heroModel}>{todayWatch.model}</span>
+                </span>
+                <span className={s.heroChange}>{t.change}</span>
+              </Link>
+              {!todayShot && (
+                <button type="button" className={s.shotCta} onClick={() => setCheck({ watchId: todayWatch.id, day: today })}>
+                  <span className={s.shotIcon}><Camera size={18} strokeWidth={2} aria-hidden="true" /></span>
+                  <b>{t.addShot}</b>
+                </button>
+              )}
+            </div>
           ) : watches.length === 0 && !mine.loading ? (
             <div className={`panel ${s.heroEmpty}`} data-tone="lume">
               <WatchIcon size={40} strokeWidth={1.1} aria-hidden="true" />
@@ -234,9 +267,55 @@ export default function DashboardPage() {
                   </li>
                 ))}
               </ul>
+              <button type="button" className={s.pickCta} onClick={() => setCheck({ day: today })}>
+                <span className={s.shotIcon}><Camera size={20} strokeWidth={1.9} aria-hidden="true" /></span>
+                <span className={s.shotText}>
+                  <b>{t.withPhoto}</b>
+                  <small>{photoNudge}</small>
+                </span>
+              </button>
             </div>
           )}
         </section>
+
+        {/* ---------- Série de portage ---------- */}
+        {streak.data && (
+          <section className={`panel ${s.tile} ${s.wide} ${s.streakTile}`} data-tone="lume" data-reveal aria-label={st.tileTitle}>
+            <div className={s.tileHead}>
+              <span className={s.tileIcon}><Award size={18} strokeWidth={1.7} /></span>
+              <span className={s.tileTitle}>
+                {st.tileTitle}
+                <button type="button" className={s.infoBtn} aria-expanded={explain} aria-label={st.explainBtn} title={st.explainBtn}
+                  onClick={() => setExplain(!explain)}><Info size={15} strokeWidth={1.9} aria-hidden="true" /></button>
+              </span>
+              <span className={s.todayChip} data-done={streak.data.logged_today}
+                title={streak.data.logged_today ? st.todayDoneLong : st.todayTodoLong} aria-label={streak.data.logged_today ? st.todayDoneLong : st.todayTodoLong}>
+                {streak.data.logged_today ? <Check size={13} strokeWidth={2.8} aria-hidden="true" /> : <span className={s.todayEmpty} aria-hidden="true" />}
+                {streak.data.logged_today ? st.todayDone : st.todayTodo}
+              </span>
+            </div>
+            {explain && <p className={s.explain}>{st.explain}</p>}
+            <div className={s.streakTop}>
+              <span className={s.metric}>
+                <b className="num">{streakAlive ? streak.data.current : streak.data.paused_length}</b>
+                <span>{(streakAlive ? streak.data.current : streak.data.paused_length) > 1 ? st.daysInRow : st.dayInRow}</span>
+              </span>
+              {streak.data.best > 0 && <span className={s.small}>{st.best(streak.data.best)}</span>}
+            </div>
+            <StreakTrack streak={streak.data} />
+            <p className={s.streakMsg}>
+              {streak.data.status === 'none' ? st.firstDay : streakAlive && streak.data.next_milestone
+                ? st.toNext(streak.data.next_milestone - streak.data.current, st.badge[streak.data.next_milestone])
+                : streakMessage}
+              {streak.data.status === 'open' && streak.data.catch_up.length > 0 && (
+                <button type="button" className={s.catchLink} onClick={() => setCheck({ day: streak.data!.catch_up[streak.data!.catch_up.length - 1] })}>
+                  {st.catchUpBtn} {formatDate(streak.data.catch_up[streak.data.catch_up.length - 1], { weekday: 'long' })}
+                </button>
+              )}
+            </p>
+          </section>
+        )}
+
 
         {/* ---------- Collection ---------- */}
         <Tile to="/collection" icon={<WatchIcon size={18} strokeWidth={1.7} />} title={t.collection} className={s.wide}>
@@ -358,6 +437,9 @@ export default function DashboardPage() {
           </nav>
         </section>
       </div>
+      <WristCheckSheet open={check !== null} onClose={() => setCheck(null)} watches={watches}
+        watchId={check?.watchId} day={check?.day}
+        onDone={() => { streak.reload(); mine.reload(); setJustLogged(null); }} />
     </div>
   );
 }

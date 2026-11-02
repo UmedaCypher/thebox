@@ -30,6 +30,8 @@ export interface Photo {
   is_main_photo: boolean;
   is_public_gallery?: boolean | null;
   created_at?: string | null;
+  /** Jour porté, pour une photo prise lors d'un Wrist Check (AAAA-MM-JJ). */
+  worn_on?: string | null;
 }
 
 export interface Watch {
@@ -162,6 +164,39 @@ export interface GalleryShot {
   model: string;
   username: string | null;
   wrist_size_cm: number | null;
+  worn_on: string | null;
+  created_at: string;
+  is_mine: boolean;
+  likes: number;
+  liked: boolean;
+  fit: PhotoFit;
+}
+
+export type FitChoice = 'small' | 'perfect' | 'large';
+/** Votes « Au poignet ? » d'une photo, et le vote du membre connecté. */
+export interface PhotoFit { small: number; perfect: number; large: number; mine: FitChoice | null }
+
+export interface WearStreak {
+  today: string;
+  /** none : jamais noté · done : noté aujourd'hui · open : à noter aujourd'hui (rattrapage possible) · paused : en pause */
+  status: 'none' | 'done' | 'open' | 'paused';
+  current: number;
+  best: number;
+  paused_length: number;
+  last_day: string | null;
+  catch_up: string[];
+  next_milestone: number | null;
+  badges: { days: number; earned_on: string }[];
+  logged_today: boolean;
+  photo_today: boolean;
+  photos: number;
+  photo_badges: number[];
+  next_photo_milestone: number | null;
+}
+
+export interface FitRankingRow {
+  brand: string; model: string; votes: number; perfect_pct: number; small_pct: number; large_pct: number;
+  photos: number; photo_storage_path: string | null; case_diameter_mm: number | null; lug_to_lug_mm: number | null;
 }
 
 export interface Subscription {
