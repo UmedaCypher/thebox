@@ -245,6 +245,35 @@ function Thread({ id, onActivity }: { id: string; onActivity: () => void }) {
     if (el) el.scrollTop = el.scrollHeight;
   }, [messages?.length]);
 
+  const ready = Boolean(summary.data); // le fil (et sa zone de messages) n'existe qu'une fois la conversation chargée
+  // Clavier du téléphone : le fil prend la hauteur visible au-dessus du clavier, la page ne défile pas,
+  // et la conversation reste calée sur le dernier message.
+  useEffect(() => {
+    const vv = window.visualViewport;
+    const root = document.documentElement;
+    const el = scroller.current;
+    let atBottom = true;
+    const onScroll = () => { if (el) atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 40; };
+    const fit = () => {
+      if (vv) root.style.setProperty('--vv-h', `${Math.round(vv.height)}px`);
+      if (window.scrollY !== 0 && window.matchMedia('(max-width: 899px)').matches) window.scrollTo(0, 0);
+      if (el && atBottom) el.scrollTop = el.scrollHeight;
+    };
+    fit();
+    el?.addEventListener('scroll', onScroll, { passive: true });
+    vv?.addEventListener('resize', fit);
+    vv?.addEventListener('scroll', fit);
+    const ro = el ? new ResizeObserver(() => { if (atBottom) el.scrollTop = el.scrollHeight; }) : null;
+    if (el) ro?.observe(el);
+    return () => {
+      el?.removeEventListener('scroll', onScroll);
+      vv?.removeEventListener('resize', fit);
+      vv?.removeEventListener('scroll', fit);
+      ro?.disconnect();
+      root.style.removeProperty('--vv-h');
+    };
+  }, [id, ready]);
+
   const c = summary.data;
   const blocked = Boolean(c?.blocked_by_me);
 

@@ -5,8 +5,10 @@
 }
 .page[data-thread='true'] .listPane { display: none; }
 .page[data-thread='false'] .threadPane { display: none; }
+/* --vv-h : hauteur réellement visible (clavier ouvert compris), tenue à jour par la page.
+   Le fil tient alors entre l'en-tête et le clavier : les premiers messages ne sortent plus de l'écran. */
 .page[data-thread='true'] {
-  height: calc(100dvh - var(--header-h) - env(safe-area-inset-top));
+  height: calc(var(--vv-h, 100dvh) - var(--header-h) - env(safe-area-inset-top));
 }
 
 @media (min-width: 900px) {

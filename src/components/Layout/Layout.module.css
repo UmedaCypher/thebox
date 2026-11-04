@@ -110,6 +110,8 @@ a.avatar::after { content: ''; position: absolute; inset: -6px; border-radius: 5
 }
 @media (max-width: 359px) { .tab { font-size: 0.75rem; } .tabIcon { width: 48px; } }
 @media (min-width: 860px) { .tabbar { display: none; } }
+/* Pendant la saisie, la barre d'onglets ne remonte pas au-dessus du clavier */
+:global(html:has(textarea:focus, input:not([type='checkbox'], [type='radio'], [type='range'], [type='file']):focus, select:focus)) .tabbar { display: none; }
 @media (max-width: 859px) { .hideOnMobile { display: none; } }
 
 /* Pied de page : complet sur ordinateur ; sur téléphone, une ligne légale pour les visiteurs, rien pour les membres. */
