@@ -16,7 +16,7 @@ export const FREE_WATCH_LIMIT = 6;
  * 'waitlist' : l'accueil propose la liste d'attente ; l'inscription reste possible via /signup (testeurs).
  * 'open'     : l'accueil propose de créer un compte.
  */
-export const LAUNCH_MODE: 'waitlist' | 'open' = 'waitlist';
+export const LAUNCH_MODE: 'waitlist' | 'open' = 'open';
 
 /**
  * Paiement Stripe actif. false : la page Premium propose la liste d'attente.
