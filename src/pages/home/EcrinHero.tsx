@@ -35,12 +35,16 @@ const S = defineStrings({
  * pendant que le défilement ouvre le couvercle puis plonge vers une place libre.
  * Sans WebGL ou avec les animations réduites : une image fixe de l'écrin ouvert.
  */
+const STILL_KEY = 'arcora-ecrin-still';
+const stillRemembered = () => { try { return localStorage.getItem(STILL_KEY) === '1'; } catch { return false; } };
+const rememberStill = () => { try { localStorage.setItem(STILL_KEY, '1'); } catch { /* stockage indisponible */ } };
+
 export default function EcrinHero() {
   const t = useStrings(S);
   const sectionRef = useRef<HTMLElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const sceneRef = useRef<EcrinScene | null>(null);
-  const [mode] = useState<'3d' | 'still'>(() => (prefersReducedMotion() || !hasWebGL() ? 'still' : '3d'));
+  const [mode, setMode] = useState<'3d' | 'still'>(() => (prefersReducedMotion() || !hasWebGL() || stillRemembered() ? 'still' : '3d'));
   const [ready, setReady] = useState(false);
 
   const onProgress = useCallback((p: number) => {
@@ -61,7 +65,12 @@ export default function EcrinHero() {
       await document.fonts?.ready;
       if (disposed) return;
       try {
-        scene = createEcrinScene(canvas, { lowPower: low, onFirstFrame: () => setReady(true) });
+        scene = createEcrinScene(canvas, {
+          lowPower: low,
+          onFirstFrame: () => setReady(true),
+          // Rendu raté sur cet appareil : image fixe, maintenant et aux prochaines visites
+          onBroken: () => { rememberStill(); setReady(false); setMode('still'); },
+        });
       } catch {
         return; // l'image fixe reste affichée
       }

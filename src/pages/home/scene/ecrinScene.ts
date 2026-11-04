@@ -18,7 +18,30 @@ export interface EcrinScene {
   dispose(): void;
 }
 
-interface Options { lowPower?: boolean; onFirstFrame?: () => void }
+interface Options {
+  lowPower?: boolean; onFirstFrame?: () => void;
+  /** Rendu inexploitable (certains processeurs graphiques de téléphone dessinent tout en blanc) : on passe à l'image fixe. */
+  onBroken?: () => void;
+}
+
+/**
+ * Contrôle de l'image rendue : la scène est sombre ; si la plupart des points sondés sont presque blancs,
+ * le processeur graphique a mal calculé l'éclairage. Lu juste après le rendu, tant que l'image est disponible.
+ */
+function looksBroken(gl: WebGLRenderingContext | WebGL2RenderingContext) {
+  const w = gl.drawingBufferWidth, h = gl.drawingBufferHeight;
+  if (!w || !h) return false;
+  const px = new Uint8Array(4);
+  let bright = 0, total = 0;
+  for (let i = 1; i <= 5; i++) {
+    for (let j = 1; j <= 5; j++) {
+      gl.readPixels(Math.floor((w * i) / 6), Math.floor((h * j) / 6), 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, px);
+      total++;
+      if (px[0] > 225 && px[1] > 225 && px[2] > 215) bright++;
+    }
+  }
+  return bright / total > 0.4;
+}
 
 // Dimensions (unité arbitraire, ~ 5 cm)
 const BOX_W = 6.6, BOX_D = 4.7, TRAY_H = 1.25, WALL = 0.26, LID_H = 0.42;
@@ -258,7 +281,7 @@ export function createEcrinScene(canvasEl: HTMLCanvasElement, opts: Options = {}
   /* ---- état ---- */
   let progress = 0, shown = 0;
   const pointer = new THREE.Vector2(), pointerSmooth = new THREE.Vector2();
-  let raf = 0, running = false, first = true, lastShift = -1;
+  let raf = 0, running = false, first = true, lastShift = -1, frames = 0, broken = false;
   const clock = new THREE.Clock();
   const target = new THREE.Vector3();
 
@@ -321,6 +344,13 @@ export function createEcrinScene(canvasEl: HTMLCanvasElement, opts: Options = {}
     (dust.points.material as THREE.PointsMaterial).opacity = 0.5 * (1 - b * 0.6);
 
     renderer.render(scene, camera);
+    frames++;
+    // Contrôle à la première image, puis une fois l'écrin éclairé (les ombres et la lueur arrivent ensuite)
+    if ((frames === 1 || frames === 45) && !broken) {
+      let bad = false;
+      try { bad = looksBroken(renderer.getContext()); } catch { bad = false; }
+      if (bad) { broken = true; api.stop(); opts.onBroken?.(); return; }
+    }
     if (first) { first = false; opts.onFirstFrame?.(); }
   };
 
