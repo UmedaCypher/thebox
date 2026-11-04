@@ -64,21 +64,21 @@ Les visuels sont prêts dans `docs/store/android/` :
 Textes proposés :
 
 - **Description courte** (80 caractères max) :
-  `Ta collection de montres, rangée, portée, partagée. Passeport, portage, galerie.`
+  `Votre collection de montres, rangée, portée et partagée entre collectionneurs.`
 - **Description complète** :
 
 ```
 Arcora est l'écrin des collectionneurs de montres.
 
-• Ta collection au même endroit : fiches détaillées, photos, valeur déclarée, entretiens à prévoir.
-• Le calendrier de portage : note en un geste la montre du jour, retrouve ton mois au poignet et partage ton image du mois.
+• Votre collection au même endroit : une fiche par montre, photos, valeur déclarée, entretiens à prévoir.
+• Le Wrist Check : notez chaque jour la montre que vous portez, avec une photo au poignet si vous le souhaitez. Votre série de portage avance, et des badges marquent les paliers.
+• Le calendrier de portage : retrouvez votre mois au poignet et le coût par port de chaque montre.
+• La Galerie au poignet : voyez comment une pièce tombe sur un poignet comme le vôtre, et dites aux autres membres si la leur leur va : petite, parfaite ou grande.
 • Le passeport : une page à partager pour chaque montre.
-• La galerie au poignet : vois comment une pièce tombe sur un poignet comme le tien.
 • Le Marché : annonces de vente et d'échange entre membres, avec messagerie.
-• Le parrainage : offre un mois de Premium à tes amis collectionneurs.
+• L'inventaire pour l'assurance : un document prêt à envoyer à votre assureur.
 
-Gratuit jusqu'à 6 montres. Premium débloque une collection illimitée, le coût par port, les statistiques,
-la wishlist et l'inventaire pour l'assurance.
+Gratuit jusqu'à 6 montres. Premium débloque une collection illimitée, les statistiques et la wishlist.
 
 Conçu par un collectionneur, pour les collectionneurs.
 ```
