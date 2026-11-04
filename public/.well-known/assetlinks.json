@@ -1,8 +1,11 @@
 [{
-      "relation": ["delegate_permission/common.handle_all_urls"],
-      "target": {
-        "namespace": "android_app",
-        "package_name": "com.arcorawatch.app",
-        "sha256_cert_fingerprints": ["08:58:F5:9B:BB:89:88:45:B3:54:5F:54:BD:9D:C4:7F:8B:8D:9B:37:A3:47:31:E1:75:FE:F0:4B:63:53:35:97"]
-      }
-    }]
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "com.arcorawatch.app",
+    "sha256_cert_fingerprints": [
+      "15:D8:45:DE:2F:18:9A:8D:05:B5:73:66:B5:02:DD:94:99:E8:2F:FD:69:A2:FC:E2:2A:E3:71:01:84:7E:20:AF",
+      "08:58:F5:9B:BB:89:88:45:B3:54:5F:54:BD:9D:C4:7F:8B:8D:9B:37:A3:47:31:E1:75:FE:F0:4B:63:53:35:97"
+    ]
+  }
+}]
