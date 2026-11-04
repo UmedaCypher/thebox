@@ -2,6 +2,7 @@
 .hero { --p: 0; position: relative; height: 320vh; margin-top: calc(var(--header-h) * -1 - env(safe-area-inset-top)); }
 .stage { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; background: #140709; }
 
+.posterWrap { position: absolute; inset: 0; }
 .canvas, .poster { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 .poster { object-fit: cover; transition: opacity 600ms var(--ease); }
 .poster[data-hidden='true'] { opacity: 0; }
@@ -47,11 +48,58 @@
 .cue::after { content: ''; width: 1px; height: 36px; background: linear-gradient(rgba(194, 160, 114, 0.9), transparent); animation: drip 2.2s var(--ease) infinite; transform-origin: top; }
 @keyframes drip { 0% { transform: scaleY(0); opacity: 1; } 70% { transform: scaleY(1); opacity: 1; } 100% { transform: scaleY(1); opacity: 0; } }
 
-/* Image fixe (pas de WebGL, ou animations réduites) : un seul écran, tout le texte d'accueil */
+/* ---------- Version fixe (pas de WebGL, rendu raté, ou animations réduites) ----------
+   L'écrin ouvert devient une image posée sous le texte (téléphone) ou à côté (écran large),
+   fondue dans le fond sombre ; un halo désigne la place libre, comme le faisceau de la version animée. */
 .still { height: auto; }
-.still .stage { height: 92vh; height: 92svh; }
-.still .copyA { opacity: 1; transform: none; }
-.still .copyB, .still .copyC, .still .cue { display: none; }
+.still .stage {
+  position: relative; height: auto; min-height: 100vh; min-height: 100svh; overflow: hidden;
+  display: grid; grid-template-columns: minmax(0, 1fr); align-content: center; row-gap: var(--sp-5);
+  padding: calc(var(--header-h) + env(safe-area-inset-top) + var(--sp-6)) 0 var(--sp-7);
+  background:
+    radial-gradient(90% 55% at 50% 62%, rgba(120, 40, 50, 0.28), transparent 70%),
+    #140709;
+}
+.still .vignette, .still .copyC, .still .cue { display: none; }
+.still .copy { position: relative; inset: auto; top: auto; bottom: auto; opacity: 1; transform: none; margin: 0 auto; }
+.still .copyA { order: 1; visibility: visible !important; pointer-events: auto !important; }
+.still .posterWrap { order: 2; }
+.still .copyB { order: 3; }
+.still .copyB { visibility: visible; gap: var(--sp-2); }
+.still .copyB .subtitle { font-size: var(--fs-xl); max-width: none; }
+.still .copyB .lead { font-size: var(--fs-sm); color: #b9a69a; max-width: 40ch; }
 
-@media (prefers-reduced-motion: reduce) { .cue::after { animation: none; } }
-.still .copyA { visibility: visible !important; pointer-events: auto !important; }
+.still .posterWrap {
+  position: relative; inset: auto; justify-self: center; width: 128%; max-width: 760px; aspect-ratio: 16 / 10;
+  /* Fondu sur les quatre bords : l'image n'a plus de contour visible */
+  -webkit-mask-image: linear-gradient(180deg, transparent, #000 16%, #000 70%, transparent 96%), linear-gradient(90deg, transparent 4%, #000 20%, #000 80%, transparent 96%);
+  -webkit-mask-composite: source-in;
+  mask-image: linear-gradient(180deg, transparent, #000 16%, #000 70%, transparent 96%), linear-gradient(90deg, transparent 4%, #000 20%, #000 80%, transparent 96%);
+  mask-composite: intersect;
+  animation: settle 1.4s var(--ease-out) both;
+}
+.still .poster { object-fit: cover; opacity: 1; animation: drift 18s ease-in-out infinite alternate; }
+.halo {
+  position: absolute; left: 51%; top: 62%; width: 30%; aspect-ratio: 1; transform: translate(-50%, -50%); border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(255, 214, 170, 0.5), rgba(255, 190, 150, 0.16) 55%, transparent);
+  mix-blend-mode: screen; animation: halo 4.5s ease-in-out infinite;
+}
+@keyframes settle { from { opacity: 0; transform: translateY(18px) scale(0.98); } }
+@keyframes drift { to { transform: scale(1.045) translateY(-1.5%); } }
+@keyframes halo { 50% { opacity: 0.45; transform: translate(-50%, -50%) scale(0.92); } }
+
+/* Écran large : le texte à gauche, l'écrin à droite */
+@media (min-width: 900px) and (min-aspect-ratio: 1/1) {
+  .still .stage {
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); grid-template-rows: auto auto; align-content: center;
+    column-gap: var(--sp-6); padding-inline: max(var(--gutter), calc((100vw - var(--page-max)) / 2 + var(--gutter)));
+  }
+  .still .copy { margin: 0; padding: 0; max-width: none; }
+  .still .copyA { grid-column: 1; grid-row: 1; align-self: end; }
+  .still .copyB { grid-column: 1; grid-row: 2; align-self: start; margin-top: var(--sp-4); padding-top: var(--sp-4); border-top: 1px solid rgba(243, 237, 227, 0.12); max-width: 46ch; }
+  .still .posterWrap { grid-column: 2; grid-row: 1 / span 2; align-self: center; width: 118%; max-width: none; justify-self: start; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cue::after, .still .posterWrap, .still .poster, .halo { animation: none; }
+}
