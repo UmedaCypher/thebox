@@ -36,7 +36,11 @@ const S = defineStrings({
  * Sans WebGL ou avec les animations réduites : une image fixe de l'écrin ouvert.
  */
 const STILL_KEY = 'arcora-ecrin-still';
-const stillRemembered = () => { try { return localStorage.getItem(STILL_KEY) === '1'; } catch { return false; } };
+const stillRemembered = () => {
+  // ?ecrin=fixe : aperçu de la version fixe sur n'importe quel appareil
+  if (new URLSearchParams(window.location.search).get('ecrin') === 'fixe') return true;
+  try { return localStorage.getItem(STILL_KEY) === '1'; } catch { return false; }
+};
 const rememberStill = () => { try { localStorage.setItem(STILL_KEY, '1'); } catch { /* stockage indisponible */ } };
 
 export default function EcrinHero() {
@@ -114,7 +118,10 @@ export default function EcrinHero() {
   return (
     <section ref={sectionRef} data-stage="a" className={`${s.hero} ${mode === 'still' ? s.still : ''}`} aria-label={t.aria}>
       <div className={s.stage}>
-        <img className={s.poster} data-hidden={ready} src={mode === 'still' ? '/landing/ecrin-ouvert.webp' : '/landing/ecrin-ferme.webp'} alt="" />
+        <div className={s.posterWrap} aria-hidden="true">
+          <img className={s.poster} data-hidden={ready} src={mode === 'still' ? '/landing/ecrin-ouvert.webp' : '/landing/ecrin-ferme.webp'} alt="" />
+          {mode === 'still' && <span className={s.halo} />}
+        </div>
         {mode === '3d' && <canvas ref={canvasRef} className={s.canvas} data-ready={ready} aria-hidden="true" />}
         <div className={s.vignette} aria-hidden="true" />
 
