@@ -1,0 +1,10 @@
+User-agent: *
+Disallow: /admin
+Disallow: /accueil
+Disallow: /montre/
+Disallow: /collection
+Disallow: /profil$
+Disallow: /messages
+Disallow: /export/
+
+Sitemap: https://arcorawatch.com/sitemap-index.xml

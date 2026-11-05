@@ -1,0 +1,96 @@
+---
+import '@fontsource-variable/bodoni-moda';
+import '@fontsource-variable/hanken-grotesk';
+import '../styles/global.css';
+import { SITE, T, magazinePath, type Lang } from '../lib/i18n';
+
+interface Alternate { lang: Lang; path: string }
+interface Props {
+  lang: Lang;
+  title: string;
+  description: string;
+  path: string;                 // adresse canonique de la page, ex. /magazine/taille-montre-poignet/
+  alternates?: Alternate[];     // versions dans chaque langue (la page elle-même incluse)
+  type?: 'website' | 'article';
+  image?: string;
+  jsonLd?: Record<string, unknown>[];
+}
+
+const { lang, title, description, path, alternates = [], type = 'website', image, jsonLd = [] } = Astro.props;
+const t = T[lang];
+const canonical = SITE + path;
+const ogImage = new URL(image ?? '/icons/icon-1024x1024.png', SITE).href;
+const frAlt = alternates.find((a) => a.lang === 'fr');
+const other = alternates.find((a) => a.lang !== lang);
+---
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {alternates.map((a) => <link rel="alternate" hreflang={a.lang} href={SITE + a.path} />)}
+    {frAlt && <link rel="alternate" hreflang="x-default" href={SITE + frAlt.path} />}
+    <link rel="alternate" type="application/rss+xml" title={`Arcora — ${t.magazine}`} href={SITE + magazinePath(lang) + 'rss.xml'} />
+
+    <meta property="og:type" content={type} />
+    <meta property="og:site_name" content="Arcora" />
+    <meta property="og:locale" content={t.locale.replace('-', '_')} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <meta name="theme-color" content="#1f0e11" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192x192.png" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+    {jsonLd.map((d) => <script type="application/ld+json" set:html={JSON.stringify(d)} />)}
+  </head>
+  <body>
+    <a class="skip" href="#contenu">{lang === 'fr' ? 'Aller au contenu' : 'Skip to content'}</a>
+    <header class="top">
+      <div class="wrap top-row">
+        <a href="/" class="logo" aria-label="Arcora">Arcora</a>
+        <nav class="top-nav" aria-label={t.magazine}>
+          <a href={magazinePath(lang)} aria-current={path.startsWith(magazinePath(lang)) ? 'page' : undefined}>{t.magazine}</a>
+          <a href="/?src=magazine" class="btn btn-small">{t.openApp}</a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="contenu">
+      <slot />
+    </main>
+
+    <footer class="foot">
+      <div class="wrap foot-grid">
+        <div>
+          <p class="logo">Arcora</p>
+          <p class="muted">{lang === 'fr' ? "L'écrin numérique de votre collection de montres." : 'The digital home of your watch collection.'}</p>
+        </div>
+        <nav aria-label={t.footerApp}>
+          <p class="foot-title">{t.footerApp}</p>
+          <a href="/galerie">{t.gallery}</a>
+          <a href="/marche">{t.market}</a>
+          <a href="/premium">{t.premium}</a>
+          <a href="/faq">{t.faq}</a>
+        </nav>
+        <nav aria-label={t.magazine}>
+          <p class="foot-title">{t.magazine}</p>
+          <a href={magazinePath(lang)}>{t.allArticles}</a>
+          <a href={other ? other.path : magazinePath(lang === 'fr' ? 'en' : 'fr')} hreflang={lang === 'fr' ? 'en' : 'fr'}>{t.otherLang}</a>
+          <a href={magazinePath(lang) + 'rss.xml'}>RSS</a>
+        </nav>
+        <nav aria-label={t.legal}>
+          <p class="foot-title">Arcora</p>
+          <a href="/mentions-legales">{t.legal}</a>
+          <a href="/confidentialite">{t.privacy}</a>
+        </nav>
+      </div>
+      <p class="wrap muted small">© {new Date().getFullYear()} Arcora</p>
+    </footer>
+  </body>
+</html>

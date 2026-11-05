@@ -1,0 +1,16 @@
+---
+import { T, articlePath, formatDate, readingMinutes, type Article } from '../lib/i18n';
+
+interface Props { article: Article; featured?: boolean; headingLevel?: 'h2' | 'h3' }
+const { article, featured = false, headingLevel = 'h2' } = Astro.props;
+const { lang } = article.data;
+const Heading = headingLevel;
+---
+<a href={articlePath(article)} class:list={['card', { featured }]}>
+  <span class="eyebrow">{article.data.category}</span>
+  <Heading>{article.data.title}</Heading>
+  <p>{article.data.description}</p>
+  <span class="meta">
+    <time datetime={article.data.publishedAt.toISOString()}>{formatDate(article.data.publishedAt, lang)}</time>{' · '}{T[lang].readingTime(readingMinutes(article.body))}
+  </span>
+</a>

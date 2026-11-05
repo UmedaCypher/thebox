@@ -7,7 +7,7 @@ import { LinkButton } from '../ui';
 import GlobalSearch from '../Search/GlobalSearch';
 import { LAUNCH_MODE } from '../../lib/features';
 import { useUnreadCount } from '../../hooks/useUnreadCount';
-import { defineStrings, useStrings } from '../../i18n';
+import { defineStrings, useLang, useStrings } from '../../i18n';
 import type { LangChoice } from '../../i18n';
 import { COMMON } from '../../i18n/common';
 import { useLanguageSetting } from '../../i18n/useLanguageSetting';
@@ -144,6 +144,7 @@ function LanguageSwitch() {
 
 function Footer({ loggedIn }: { loggedIn: boolean }) {
   const t = useStrings(S);
+  const { lang } = useLang();
   return (
     <footer className={s.footer} data-member={loggedIn}>
       <div className={s.footerInner}>
@@ -151,6 +152,8 @@ function Footer({ loggedIn }: { loggedIn: boolean }) {
           <Link to="/a-propos">{t.about}</Link>
           <Link to="/faq">{t.faq}</Link>
           <Link to="/actualites">{t.news}</Link>
+          {/* Le magazine est un site statique à part (dossier site/) : lien classique, pas de navigation interne. */}
+          <a href={lang === 'fr' ? '/magazine/' : '/en/magazine/'}>Magazine</a>
           <Link to="/presse">{t.press}</Link>
           <Link to="/contact">{t.contact}</Link>
           <Link to="/affiliation">{t.affiliate}</Link>

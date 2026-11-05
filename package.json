@@ -5,9 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build && npm run build:magazine",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "build:magazine": "npm ci --prefix site && npm run build --prefix site && cp -R site/dist/. dist/",
+    "dev:magazine": "npm run dev --prefix site"
   },
   "dependencies": {
     "@fontsource-variable/bodoni-moda": "^5.3.0",
