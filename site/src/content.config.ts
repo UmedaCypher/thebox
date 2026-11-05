@@ -9,7 +9,7 @@ import { z } from 'astro/zod';
  */
 const articles = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/articles' }),
-  schema: z.object({
+  schema: ({ image }) => z.object({
     title: z.string().max(70, 'Titre trop long pour Google (70 caractères max).'),
     description: z.string().min(70).max(165, 'Description trop longue (165 caractères max).'),
     lang: z.enum(['fr', 'en']),
@@ -18,9 +18,14 @@ const articles = defineCollection({
     publishedAt: z.coerce.date(),
     updatedAt: z.coerce.date().optional(),
     author: z.string().default('Arcora'),
-    cover: z.string().optional(),
+    // Image principale : fichier dans src/content/articles/images/, idéalement 1200 px de large ou plus (exigé par Google Discover).
+    cover: image().optional(),
     coverAlt: z.string().optional(),
+    coverCaption: z.string().optional(),
     draft: z.boolean().default(false),
+  }).refine((d) => !d.cover || !!d.coverAlt?.trim(), {
+    message: "coverAlt est obligatoire quand il y a une image principale (cover) : décrivez l'image.",
+    path: ['coverAlt'],
   }),
 });
 

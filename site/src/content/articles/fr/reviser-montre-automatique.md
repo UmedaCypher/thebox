@@ -6,6 +6,8 @@ translationKey: watch-service-interval
 category: Entretien
 publishedAt: 2026-11-04
 author: Arcora
+cover: ../images/ecrin-boite-a-montres-ouverte.webp
+coverAlt: "Écrin à montres en bois ouvert, avec six coussins de velours bordeaux"
 ---
 
 Une montre mécanique est une petite machine : des dizaines de pièces qui tournent sans arrêt, lubrifiées par quelques gouttes d'huile. Avec le temps, ces huiles sèchent et les pièces s'usent. La révision sert à remettre tout cela à neuf avant que l'usure ne cause de vrais dégâts.

@@ -6,6 +6,8 @@ translationKey: watch-service-interval
 category: Care
 publishedAt: 2026-11-04
 author: Arcora
+cover: ../images/ecrin-boite-a-montres-ouverte.webp
+coverAlt: "Open wooden watch box with six burgundy velvet cushions"
 ---
 
 A mechanical watch is a tiny machine: dozens of parts turning non-stop, lubricated by a few drops of oil. Over time those oils dry out and parts wear. A service puts everything back in shape before wear turns into real damage.

@@ -36,8 +36,9 @@ category: Guides
 publishedAt: 2026-11-05
 author: Arcora                     # ou ton nom, pour signer l'article
 # updatedAt: 2026-12-01            # à ajouter quand l'article est mis à jour
-# cover: /magazine/images/xxx.jpg  # image 1200×675, à placer dans site/public/magazine/images/
-# coverAlt: "Description de l'image"
+cover: ../images/nom-descriptif.webp     # image principale (voir « Images » ci-dessous)
+coverAlt: "Ce que montre l'image, en une phrase"   # obligatoire si cover
+coverCaption: "Légende affichée sous l'image"      # facultatif
 # draft: true                      # brouillon : non publié
 ---
 ```
@@ -45,6 +46,30 @@ author: Arcora                     # ou ton nom, pour signer l'article
 3. Pousser sur `main` : Cloudflare reconstruit et publie en quelques minutes.
 
 Un titre ou une description trop longs bloquent le build avec un message clair.
+
+## Images
+
+Toutes les images vont dans `site/src/content/articles/images/` (JPEG, PNG ou WebP, idéalement 1200 px de large ou plus).
+Astro les optimise tout seul au build : formats AVIF et WebP, plusieurs tailles selon l'écran, largeur et hauteur fixées.
+
+**Image principale** : champs `cover`, `coverAlt` et `coverCaption` de l'en-tête. Elle sert aussi d'image de partage
+(Facebook, LinkedIn, WhatsApp, X : version JPEG 1200×630 générée automatiquement) et d'image pour Google (données structurées).
+
+**Image dans le texte** : une ligne seule, avec le texte alternatif entre crochets et la légende entre guillemets :
+
+```md
+![Omega Speedmaster à lunette tachymétrique verte, portée au poignet](../images/omega-speedmaster-poignet.webp "La lunette tachymétrique encadre le cadran.")
+```
+
+Elle devient une figure avec sa légende. Le texte alternatif est obligatoire : sans lui, le build s'arrête.
+
+Bonnes pratiques SEO :
+- **Nom de fichier** descriptif, en minuscules avec des tirets : `tudor-black-bay-58-poignet-17cm.webp`, pas `IMG_4521.jpg`.
+- **Texte alternatif** : décrit ce qu'on voit (marque, modèle, contexte), en une phrase, sans « image de ». Une version par langue.
+- **Légende** : apporte une information en plus (taille, poignet, détail à remarquer). Elle est très lue.
+- **Photos originales** de préférence (les tiennes, celles de la galerie avec l'accord du membre) : Google valorise les images uniques.
+
+La typographie française (espace insécable avant « ? ! : ; ») est appliquée automatiquement.
 
 ## Travailler en local
 

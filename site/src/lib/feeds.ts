@@ -1,4 +1,5 @@
 import rss from '@astrojs/rss';
+import { thumbImage } from './images';
 import { SITE, T, articlePath, getArticles, magazinePath, type Lang } from './i18n';
 
 /** Flux RSS du magazine (lu par les agrégateurs et par l'app). */
@@ -22,13 +23,13 @@ export async function rssFeed(lang: Lang) {
 /** Liste légère au format JSON, lue directement par la page Actualités de l'app (même domaine). */
 export async function jsonIndex(lang: Lang) {
   const articles = await getArticles(lang);
-  const body = articles.slice(0, 20).map((a) => ({
+  const body = await Promise.all(articles.slice(0, 20).map(async (a) => ({
     title: a.data.title,
     description: a.data.description,
     category: a.data.category,
     url: articlePath(a),
-    cover: a.data.cover ?? null,
+    cover: a.data.cover ? await thumbImage(a.data.cover) : null,
     publishedAt: a.data.publishedAt.toISOString(),
-  }));
+  })));
   return new Response(JSON.stringify(body), { headers: { 'Content-Type': 'application/json; charset=utf-8' } });
 }

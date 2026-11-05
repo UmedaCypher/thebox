@@ -6,6 +6,9 @@ translationKey: watch-size-wrist
 category: Guides
 publishedAt: 2026-11-05
 author: Arcora
+cover: ../images/tudor-prince-date-chrono-poignet.webp
+coverAlt: "Tudor Prince Date chronograph with a burgundy dial on a steel bracelet, worn on the wrist"
+coverCaption: "A 40 mm Tudor chronograph on the wrist."
 ---
 
 A watch can look stunning in photos and wrong the moment it's on your wrist. Too big and it overhangs and slides around; too small and it disappears. The good news: the right size isn't guesswork. You can measure it. Here's the method, the reference points and the traps to avoid.
@@ -47,6 +50,8 @@ Two watches with the same diameter can wear very differently. A few things matte
 - **Thickness.** Above roughly 13–14 mm, a watch catches on cuffs and looks chunky even at a sensible diameter.
 - **Case shape.** A cushion or square case takes up more room than a round case of the same diameter.
 - **Strap or bracelet.** A steel bracelet adds visual weight; a slim leather strap or a NATO lightens the whole thing.
+
+![Omega Speedmaster with a silver dial and green tachymeter bezel, worn on the wrist](../images/omega-speedmaster-lunette-tachymetre-poignet.webp "The tachymeter bezel frames the dial, so the watch looks more compact than its 42 mm.")
 
 ## Trends and personal taste
 

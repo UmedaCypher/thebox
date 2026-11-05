@@ -6,6 +6,9 @@ translationKey: watch-size-wrist
 category: Guides
 publishedAt: 2026-11-05
 author: Arcora
+cover: ../images/tudor-prince-date-chrono-poignet.webp
+coverAlt: "Chronographe Tudor Prince Date au cadran bordeaux, porté sur un bracelet acier au poignet"
+coverCaption: "Un chronographe Tudor de 40 mm porté au poignet."
 ---
 
 Une montre peut être magnifique en photo et ridicule une fois au poignet. Trop grande, elle déborde et bascule ; trop petite, elle se perd. Bonne nouvelle : la « bonne » taille ne se devine pas, elle se mesure. Voici la méthode, les repères et les pièges à éviter.
@@ -47,6 +50,8 @@ Deux montres de même diamètre peuvent paraître très différentes. Quelques f
 - **L'épaisseur.** Au-delà de 13 à 14 mm, une montre accroche les manchettes et paraît massive, même avec un diamètre raisonnable.
 - **La forme.** Un boîtier coussin ou carré occupe plus de place qu'un boîtier rond de même diamètre.
 - **Le bracelet.** Un bracelet métal ajoute du volume ; un cuir fin ou un nato allège l'ensemble.
+
+![Omega Speedmaster au cadran argenté et à la lunette tachymétrique verte, portée au poignet](../images/omega-speedmaster-lunette-tachymetre-poignet.webp "La lunette tachymétrique encadre le cadran : la montre paraît plus compacte que ses 42 mm.")
 
 ## Tendance et goût personnel
 
