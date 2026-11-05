@@ -12,6 +12,19 @@
   --brass-hover: #d4b688;
   --brass-ink: #1f0e11;
   --lume: #c9e7a7;
+  --ruby: #ee6f86;
+  --brass-fill: #c2a072;
+  --brass-fill-hover: #d4b688;
+  --fs-sm: 0.875rem; --fs-md: 1rem;
+  --sp-2: 8px; --sp-3: 12px; --sp-4: 16px; --sp-5: 24px;
+  --dur-fast: 150ms; --dur: 220ms;
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --sp-6: 32px;
+  --glass-bg: rgba(42, 20, 24, 0.52);
+  --glass-border: rgba(239, 232, 220, 0.14);
+  --glass-hi: rgba(255, 245, 230, 0.10);
+  --glass-blur: 18px;
+  --glass-shadow: 0 1px 0 0 var(--glass-hi) inset, 0 18px 40px -22px rgba(0, 0, 0, 0.75);
   --font-display: 'Bodoni Moda Variable', 'Bodoni 72', 'Didot', Georgia, serif;
   --font-body: 'Hanken Grotesk Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --page-max: 1120px;
@@ -51,16 +64,50 @@ a:hover { color: var(--brass-hover); }
 .skip:focus { left: 8px; }
 
 /* En-tête */
-.top { position: sticky; top: 0; z-index: 5; background: rgba(31, 14, 17, 0.78); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border-bottom: 1px solid var(--line); }
+.top { position: sticky; top: 0; z-index: 5; background: rgba(31, 14, 17, 0.9); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border-bottom: 1px solid var(--line); }
 .top-row { display: flex; align-items: center; justify-content: space-between; height: 60px; gap: 16px; }
 .logo { font-family: var(--font-display); font-size: 1.5rem; font-weight: 500; letter-spacing: 0.02em; color: var(--text); text-decoration: none; margin: 0; }
 .top-nav { display: flex; align-items: center; gap: 20px; }
 .top-nav a:not(.btn) { color: var(--text-2); text-decoration: none; font-size: 0.95rem; }
 .top-nav a[aria-current='page'] { color: var(--text); }
 
-.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: var(--brass); color: var(--brass-ink); font-weight: 600; text-decoration: none; border-radius: var(--r-pill); padding: 12px 22px; transition: background 150ms; }
-.btn:hover { background: var(--brass-hover); color: var(--brass-ink); }
-.btn-small { padding: 8px 16px; font-size: 0.9rem; }
+/* Boutons : copie exacte de l'app (src/components/ui/ui.module.css), verre liquide dont le reflet suit le pointeur */
+.btn {
+  position: relative; isolation: isolate;
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--sp-2);
+  min-height: 44px; padding: 0 var(--sp-5);
+  border-radius: var(--r-pill); border: 1px solid transparent;
+  font-family: var(--font-body); font-size: var(--fs-md); font-weight: 600; letter-spacing: 0.005em; line-height: 1;
+  text-decoration: none; white-space: nowrap; cursor: pointer;
+  transition: background-color var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease),
+    box-shadow var(--dur) var(--ease), transform 420ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.btn:active { transform: scale(0.96); transition-duration: 90ms; }
+.btn::before {
+  content: ''; position: absolute; inset: -1px; z-index: -1; border-radius: inherit; padding: 1px; pointer-events: none;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.75) 0%, rgba(255, 255, 255, 0.08) 38%, rgba(0, 0, 0, 0.15) 62%, rgba(255, 255, 255, 0.4) 100%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); mask-composite: exclude;
+}
+.btn::after {
+  content: ''; position: absolute; inset: 0; z-index: -1; border-radius: inherit; pointer-events: none;
+  background:
+    radial-gradient(90px circle at var(--mx, 50%) var(--my, -20%), rgba(255, 255, 255, 0.5), transparent 70%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0) 48%);
+  mix-blend-mode: soft-light; opacity: 0.7; transition: opacity var(--dur) var(--ease);
+}
+@media (hover: hover) { .btn:hover::after { opacity: 1; } }
+/* Principal : laiton */
+.btn {
+  background: var(--brass-fill); color: var(--brass-ink);
+  box-shadow: inset 0 -6px 12px -6px rgba(0, 0, 0, 0.25), 0 6px 18px -10px color-mix(in srgb, var(--brass-fill) 80%, transparent);
+}
+.btn:hover {
+  background: var(--brass-fill-hover); color: var(--brass-ink);
+  box-shadow: inset 0 -6px 12px -6px rgba(0, 0, 0, 0.2), 0 14px 32px -12px color-mix(in srgb, var(--brass-fill) 95%, transparent);
+}
+.btn-small { min-height: 40px; padding: 0 var(--sp-4); font-size: var(--fs-sm); }
+@media (prefers-reduced-motion: reduce) { .btn { transition-property: background-color, border-color, color, box-shadow; } }
 
 /* Titres */
 h1, h2, h3 { font-family: var(--font-display); font-weight: 500; line-height: 1.15; letter-spacing: -0.005em; text-wrap: balance; }
@@ -100,9 +147,25 @@ h1, h2, h3 { font-family: var(--font-display); font-weight: 500; line-height: 1.
 .prose th { color: var(--brass); font-weight: 600; font-size: 0.85rem; letter-spacing: 0.04em; }
 .prose hr { border: 0; border-top: 1px solid var(--line); margin: 2.5em 0; }
 
-.cta { margin: 48px auto 0; max-width: calc(var(--read-max) - 2 * var(--gutter)); background: linear-gradient(135deg, #3a1c21, #2a1418); border: 1px solid rgba(194, 160, 114, 0.38); border-radius: var(--r-xl); padding: 28px; }
-.cta h2 { font-size: 1.6rem; margin: 0 0 8px; }
-.cta p { margin: 0 0 20px; color: var(--text-2); }
+/* Encadré d'appel à l'action : même panneau en verre que l'app (.panel[data-tone='brass'], src/index.css) */
+.cta {
+  --tone: var(--brass); --tone-2: var(--ruby); --halo-x: 100%;
+  position: relative; isolation: isolate; overflow: hidden;
+  display: flex; flex-direction: column; gap: var(--sp-4);
+  margin: 48px auto 0; max-width: calc(var(--read-max) - 2 * var(--gutter));
+  padding: var(--sp-5); border-radius: var(--r-xl);
+  background:
+    radial-gradient(85% 100% at var(--halo-x, 0%) 0%, color-mix(in srgb, var(--tone) 24%, transparent), transparent 72%),
+    radial-gradient(60% 80% at 100% 100%, color-mix(in srgb, var(--tone-2) 14%, transparent), transparent 70%),
+    var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.4); backdrop-filter: blur(var(--glass-blur)) saturate(1.4);
+}
+@media (min-width: 640px) { .cta { padding: var(--sp-6); } }
+.cta h2 { font-size: 1.6rem; margin: 0; }
+.cta p { margin: 0; color: var(--text-2); }
+.cta > a:last-child { align-self: flex-start; }
 .related { max-width: var(--read-max); margin: 56px auto 72px; padding: 0 var(--gutter); }
 .related h2 { font-size: 1.4rem; margin: 0 0 16px; }
 .related .cards { padding-block: 0; grid-template-columns: 1fr; }
