@@ -1,0 +1,116 @@
+---
+import { typo } from '../lib/typo';
+import { render } from 'astro:content';
+import { Picture } from 'astro:assets';
+import { shareImage } from '../lib/images';
+import Base from '../layouts/Base.astro';
+import ArticleCard from './ArticleCard.astro';
+import {
+  SITE, T, articlePath, formatDate, getArticles, getTranslations, magazinePath, readingMinutes, type Article,
+} from '../lib/i18n';
+
+interface Props { article: Article }
+const { article } = Astro.props;
+const { data } = article;
+const lang = data.lang;
+const t = T[lang];
+const { Content } = await render(article);
+
+const path = articlePath(article);
+const translations = await getTranslations(article);
+const alternates = translations.map((a) => ({ lang: a.data.lang, path: articlePath(a) }));
+
+// Trois articles de la même langue, la même rubrique d'abord.
+const others = (await getArticles(lang)).filter((a) => a.id !== article.id);
+const related = [
+  ...others.filter((a) => a.data.category === data.category),
+  ...others.filter((a) => a.data.category !== data.category),
+].slice(0, 3);
+
+const ogImage = data.cover ? await shareImage(data.cover) : undefined;
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: data.title,
+    description: data.description,
+    inLanguage: lang,
+    datePublished: data.publishedAt.toISOString(),
+    dateModified: (data.updatedAt ?? data.publishedAt).toISOString(),
+    author: { '@type': data.author === 'Arcora' ? 'Organization' : 'Person', name: data.author },
+    publisher: { '@type': 'Organization', name: 'Arcora', url: SITE, logo: { '@type': 'ImageObject', url: SITE + '/icons/icon-512x512.png' } },
+    mainEntityOfPage: SITE + path,
+    ...(ogImage ? { image: [new URL(ogImage, SITE).href] } : {}),
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Arcora', item: SITE + '/' },
+      { '@type': 'ListItem', position: 2, name: t.magazine, item: SITE + magazinePath(lang) },
+      { '@type': 'ListItem', position: 3, name: data.title, item: SITE + path },
+    ],
+  },
+];
+---
+<Base
+  lang={lang}
+  title={`${data.title} | Arcora`}
+  description={data.description}
+  path={path}
+  alternates={alternates}
+  type="article"
+  image={ogImage}
+  imageAlt={data.coverAlt}
+  jsonLd={jsonLd}
+>
+  <article class="article">
+    <nav class="crumbs" aria-label="Fil d'Ariane">
+      <a href="/">Arcora</a> › <a href={magazinePath(lang)}>{t.magazine}</a> › {data.category}
+    </nav>
+    <h1>{typo(data.title, lang)}</h1>
+    <p class="lede">{typo(data.description, lang)}</p>
+    <p class="byline">
+      <span>{t.by} {data.author}</span>
+      <time datetime={data.publishedAt.toISOString()}>{formatDate(data.publishedAt, lang)}</time>
+      {data.updatedAt && <span>{t.updated} <time datetime={data.updatedAt.toISOString()}>{formatDate(data.updatedAt, lang)}</time></span>}
+      <span>{t.readingTime(readingMinutes(article.body))}</span>
+    </p>
+    {data.cover && (
+      <figure class="cover">
+        <Picture
+          src={data.cover}
+          alt={data.coverAlt ?? ''}
+          formats={['avif', 'webp']}
+          fallbackFormat="jpg"
+          widths={[400, 680, 1000, 1360].filter((w) => w <= data.cover!.width)}
+          sizes="(max-width: 712px) 100vw, 680px"
+          loading="eager"
+          fetchpriority="high"
+        />
+        {data.coverCaption && <figcaption>{typo(data.coverCaption, lang)}</figcaption>}
+      </figure>
+    )}
+    <div class="prose">
+      <Content />
+    </div>
+  </article>
+
+  <aside class="wrap">
+    <div class="cta">
+      <h2>{t.ctaTitle}</h2>
+      <p>{t.ctaText}</p>
+      <a class="btn" data-liquid href={`/signup?src=magazine-${lang}`}>{t.ctaButton}</a>
+    </div>
+  </aside>
+
+  {related.length > 0 && (
+    <section class="related">
+      <h2>{t.related}</h2>
+      <div class="cards">
+        {related.map((a) => <ArticleCard article={a} headingLevel="h3" />)}
+      </div>
+    </section>
+  )}
+</Base>

@@ -1,0 +1,120 @@
+---
+import '@fontsource-variable/bodoni-moda';
+import '@fontsource-variable/hanken-grotesk';
+import '../styles/global.css';
+import AppHeader from '../components/AppHeader.astro';
+import { SITE, T, magazinePath, type Lang } from '../lib/i18n';
+
+interface Alternate { lang: Lang; path: string }
+interface Props {
+  lang: Lang;
+  title: string;
+  description: string;
+  path: string;                 // adresse canonique de la page, ex. /magazine/taille-montre-poignet/
+  alternates?: Alternate[];     // versions dans chaque langue (la page elle-même incluse)
+  type?: 'website' | 'article';
+  image?: string;               // image de partage déjà générée (1200×630)
+  imageAlt?: string;
+  jsonLd?: Record<string, unknown>[];
+}
+
+const { lang, title, description, path, alternates = [], type = 'website', image, imageAlt, jsonLd = [] } = Astro.props;
+const t = T[lang];
+const canonical = SITE + path;
+const ogImage = new URL(image ?? '/icons/icon-1024x1024.png', SITE).href;
+const frAlt = alternates.find((a) => a.lang === 'fr');
+const other = alternates.find((a) => a.lang !== lang);
+---
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {alternates.map((a) => <link rel="alternate" hreflang={a.lang} href={SITE + a.path} />)}
+    {frAlt && <link rel="alternate" hreflang="x-default" href={SITE + frAlt.path} />}
+    <link rel="alternate" type="application/rss+xml" title={`Arcora — ${t.magazine}`} href={SITE + magazinePath(lang) + 'rss.xml'} />
+
+    <meta property="og:type" content={type} />
+    <meta property="og:site_name" content="Arcora" />
+    <meta property="og:locale" content={t.locale.replace('-', '_')} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    {image && <meta property="og:image:width" content="1200" />}
+    {image && <meta property="og:image:height" content="630" />}
+    {imageAlt && <meta property="og:image:alt" content={imageAlt} />}
+    <meta name="twitter:card" content={image ? 'summary_large_image' : 'summary'} />
+    {type === 'article' && <meta name="robots" content="max-image-preview:large" />}
+
+    <meta name="theme-color" content="#1f0e11" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192x192.png" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+    {jsonLd.map((d) => <script type="application/ld+json" set:html={JSON.stringify(d)} />)}
+    <script is:inline>
+      // Membre connecté dans ce navigateur (session Supabase de l'app, même domaine) : en-tête « membre », comme dans l'app.
+      try {
+        var raw = localStorage.getItem('sb-gwotvurtiyeaslmxnqcw-auth-token');
+        var sess = raw && JSON.parse(raw);
+        if (sess && sess.user) {
+          document.documentElement.dataset.member = 'true';
+          window.__arcoraInitial = (sess.user.email || '?').charAt(0).toUpperCase();
+        }
+      } catch (e) { /* stockage indisponible : en-tête visiteur */ }
+    </script>
+  </head>
+  <body>
+    <a class="skip" href="#contenu">{lang === 'fr' ? 'Aller au contenu' : 'Skip to content'}</a>
+    <AppHeader lang={lang} />
+
+    <main id="contenu">
+      <slot />
+    </main>
+
+    <footer class="foot">
+      <div class="wrap foot-grid">
+        <div>
+          <p class="logo">Arcora</p>
+          <p class="muted">{lang === 'fr' ? "L'écrin numérique de votre collection de montres." : 'The digital home of your watch collection.'}</p>
+        </div>
+        <nav aria-label={t.footerApp}>
+          <p class="foot-title">{t.footerApp}</p>
+          <a href="/galerie">{t.gallery}</a>
+          <a href="/marche">{t.market}</a>
+          <a href="/premium">{t.premium}</a>
+          <a href="/faq">{t.faq}</a>
+        </nav>
+        <nav aria-label={t.magazine}>
+          <p class="foot-title">{t.magazine}</p>
+          <a href={magazinePath(lang)}>{t.allArticles}</a>
+          <a href={other ? other.path : magazinePath(lang === 'fr' ? 'en' : 'fr')} hreflang={lang === 'fr' ? 'en' : 'fr'}>{t.otherLang}</a>
+          <a href={magazinePath(lang) + 'rss.xml'}>RSS</a>
+        </nav>
+        <nav aria-label={t.legal}>
+          <p class="foot-title">Arcora</p>
+          <a href="/mentions-legales">{t.legal}</a>
+          <a href="/confidentialite">{t.privacy}</a>
+        </nav>
+      </div>
+      <p class="wrap muted small">© {new Date().getFullYear()} Arcora</p>
+    </footer>
+    <script is:inline>
+      document.querySelectorAll('[data-avatar]').forEach(function (a) { a.textContent = window.__arcoraInitial || '·'; });
+    </script>
+    <script>
+      // Reflet des boutons en verre liquide : il suit le pointeur (même effet que dans l'app).
+      const move = (e: PointerEvent) => {
+        const el = (e.target as Element | null)?.closest?.('[data-liquid]') as HTMLElement | null;
+        if (!el) return;
+        const r = el.getBoundingClientRect();
+        el.style.setProperty('--mx', `${e.clientX - r.left}px`);
+        el.style.setProperty('--my', `${e.clientY - r.top}px`);
+      };
+      document.addEventListener('pointermove', move, { passive: true });
+      document.addEventListener('pointerdown', move, { passive: true });
+    </script>
+  </body>
+</html>

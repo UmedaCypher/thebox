@@ -1,0 +1,105 @@
+---
+/**
+ * En-tête identique à celui de l'app (src/components/Layout/Layout.tsx + GlobalSearch).
+ * Le magazine est une rubrique comme les autres : le visiteur ne sent pas qu'il change de site.
+ * Deux versions sont rendues : visiteur (vue par Google) et membre (affichée si une session Supabase existe
+ * dans ce navigateur ; voir le script dans Base.astro).
+ */
+import * as Icons from 'lucide-static';
+import type { Lang } from '../lib/i18n';
+import { magazinePath } from '../lib/i18n';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+
+const L = {
+  fr: {
+    mainNav: 'Navigation principale', login: 'Se connecter', signup: 'Créer un compte', myProfile: 'Mon profil',
+    search: 'Rechercher sur le Marché', placeholder: 'Rechercher une marque, un modèle, une référence',
+    home: 'Accueil', collection: 'Collection', wear: 'Portage', gallery: 'Galerie', market: 'Marché',
+    questions: 'Questions', news: 'Actualités', magazine: 'Magazine', messages: 'Messages',
+  },
+  en: {
+    mainNav: 'Main navigation', login: 'Log in', signup: 'Create an account', myProfile: 'My profile',
+    search: 'Search the Market', placeholder: 'Search a brand, a model, a reference',
+    home: 'Home', collection: 'Collection', wear: 'Wear', gallery: 'Gallery', market: 'Market',
+    questions: 'FAQ', news: 'News', magazine: 'Magazine', messages: 'Messages',
+  },
+}[lang];
+
+/** Icône Lucide aux mêmes réglages que l'app (taille 18, trait 1,7). */
+const icon = (svg: string, size = 18, stroke = 1.7) =>
+  svg
+    .replace(/width="24"/, `width="${size}"`)
+    .replace(/height="24"/, `height="${size}"`)
+    .replace(/stroke-width="2"/, `stroke-width="${stroke}"`)
+    .replace('<svg', '<svg aria-hidden="true"');
+
+const memberTabs = [
+  { href: '/accueil', label: L.home, svg: Icons.LayoutGrid },
+  { href: '/collection', label: L.collection, svg: Icons.Watch },
+  { href: '/portage', label: L.wear, svg: Icons.CalendarDays },
+  { href: '/galerie', label: L.gallery, svg: Icons.Images },
+  { href: '/marche', label: L.market, svg: Icons.Store },
+];
+const mag = magazinePath(lang);
+---
+<header class="hdr">
+  <div class="hdr-inner">
+    <a href="/" class="wordmark only-visitor">Arcora</a>
+    <a href="/accueil" class="wordmark only-member">Arcora</a>
+
+    <form class="search-slot" action="/marche" method="get" role="search">
+      <label class="search-field">
+        <Fragment set:html={icon(Icons.Search)} />
+        <span class="visually-hidden">{L.search}</span>
+        <input type="search" name="q" placeholder={L.placeholder} autocomplete="off" spellcheck="false" />
+        <kbd class="kbd" aria-hidden="true">/</kbd>
+      </label>
+    </form>
+
+    <div class="hdr-end">
+      <span class="only-visitor hdr-end">
+        <a href="/login" class="text-link">{L.login}</a>
+        <a href={`/signup?src=magazine-${lang}`} class="btn btn-small desktop-only" data-liquid>{L.signup}</a>
+      </span>
+      <span class="only-member hdr-end">
+        <a href="/messages" class="icon-link desktop-only" aria-label={L.messages} title={L.messages}>
+          <Fragment set:html={icon(Icons.MessageCircle, 22)} />
+        </a>
+        <a href="/profil" class="avatar" aria-label={L.myProfile} data-avatar>·</a>
+      </span>
+    </div>
+  </div>
+
+  <nav class="subnav" aria-label={L.mainNav}>
+    <div class="subnav-inner">
+      <div class="subnav-main">
+        <span class="only-visitor subnav-main">
+          <a href="/marche" class="sub-link"><Fragment set:html={icon(Icons.Store)} />{L.market}</a>
+          <a href="/galerie" class="sub-link"><Fragment set:html={icon(Icons.Images)} />{L.gallery}</a>
+          <a href="/faq" class="sub-link">{L.questions}</a>
+        </span>
+        <span class="only-member subnav-main">
+          {memberTabs.map((t) => <a href={t.href} class="sub-link"><Fragment set:html={icon(t.svg)} />{t.label}</a>)}
+        </span>
+      </div>
+      <div class="subnav-aside">
+        <a href={mag} class="sub-link" aria-current="page"><Fragment set:html={icon(Icons.BookOpen)} />{L.magazine}</a>
+        <a href="/actualites" class="sub-link"><Fragment set:html={icon(Icons.Newspaper)} />{L.news}</a>
+        <a href="/premium" class="sub-link premium-link"><Fragment set:html={icon(Icons.Sparkles, 16, 1.8)} />Premium</a>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<script>
+  // Raccourci « / » pour la recherche, comme dans l'app.
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== '/' || e.metaKey || e.ctrlKey) return;
+    const el = document.activeElement;
+    if (el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || (el as HTMLElement).isContentEditable)) return;
+    const input = document.querySelector<HTMLInputElement>('.search-field input');
+    if (input) { e.preventDefault(); input.focus(); }
+  });
+</script>

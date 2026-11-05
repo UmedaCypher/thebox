@@ -1,13 +1,13 @@
 import { scrollToElement, scrollToTop, useMotion } from '../../lib/motion';
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
-import { CalendarDays, Images, MessageCircle, Newspaper, Sparkles, Store, Watch, LayoutGrid } from 'lucide-react';
+import { BookOpen, CalendarDays, Images, MessageCircle, Newspaper, Sparkles, Store, Watch, LayoutGrid } from 'lucide-react';
 import { useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { LinkButton } from '../ui';
 import GlobalSearch from '../Search/GlobalSearch';
 import { LAUNCH_MODE } from '../../lib/features';
 import { useUnreadCount } from '../../hooks/useUnreadCount';
-import { defineStrings, useStrings } from '../../i18n';
+import { defineStrings, useLang, useStrings } from '../../i18n';
 import type { LangChoice } from '../../i18n';
 import { COMMON } from '../../i18n/common';
 import { useLanguageSetting } from '../../i18n/useLanguageSetting';
@@ -47,6 +47,7 @@ const badgeText = (n: number) => (n > 99 ? '99+' : String(n));
 
 function Header({ unread }: { unread: number }) {
   const { user, profile, isPremium } = useAuth();
+  const { lang } = useLang();
   const initial = (profile?.username || user?.email || '?').charAt(0).toUpperCase();
   const t = useStrings(S);
   const c = useStrings(COMMON);
@@ -98,6 +99,8 @@ function Header({ unread }: { unread: number }) {
                 </>}
           </div>
           <div className={s.subnavAside}>
+            {/* Le magazine est un site statique servi à part : lien classique, pas de navigation interne. */}
+            <a href={lang === 'fr' ? '/magazine/' : '/en/magazine/'} className={s.subLink}><BookOpen size={18} strokeWidth={1.7} aria-hidden="true" />Magazine</a>
             <NavLink to="/actualites" className={s.subLink}><Newspaper size={18} strokeWidth={1.7} aria-hidden="true" />{t.news}</NavLink>
             {!isPremium && (
               <NavLink to="/premium" className={`${s.subLink} ${s.premiumLink}`}><Sparkles size={16} strokeWidth={1.8} aria-hidden="true" />Premium</NavLink>
@@ -144,6 +147,7 @@ function LanguageSwitch() {
 
 function Footer({ loggedIn }: { loggedIn: boolean }) {
   const t = useStrings(S);
+  const { lang } = useLang();
   return (
     <footer className={s.footer} data-member={loggedIn}>
       <div className={s.footerInner}>
@@ -151,6 +155,8 @@ function Footer({ loggedIn }: { loggedIn: boolean }) {
           <Link to="/a-propos">{t.about}</Link>
           <Link to="/faq">{t.faq}</Link>
           <Link to="/actualites">{t.news}</Link>
+          {/* Le magazine est un site statique à part (dossier site/) : lien classique, pas de navigation interne. */}
+          <a href={lang === 'fr' ? '/magazine/' : '/en/magazine/'}>Magazine</a>
           <Link to="/presse">{t.press}</Link>
           <Link to="/contact">{t.contact}</Link>
           <Link to="/affiliation">{t.affiliate}</Link>

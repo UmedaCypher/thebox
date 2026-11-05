@@ -1,0 +1,12 @@
+User-agent: *
+Disallow: /admin
+Disallow: /accueil
+Disallow: /montre/
+Disallow: /collection
+Disallow: /profil$
+Disallow: /messages
+Disallow: /export/
+# Page Actualités de l'app : elle reprend les titres d'autres sites, on ne la propose pas à Google.
+Disallow: /actualites
+
+Sitemap: https://arcorawatch.com/sitemap-index.xml

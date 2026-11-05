@@ -43,6 +43,9 @@ export default defineConfig({
       workbox: {
         // Réception des notifications push et ouverture de la bonne page au toucher (public/push-sw.js)
         importScripts: ['push-sw.js'],
+        // Le magazine (/magazine, /en/magazine) et les fichiers du référencement sont des pages statiques
+        // servies à part : l'app installée ne doit pas les remplacer par son index.html.
+        navigateFallbackDenylist: [/^\/magazine/, /^\/en\//, /^\/sitemap/, /^\/robots\.txt$/],
         globPatterns: ['**/*.{js,css,html,ico,png,svg,webmanifest}'],
         runtimeCaching: [
           {

@@ -1,0 +1,30 @@
+---
+import { typo } from '../lib/typo';
+import { Image } from 'astro:assets';
+import { T, articlePath, formatDate, readingMinutes, type Article } from '../lib/i18n';
+
+interface Props { article: Article; featured?: boolean; headingLevel?: 'h2' | 'h3' }
+const { article, featured = false, headingLevel = 'h2' } = Astro.props;
+const { lang } = article.data;
+const Heading = headingLevel;
+---
+<a href={articlePath(article)} class:list={['card', { featured, 'has-cover': !!article.data.cover }]}>
+  {article.data.cover && (
+    <Image
+      src={article.data.cover}
+      alt=""
+      width={featured ? 960 : 640}
+      height={featured ? 600 : 400}
+      fit="cover"
+      layout="constrained"
+      sizes={featured ? '(max-width: 720px) 100vw, 560px' : '(max-width: 720px) 100vw, 360px'}
+      class="card-img"
+    />
+  )}
+  <span class="eyebrow">{article.data.category}</span>
+  <Heading>{typo(article.data.title, lang)}</Heading>
+  <p>{typo(article.data.description, lang)}</p>
+  <span class="meta">
+    <time datetime={article.data.publishedAt.toISOString()}>{formatDate(article.data.publishedAt, lang)}</time>{' · '}{T[lang].readingTime(readingMinutes(article.body))}
+  </span>
+</a>
