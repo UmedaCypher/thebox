@@ -2,6 +2,7 @@
 import '@fontsource-variable/bodoni-moda';
 import '@fontsource-variable/hanken-grotesk';
 import '../styles/global.css';
+import AppHeader from '../components/AppHeader.astro';
 import { SITE, T, magazinePath, type Lang } from '../lib/i18n';
 
 interface Alternate { lang: Lang; path: string }
@@ -53,18 +54,21 @@ const other = alternates.find((a) => a.lang !== lang);
     <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192x192.png" />
     <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
     {jsonLd.map((d) => <script type="application/ld+json" set:html={JSON.stringify(d)} />)}
+    <script is:inline>
+      // Membre connecté dans ce navigateur (session Supabase de l'app, même domaine) : en-tête « membre », comme dans l'app.
+      try {
+        var raw = localStorage.getItem('sb-gwotvurtiyeaslmxnqcw-auth-token');
+        var sess = raw && JSON.parse(raw);
+        if (sess && sess.user) {
+          document.documentElement.dataset.member = 'true';
+          window.__arcoraInitial = (sess.user.email || '?').charAt(0).toUpperCase();
+        }
+      } catch (e) { /* stockage indisponible : en-tête visiteur */ }
+    </script>
   </head>
   <body>
     <a class="skip" href="#contenu">{lang === 'fr' ? 'Aller au contenu' : 'Skip to content'}</a>
-    <header class="top">
-      <div class="wrap top-row">
-        <a href="/" class="logo" aria-label="Arcora">Arcora</a>
-        <nav class="top-nav" aria-label={t.magazine}>
-          <a href={magazinePath(lang)} aria-current={path.startsWith(magazinePath(lang)) ? 'page' : undefined}>{t.magazine}</a>
-          <a href="/?src=magazine" class="btn btn-small" data-liquid>{t.openApp}</a>
-        </nav>
-      </div>
-    </header>
+    <AppHeader lang={lang} />
 
     <main id="contenu">
       <slot />
@@ -97,6 +101,9 @@ const other = alternates.find((a) => a.lang !== lang);
       </div>
       <p class="wrap muted small">© {new Date().getFullYear()} Arcora</p>
     </footer>
+    <script is:inline>
+      document.querySelectorAll('[data-avatar]').forEach(function (a) { a.textContent = window.__arcoraInitial || '·'; });
+    </script>
     <script>
       // Reflet des boutons en verre liquide : il suit le pointeur (même effet que dans l'app).
       const move = (e: PointerEvent) => {
