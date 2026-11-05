@@ -337,11 +337,11 @@ function Specs({ rows }: { rows: [string, ReactNode][] }) {
   );
 }
 
-function passportRows(t: T, w: Pick<Watch, 'movement' | 'case_diameter_mm' | 'lug_to_lug_mm' | 'lug_width_mm' | 'case_material' | 'dial_color' | 'bracelet_material' | 'bracelet_type' | 'condition' | 'box_papers_status' | 'reference_number' | 'year_of_production'>): [string, ReactNode][] {
+function passportRows(t: T, w: Pick<Watch, 'movement' | 'caliber' | 'case_diameter_mm' | 'lug_to_lug_mm' | 'lug_width_mm' | 'case_material' | 'dial_color' | 'bracelet_material' | 'bracelet_type' | 'condition' | 'box_papers_status' | 'reference_number' | 'year_of_production'>): [string, ReactNode][] {
   return [
     [t.specs.reference, w.reference_number],
     [t.specs.year, w.year_of_production],
-    [t.specs.movement, movementLabel(t, w.movement)],
+    [t.specs.movement, [movementLabel(t, w.movement), w.caliber].filter(Boolean).join(' · ') || null],
     [t.specs.diameter, formatMm(w.case_diameter_mm)],
     [t.specs.lugToLug, formatMm(w.lug_to_lug_mm)],
     [t.specs.lugWidth, formatMm(w.lug_width_mm)],

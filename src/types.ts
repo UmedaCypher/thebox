@@ -41,6 +41,8 @@ export interface Watch {
   model: string;
   reference_number: string | null;
   movement: string | null;
+  /** Calibre du mouvement (ex. NH35) */
+  caliber: string | null;
   year_of_production: number | null;
   case_diameter_mm: number | null;
   lug_to_lug_mm: number | null;
@@ -116,6 +118,7 @@ export interface Passport {
   reference_number: string | null;
   year_of_production: number | null;
   movement: string | null;
+  caliber?: string | null;
   case_diameter_mm: number | null;
   lug_to_lug_mm: number | null;
   lug_width_mm: number | null;

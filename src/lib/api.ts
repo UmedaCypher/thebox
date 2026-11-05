@@ -245,6 +245,13 @@ export async function setMainPhoto(userId: string, watchId: string, photoId: str
   fail(error, 'Mise à jour impossible.');
 }
 
+/** Calibres déjà saisis par plusieurs membres (suggestions du champ Calibre). */
+export async function fetchCaliberSuggestions(): Promise<string[]> {
+  const { data, error } = await supabase.rpc('get_caliber_suggestions');
+  if (error) return [];
+  return ((data ?? []) as { caliber: string }[]).map(r => r.caliber);
+}
+
 export interface ReferenceOptions { brands: string[]; conditions: string[]; boxPapers: string[]; materials: string[]; dialColors: string[] }
 
 export async function fetchReferenceOptions(): Promise<ReferenceOptions> {
