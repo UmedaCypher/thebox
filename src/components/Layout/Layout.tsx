@@ -17,7 +17,7 @@ const S = defineStrings({
   mainNav: 'Navigation principale', tabsNav: 'Onglets', questions: 'Questions', myProfile: 'Mon profil',
   login: 'Se connecter', joinList: 'Rejoindre la liste', signup: 'Créer un compte', skip: 'Aller au contenu',
   info: 'Informations', legal: 'Légal', about: 'À propos', faq: 'Questions fréquentes', news: 'Actualités', press: 'Presse',
-  contact: 'Contact', affiliate: 'Parrainage', cgu: 'CGU', cgv: 'CGV', privacy: 'Confidentialité', mentions: 'Mentions légales', language: 'Langue',
+  contact: 'Contact', affiliate: 'Parrainage', cgu: 'Conditions d’utilisation', cgv: 'CGV', privacy: 'Confidentialité', mentions: 'Mentions légales', language: 'Langue',
 }, {
   mainNav: 'Main navigation', tabsNav: 'Tabs', questions: 'FAQ', myProfile: 'My profile',
   login: 'Log in', joinList: 'Join the waitlist', signup: 'Create an account', skip: 'Skip to content',

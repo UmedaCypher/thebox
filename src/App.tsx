@@ -103,6 +103,7 @@ export default function App() {
             <Route path="/contact" element={<ContactPage />} />
             <Route path="/presse" element={<PressPage />} />
             <Route path="/cgu" element={<CguPage />} />
+            <Route path="/conditions-utilisation" element={<Navigate to="/cgu" replace />} />
             <Route path="/cgv" element={<CgvPage />} />
             <Route path="/confidentialite" element={<PrivacyPolicyPage />} />
             <Route path="/mentions-legales" element={<LegalMentionsPage />} />

@@ -73,7 +73,7 @@ export default function PrivacyPolicyPage() {
           <tr><td>Supabase</td><td>Base de données, comptes, stockage des photos</td><td>Région <Fill v={L.dataRegion} label="région Supabase" /></td></tr>
           <tr><td>Cloudflare</td><td>Hébergement et diffusion du site</td><td>Réseau mondial, société aux États-Unis</td></tr>
           <tr><td>Stripe</td><td>Paiement de l'abonnement Premium</td><td>Irlande et États-Unis</td></tr>
-          <tr><td><Fill v={L.emailProvider} label="prestataire d'e-mails" /></td><td>Envoi des e-mails du Service (confirmation, mot de passe)</td><td>À préciser</td></tr>
+          <tr><td><Fill v={L.emailProvider} label="prestataire d'e-mails" /></td><td>Envoi des e-mails du Service (confirmation, mot de passe)</td><td>Union européenne (France)</td></tr>
           <tr><td>Google, Apple, Mozilla</td><td>Acheminement des notifications push vers votre appareil (contenu chiffré)</td><td>Selon votre navigateur ou téléphone</td></tr>
         </tbody>
       </table>

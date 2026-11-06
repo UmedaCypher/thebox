@@ -8,12 +8,12 @@ import { defineStrings, useStrings } from '../i18n';
 const S = defineStrings({
   kicker: 'Informations légales',
   title: "Conditions générales d'utilisation",
-  lead: `Mises à jour le ${LEGAL.updatedAt}.`,
+  lead: `Mises à jour le ${LEGAL.cguUpdatedAt}.`,
   notice: '',
 }, {
   kicker: 'Legal',
   title: 'Terms of use',
-  lead: `Last updated ${LEGAL.updatedAt}.`,
+  lead: `Last updated ${LEGAL.cguUpdatedAt}.`,
   notice: 'This document is available in French only.',
 });
 
@@ -24,20 +24,27 @@ export default function CguPage() {
     <InfoPage kicker={t.kicker} title={t.title} notice={t.notice || undefined} lead={t.lead} toc>
       <h2>Article 1 : Objet</h2>
       <p>
-        Les présentes conditions encadrent l'utilisation du site et des applications {L.appName} (« le Service »), édités par
-        {' '}<Fill v={L.companyName} label="dénomination sociale" /> (« nous »). Créer un compte vaut acceptation de ces conditions.
-        L'abonnement payant Premium est régi en plus par les <Link to="/cgv">conditions générales de vente</Link>.
+        Les présentes conditions encadrent l'utilisation du site {L.siteUrl.replace('https://', '')} et de l'application Android {L.appName}
+        (ensemble, « le Service »), édités par <Fill v={L.companyName} label="dénomination sociale" /> (« nous »).
+        Créer un compte vaut acceptation de ces conditions. L'abonnement payant Premium est régi en plus par les
+        {' '}<Link to="/cgv">conditions générales de vente</Link>, et le programme de parrainage par ses <Link to="/affiliation/conditions">conditions de parrainage</Link>.
       </p>
 
       <h2>Article 2 : Le Service</h2>
       <p>{L.appName} permet aux collectionneurs de montres de :</p>
       <ul>
         <li>tenir le registre de leur collection (gratuit jusqu'à {FREE_WATCH_LIMIT} montres) ;</li>
-        <li>noter les montres portées chaque jour et consulter leurs statistiques ;</li>
-        <li>partager une galerie de photos au poignet et un passeport public pour chaque montre, s'ils le souhaitent ;</li>
+        <li>noter chaque jour la montre portée (le « Wrist Check »), suivre leur série de portage, leurs badges et leurs statistiques ;</li>
+        <li>partager des photos au poignet dans la Galerie, où les membres peuvent les aimer et dire si la montre va bien au poignet (« Au poignet ? ») ;</li>
+        <li>partager un passeport public pour chaque montre, s'ils le souhaitent ;</li>
         <li>publier des annonces de vente ou d'échange sur le Marché et échanger avec les autres membres par messagerie ;</li>
-        <li>recevoir des notifications, s'ils les activent.</li>
+        <li>recevoir des notifications, s'ils les activent ;</li>
+        <li>parrainer d'autres collectionneurs.</li>
       </ul>
+      <p>
+        L'application Android, distribuée sur Google Play, affiche le même Service que le site, avec le même compte.
+        Elle ne permet aucun achat : l'abonnement Premium se souscrit uniquement sur le site.
+      </p>
       <p>Nous pouvons faire évoluer, suspendre ou arrêter une fonction ; nous prévenons les membres concernés à l'avance quand c'est possible.</p>
 
       <h2>Article 3 : Compte</h2>
@@ -63,14 +70,22 @@ export default function CguPage() {
       <p>Sont interdits sur le Marché : les contrefaçons et répliques, les montres volées ou d'origine douteuse, les annonces sans montre réelle, les demandes de paiement hors de toute rencontre ou garantie raisonnable, et toute tentative d'escroquerie.</p>
       <p>Nous vous recommandons de demander des photos récentes, de vérifier la référence et les papiers, et de privilégier une remise en main propre dans un lieu sûr ou chez un horloger.</p>
 
-      <h2>Article 5 : Messagerie</h2>
+      <h2>Article 5 : Galerie, votes et classement</h2>
+      <ul>
+        <li>Une photo publiée dans la Galerie est visible par tous les membres, avec votre pseudo et le tour de poignet que vous avez indiqué. Vous pouvez la rendre privée ou la supprimer à tout moment.</li>
+        <li>Les votes « Au poignet ? » (petite, parfaite, grande) et les « j'aime » sont anonymes : les autres membres ne voient que les totaux. Vous pouvez changer votre vote.</li>
+        <li>Votez de bonne foi. Sont interdits les votes en série depuis plusieurs comptes, les échanges de votes organisés et toute manœuvre destinée à fausser le classement. Nous pouvons retirer des votes, une photo du classement ou le classement lui-même en cas d'abus.</li>
+        <li>Les séries de portage, badges et classements sont des éléments de jeu, sans valeur marchande ; ils ne donnent droit à aucune récompense et peuvent évoluer.</li>
+      </ul>
+
+      <h2>Article 6 : Messagerie</h2>
       <p>
         La messagerie sert à échanger à propos d'une montre ou de la collection d'un membre. Le harcèlement, les insultes, le démarchage,
         la publicité et l'envoi de liens frauduleux sont interdits. Chaque membre peut refuser les messages, bloquer un membre
         et signaler un message. Nous pouvons consulter un message signalé pour traiter le signalement.
       </p>
 
-      <h2>Article 6 : Vos contenus</h2>
+      <h2>Article 7 : Vos contenus</h2>
       <p>
         Vous restez propriétaire des photos et textes que vous publiez. Vous nous accordez une licence gratuite, non exclusive et mondiale
         pour les héberger, les redimensionner et les afficher dans le Service, selon les réglages de visibilité que vous choisissez,
@@ -78,7 +93,7 @@ export default function CguPage() {
       </p>
       <p>Avant l'envoi, la position GPS est retirée des photos. Les prix et valeurs que vous saisissez dans votre collection ne sont jamais publiés.</p>
 
-      <h2>Article 7 : Signalement et modération</h2>
+      <h2>Article 8 : Signalement et modération</h2>
       <ul>
         <li>Tout contenu peut être signalé avec le bouton « Signaler » ou à <a href={`mailto:${L.email}`}>{L.email}</a>, en précisant le contenu en cause et la raison.</li>
         <li>Nous examinons les signalements avec diligence. Un contenu illicite ou contraire à ces conditions peut être retiré ou rendu invisible.</li>
@@ -86,20 +101,21 @@ export default function CguPage() {
         <li>Nous informons le membre concerné de la décision et de ses motifs. Il peut la contester en répondant à ce message ; un humain réexamine alors la décision.</li>
       </ul>
 
-      <h2>Article 8 : Responsabilité</h2>
+      <h2>Article 9 : Responsabilité</h2>
       <p>
         Nous faisons de notre mieux pour que le Service soit disponible et sûr, sans pouvoir garantir une disponibilité permanente.
         Notre responsabilité ne peut être engagée pour les transactions conclues entre membres, ni pour le contenu publié par un membre.
         Les estimations de valeur et le coût par port sont calculés à partir de vos propres saisies et n'ont qu'une valeur indicative.
+        Les informations sur les montres (marques, modèles, calibres, références) sont saisies par les membres et peuvent comporter des erreurs.
       </p>
 
-      <h2>Article 9 : Données personnelles</h2>
+      <h2>Article 10 : Données personnelles</h2>
       <p>Le traitement de vos données est décrit dans la <Link to="/confidentialite">politique de confidentialité</Link>.</p>
 
-      <h2>Article 10 : Modification des conditions</h2>
+      <h2>Article 11 : Modification des conditions</h2>
       <p>Nous pouvons modifier ces conditions. En cas de changement important, nous vous prévenons au moins 15 jours à l'avance par e-mail ou dans l'app. Si vous refusez, vous pouvez supprimer votre compte.</p>
 
-      <h2>Article 11 : Droit applicable</h2>
+      <h2>Article 12 : Droit applicable</h2>
       <p>
         Ces conditions sont soumises au droit français. En cas de litige, contactez-nous d'abord à <a href={`mailto:${L.email}`}>{L.email}</a>.
         Les consommateurs peuvent aussi recourir à la médiation (voir les <Link to="/mentions-legales">mentions légales</Link>) et

@@ -30,10 +30,12 @@ export const LEGAL = {
   /** Région du projet Supabase (Settings → General). Idéalement dans l'UE, ex. « Francfort (Allemagne) ». */
   dataRegion: '',
   /** Prestataire d'envoi des e-mails (ex. Resend, Brevo), une fois choisi. */
-  emailProvider: '',
+  emailProvider: 'Brevo',
 
   /** Date de dernière mise à jour des documents (à changer à chaque modification). */
   updatedAt: '28 octobre 2026',
+  /** Date de mise à jour des conditions d'utilisation (CGU). */
+  cguUpdatedAt: '6 novembre 2026',
   /** Âge minimum pour créer un compte. */
   minAge: 18,
 };
