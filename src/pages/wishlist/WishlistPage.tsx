@@ -6,6 +6,8 @@ import { useLoad } from '../../hooks/useLoad';
 import { addWishlistItem, deleteWishlistItem, listWishlist, updateWishlistItem } from '../../lib/api';
 import { formatEuros } from '../../lib/format';
 import type { WishlistItem } from '../../types';
+import BrandModelFields from '../../components/BrandModel/BrandModelFields';
+import { loadBrands, loadModels, normalizeBrand, normalizeModel } from '../../lib/brands';
 import { Button, EmptyState, IconButton, Notice, PageHeader, Segmented, Sheet, TextArea, TextField } from '../../components/ui';
 import PremiumGate from '../../components/PremiumGate/PremiumGate';
 import { defineStrings, useStrings } from '../../i18n';
@@ -83,8 +85,9 @@ function WishlistContent() {
     e.preventDefault();
     if (!f.brand.trim() || !f.model.trim()) { setErr(t.brandModelRequired); return; }
     try {
+      const brand = normalizeBrand(f.brand, await loadBrands());
       await addWishlistItem(uid, {
-        brand: f.brand.trim(), model: f.model.trim(), reference_number: f.reference_number.trim() || null,
+        brand, model: normalizeModel(f.model, await loadModels(brand)), reference_number: f.reference_number.trim() || null,
         target_price: f.target_price ? Number(f.target_price.replace(',', '.').replace(/\s/g, '')) : null,
         priority: Number(f.priority) as WishlistItem['priority'], notes: f.notes.trim() || null,
       });
@@ -138,8 +141,7 @@ function WishlistContent() {
       <Sheet open={open} onClose={() => setOpen(false)} title={t.sheetTitle}>
         <form onSubmit={submit} className={s.form}>
           {err && <Notice tone="error">{err}</Notice>}
-          <TextField label={t.brand} value={f.brand} onChange={e => setF({ ...f, brand: e.target.value })} required />
-          <TextField label={t.model} value={f.model} onChange={e => setF({ ...f, model: e.target.value })} required />
+          <BrandModelFields brand={f.brand} model={f.model} onBrand={v => setF(x => ({ ...x, brand: v }))} onModel={v => setF(x => ({ ...x, model: v }))} />
           <TextField label={t.reference} optional value={f.reference_number} onChange={e => setF({ ...f, reference_number: e.target.value })} />
           <TextField label={t.targetPrice} optional inputMode="decimal" suffix="€" value={f.target_price} onChange={e => setF({ ...f, target_price: e.target.value })} />
           <div className={s.field}>

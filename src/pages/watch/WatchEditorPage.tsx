@@ -16,6 +16,8 @@ import { formatDecimal } from '../../lib/format';
 import { defineStrings, useStrings } from '../../i18n';
 import { COMMON } from '../../i18n/common';
 import { COMMON_CALIBERS, normalizeCaliber } from '../../lib/calibers';
+import { loadBrands, loadModels, normalizeBrand, normalizeModel } from '../../lib/brands';
+import BrandModelFields from '../../components/BrandModel/BrandModelFields';
 import s from './WatchEditorPage.module.css';
 import { SkeletonHeader, SkeletonList } from '../../components/Skeleton/Skeleton';
 import { useToast } from '../../components/Toast/Toast';
@@ -323,6 +325,10 @@ export default function WatchEditorPage() {
     try {
       let id = watchId;
       const input = { ...toInput(form), current_status: status };
+      // Noms propres pour les statistiques : écriture officielle de la marque, écriture courante du modèle
+      const brands = await loadBrands();
+      input.brand = normalizeBrand(form.brand, brands);
+      input.model = normalizeModel(form.model, await loadModels(input.brand));
       if (status === 'for_exchange') input.sale_price = null;
       if (isEdit) await updateWatch(uid, id!, input);
       else id = (await createWatch(uid, input)).id;
@@ -341,7 +347,6 @@ export default function WatchEditorPage() {
   };
 
   const o = options.data;
-  const brandList = useMemo(() => o?.brands ?? [], [o]);
   // Calibres courants, puis ceux déjà saisis par la communauté
   const caliberList = useMemo(() => {
     const seen = new Set(COMMON_CALIBERS.map(c => c.value.toUpperCase()));
@@ -374,9 +379,9 @@ export default function WatchEditorPage() {
   const identityBlock = (
     <section className={s.section}>
       <div className={s.grid2}>
-        <TextField label={t.brand} list="brand-options" value={form.brand} onChange={set('brand')} error={fieldErrors.brand} autoComplete="off" required />
-        <datalist id="brand-options">{brandList.map(b => <option key={b} value={b} />)}</datalist>
-        <TextField label={t.model} value={form.model} onChange={set('model')} error={fieldErrors.model} placeholder={t.modelPh} required />
+        <BrandModelFields brand={form.brand} model={form.model}
+          onBrand={v => setForm(f => ({ ...f, brand: v }))} onModel={v => setForm(f => ({ ...f, model: v }))}
+          brandError={fieldErrors.brand} modelError={fieldErrors.model} modelPlaceholder={t.modelPh} />
         <TextField label={t.reference} optional value={form.reference_number} onChange={set('reference_number')} placeholder={t.referencePh} />
         <TextField label={t.year} optional inputMode="numeric" value={form.year_of_production} onChange={set('year_of_production')} error={fieldErrors.year_of_production} placeholder={t.yearPh} />
       </div>

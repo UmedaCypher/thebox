@@ -101,3 +101,10 @@
 .founderDot { width: 7px; height: 7px; border-radius: 50%; background: var(--lume); box-shadow: 0 0 8px var(--lume); }
 .table tbody th .small { display: block; font-weight: 400; }
 .more { color: var(--brass); font-weight: 600; text-decoration: underline; }
+
+/* Marques à vérifier */
+.brandList { list-style: none; display: flex; flex-direction: column; gap: var(--sp-2); margin-top: var(--sp-3); }
+.brandList .brandRow { display: flex; flex-direction: row; justify-content: space-between; align-items: center; gap: var(--sp-3); flex-wrap: wrap; padding: var(--sp-3) var(--sp-4); }
+.brandList .brandRow > div:first-child { flex: 1 1 200px; min-width: 0; text-align: left; }
+.brandActions { display: flex; flex-wrap: wrap; gap: var(--sp-2); align-items: flex-end; }
+.brandActions > :nth-child(2) { flex: 1 1 180px; }

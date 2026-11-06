@@ -1,0 +1,5 @@
+.suggest { color: var(--text-2); }
+.suggestBtn {
+  font: inherit; font-weight: 700; color: var(--brass, var(--accent)); text-decoration: underline; text-underline-offset: 2px;
+  padding: 0; background: none; border: 0; cursor: pointer;
+}

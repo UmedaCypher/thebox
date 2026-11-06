@@ -3,13 +3,14 @@ import type { FormEvent } from 'react';
 import { Download, RefreshCw, Trash2 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import {
-  adminAddExpense, adminDeleteExpense, adminDeleteWaitlist, exportAdminWaitlist, getAdminMembers, getAdminWaitlist, adminGrantPremium, adminSetFoundersOpen, adminUpdateAffiliate,
+  adminAddBrand, adminAddExpense, adminDeleteExpense, adminMergeBrand, getAdminBrandReview, adminDeleteWaitlist, exportAdminWaitlist, getAdminMembers, getAdminWaitlist, adminGrantPremium, adminSetFoundersOpen, adminUpdateAffiliate,
   getAdminAffiliates, getAdminDashboard, getAffiliatePayoutsDue, recordAffiliatePayout,
 } from '../../lib/api';
 import type {
-  AdminAffiliate, AdminAffiliates, AdminDashboard, AdminMember, AdminMonth, AdminWaitlist, AffiliatePayoutDue, ExpenseCategory,
+  AdminAffiliate, AdminAffiliates, AdminBrandReview, AdminDashboard, AdminMember, AdminMonth, AdminWaitlist, AffiliatePayoutDue, ExpenseCategory,
 } from '../../lib/api';
 import { AFFILIATE_MIN_PAYOUT_EUR } from '../../lib/features';
+import { closeBrand } from '../../lib/brands';
 import { Button, EmptyState, IconButton, Loading, Notice, PageHeader, SelectField, TextField, Toggle } from '../../components/ui';
 import { useToast } from '../../components/Toast/Toast';
 import { formatDate, formatEuros, formatNumber, todayISO } from '../../lib/format';
@@ -74,6 +75,7 @@ export default function AdminPage() {
           <Affiliates onChange={load} />
           <Payouts />
           <Audience d={data} />
+          <Brands />
           <Settings d={data} onChange={load} />
         </>
       )}
@@ -578,6 +580,58 @@ function Audience({ d }: { d: AdminDashboard }) {
 }
 
 /* ---------- Réglages ---------- */
+/** Marques saisies hors de la liste officielle : à ajouter, ou à fusionner dans la bonne écriture. */
+function Brands() {
+  const toast = useToast();
+  const [r, setR] = useState<AdminBrandReview | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [target, setTarget] = useState<Record<string, string>>({});
+  const load = useCallback(() => { getAdminBrandReview().then(setR).catch(e => setError(e instanceof Error ? e.message : String(e))); }, []);
+  useEffect(() => { load(); }, [load]);
+
+  const add = async (name: string) => {
+    try { await adminAddBrand(name); toast(`« ${name} » ajoutée à la liste.`); load(); }
+    catch (e) { setError(e instanceof Error ? e.message : String(e)); }
+  };
+  const merge = async (from: string) => {
+    const to = (target[from] ?? closeBrand(from, r?.official ?? []) ?? '').trim();
+    if (!to) return;
+    if (!window.confirm(`Renommer « ${from} » en « ${to} » dans toutes les montres et wishlists ?`)) return;
+    try { const n = await adminMergeBrand(from, to); toast(`${n} ligne${n > 1 ? 's' : ''} renommée${n > 1 ? 's' : ''}.`); load(); }
+    catch (e) { setError(e instanceof Error ? e.message : String(e)); }
+  };
+
+  return (
+    <section className={s.section}>
+      <h2 className={s.h}>Marques à vérifier</h2>
+      <p className={s.small}>
+        Marques saisies par les membres et absentes de la liste officielle ({r?.official.length ?? '…'} marques).
+        Ajoutez une vraie marque, ou fusionnez une faute de frappe dans la bonne écriture.
+      </p>
+      {error && <Notice tone="error">{error}</Notice>}
+      {r && <datalist id="admin-official-brands">{r.official.map(b => <option key={b} value={b} />)}</datalist>}
+      {!r ? <Loading /> : r.unknown.length === 0 ? <p className={s.small}>Rien à vérifier : toutes les marques saisies sont dans la liste.</p> : (
+        <ul className={s.brandList}>
+          {r.unknown.map(u => (
+            <li key={u.name} className={`panel ${s.brandRow}`} data-tone="plain">
+              <div>
+                <strong>{u.name}</strong>
+                <p className={s.small}>{u.watches} montre{u.watches > 1 ? 's' : ''} · {u.wishlist} wishlist · {u.members} membre{u.members > 1 ? 's' : ''}</p>
+              </div>
+              <div className={s.brandActions}>
+                <Button size="small" variant="secondary" onClick={() => add(u.name)}>Ajouter à la liste</Button>
+                <TextField label="Fusionner dans" list="admin-official-brands" value={target[u.name] ?? closeBrand(u.name, r.official) ?? ''}
+                  onChange={e => setTarget({ ...target, [u.name]: e.target.value })} placeholder="Ex. Rolex" autoComplete="off" />
+                <Button size="small" onClick={() => merge(u.name)} disabled={!(target[u.name] ?? closeBrand(u.name, r.official) ?? '').trim()}>Fusionner</Button>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
+  );
+}
+
 function Settings({ d, onChange }: { d: AdminDashboard; onChange: () => void }) {
   const toast = useToast();
   const [grant, setGrant] = useState({ username: '', days: '90' });
