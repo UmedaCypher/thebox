@@ -99,7 +99,7 @@ function ExportContent() {
               <h2><span className="num">{i + 1}.</span> {w.brand} {w.model}</h2>
               <dl>
                 {([
-                  [t.specs.reference, w.reference_number], [t.specs.year, w.year_of_production], [t.specs.movement, movementLabel(w.movement, lang)],
+                  [t.specs.reference, w.reference_number], [t.specs.year, w.year_of_production], [t.specs.movement, [movementLabel(w.movement, lang), w.caliber].filter(Boolean).join(' · ') || null],
                   [t.specs.diameter, formatMm(w.case_diameter_mm)], [t.specs.case, w.case_material], [t.specs.condition, w.condition],
                   [t.specs.boxPapers, w.box_papers_status], [t.specs.purchaseDate, w.purchase_date ? formatDate(w.purchase_date) : null],
                   [t.specs.purchasePrice, w.purchase_price !== null ? formatEuros(Number(w.purchase_price)) : null],

@@ -120,7 +120,7 @@ export default function GlobalSearch() {
   const sections = useMemo(() => {
     if (query.length < 2) return [];
     const out: { title: string; items: Item[] }[] = [];
-    const own = (mine ?? []).filter(w => matches(`${w.brand} ${w.model} ${w.reference_number ?? ''}`, query)).slice(0, 4);
+    const own = (mine ?? []).filter(w => matches(`${w.brand} ${w.model} ${w.reference_number ?? ''} ${w.caliber ?? ''}`, query)).slice(0, 4);
     if (own.length) out.push({
       title: t.mine,
       items: own.map(w => ({

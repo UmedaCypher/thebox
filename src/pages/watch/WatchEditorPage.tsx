@@ -5,28 +5,31 @@ import { Star, Trash2 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useLoad } from '../../hooks/useLoad';
 import {
-  addWatchPhoto, createWatch, deletePhoto, fetchReferenceOptions, getWatch, setMainPhoto, thumbSrc, updateWatch, WatchLimitError,
+  addWatchPhoto, createWatch, deletePhoto, fetchReferenceOptions, fetchCaliberSuggestions, getWatch, setMainPhoto, thumbSrc, updateWatch, WatchLimitError,
 } from '../../lib/api';
 import type { Photo, Watch, WatchInput, WatchStatus } from '../../types';
-import { Button, Cushion, IconButton, Notice, PageHeader, Segmented, SelectField, TextArea, TextField, Toggle } from '../../components/ui';
+import { Button, Combobox, Cushion, IconButton, Notice, PageHeader, Segmented, SelectField, TextArea, TextField, Toggle } from '../../components/ui';
 import PhotoPicker from '../../components/PhotoPicker/PhotoPicker';
 import PremiumSheet from '../../components/PremiumSheet/PremiumSheet';
 import { FREE_WATCH_LIMIT } from '../../lib/features';
 import { formatDecimal } from '../../lib/format';
 import { defineStrings, useStrings } from '../../i18n';
 import { COMMON } from '../../i18n/common';
+import { COMMON_CALIBERS, normalizeCaliber } from '../../lib/calibers';
+import { loadBrands, loadModels, normalizeBrand, normalizeModel } from '../../lib/brands';
+import BrandModelFields from '../../components/BrandModel/BrandModelFields';
 import s from './WatchEditorPage.module.css';
 import { SkeletonHeader, SkeletonList } from '../../components/Skeleton/Skeleton';
 import { useToast } from '../../components/Toast/Toast';
 
 type Form = Record<
-  'brand' | 'model' | 'reference_number' | 'year_of_production' | 'movement' | 'case_diameter_mm' | 'lug_to_lug_mm' |
+  'brand' | 'model' | 'reference_number' | 'year_of_production' | 'movement' | 'caliber' | 'case_diameter_mm' | 'lug_to_lug_mm' |
   'lug_width_mm' | 'dial_color' | 'case_material' | 'bracelet_material' | 'bracelet_type' | 'condition' |
   'box_papers_status' | 'purchase_price' | 'purchase_date' | 'purchase_location' | 'current_estimated_value' |
   'last_service_date' | 'notes_history' | 'sale_price' | 'sale_city' | 'sale_note', string>;
 
 const EMPTY: Form = {
-  brand: '', model: '', reference_number: '', year_of_production: '', movement: '', case_diameter_mm: '', lug_to_lug_mm: '',
+  brand: '', model: '', reference_number: '', year_of_production: '', movement: '', caliber: '', case_diameter_mm: '', lug_to_lug_mm: '',
   lug_width_mm: '', dial_color: '', case_material: '', bracelet_material: '', bracelet_type: '', condition: '',
   box_papers_status: '', purchase_price: '', purchase_date: '', purchase_location: '', current_estimated_value: '',
   last_service_date: '', notes_history: '', sale_price: '', sale_city: '', sale_note: '',
@@ -71,6 +74,9 @@ const S = defineStrings({
   yearPh: 'Ex. 2021',
   specs: 'Caractéristiques',
   movement: 'Mouvement',
+  caliber: 'Calibre',
+  caliberPh: 'Ex. NH35, 7750, 3235',
+  caliberHint: 'Deux montres identiques à l’œil peuvent cacher des mouvements différents.',
   diameter: 'Diamètre',
   lugToLug: 'Corne à corne',
   lugWidth: 'Entrecorne',
@@ -163,6 +169,9 @@ const S = defineStrings({
   yearPh: 'e.g. 2021',
   specs: 'Specifications',
   movement: 'Movement',
+  caliber: 'Calibre',
+  caliberPh: 'e.g. NH35, 7750, 3235',
+  caliberHint: 'Two watches that look the same can hide different movements.',
   diameter: 'Diameter',
   lugToLug: 'Lug to lug',
   lugWidth: 'Lug width',
@@ -243,7 +252,7 @@ const txt = (v: string) => (v.trim() ? v.trim() : null);
 
 const toInput = (f: Form): Partial<WatchInput> => ({
   brand: f.brand.trim(), model: f.model.trim(), reference_number: txt(f.reference_number),
-  year_of_production: num(f.year_of_production), movement: txt(f.movement),
+  year_of_production: num(f.year_of_production), movement: txt(f.movement), caliber: normalizeCaliber(f.caliber),
   case_diameter_mm: num(f.case_diameter_mm), lug_to_lug_mm: num(f.lug_to_lug_mm), lug_width_mm: num(f.lug_width_mm),
   dial_color: txt(f.dial_color), case_material: txt(f.case_material), bracelet_material: txt(f.bracelet_material),
   bracelet_type: txt(f.bracelet_type), condition: txt(f.condition), box_papers_status: txt(f.box_papers_status),
@@ -277,6 +286,7 @@ export default function WatchEditorPage() {
   const [status, setStatus] = useState<WatchStatus>('in_collection');
 
   const options = useLoad(fetchReferenceOptions, []);
+  const calibers = useLoad(fetchCaliberSuggestions, []);
   const existing = useLoad(() => getWatch(uid, watchId!), [uid, watchId], isEdit);
 
   useEffect(() => {
@@ -315,6 +325,10 @@ export default function WatchEditorPage() {
     try {
       let id = watchId;
       const input = { ...toInput(form), current_status: status };
+      // Noms propres pour les statistiques : écriture officielle de la marque, écriture courante du modèle
+      const brands = await loadBrands();
+      input.brand = normalizeBrand(form.brand, brands);
+      input.model = normalizeModel(form.model, await loadModels(input.brand));
       if (status === 'for_exchange') input.sale_price = null;
       if (isEdit) await updateWatch(uid, id!, input);
       else id = (await createWatch(uid, input)).id;
@@ -333,7 +347,11 @@ export default function WatchEditorPage() {
   };
 
   const o = options.data;
-  const brandList = useMemo(() => o?.brands ?? [], [o]);
+  // Calibres courants, puis ceux déjà saisis par la communauté
+  const caliberList = useMemo(() => {
+    const seen = new Set(COMMON_CALIBERS.map(c => c.value.toUpperCase()));
+    return [...COMMON_CALIBERS.map(c => ({ value: c.value, hint: c.maker })), ...(calibers.data ?? []).filter(c => !seen.has(c.toUpperCase())).map(value => ({ value }))];
+  }, [calibers.data]);
 
   if (isEdit && existing.loading) return <div className="page page--narrow"><SkeletonHeader /><SkeletonList rows={6} thumb={0} /></div>;
   if (isEdit && !existing.loading && !existing.data) return <div className="page"><Notice tone="error">{existing.error ?? t.notFound}</Notice></div>;
@@ -361,9 +379,9 @@ export default function WatchEditorPage() {
   const identityBlock = (
     <section className={s.section}>
       <div className={s.grid2}>
-        <TextField label={t.brand} list="brand-options" value={form.brand} onChange={set('brand')} error={fieldErrors.brand} autoComplete="off" required />
-        <datalist id="brand-options">{brandList.map(b => <option key={b} value={b} />)}</datalist>
-        <TextField label={t.model} value={form.model} onChange={set('model')} error={fieldErrors.model} placeholder={t.modelPh} required />
+        <BrandModelFields brand={form.brand} model={form.model}
+          onBrand={v => setForm(f => ({ ...f, brand: v }))} onModel={v => setForm(f => ({ ...f, model: v }))}
+          brandError={fieldErrors.brand} modelError={fieldErrors.model} modelPlaceholder={t.modelPh} />
         <TextField label={t.reference} optional value={form.reference_number} onChange={set('reference_number')} placeholder={t.referencePh} />
         <TextField label={t.year} optional inputMode="numeric" value={form.year_of_production} onChange={set('year_of_production')} error={fieldErrors.year_of_production} placeholder={t.yearPh} />
       </div>
@@ -376,6 +394,8 @@ export default function WatchEditorPage() {
         <legend>{t.specs}</legend>
         <div className={s.grid2}>
           <SelectField label={t.movement} optional options={MOVEMENTS.map(m => ({ value: m, label: t.movements[m] }))} value={form.movement} onChange={set('movement')} />
+          <Combobox label={t.caliber} optional autoCapitalize="characters" options={caliberList} value={form.caliber}
+            onValueChange={v => setForm(f => ({ ...f, caliber: v }))} placeholder={t.caliberPh} hint={t.caliberHint} />
           <TextField label={t.diameter} optional inputMode="decimal" suffix="mm" value={form.case_diameter_mm} onChange={set('case_diameter_mm')} error={fieldErrors.case_diameter_mm} />
           <TextField label={t.lugToLug} optional inputMode="decimal" suffix="mm" value={form.lug_to_lug_mm} onChange={set('lug_to_lug_mm')} error={fieldErrors.lug_to_lug_mm} />
           <TextField label={t.lugWidth} optional inputMode="decimal" suffix="mm" value={form.lug_width_mm} onChange={set('lug_width_mm')} error={fieldErrors.lug_width_mm} />

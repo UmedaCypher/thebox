@@ -85,7 +85,7 @@ export default function PassportPage() {
   const photos = [...p.photos].sort((a, b) => Number(b.is_main_photo) - Number(a.is_main_photo));
   const current = photos[idx] ?? mainPhoto(photos);
   const rows: [string, string | number | null][] = [
-    [t.specs.reference, p.reference_number], [t.specs.year, p.year_of_production], [t.specs.movement, movementLabel(p.movement, lang)],
+    [t.specs.reference, p.reference_number], [t.specs.year, p.year_of_production], [t.specs.movement, [movementLabel(p.movement, lang), p.caliber].filter(Boolean).join(' · ') || null],
     [t.specs.diameter, formatMm(p.case_diameter_mm)], [t.specs.lugToLug, formatMm(p.lug_to_lug_mm)], [t.specs.lugWidth, formatMm(p.lug_width_mm)],
     [t.specs.case, p.case_material], [t.specs.dial, p.dial_color],
     [t.specs.strap, [p.bracelet_material, p.bracelet_type].filter(Boolean).join(', ') || null],

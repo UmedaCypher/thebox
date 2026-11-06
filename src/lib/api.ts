@@ -245,6 +245,13 @@ export async function setMainPhoto(userId: string, watchId: string, photoId: str
   fail(error, 'Mise à jour impossible.');
 }
 
+/** Calibres déjà saisis par plusieurs membres (suggestions du champ Calibre). */
+export async function fetchCaliberSuggestions(): Promise<string[]> {
+  const { data, error } = await supabase.rpc('get_caliber_suggestions');
+  if (error) return [];
+  return ((data ?? []) as { caliber: string }[]).map(r => r.caliber);
+}
+
 export interface ReferenceOptions { brands: string[]; conditions: string[]; boxPapers: string[]; materials: string[]; dialColors: string[] }
 
 export async function fetchReferenceOptions(): Promise<ReferenceOptions> {
@@ -767,6 +774,32 @@ export async function exportAdminWaitlist() {
 export async function adminDeleteWaitlist(id: string) {
   const { error } = await supabase.rpc('admin_delete_waitlist', { p_id: id });
   fail(error, 'Suppression impossible.');
+}
+
+/* ---------- Backoffice : marques ---------- */
+
+export type AdminBrandReview = {
+  official: string[];
+  /** Marques saisies hors de la liste officielle */
+  unknown: { name: string; watches: number; wishlist: number; members: number }[];
+};
+
+export async function getAdminBrandReview(): Promise<AdminBrandReview> {
+  const { data, error } = await supabase.rpc('admin_brand_review');
+  fail(error, 'Marques indisponibles.');
+  return data as AdminBrandReview;
+}
+
+export async function adminAddBrand(name: string) {
+  const { error } = await supabase.rpc('admin_add_brand', { p_name: name });
+  fail(error, 'Ajout impossible.');
+}
+
+/** Renomme une écriture dans toutes les montres et wishlists ; renvoie le nombre de lignes modifiées. */
+export async function adminMergeBrand(from: string, to: string): Promise<number> {
+  const { data, error } = await supabase.rpc('admin_merge_brand', { p_from: from, p_to: to });
+  fail(error, 'Fusion impossible.');
+  return (data as number) ?? 0;
 }
 
 export type AdminMember = {
