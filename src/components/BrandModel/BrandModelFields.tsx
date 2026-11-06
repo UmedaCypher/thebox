@@ -1,5 +1,5 @@
-import { useEffect, useId, useState } from 'react';
-import { TextField } from '../ui';
+import { useEffect, useMemo, useState } from 'react';
+import { Combobox } from '../ui';
 import { defineStrings, useStrings } from '../../i18n';
 import { closeBrand, loadBrands, loadModels, officialBrand } from '../../lib/brands';
 import s from './BrandModelFields.module.css';
@@ -25,7 +25,6 @@ export default function BrandModelFields({ brand, model, onBrand, onModel, brand
   brandError?: string | null; modelError?: string | null; modelPlaceholder?: string;
 }) {
   const t = useStrings(S);
-  const id = useId();
   const [brands, setBrands] = useState<string[]>([]);
   const [models, setModels] = useState<string[]>([]);
   const [touched, setTouched] = useState(false);
@@ -39,6 +38,8 @@ export default function BrandModelFields({ brand, model, onBrand, onModel, brand
     return () => window.clearTimeout(timer);
   }, [brand, brands]);
 
+  const brandOptions = useMemo(() => brands.map(value => ({ value })), [brands]);
+  const modelOptions = useMemo(() => models.map(value => ({ value })), [models]);
   const suggestion = closeBrand(brand, brands);
   const unknown = touched && brand.trim().length >= 2 && brands.length > 0 && !suggestion && !officialBrand(brand, brands);
 
@@ -52,12 +53,10 @@ export default function BrandModelFields({ brand, model, onBrand, onModel, brand
 
   return (
     <>
-      <TextField label={t.brand} list={`${id}-brands`} value={brand} onChange={e => onBrand(e.target.value)}
-        onBlur={() => setTouched(true)} error={brandError} hint={brandHint} autoComplete="off" required />
-      <datalist id={`${id}-brands`}>{brands.map(b => <option key={b} value={b} />)}</datalist>
-      <TextField label={t.model} list={`${id}-models`} value={model} onChange={e => onModel(e.target.value)}
-        error={modelError} placeholder={modelPlaceholder} autoComplete="off" required />
-      <datalist id={`${id}-models`}>{models.map(m => <option key={m} value={m} />)}</datalist>
+      <Combobox label={t.brand} options={brandOptions} value={brand} onValueChange={onBrand}
+        onBlur={() => setTouched(true)} error={brandError} hint={brandHint} required />
+      <Combobox label={t.model} options={modelOptions} value={model} onValueChange={onModel}
+        error={modelError} placeholder={modelPlaceholder} required />
     </>
   );
 }

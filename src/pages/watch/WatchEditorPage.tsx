@@ -8,7 +8,7 @@ import {
   addWatchPhoto, createWatch, deletePhoto, fetchReferenceOptions, fetchCaliberSuggestions, getWatch, setMainPhoto, thumbSrc, updateWatch, WatchLimitError,
 } from '../../lib/api';
 import type { Photo, Watch, WatchInput, WatchStatus } from '../../types';
-import { Button, Cushion, IconButton, Notice, PageHeader, Segmented, SelectField, TextArea, TextField, Toggle } from '../../components/ui';
+import { Button, Combobox, Cushion, IconButton, Notice, PageHeader, Segmented, SelectField, TextArea, TextField, Toggle } from '../../components/ui';
 import PhotoPicker from '../../components/PhotoPicker/PhotoPicker';
 import PremiumSheet from '../../components/PremiumSheet/PremiumSheet';
 import { FREE_WATCH_LIMIT } from '../../lib/features';
@@ -350,7 +350,7 @@ export default function WatchEditorPage() {
   // Calibres courants, puis ceux déjà saisis par la communauté
   const caliberList = useMemo(() => {
     const seen = new Set(COMMON_CALIBERS.map(c => c.value.toUpperCase()));
-    return [...COMMON_CALIBERS, ...(calibers.data ?? []).filter(c => !seen.has(c.toUpperCase())).map(value => ({ value, maker: '' }))];
+    return [...COMMON_CALIBERS.map(c => ({ value: c.value, hint: c.maker })), ...(calibers.data ?? []).filter(c => !seen.has(c.toUpperCase())).map(value => ({ value }))];
   }, [calibers.data]);
 
   if (isEdit && existing.loading) return <div className="page page--narrow"><SkeletonHeader /><SkeletonList rows={6} thumb={0} /></div>;
@@ -394,8 +394,8 @@ export default function WatchEditorPage() {
         <legend>{t.specs}</legend>
         <div className={s.grid2}>
           <SelectField label={t.movement} optional options={MOVEMENTS.map(m => ({ value: m, label: t.movements[m] }))} value={form.movement} onChange={set('movement')} />
-          <TextField label={t.caliber} optional list="caliber-options" autoComplete="off" autoCapitalize="characters" value={form.caliber} onChange={set('caliber')} placeholder={t.caliberPh} hint={t.caliberHint} />
-          <datalist id="caliber-options">{caliberList.map(c => <option key={c.value} value={c.value}>{c.maker}</option>)}</datalist>
+          <Combobox label={t.caliber} optional autoCapitalize="characters" options={caliberList} value={form.caliber}
+            onValueChange={v => setForm(f => ({ ...f, caliber: v }))} placeholder={t.caliberPh} hint={t.caliberHint} />
           <TextField label={t.diameter} optional inputMode="decimal" suffix="mm" value={form.case_diameter_mm} onChange={set('case_diameter_mm')} error={fieldErrors.case_diameter_mm} />
           <TextField label={t.lugToLug} optional inputMode="decimal" suffix="mm" value={form.lug_to_lug_mm} onChange={set('lug_to_lug_mm')} error={fieldErrors.lug_to_lug_mm} />
           <TextField label={t.lugWidth} optional inputMode="decimal" suffix="mm" value={form.lug_width_mm} onChange={set('lug_width_mm')} error={fieldErrors.lug_width_mm} />

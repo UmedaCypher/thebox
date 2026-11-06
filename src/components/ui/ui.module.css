@@ -96,6 +96,28 @@ select.control {
   background-position: calc(100% - 20px) 21px, calc(100% - 15px) 21px; background-size: 5px 5px; background-repeat: no-repeat;
 }
 .suffixWrap { position: relative; }
+
+/* Champ à suggestions : la liste reprend le verre sombre des panneaux */
+.combo { position: relative; }
+.combo .control { scroll-margin-top: calc(var(--header-h) + env(safe-area-inset-top) + 48px); }
+.comboList {
+  position: absolute; z-index: 40; top: calc(100% + 6px); left: 0; right: 0; max-height: min(320px, 46vh); overflow-y: auto;
+  list-style: none; margin: 0; padding: 6px; border-radius: var(--r-md);
+  /* opaque : rien ne transparaît du formulaire derrière la liste */
+  background: color-mix(in srgb, var(--bg) 93%, var(--text) 7%); border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow), var(--shadow-lg);
+  overscroll-behavior: contain; animation: comboIn 140ms var(--ease-out);
+}
+@keyframes comboIn { from { opacity: 0; transform: translateY(-4px); } }
+.comboOption {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3); min-height: 44px; padding: 0 var(--sp-3);
+  border-radius: var(--r-sm); cursor: pointer; color: var(--text); font-size: var(--fs-md);
+}
+.comboOption[aria-selected='true'] { background: color-mix(in srgb, var(--brass) 16%, transparent); }
+.comboOption[aria-selected='true'] .comboValue { color: var(--brass); }
+.comboValue { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 500; }
+.comboHint { flex: none; font-size: var(--fs-xs); color: var(--text-3); }
+@media (prefers-reduced-motion: reduce) { .comboList { animation: none; } }
 .suffix { position: absolute; right: var(--sp-4); top: 50%; transform: translateY(-50%); color: var(--text-3); pointer-events: none; font-size: var(--fs-sm); }
 .suffixWrap .control { padding-right: 48px; }
 
