@@ -794,6 +794,47 @@ export async function adminDeleteWaitlist(id: string) {
   fail(error, 'Suppression impossible.');
 }
 
+/* ---------- Backoffice : indicateurs et OKR ---------- */
+
+export interface AdminKpis {
+  generated_at: string; members: number; paying: number; mrr_cents: number; arr_cents: number;
+  arpu_cents: number | null; arppu_cents: number | null; revenue_30d_cents: number; conversion_pct: number | null;
+  churn_30d_pct: number | null; ltv_cents: number | null; dau: number; wau: number; mau: number; stickiness_pct: number | null;
+  wearers_7d: number; listings: number; listing_conversations_30d: number; watches_30d: number; founders_taken: number;
+  activation_pct: number | null; retention_pct: number | null;
+}
+export type KpiKey = Exclude<keyof AdminKpis, 'generated_at'>;
+export interface AdminOkr { id: string; period: string; objective: string; key_result: string; metric: KpiKey; target: number; sort: number }
+
+export async function getAdminKpis(): Promise<AdminKpis | null> {
+  const { data, error } = await supabase.rpc('admin_kpis');
+  if (error) return null; // fonction pas encore installée
+  return data as AdminKpis;
+}
+
+export async function listAdminOkrs(): Promise<AdminOkr[]> {
+  const { data, error } = await supabase.from('admin_okrs').select('*').order('period', { ascending: false }).order('sort');
+  if (error) return [];
+  return (data ?? []) as AdminOkr[];
+}
+
+export async function saveAdminOkr(okr: Omit<AdminOkr, 'id'> & { id?: string }) {
+  const { error } = okr.id
+    ? await supabase.from('admin_okrs').update(okr).eq('id', okr.id)
+    : await supabase.from('admin_okrs').insert(okr);
+  fail(error, 'Enregistrement impossible.');
+}
+
+export async function deleteAdminOkr(id: string) {
+  const { error } = await supabase.from('admin_okrs').delete().eq('id', id);
+  fail(error, 'Suppression impossible.');
+}
+
+export async function adminSetFoundersOfferOpen(open: boolean) {
+  const { error } = await supabase.rpc('admin_set_founders_offer_open', { p_open: open });
+  fail(error, 'Réglage impossible.');
+}
+
 /* ---------- Backoffice : marques ---------- */
 
 export type AdminBrandReview = {

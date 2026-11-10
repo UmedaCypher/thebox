@@ -108,3 +108,25 @@
 .brandList .brandRow > div:first-child { flex: 1 1 200px; min-width: 0; text-align: left; }
 .brandActions { display: flex; flex-wrap: wrap; gap: var(--sp-2); align-items: flex-end; }
 .brandActions > :nth-child(2) { flex: 1 1 180px; }
+
+/* Indicateurs et OKR */
+.sectionHead { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3); flex-wrap: wrap; }
+.okrForm { display: grid; gap: var(--sp-3); grid-template-columns: 1fr; }
+@media (min-width: 720px) { .okrForm { grid-template-columns: 1fr 2fr; } }
+.okrPeriod { display: flex; flex-direction: column; gap: var(--sp-3); margin-top: var(--sp-3); }
+.okr { gap: var(--sp-3); }
+.okrHead { display: flex; justify-content: space-between; align-items: baseline; gap: var(--sp-3); }
+.okrScore { font-family: var(--font-display); font-size: var(--fs-xl); }
+.okrScore[data-level='good'] { color: var(--lume); }
+.okrScore[data-level='mid'] { color: var(--brass); }
+.okrScore[data-level='low'] { color: var(--ruby); }
+.krList { list-style: none; display: flex; flex-direction: column; gap: var(--sp-3); }
+.krList li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px var(--sp-3); align-items: center; }
+.krText { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.krBar { grid-column: 1; height: 8px; border-radius: 4px; background: color-mix(in srgb, var(--text) 10%, transparent); overflow: hidden; }
+.krBar i { display: block; height: 100%; border-radius: inherit; background: var(--ruby); }
+.krBar[data-level='mid'] i { background: var(--brass); }
+.krBar[data-level='good'] i { background: var(--lume); }
+.krActions { grid-column: 2; grid-row: 1 / span 2; display: flex; gap: 4px; }
+.krActions button { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; color: var(--text-3); }
+.krActions button:hover { color: var(--text); background: var(--cushion); }

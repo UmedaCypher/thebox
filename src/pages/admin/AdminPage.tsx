@@ -15,6 +15,7 @@ import { Button, EmptyState, IconButton, Loading, Notice, PageHeader, SelectFiel
 import { useToast } from '../../components/Toast/Toast';
 import { formatDate, formatEuros, formatNumber, todayISO } from '../../lib/format';
 import { Bars, Line } from './Charts';
+import { FoundersOfferSetting, Kpis, Okrs } from './AdminKpis';
 import s from './AdminPage.module.css';
 
 /*
@@ -68,6 +69,8 @@ export default function AdminPage() {
       {!data ? (!error && <Loading />) : (
         <>
           <Overview d={data} />
+          <Kpis />
+          <Okrs />
           <Growth d={data} />
           <Members />
           <Waitlist />
@@ -659,6 +662,7 @@ function Settings({ d, onChange }: { d: AdminDashboard; onChange: () => void }) 
           <Toggle label="Inscriptions « membre fondateur » ouvertes" checked={d.founders_open} onChange={toggleFounders}
             description="Tant que c'est activé, chaque nouvel inscrit reçoit le badge fondateur à vie. À fermer à l'ouverture des paiements, ou à 500 fondateurs." />
         </div>
+        <FoundersOfferSetting />
         <form className={`panel ${s.block}`} data-tone="lume" onSubmit={submitGrant}>
           <h3 className={s.h3}>Offrir du Premium</h3>
           <p className={s.small}>Pour un co-animateur, un invité ou un geste commercial. Les jours s'ajoutent à ceux déjà offerts.</p>
