@@ -22,6 +22,7 @@ import WearStrip from '../../components/WearStrip/WearStrip';
 import Sparkline from '../../components/Sparkline/Sparkline';
 import PremiumSheet from '../../components/PremiumSheet/PremiumSheet';
 import TheftPanel from '../../components/Theft/TheftPanel';
+import AccuracyCard from '../../components/Accuracy/AccuracyCard';
 import { FREE_WATCH_LIMIT } from '../../lib/features';
 import s from './WatchPage.module.css';
 import { SkeletonDetail, SkeletonList } from '../../components/Skeleton/Skeleton';
@@ -317,7 +318,10 @@ export default function WatchPage() {
               <WearTab watch={watch} days={wornDays} logs={wears.data ?? []} isPremium={isPremium} onPremium={() => setPremiumReason(t.premiumCost)} />
             )}
             {tab === 'entretien' && (
-              <MaintenanceTab watch={watch} uid={uid} isPremium={isPremium} onPremium={() => setPremiumReason(t.premiumService)} />
+              <>
+                <MaintenanceTab watch={watch} uid={uid} isPremium={isPremium} onPremium={() => setPremiumReason(t.premiumService)} />
+                {watch.movement !== 'Quartz' && <AccuracyCard uid={uid} watchId={watch.id} />}
+              </>
             )}
             {tab === 'valeur' && (
               <ValueTab watch={watch} uid={uid} isPremium={isPremium} onPremium={() => setPremiumReason(t.premiumValue)} />

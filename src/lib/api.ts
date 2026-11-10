@@ -587,6 +587,34 @@ async function invokeForUrl(fn: 'create-checkout-session' | 'create-portal-sessi
 }
 
 /** Envoie vers la page de paiement Stripe, au mois ou à l'année (avec le code d'affilié éventuel). */
+/* ---------- Précision (timegrapher) ---------- */
+
+export type MeasurePosition = 'dial_up' | 'dial_down' | 'crown_up' | 'crown_down' | 'crown_left' | 'crown_right' | 'wrist';
+export interface AccuracyMeasurement {
+  id: string; watch_id: string | null; measured_at: string; rate_s_day: number; beat_error_ms: number | null;
+  amplitude_deg: number | null; bph: number | null; position: MeasurePosition | null; source: 'timegrapher' | 'manual';
+  quality: number | null; note: string | null;
+}
+export type AccuracyInput = Omit<AccuracyMeasurement, 'id' | 'measured_at'> & { measured_at?: string };
+
+export async function listAccuracy(userId: string, watchId?: string): Promise<AccuracyMeasurement[]> {
+  let q = supabase.from('accuracy_measurements').select('*').eq('user_id', userId).order('measured_at', { ascending: true });
+  if (watchId) q = q.eq('watch_id', watchId);
+  const { data, error } = await q;
+  if (error) return []; // table pas encore installée
+  return (data ?? []).map(r => ({ ...r, rate_s_day: Number(r.rate_s_day), beat_error_ms: r.beat_error_ms === null ? null : Number(r.beat_error_ms) })) as AccuracyMeasurement[];
+}
+
+export async function addAccuracy(userId: string, input: AccuracyInput) {
+  const { error } = await supabase.from('accuracy_measurements').insert({ ...input, user_id: userId });
+  fail(error, 'Enregistrement de la mesure impossible.');
+}
+
+export async function deleteAccuracy(id: string) {
+  const { error } = await supabase.from('accuracy_measurements').delete().eq('id', id);
+  fail(error, 'Suppression impossible.');
+}
+
 /* ---------- Déclaration de vol ---------- */
 
 export const THEFT_BUCKET = 'theft-proofs';

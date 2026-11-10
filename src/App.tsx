@@ -24,6 +24,7 @@ import { SkeletonHeader } from './components/Skeleton/Skeleton';
 const StatsPage = lazy(() => import('./pages/stats/StatsPage'));
 const WishlistPage = lazy(() => import('./pages/wishlist/WishlistPage'));
 const ComparePage = lazy(() => import('./pages/compare/ComparePage'));
+const TimegrapherPage = lazy(() => import('./pages/timegrapher/TimegrapherPage'));
 const InsuranceExportPage = lazy(() => import('./pages/export/InsuranceExportPage'));
 const WatchNewsPage = lazy(() => import('./pages/WatchNewsPage'));
 const FaqPage = lazy(() => import('./pages/FaqPage'));
@@ -128,6 +129,7 @@ export default function App() {
             <Route path="/admin" element={P(<AdminPage />)} />
             <Route path="/wishlist" element={P(<WishlistPage />)} />
             <Route path="/comparer" element={P(<ComparePage />)} />
+            <Route path="/timegrapher" element={P(<TimegrapherPage />)} />
             <Route path="/export/assurance" element={P(<InsuranceExportPage />)} />
             <Route path="/bienvenue" element={P(<OnboardingPage />)} />
             <Route path="/messages" element={P(<MessagesPage />)} />
