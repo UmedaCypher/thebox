@@ -196,8 +196,8 @@ a.tile:active { transform: scale(0.985); }
 
 /* ---------- Raccourcis ---------- */
 .shortcutsTile { min-height: 0; }
-.shortcuts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--sp-2); }
-@media (min-width: 1000px) { .shortcuts { grid-template-columns: repeat(6, minmax(0, 1fr)); } }
+.shortcuts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--sp-2); }
+@media (min-width: 1000px) { .shortcuts { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 .shortcuts a {
   display: flex; flex-direction: column; align-items: center; gap: 6px; padding: var(--sp-3) var(--sp-1); min-width: 0;
   border-radius: var(--r-md); font-size: var(--fs-xs); font-weight: 600; color: var(--text-2); text-decoration: none; text-align: center;

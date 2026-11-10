@@ -3,7 +3,8 @@ import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import {
   ArrowUpRight, Award, BarChart3, CalendarDays, Camera, Check, Info, HandCoins, Heart, Images, MessageCircle, Newspaper, Plus,
-  ShieldCheck, Sparkles, Store, Tag, UserRound, Watch as WatchIcon,
+  ShieldCheck, Sparkles, Store, Tag, Watch as WatchIcon,
+  Activity, GitCompareArrows, ShieldAlert,
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useLoad } from '../../hooks/useLoad';
@@ -56,7 +57,10 @@ const S = defineStrings({
   stats: 'Statistiques',
   wearsLabel: (n: number) => (n > 1 ? 'ports notés' : 'port noté'),
   news: 'À lire',
-  shortcuts: 'Raccourcis',
+  shortcuts: 'Outils',
+  timegrapher: 'Timegrapher',
+  compare: 'Comparer',
+  stolen: 'Montres volées',
   add: 'Ajouter',
   sell: 'Vendre',
   wishlist: 'Wishlist',
@@ -95,7 +99,10 @@ const S = defineStrings({
   stats: 'Statistics',
   wearsLabel: n => (n === 1 ? 'wear logged' : 'wears logged'),
   news: 'Worth reading',
-  shortcuts: 'Shortcuts',
+  shortcuts: 'Tools',
+  timegrapher: 'Timegrapher',
+  compare: 'Compare',
+  stolen: 'Stolen watches',
   add: 'Add',
   sell: 'Sell',
   wishlist: 'Wishlist',
@@ -424,16 +431,18 @@ export default function DashboardPage() {
           </Tile>
         )}
 
-        {/* ---------- Raccourcis ---------- */}
+        {/* ---------- Outils ---------- */}
         <section className={`panel ${s.tile} ${s.wide} ${s.shortcutsTile}`} data-tone="plain" data-reveal aria-label={t.shortcuts}>
           <span className={s.tileHead}><span className={s.tileTitle}>{t.shortcuts}</span></span>
           <nav className={s.shortcuts}>
             <Link to="/ajouter-montre"><Plus size={20} strokeWidth={1.7} aria-hidden="true" />{t.add}</Link>
             <Link to="/collection"><Tag size={20} strokeWidth={1.7} aria-hidden="true" />{t.sell}</Link>
             <Link to="/wishlist"><Heart size={20} strokeWidth={1.7} aria-hidden="true" />{t.wishlist}</Link>
+            <Link to="/timegrapher"><Activity size={20} strokeWidth={1.7} aria-hidden="true" />{t.timegrapher}</Link>
+            <Link to="/comparer"><GitCompareArrows size={20} strokeWidth={1.7} aria-hidden="true" />{t.compare}</Link>
+            <Link to="/montres-volees"><ShieldAlert size={20} strokeWidth={1.7} aria-hidden="true" />{t.stolen}</Link>
             <Link to="/export/assurance"><ShieldCheck size={20} strokeWidth={1.7} aria-hidden="true" />{t.insurance}</Link>
             <Link to="/affiliation"><HandCoins size={20} strokeWidth={1.7} aria-hidden="true" />{t.affiliate}</Link>
-            <Link to="/profil"><UserRound size={20} strokeWidth={1.7} aria-hidden="true" />{t.profile}</Link>
           </nav>
         </section>
       </div>
