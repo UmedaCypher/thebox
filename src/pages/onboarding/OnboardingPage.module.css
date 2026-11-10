@@ -102,3 +102,28 @@
 
 @keyframes in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) { .step { animation: none; } }
+
+/* Besoins (étape 2) */
+.needs { list-style: none; display: flex; flex-direction: column; gap: var(--sp-2); }
+.need {
+  width: 100%; display: flex; align-items: center; gap: var(--sp-3); padding: 12px 14px; border-radius: var(--r-md); text-align: left;
+  font-size: var(--fs-sm); font-weight: 600; color: var(--text); border: 1px solid var(--line-strong); background: var(--surface);
+  transition: border-color var(--dur), background var(--dur);
+}
+.need[aria-pressed='true'] { border-color: var(--brass); background: color-mix(in srgb, var(--brass) 12%, var(--surface)); }
+.needBox { flex: none; width: 22px; height: 22px; border-radius: 6px; display: grid; place-items: center; border: 1.5px solid var(--line-strong); color: var(--brass-ink); }
+.need[aria-pressed='true'] .needBox { background: var(--brass); border-color: var(--brass); }
+/* Découverte : le « avant » en retrait, barré */
+.before { font-size: var(--fs-sm); color: var(--text-3); text-decoration: line-through; text-decoration-color: color-mix(in srgb, var(--ruby) 60%, transparent); }
+.listDemo { display: flex; flex-direction: column; align-items: center; gap: var(--sp-3); }
+.listIcon { width: 56px; height: 56px; border-radius: 50%; display: grid; place-items: center; color: var(--brass); background: color-mix(in srgb, var(--brass) 14%, transparent); }
+.listDemo ul { list-style: none; display: flex; flex-direction: column; gap: 6px; font-size: var(--fs-sm); }
+.listDemo li { display: flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: var(--r-pill); background: rgba(239, 232, 220, 0.06); }
+.listDemo li svg { color: var(--lume); flex: none; }
+.zero { font-size: var(--fs-xs); font-weight: 700; color: var(--lume); }
+/* Premium (avant-dernière étape) */
+.premiumList { list-style: none; display: flex; flex-direction: column; gap: var(--sp-2); font-size: var(--fs-sm); color: var(--text-2); }
+.premiumList li { display: flex; gap: 8px; align-items: flex-start; }
+.premiumList svg { color: var(--brass); flex: none; margin-top: 4px; }
+.premiumList strong { color: var(--text); }
+.priceLine { font-size: var(--fs-sm); color: var(--text-2); }
