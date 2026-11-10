@@ -1,6 +1,6 @@
 import { lockScroll } from '../../lib/motion';
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
-import type { ButtonHTMLAttributes, InputHTMLAttributes, ReactNode, SelectHTMLAttributes, TextareaHTMLAttributes } from 'react';
+import type { ButtonHTMLAttributes, InputHTMLAttributes, ReactNode, Ref, SelectHTMLAttributes, TextareaHTMLAttributes } from 'react';
 import { Link } from 'react-router-dom';
 import type { LinkProps } from 'react-router-dom';
 import { ChevronLeft, Watch as WatchIcon, X } from 'lucide-react';
@@ -153,7 +153,7 @@ export function SelectField({ label, hint, error, optional, className, options, 
   );
 }
 
-export function TextArea({ label, hint, error, optional, className, ...rest }: FieldShell & TextareaHTMLAttributes<HTMLTextAreaElement>) {
+export function TextArea({ label, hint, error, optional, className, ...rest }: FieldShell & TextareaHTMLAttributes<HTMLTextAreaElement> & { ref?: Ref<HTMLTextAreaElement> }) {
   const id = useId();
   return (
     <Shell id={id} label={label} hint={hint} error={error} optional={optional} className={className}>

@@ -1074,3 +1074,72 @@ export async function deleteMyAccount(userId: string) {
   fail(error, 'Suppression impossible.');
   await supabase.auth.signOut();
 }
+
+/* ---------- Magazine (backoffice) ---------- */
+
+export interface MagazineArticle {
+  id: string;
+  lang: 'fr' | 'en';
+  slug: string;
+  translation_key: string;
+  title: string;
+  description: string;
+  category: string;
+  author: string;
+  body_md: string;
+  cover_path: string | null;
+  cover_alt: string | null;
+  cover_caption: string | null;
+  status: 'draft' | 'published';
+  published_at: string;
+  updated_at: string;
+  created_at: string;
+}
+export type MagazineArticleInput = Omit<MagazineArticle, 'id' | 'updated_at' | 'created_at'>;
+
+const MAGAZINE_BUCKET = 'magazine';
+
+/** Adresse publique d'une image du magazine (les couvertures « local:… » vivent dans le dépôt du site). */
+export const magazineImageUrl = (path: string | null) =>
+  path && !path.startsWith('local:') ? supabase.storage.from(MAGAZINE_BUCKET).getPublicUrl(path).data.publicUrl : null;
+
+export async function listMagazineArticles(): Promise<MagazineArticle[]> {
+  const { data, error } = await supabase.from('magazine_articles').select('*')
+    .order('published_at', { ascending: false }).order('updated_at', { ascending: false });
+  fail(error, 'Chargement impossible.');
+  return (data as MagazineArticle[]) ?? [];
+}
+
+export async function getMagazineArticle(id: string): Promise<MagazineArticle | null> {
+  const { data, error } = await supabase.from('magazine_articles').select('*').eq('id', id).maybeSingle();
+  fail(error, 'Chargement impossible.');
+  return data as MagazineArticle | null;
+}
+
+export async function saveMagazineArticle(id: string | null, input: MagazineArticleInput): Promise<MagazineArticle> {
+  const row = { ...input, updated_at: new Date().toISOString() };
+  const q = id
+    ? supabase.from('magazine_articles').update(row).eq('id', id).select('*').single()
+    : supabase.from('magazine_articles').insert(row).select('*').single();
+  const { data, error } = await q;
+  if (error?.message.includes('magazine_articles_lang_slug_key')) throw new Error('Cette adresse existe déjà dans cette langue.');
+  fail(error, 'Enregistrement impossible.');
+  return data as MagazineArticle;
+}
+
+export async function deleteMagazineArticle(id: string) {
+  const { error } = await supabase.from('magazine_articles').delete().eq('id', id);
+  fail(error, 'Suppression impossible.');
+}
+
+/** Envoie une image du magazine (redimensionnée à 1600 px) et renvoie son chemin dans le stockage. */
+export async function uploadMagazineImage(file: File): Promise<string> {
+  const prepared = await preparePhoto(file, 1600, 0.86);
+  const base = file.name.replace(/\.[^.]+$/, '').normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40) || 'image';
+  const ext = prepared.type === 'image/webp' ? 'webp' : 'jpg';
+  const path = `${new Date().toISOString().slice(0, 7)}/${base}-${Date.now().toString(36)}.${ext}`;
+  const { error } = await supabase.storage.from(MAGAZINE_BUCKET).upload(path, prepared, { contentType: prepared.type || 'image/jpeg' });
+  fail(error, "Envoi de l'image impossible.");
+  return path;
+}

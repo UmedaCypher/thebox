@@ -42,6 +42,7 @@ const AffiliateTermsPage = lazy(() => import('./pages/AffiliateTermsPage'));
 const AccountDeletionPage = lazy(() => import('./pages/AccountDeletionPage'));
 const AffiliatePage = lazy(() => import('./pages/affiliate/AffiliatePage'));
 const AdminPage = lazy(() => import('./pages/admin/AdminPage'));
+const MagazineAdminPage = lazy(() => import('./pages/admin/MagazineAdminPage'));
 const MarketPage = lazy(() => import('./pages/market/MarketPage'));
 const MessagesPage = lazy(() => import('./pages/messages/MessagesPage'));
 const OnboardingPage = lazy(() => import('./pages/onboarding/OnboardingPage'));
@@ -128,6 +129,8 @@ export default function App() {
             <Route path="/stats" element={P(<StatsPage />)} />
             <Route path="/affiliation" element={P(<AffiliatePage />)} />
             <Route path="/admin" element={P(<AdminPage />)} />
+            <Route path="/admin/magazine" element={P(<MagazineAdminPage />)} />
+            <Route path="/admin/magazine/:articleId" element={P(<MagazineAdminPage />)} />
             <Route path="/wishlist" element={P(<WishlistPage />)} />
             <Route path="/comparer" element={P(<ComparePage />)} />
             <Route path="/timegrapher" element={P(<TimegrapherPage />)} />

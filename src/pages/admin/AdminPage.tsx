@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { FormEvent } from 'react';
-import { Download, RefreshCw, Trash2 } from 'lucide-react';
+import { Download, Newspaper, RefreshCw, Trash2 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import {
   adminAddBrand, adminAddExpense, adminDeleteExpense, adminMergeBrand, getAdminBrandReview, adminDeleteWaitlist, exportAdminWaitlist, getAdminMembers, getAdminWaitlist, adminGrantPremium, adminSetFoundersOpen, adminUpdateAffiliate,
@@ -11,7 +11,7 @@ import type {
 } from '../../lib/api';
 import { AFFILIATE_MIN_PAYOUT_EUR } from '../../lib/features';
 import { closeBrand } from '../../lib/brands';
-import { Button, EmptyState, IconButton, Loading, Notice, PageHeader, SelectField, TextField, Toggle, Combobox } from '../../components/ui';
+import { Button, EmptyState, IconButton, LinkButton, Loading, Notice, PageHeader, SelectField, TextField, Toggle, Combobox } from '../../components/ui';
 import { useToast } from '../../components/Toast/Toast';
 import { formatDate, formatEuros, formatNumber, todayISO } from '../../lib/format';
 import { Bars, Line } from './Charts';
@@ -71,6 +71,7 @@ export default function AdminPage() {
           <Overview d={data} />
           <Kpis />
           <Okrs />
+          <Magazine />
           <Growth d={data} />
           <Members />
           <Waitlist />
@@ -83,6 +84,19 @@ export default function AdminPage() {
         </>
       )}
     </div>
+  );
+}
+
+/* ---------- Magazine ---------- */
+function Magazine() {
+  return (
+    <section className={s.section}>
+      <div className={s.sectionHead}>
+        <h2 className={s.h}>Magazine</h2>
+        <LinkButton to="/admin/magazine" variant="secondary"><Newspaper size={16} aria-hidden="true" />Gérer les articles</LinkButton>
+      </div>
+      <p className={s.small}>Écrivez, modifiez et publiez les articles du magazine. Une publication met le site à jour en 2 à 3 minutes.</p>
+    </section>
   );
 }
 
