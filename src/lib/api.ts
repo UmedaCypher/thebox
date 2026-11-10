@@ -585,6 +585,24 @@ async function invokeForUrl(fn: 'create-checkout-session' | 'create-portal-sessi
 }
 
 /** Envoie vers la page de paiement Stripe, au mois ou à l'année (avec le code d'affilié éventuel). */
+/* ---------- Offre membres fondateurs ---------- */
+
+export interface FoundersOffer { limit: number; taken: number; remaining: number; open: boolean; claimed: boolean }
+
+/** Places restantes de l'offre fondateurs (null si la fonction n'est pas encore installée). */
+export async function getFoundersOffer(): Promise<FoundersOffer | null> {
+  const { data, error } = await supabase.rpc('get_founders_offer');
+  if (error) return null;
+  return data as FoundersOffer;
+}
+
+/** Nombre de montres de la collection (pour proposer Premium quand l'écrin gratuit est plein). */
+export async function countMyWatches(userId: string): Promise<number> {
+  const { count, error } = await supabase.from('watches').select('id', { count: 'exact', head: true }).eq('user_id', userId);
+  if (error) return 0;
+  return count ?? 0;
+}
+
 export async function startCheckout(interval: 'month' | 'year') {
   const ref = interval === 'year' ? readRef() : null;
   window.location.assign(await invokeForUrl('create-checkout-session', { interval, lang: getLang(), ...(ref ? { ref } : {}) }));

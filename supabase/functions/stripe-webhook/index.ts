@@ -76,6 +76,21 @@ const HOLD_DAYS = 30;
 const YEAR_MS = 365 * 24 * 3600 * 1000;
 const idOf = (x: string | { id: string } | null | undefined) => (x == null ? null : typeof x === 'string' ? x : x.id);
 
+/** Offre membres fondateurs : la place est comptée au premier paiement d'un abonnement qui en bénéficie. */
+async function recordFoundersClaim(invoice: Stripe.Invoice) {
+  const subId = idOf(invoice.subscription as string | Stripe.Subscription | null);
+  if (!subId) return;
+  const sub = await stripe.subscriptions.retrieve(subId);
+  if (sub.metadata?.founders_offer !== '1') return;
+  const userId = await userIdFor(sub);
+  if (!userId) return;
+  const { error } = await admin.from('founders_offer_claims').upsert(
+    { user_id: userId, stripe_subscription_id: sub.id, billing_interval: sub.items.data[0]?.price.recurring?.interval ?? null },
+    { onConflict: 'user_id', ignoreDuplicates: true },
+  );
+  if (error) throw error;
+}
+
 /** Facture payée d'un abonnement parrainé : 30 % du HT pour les factures annuelles de la première année. */
 async function recordCommission(invoice: Stripe.Invoice) {
   const subId = idOf(invoice.subscription as string | Stripe.Subscription | null);
@@ -197,6 +212,7 @@ Deno.serve(async (req) => {
       case 'invoice.paid':
         await recordPayment(event.data.object as Stripe.Invoice);
         await recordCommission(event.data.object as Stripe.Invoice);
+        await recordFoundersClaim(event.data.object as Stripe.Invoice);
         break;
       case 'charge.refunded': {
         const charge = event.data.object as Stripe.Charge;

@@ -5,7 +5,7 @@ import { Star, Trash2 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useLoad } from '../../hooks/useLoad';
 import {
-  addWatchPhoto, createWatch, deletePhoto, fetchReferenceOptions, fetchCaliberSuggestions, getWatch, setMainPhoto, thumbSrc, updateWatch, WatchLimitError,
+  addWatchPhoto, countMyWatches, createWatch, deletePhoto, fetchReferenceOptions, fetchCaliberSuggestions, getWatch, setMainPhoto, thumbSrc, updateWatch, WatchLimitError,
 } from '../../lib/api';
 import type { Photo, Watch, WatchInput, WatchStatus } from '../../types';
 import { Button, Combobox, Cushion, IconButton, Notice, PageHeader, Segmented, SelectField, TextArea, TextField, Toggle } from '../../components/ui';
@@ -270,7 +270,7 @@ export default function WatchEditorPage() {
   const toast = useToast();
   const { watchId } = useParams();
   const isEdit = Boolean(watchId);
-  const { user, profile } = useAuth();
+  const { user, profile, isPremium } = useAuth();
   const uid = user!.id;
   const navigate = useNavigate();
 
@@ -337,7 +337,9 @@ export default function WatchEditorPage() {
       if (wristFile) await addWatchPhoto(uid, id!, wristFile, { type: 'wrist_shot', inGallery: wristInGallery, wristSizeCm: profile?.wrist_size_cm ?? null });
       const wasListed = Boolean(existing.data && ['for_sale', 'for_exchange'].includes(existing.data.current_status));
       toast(listed && !wasListed ? c.toast.listingOn : isEdit ? c.toast.watchSaved : c.toast.watchAdded);
-      navigate(`/montre/${id}`, { replace: !isEdit });
+      // L'écrin gratuit vient d'être rempli : on propose Premium sur la fiche de la montre
+      const full = !isEdit && !isPremium && (await countMyWatches(uid)) >= FREE_WATCH_LIMIT;
+      navigate(`/montre/${id}`, { replace: !isEdit, state: full ? { collectionFull: true } : undefined });
     } catch (err) {
       if (err instanceof WatchLimitError) setLimitOpen(true);
       else setError(err instanceof Error ? err.message : t.saveFailed);

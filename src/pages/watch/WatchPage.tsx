@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import type { FormEvent, ReactNode } from 'react';
-import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { Check, Link2, Pencil, Plus, Trash2 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useLoad } from '../../hooks/useLoad';
@@ -21,6 +21,7 @@ import {
 import WearStrip from '../../components/WearStrip/WearStrip';
 import Sparkline from '../../components/Sparkline/Sparkline';
 import PremiumSheet from '../../components/PremiumSheet/PremiumSheet';
+import { FREE_WATCH_LIMIT } from '../../lib/features';
 import s from './WatchPage.module.css';
 import { SkeletonDetail, SkeletonList } from '../../components/Skeleton/Skeleton';
 import { useToast } from '../../components/Toast/Toast';
@@ -61,6 +62,7 @@ const S = defineStrings({
   premiumCost: 'Le coût par port fait partie des statistiques Premium.',
   premiumService: "Le carnet d'entretien et ses rappels font partie de Premium.",
   premiumValue: "L'historique de valeur fait partie de Premium.",
+  collectionFull: (n: number) => `Votre écrin gratuit est complet : ${n} montres, toutes à leur place. Pour accueillir la suivante, et garder chaque pièce documentée, passez à Premium.`,
   deleteWatch: 'Supprimer cette montre',
   specs: {
     reference: 'Référence', year: 'Année', movement: 'Mouvement', diameter: 'Diamètre', lugToLug: 'Corne à corne',
@@ -143,6 +145,7 @@ const S = defineStrings({
   premiumCost: 'Cost per wear is part of the Premium stats.',
   premiumService: 'The service log and its reminders are part of Premium.',
   premiumValue: 'Value history is part of Premium.',
+  collectionFull: (n: number) => `Your free case is full: ${n} watches, each in its place. To welcome the next one and keep every piece documented, go Premium.`,
   deleteWatch: 'Delete this watch',
   specs: {
     reference: 'Reference', year: 'Year', movement: 'Movement', diameter: 'Diameter', lugToLug: 'Lug to lug',
@@ -216,7 +219,10 @@ export default function WatchPage() {
   const { data: watch, setData: setWatch, loading, error } = useLoad(() => getWatch(uid, watchId!), [uid, watchId]);
   const wears = useLoad(() => listWearLogs(uid).then(l => l.filter(w => w.watch_id === watchId)), [uid, watchId]);
   const [photoIndex, setPhotoIndex] = useState(0);
-  const [premiumReason, setPremiumReason] = useState<string | null>(null);
+  const location = useLocation();
+  // Arrivée depuis l'ajout de la montre qui remplit l'écrin gratuit : on propose Premium une fois
+  const [premiumReason, setPremiumReason] = useState<string | null>(
+    (location.state as { collectionFull?: boolean } | null)?.collectionFull ? t.collectionFull(FREE_WATCH_LIMIT) : null);
 
   const wornDays = useMemo(() => new Set((wears.data ?? []).map(w => w.worn_on)), [wears.data]);
   const wornToday = wornDays.has(todayISO());

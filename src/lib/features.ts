@@ -34,16 +34,22 @@ export const canPurchase = () => PAYMENTS_ENABLED && !isAndroidApp();
  */
 export type BillingInterval = 'month' | 'year';
 const PRICES = defineStrings<Record<BillingInterval, { amount: string; period: string; note?: string }>>({
-  month: { amount: '3 €', period: 'par mois' },
-  year: { amount: '30 €', period: 'par an', note: '2 mois offerts' },
+  month: { amount: '2,99\u00a0€', period: 'par mois' },
+  year: { amount: '29,90\u00a0€', period: 'par an', note: '2 mois offerts' },
 }, {
-  month: { amount: '€3', period: 'per month' },
-  year: { amount: '€30', period: 'per year', note: '2 months free' },
+  month: { amount: '€2.99', period: 'per month' },
+  year: { amount: '€29.90', period: 'per year', note: '2 months free' },
 });
 export const premiumPrices = () => tr(PRICES);
 /** Prix TTC en euros, pour les calculs (coût par port, affiliation). Garder identique aux prix Stripe. */
-export const PREMIUM_YEAR_EUR = 30;
-export const PREMIUM_MONTH_EUR = 3;
+export const PREMIUM_YEAR_EUR = 29.9;
+export const PREMIUM_MONTH_EUR = 2.99;
+
+/**
+ * Offre membres fondateurs : les FOUNDERS_OFFER.limit premiers abonnés paient la première année à prix réduit,
+ * puis le tarif normal. Appliquée par create-checkout-session (coupons Stripe), décomptée par le webhook.
+ */
+export const FOUNDERS_OFFER = { limit: 100, month: 1, year: 9.99 } as const;
 
 /* ---------- Parrainage et affiliation (mêmes valeurs que la migration et le webhook) ---------- */
 export type AffiliateKind = 'member' | 'creator' | 'pro';
@@ -68,7 +74,7 @@ export const AFFILIATE_HOLD_DAYS = 30;
 export const AFFILIATE_MIN_PAYOUT_EUR = 50;
 /** TVA française incluse dans le prix affiché, pour estimer la commission par abonné. */
 export const VAT_RATE = 0.2;
-/** Commission estimée par abonné annuel, en euros (7,50 € pour 30 € TTC). */
+/** Commission estimée par abonné annuel, en euros (7,48 € pour 29,90 € TTC). */
 export const affiliateCommissionPerYear = () => Math.round((PREMIUM_YEAR_EUR / (1 + VAT_RATE)) * AFFILIATE_RATE * 100) / 100;
 
 /**

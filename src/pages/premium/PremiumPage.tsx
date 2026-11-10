@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { FREE_WATCH_LIMIT, PAYMENTS_ENABLED, canPurchase, premiumPrices } from '../../lib/features';
+import { FOUNDERS_OFFER, FREE_WATCH_LIMIT, PAYMENTS_ENABLED, canPurchase, premiumPrices } from '../../lib/features';
+import FoundersOffer, { eur, useFoundersOffer } from '../../components/FoundersOffer/FoundersOffer';
 import { isAndroidApp } from '../../lib/platform';
 import type { BillingInterval } from '../../lib/features';
 import { premiumFeatures, premiumHighlights } from '../../lib/premium';
@@ -46,6 +47,7 @@ const S = defineStrings({
   yearly: 'À l’année',
   monthly: 'Au mois',
   soon: '. Bientôt disponible',
+  firstYear: 'la première année (offre fondateurs)',
   pays: 'Ce qui le rentabilise',
   alsoIncluded: 'Et aussi, en plus du gratuit :',
 }, {
@@ -81,6 +83,7 @@ const S = defineStrings({
   yearly: 'Yearly',
   monthly: 'Monthly',
   soon: '. Coming soon',
+  firstYear: 'for the first year (founding offer)',
   pays: 'What makes it worth it',
   alsoIncluded: 'Plus, on top of the free plan:',
 });
@@ -95,6 +98,8 @@ export default function PremiumPage() {
   const [accepted, setAccepted] = useState(false);
   const [interval, setInterval_] = useState<BillingInterval>('year');
   const price = premiumPrices()[interval];
+  const founders = useFoundersOffer();
+  const foundersAmount = founders ? eur(FOUNDERS_OFFER[interval]) : null;
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [waiting, setWaiting] = useState(result === 'ok');
@@ -155,7 +160,7 @@ export default function PremiumPage() {
           <input type="checkbox" checked={accepted} onChange={e => setAccepted(e.target.checked)} />
           <span>{t.consentBefore}<Link to="/cgv">{t.terms}</Link>{t.consentAfter}</span>
         </label>
-        <Button onClick={subscribe} disabled={!accepted || busy}>{busy ? t.opening : t.subscribe(price.amount, price.period)}</Button>
+        <Button onClick={subscribe} disabled={!accepted || busy}>{busy ? t.opening : t.subscribe(foundersAmount ?? price.amount, price.period)}</Button>
         <p className={s.small}>{t.secure}</p>
       </div>
     );
@@ -175,6 +180,8 @@ export default function PremiumPage() {
       )}
       {error && <Notice tone="error">{error}</Notice>}
 
+      {!isPremium && <div className={s.founders}><FoundersOffer /></div>}
+
       <div className={s.plans}>
         <section className={`panel ${s.plan}`} data-tone="lume">
           <h2>{t.freePlan}</h2>
@@ -190,8 +197,8 @@ export default function PremiumPage() {
           )}
           <p className={s.price}>
             {isAndroidApp() ? null : <>
-              {price.amount}
-              <span>{price.period}{price.note && `, ${price.note}`}{!PAYMENTS_ENABLED && t.soon}</span>
+              {foundersAmount ? <>{foundersAmount} <s className={s.was}>{price.amount}</s></> : price.amount}
+              <span>{price.period}{foundersAmount ? `, ${t.firstYear}` : price.note && `, ${price.note}`}{!PAYMENTS_ENABLED && t.soon}</span>
             </>}
           </p>
           <p className={s.includes}>{t.pays}</p>

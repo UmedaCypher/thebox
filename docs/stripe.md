@@ -27,8 +27,8 @@ On travaille d'abord en **mode test** (interrupteur « Mode test » en haut du t
 
 1. **Catalogue de produits → Ajouter un produit** « Premium » avec **deux prix récurrents**, en cochant
    « Le prix inclut les taxes » (prix TTC) :
-   - 3 € **par mois** ;
-   - 30 € **par an**.
+   - 2,99 € **par mois** ;
+   - 29,90 € **par an**.
 
    Copier l'identifiant de chaque prix (`price_…`).
 2. **TVA** (à confirmer avec le comptable) :
@@ -60,6 +60,8 @@ On travaille d'abord en **mode test** (interrupteur « Mode test » en haut du t
 | `STRIPE_SECRET_KEY` | `sk_test_…` |
 | `STRIPE_PRICE_MONTHLY` | `price_…` du prix mensuel |
 | `STRIPE_PRICE_YEARLY` | `price_…` du prix annuel |
+| `STRIPE_COUPON_FOUNDERS_MONTHLY` | coupon de l'offre fondateurs mensuelle (voir plus bas) |
+| `STRIPE_COUPON_FOUNDERS_YEARLY` | coupon de l'offre fondateurs annuelle (voir plus bas) |
 | `SITE_URL` | `https://arcorawatch.com` (sans `/` final) |
 | `STRIPE_TAX_RATE` | `txr_…` si la société est redevable de la TVA (sinon ne pas créer ce secret) |
 | `STRIPE_TERMS_CONSENT` | `on` pour faire aussi cocher les CGV sur la page Stripe (facultatif : l'app les fait déjà accepter) |
@@ -103,7 +105,7 @@ Sans toucher au code : Cloudflare → ton Worker → **Settings → Build → Va
 `VITE_PAYMENTS_ENABLED` = `true`, puis relancer un déploiement (Deployments → Retry, ou un nouvel envoi sur `main`).
 Pour couper les paiements : remettre `false` et redéployer.
 
-Vérifier que les prix affichés (`PRICES` dans `src/lib/features.ts` : 3 € et 30 €) sont les mêmes que dans Stripe.
+Vérifier que les prix affichés (`PRICES` dans `src/lib/features.ts` : 2,99 € et 29,90 €) sont les mêmes que dans Stripe.
 Dans l'application Android, rien n'est vendu (règles de Google Play) : Premium s'achète sur le site.
 
 ## 8. Tester (mode test)
@@ -135,3 +137,17 @@ Dans l'application Android, rien n'est vendu (règles de Google Play) : Premium 
   « à compléter » sur les pages. Faire relire le tout par un professionnel.
 - **Médiateur de la consommation** : obligatoire dès la première vente à un particulier.
 - Dans les apps Android et iOS, le Premium passera par l'achat intégré (voir le plan de lancement) ; Stripe reste pour le web.
+
+
+## Offre membres fondateurs (100 places, première année)
+
+Les 100 premiers abonnés paient **1 €/mois** ou **9,99 €/an** la première année, puis le tarif normal.
+
+1. Stripe → **Produits → Coupons → Nouveau** :
+   - `Fondateurs mensuel` : montant fixe **1,99 €**, durée **plusieurs mois**, **12 mois** → 2,99 − 1,99 = 1 €/mois pendant un an ;
+   - `Fondateurs annuel` : montant fixe **19,91 €**, durée **une fois** → 29,90 − 19,91 = 9,99 € la première année.
+2. Copier les identifiants des coupons dans les secrets Supabase `STRIPE_COUPON_FOUNDERS_MONTHLY` et `STRIPE_COUPON_FOUNDERS_YEARLY`.
+3. Redéployer `create-checkout-session` et `stripe-webhook`.
+
+Le compteur de places est tenu par la base (`founders_offer_claims`, une ligne au premier paiement) ; l'offre se ferme seule à 100,
+ou depuis le backoffice. Sans les coupons, l'app affiche l'offre mais Stripe facture le tarif normal : créez les coupons avant d'ouvrir.

@@ -30,3 +30,7 @@
   flex: none; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center;
   background: color-mix(in srgb, var(--brass) 18%, transparent); color: var(--brass);
 }
+
+/* Offre fondateurs */
+.founders { margin-bottom: var(--sp-5); }
+.was { font-size: 0.5em; color: var(--text-3); text-decoration-thickness: 1px; font-family: var(--font-body); vertical-align: middle; }

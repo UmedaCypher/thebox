@@ -5,11 +5,14 @@
 //
 // Secrets nécessaires (Supabase → Edge Functions → Secrets) :
 //   STRIPE_SECRET_KEY  clé secrète Stripe (sk_test_… puis sk_live_…)
-//   STRIPE_PRICE_MONTHLY  identifiant du prix mensuel (price_…, 3 €/mois)
-//   STRIPE_PRICE_YEARLY   identifiant du prix annuel (price_…, 30 €/an)
+//   STRIPE_PRICE_MONTHLY  identifiant du prix mensuel (price_…, 2,99 €/mois)
+//   STRIPE_PRICE_YEARLY   identifiant du prix annuel (price_…, 29,90 €/an)
 //   SITE_URL           adresse publique de l'app, sans / final (ex. https://arcorawatch.com)
 // Facultatifs :
 //   STRIPE_TAX_RATE      taux de TVA Stripe (txr_…, « TVA 20 % incluse ») ajouté à l'abonnement et aux factures
+//   STRIPE_COUPON_FOUNDERS_MONTHLY  coupon de l'offre fondateurs mensuelle (1,99 € de remise, 12 mois : 1 €/mois la 1re année)
+//   STRIPE_COUPON_FOUNDERS_YEARLY   coupon de l'offre fondateurs annuelle (19,91 € de remise, une fois : 9,99 € la 1re année)
+//                        Sans ces coupons, l'offre fondateurs n'est pas appliquée (tarif normal).
 //   STRIPE_TERMS_CONSENT « on » pour faire cocher les CGV sur la page de paiement
 //                        (renseigner d'abord l'adresse des CGV dans Stripe → Paramètres → Informations publiques)
 //
@@ -110,6 +113,18 @@ Deno.serve(async (req) => {
       }
     }
 
+    // Offre membres fondateurs : premier abonnement seulement, tant qu'il reste des places.
+    let foundersCoupon: string | null = null;
+    const couponId = Deno.env.get(interval === 'month' ? 'STRIPE_COUPON_FOUNDERS_MONTHLY' : 'STRIPE_COUPON_FOUNDERS_YEARLY');
+    if (couponId) {
+      const { data: offer } = await admin.rpc('get_founders_offer');
+      const { data: claim } = await admin.from('founders_offer_claims').select('user_id').eq('user_id', user.id).maybeSingle();
+      if (offer?.open && !claim) {
+        const earlier = await stripe.subscriptions.list({ customer: customerId, status: 'all', limit: 1 });
+        if (!earlier.data.length) foundersCoupon = couponId;
+      }
+    }
+
     const taxRate = Deno.env.get('STRIPE_TAX_RATE');
     const termsConsent = Deno.env.get('STRIPE_TERMS_CONSENT') === 'on';
     const en = body?.lang === 'en';
@@ -119,11 +134,16 @@ Deno.serve(async (req) => {
       client_reference_id: user.id,
       line_items: [{ price: priceId, quantity: 1, ...(taxRate ? { tax_rates: [taxRate] } : {}) }],
       subscription_data: {
-        metadata: { supabase_user_id: user.id, ...(affiliateId ? { affiliate_id: affiliateId, affiliate_code: affiliateCode } : {}) },
+        metadata: {
+          supabase_user_id: user.id,
+          ...(affiliateId ? { affiliate_id: affiliateId, affiliate_code: affiliateCode } : {}),
+          ...(foundersCoupon ? { founders_offer: '1' } : {}),
+        },
         ...(taxRate ? { default_tax_rates: [taxRate] } : {}),
       },
       metadata: { supabase_user_id: user.id },
-      allow_promotion_codes: true,
+      // Stripe n'accepte pas à la fois une remise imposée et la saisie d'un code promo
+      ...(foundersCoupon ? { discounts: [{ coupon: foundersCoupon }] } : { allow_promotion_codes: true }),
       locale: en ? 'en' : 'fr',
       ...(termsConsent ? {
         consent_collection: { terms_of_service: 'required' as const },
