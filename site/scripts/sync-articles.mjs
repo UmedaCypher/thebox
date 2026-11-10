@@ -17,6 +17,22 @@ const yaml = (v) => JSON.stringify(v); // une chaîne JSON est une chaîne YAML 
 const edited = (r) => r.updated_at.slice(0, 10) > r.published_at
   && new Date(r.updated_at).getTime() - new Date(r.created_at).getTime() > 10 * 60 * 1000;
 
+/**
+ * Filet de sécurité : une erreur dans un article ne doit jamais bloquer la mise à jour de tout le site.
+ * Image sans texte alternatif → on prend le titre de l'article ; image du dépôt introuvable → retirée.
+ */
+function safeBody(r) {
+  return r.body_md.trim().replace(/!\[([^\]]*)\]\(\s*(\S+?)(\s+"[^"]*")?\s*\)/g, (all, alt, src, title = '') => {
+    if (src.startsWith('../images/') && !existsSync(join(IMAGES, basename(src)))) {
+      console.warn(`[magazine] ${r.lang}/${r.slug} : image introuvable retirée (${src})`);
+      return '';
+    }
+    if (alt.trim()) return all;
+    console.warn(`[magazine] ${r.lang}/${r.slug} : image sans texte alternatif, titre de l'article utilisé (${src})`);
+    return `![${r.title.replace(/[[\]]/g, '')}](${src}${title})`;
+  });
+}
+
 async function main() {
   if (!url || !key || key === 'mock-anon') {
     console.log('[magazine] Pas de connexion Supabase : articles du dépôt uniquement.');
@@ -79,7 +95,7 @@ async function main() {
       '---',
       '',
     ].join('\n');
-    writeFileSync(join(ROOT, r.lang, `${r.slug}.md`), fm + r.body_md.trim() + '\n');
+    writeFileSync(join(ROOT, r.lang, `${r.slug}.md`), fm + safeBody(r) + '\n');
   }
   console.log(`[magazine] ${rows.length} article(s) du backoffice.`);
 }

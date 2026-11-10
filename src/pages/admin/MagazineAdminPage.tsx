@@ -183,7 +183,8 @@ function Editor({ id }: { id: string | null }) {
     translation_key: form.translation_key.trim().length < 2 ? 'Obligatoire.' : null,
     category: form.category.trim().length < 2 ? 'Obligatoire.' : form.category.trim().length > 40 ? '40 caractères au plus.' : null,
     cover_alt: form.cover_path && !form.cover_alt?.trim() ? 'Décrivez l\'image (lecteurs d\'écran et Google).' : null,
-    body_md: form.body_md.trim().length < 200 ? 'Le texte est trop court pour être publié (200 caractères au moins).' : null,
+    body_md: form.body_md.trim().length < 200 ? 'Le texte est trop court pour être publié (200 caractères au moins).'
+      : /!\[\s*\]\(/.test(form.body_md) ? 'Une image n\'a pas de description : écrivez-la entre les crochets, ![description](…).' : null,
   };
   // Un brouillon peut être incomplet, sauf ce que la base exige pour l'enregistrer
   const blocking = (publish: boolean) => Object.entries(errors).filter(([k, v]) => v && (publish || k !== 'body_md')).length > 0;
@@ -253,8 +254,9 @@ function Editor({ id }: { id: string | null }) {
       const path = await uploadMagazineImage(file);
       if (target === 'cover') set('cover_path', path);
       else {
-        const alt = window.prompt('Description de l\'image (pour les lecteurs d\'écran et Google) :', '') ?? '';
-        wrap(`\n\n![${alt.replace(/[[\]]/g, '')}](${magazineImageUrl(path)})\n\n`);
+        const alt = (window.prompt('Description de l\'image (pour les lecteurs d\'écran et Google) :', '') ?? '').replace(/[[\]]/g, '').trim();
+        // Sans description, on laisse un repère visible à remplacer (la publication le signale)
+        wrap(`\n\n![${alt}](${magazineImageUrl(path)} "Légende facultative")\n\n`);
       }
     } catch (err) { toast(err instanceof Error ? err.message : String(err)); }
     setUploading(false);
