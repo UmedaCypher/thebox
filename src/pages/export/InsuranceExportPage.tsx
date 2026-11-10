@@ -20,7 +20,7 @@ const S = defineStrings({
   totalValue: 'Valeur totale déclarée',
   watches: (n: number) => `${n} montre${n > 1 ? 's' : ''}`,
   specs: {
-    reference: 'Référence', year: 'Année', movement: 'Mouvement', diameter: 'Diamètre', case: 'Boîtier', condition: 'État',
+    reference: 'Référence', serial: 'N° de série', year: 'Année', movement: 'Mouvement', diameter: 'Diamètre', case: 'Boîtier', condition: 'État',
     boxPapers: 'Boîte et papiers', purchaseDate: 'Date d\'achat', purchasePrice: 'Prix d\'achat', lastService: 'Dernière révision',
   },
   worn: 'Portée',
@@ -38,7 +38,7 @@ const S = defineStrings({
   totalValue: 'Total declared value',
   watches: n => `${n} ${n === 1 ? 'watch' : 'watches'}`,
   specs: {
-    reference: 'Reference', year: 'Year', movement: 'Movement', diameter: 'Diameter', case: 'Case', condition: 'Condition',
+    reference: 'Reference', serial: 'Serial no.', year: 'Year', movement: 'Movement', diameter: 'Diameter', case: 'Case', condition: 'Condition',
     boxPapers: 'Box & papers', purchaseDate: 'Purchase date', purchasePrice: 'Purchase price', lastService: 'Last service',
   },
   worn: 'Worn',
@@ -99,7 +99,7 @@ function ExportContent() {
               <h2><span className="num">{i + 1}.</span> {w.brand} {w.model}</h2>
               <dl>
                 {([
-                  [t.specs.reference, w.reference_number], [t.specs.year, w.year_of_production], [t.specs.movement, [movementLabel(w.movement, lang), w.caliber].filter(Boolean).join(' · ') || null],
+                  [t.specs.reference, w.reference_number], [t.specs.serial, w.serial_number ?? null], [t.specs.year, w.year_of_production], [t.specs.movement, [movementLabel(w.movement, lang), w.caliber].filter(Boolean).join(' · ') || null],
                   [t.specs.diameter, formatMm(w.case_diameter_mm)], [t.specs.case, w.case_material], [t.specs.condition, w.condition],
                   [t.specs.boxPapers, w.box_papers_status], [t.specs.purchaseDate, w.purchase_date ? formatDate(w.purchase_date) : null],
                   [t.specs.purchasePrice, w.purchase_price !== null ? formatEuros(Number(w.purchase_price)) : null],
