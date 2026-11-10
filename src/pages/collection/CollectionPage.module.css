@@ -23,3 +23,5 @@
   text-decoration: none; font-size: var(--fs-sm);
 }
 .reminder span { color: var(--text-2); }
+
+.headActions { display: flex; gap: var(--sp-2); flex-wrap: wrap; }

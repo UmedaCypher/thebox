@@ -5,6 +5,7 @@ import { getPassport, mainPhoto, photoUrl, thumbSrc } from '../../lib/api';
 import { formatDate, formatMm } from '../../lib/format';
 import { listingPrice } from '../../lib/listing';
 import { Cushion, Glow, LinkButton, Notice } from '../../components/ui';
+import { useAuth } from '../../contexts/AuthContext';
 import ContactButton from '../../components/ContactButton/ContactButton';
 import { defineStrings, useLang, useStrings } from '../../i18n';
 import { COMMON, movementLabel } from '../../i18n/common';
@@ -35,6 +36,7 @@ const S = defineStrings({
   pricesPrivate: 'Prix et valeur ne sont jamais publiés.',
   backToWatch: 'Retour à ma montre',
   backToMarket: 'Retour au marché',
+  compareMine: 'Comparer avec ma collection',
   createPassport: 'Créer le passeport de mes montres',
 }, {
   notFound: 'This passport doesn’t exist or is no longer shared.',
@@ -60,11 +62,13 @@ const S = defineStrings({
   pricesPrivate: 'Prices and values are never published.',
   backToWatch: 'Back to my watch',
   backToMarket: 'Back to the Market',
+  compareMine: 'Compare with my collection',
   createPassport: 'Create passports for my watches',
 });
 
 /** Passeport public d'une montre : caractéristiques et historique, jamais les prix. */
 export default function PassportPage() {
+  const { user } = useAuth();
   const t = useStrings(S);
   const c = useStrings(COMMON);
   const { lang } = useLang();
@@ -156,7 +160,10 @@ export default function PassportPage() {
 
           {p.is_owner
             ? <LinkButton to={`/montre/${p.id}`} variant="ghost">{t.backToWatch}</LinkButton>
-            : p.listing ? <LinkButton to="/marche" variant="ghost">{t.backToMarket}</LinkButton>
+            : p.listing ? <>
+                {user && <LinkButton to={`/comparer?b=${p.id}`} variant="secondary">{t.compareMine}</LinkButton>}
+                <LinkButton to="/marche" variant="ghost">{t.backToMarket}</LinkButton>
+              </>
             : <LinkButton to="/" variant="secondary">{t.createPassport}</LinkButton>}
         </div>
       </article>

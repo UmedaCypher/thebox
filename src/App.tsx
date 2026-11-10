@@ -23,6 +23,7 @@ import { SkeletonHeader } from './components/Skeleton/Skeleton';
 // Pages secondaires, chargées à la demande.
 const StatsPage = lazy(() => import('./pages/stats/StatsPage'));
 const WishlistPage = lazy(() => import('./pages/wishlist/WishlistPage'));
+const ComparePage = lazy(() => import('./pages/compare/ComparePage'));
 const InsuranceExportPage = lazy(() => import('./pages/export/InsuranceExportPage'));
 const WatchNewsPage = lazy(() => import('./pages/WatchNewsPage'));
 const FaqPage = lazy(() => import('./pages/FaqPage'));
@@ -122,6 +123,7 @@ export default function App() {
             <Route path="/affiliation" element={P(<AffiliatePage />)} />
             <Route path="/admin" element={P(<AdminPage />)} />
             <Route path="/wishlist" element={P(<WishlistPage />)} />
+            <Route path="/comparer" element={P(<ComparePage />)} />
             <Route path="/export/assurance" element={P(<InsuranceExportPage />)} />
             <Route path="/bienvenue" element={P(<OnboardingPage />)} />
             <Route path="/messages" element={P(<MessagesPage />)} />

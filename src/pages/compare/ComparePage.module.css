@@ -1,0 +1,29 @@
+.heads { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: var(--sp-3); align-items: start; margin-bottom: var(--sp-5); }
+.slot { display: flex; flex-direction: column; gap: var(--sp-2); min-width: 0; }
+.photo {
+  aspect-ratio: 1; border-radius: var(--r-lg); overflow: hidden; display: grid; place-items: center; color: var(--text-3);
+  background: var(--cushion); box-shadow: var(--shadow-sm);
+}
+.photo img { width: 100%; height: 100%; object-fit: cover; }
+.name { display: flex; flex-direction: column; min-width: 0; }
+.name span { font-size: var(--fs-xs); font-weight: 600; color: var(--text-2); }
+.name a { font-family: var(--font-display); font-size: var(--fs-lg); line-height: 1.15; color: var(--text); text-decoration: none; overflow-wrap: anywhere; }
+.tag { align-self: flex-start; font-size: var(--fs-xs); font-weight: 700; padding: 3px 10px; border-radius: var(--r-pill); color: var(--ruby); background: color-mix(in srgb, var(--ruby) 12%, transparent); }
+.swap {
+  align-self: center; margin-top: 30%; width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center;
+  color: var(--brass); border: 1px solid var(--line-strong); background: var(--surface);
+}
+.swap:hover { border-color: var(--brass); }
+.table { width: 100%; border-collapse: collapse; font-size: var(--fs-sm); table-layout: fixed; }
+.table th, .table td { padding: 12px 8px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); overflow-wrap: anywhere; }
+.table th { width: 34%; color: var(--text-2); font-weight: 600; }
+.table td { color: var(--text); }
+.table tr[data-differs='true'] td { color: var(--text); font-weight: 600; }
+.table tr[data-differs='false'] td { color: var(--text-3); }
+.delta { display: block; margin-top: 2px; font-size: var(--fs-xs); font-weight: 700; color: var(--brass); font-variant-numeric: tabular-nums; }
+.note { margin-top: var(--sp-4); font-size: var(--fs-xs); color: var(--text-3); }
+@media (min-width: 720px) {
+  .heads { gap: var(--sp-5); }
+  .table th { width: 28%; }
+  .photo { aspect-ratio: 4 / 3; }
+}

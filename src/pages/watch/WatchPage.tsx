@@ -75,6 +75,7 @@ const S = defineStrings({
   linkCopied: 'Lien copié',
   shareLink: 'Partager le lien',
   seePublic: 'Voir la page publique',
+  compare: 'Comparer avec une autre montre',
   daysWorn: (n: number) => (n > 1 ? 'jours portée' : 'jour portée'),
   lastWear: 'dernier port',
   costPerWear: 'coût par port',
@@ -158,6 +159,7 @@ const S = defineStrings({
   linkCopied: 'Link copied',
   shareLink: 'Share the link',
   seePublic: 'View the public page',
+  compare: 'Compare with another watch',
   daysWorn: n => (n === 1 ? 'day worn' : 'days worn'),
   lastWear: 'last worn',
   costPerWear: 'cost per wear',
@@ -409,6 +411,7 @@ function PassportTab({ watch, uid, onUpdate }: { watch: Watch; uid: string; onUp
             <Link to={`/passeport/${watch.id}`} className={s.subtle}>{t.seePublic}</Link>
           </div>
         )}
+        <Link to={`/comparer?a=${watch.id}`} className={s.subtle}>{t.compare}</Link>
       </section>
     </div>
   );

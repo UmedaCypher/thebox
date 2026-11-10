@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Plus } from 'lucide-react';
+import { ArrowLeftRight, Plus } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useLoad } from '../../hooks/useLoad';
 import { listMaintenance, listWatches, listWearLogs, mainPhoto, thumbSrc } from '../../lib/api';
@@ -25,6 +25,7 @@ const S = defineStrings({
   opening: "Ouverture de l'écrin…",
   title: 'Collection',
   add: 'Ajouter',
+  compare: 'Comparer',
   emptyTitle: 'Votre écrin est vide',
   addFirst: 'Ajouter ma première montre',
   emptyText: 'Commencez par la montre que vous portez le plus. Une photo, une marque, un modèle : le reste peut attendre.',
@@ -47,6 +48,7 @@ const S = defineStrings({
   opening: 'Opening your watch box…',
   title: 'Collection',
   add: 'Add',
+  compare: 'Compare',
   emptyTitle: 'Your watch box is empty',
   addFirst: 'Add my first watch',
   emptyText: 'Start with the watch you wear most. A photo, a brand, a model: the rest can wait.',
@@ -137,7 +139,12 @@ export default function CollectionPage() {
       <PageHeader
         title={t.title}
         action={watches.length > 0 && (
-          <Button size="small" onClick={onAdd}><Plus size={16} strokeWidth={2} aria-hidden="true" />{t.add}</Button>
+          <div className={s.headActions}>
+            {watches.length > 1 && (
+              <LinkButton to="/comparer" size="small" variant="secondary"><ArrowLeftRight size={16} strokeWidth={2} aria-hidden="true" />{t.compare}</LinkButton>
+            )}
+            <Button size="small" onClick={onAdd}><Plus size={16} strokeWidth={2} aria-hidden="true" />{t.add}</Button>
+          </div>
         )}
       />
 
