@@ -28,6 +28,7 @@ const InsuranceExportPage = lazy(() => import('./pages/export/InsuranceExportPag
 const WatchNewsPage = lazy(() => import('./pages/WatchNewsPage'));
 const FaqPage = lazy(() => import('./pages/FaqPage'));
 const AboutPage = lazy(() => import('./pages/AboutPage'));
+const VersusPage = lazy(() => import('./pages/VersusPage'));
 const ContactPage = lazy(() => import('./pages/ContactPage'));
 const PressPage = lazy(() => import('./pages/PressPage'));
 const CguPage = lazy(() => import('./pages/CguPage'));
@@ -101,6 +102,7 @@ export default function App() {
             <Route path="/nouveau-mot-de-passe" element={<NewPasswordPage />} />
             <Route path="/faq" element={<FaqPage />} />
             <Route path="/a-propos" element={<AboutPage />} />
+            <Route path="/arcora-vs" element={<VersusPage />} />
             <Route path="/contact" element={<ContactPage />} />
             <Route path="/presse" element={<PressPage />} />
             <Route path="/cgu" element={<CguPage />} />

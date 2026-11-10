@@ -1,0 +1,16 @@
+.verified { font-size: var(--fs-sm); color: var(--text-3); }
+.scroll { overflow-x: auto; margin: 0 calc(var(--gutter) * -1); padding: 0 var(--gutter); -webkit-overflow-scrolling: touch; }
+.table { width: 100%; min-width: 760px; border-collapse: collapse; font-size: var(--fs-sm); }
+.table th, .table td { padding: 10px 10px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); }
+.table thead th { font-family: var(--font-display); font-size: var(--fs-md); font-weight: 500; color: var(--text); white-space: nowrap; }
+.table thead small { display: block; font-family: var(--font-body); font-size: 11px; color: var(--text-3); font-weight: 400; }
+.table tbody th { color: var(--text-2); font-weight: 600; min-width: 170px; position: sticky; left: 0; background: var(--bg); }
+.table [data-us='true'] { background: color-mix(in srgb, var(--brass) 10%, transparent); color: var(--text); }
+.table thead [data-us='true'] { color: var(--brass); }
+.yes { color: var(--lume); display: inline-flex; }
+.no { color: var(--text-3); display: inline-flex; }
+.unknown { color: var(--text-3); font-size: var(--fs-xs); font-style: italic; }
+.who { display: flex; flex-direction: column; gap: var(--sp-3); }
+.who dt { font-weight: 700; color: var(--text); }
+.who dd { margin: 0; color: var(--text-2); }
+.sources { font-size: var(--fs-sm); }

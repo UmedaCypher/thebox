@@ -9,7 +9,7 @@ const SITE = 'https://arcorawatch.com';
 
 // Pages publiques de l'app à déclarer aussi dans le sitemap (l'app elle-même n'en génère pas).
 const APP_PUBLIC_PAGES = [
-  '/', '/galerie', '/marche', '/premium', '/faq', '/a-propos', '/contact', '/presse',
+  '/', '/galerie', '/marche', '/premium', '/faq', '/a-propos', '/contact', '/presse', '/arcora-vs',
 ];
 
 export default defineConfig({
