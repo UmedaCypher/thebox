@@ -150,4 +150,4 @@ Les 100 premiers abonnés paient **1 €/mois** ou **9,99 €/an** la première 
 3. Redéployer `create-checkout-session` et `stripe-webhook`.
 
 Le compteur de places est tenu par la base (`founders_offer_claims`, une ligne au premier paiement) ; l'offre se ferme seule à 100,
-ou depuis le backoffice. Sans les coupons, l'app affiche l'offre mais Stripe facture le tarif normal : créez les coupons avant d'ouvrir.
+et s'ouvre ou se ferme depuis le backoffice (fermée au départ). Créez les coupons avant de l'ouvrir : sans eux, Stripe facturerait le tarif normal.

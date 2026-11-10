@@ -76,6 +76,7 @@
   --header-h: 56px;          /* hauteur totale de l'en-tête (une ligne sur mobile) */
   --header-row-h: 56px;
   --subnav-h: 0px;
+  --search-row-h: 0px;
   --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
 
   /* Alias de compatibilité pour les anciennes feuilles de style */
@@ -110,6 +111,11 @@
   --success-text: var(--ok);
 
   color-scheme: dark;
+}
+
+/* Téléphone, membre connecté : une ligne de recherche sous l'en-tête (posée par Layout) */
+@media (max-width: 859px) {
+  :root[data-header-search] { --search-row-h: 54px; --header-h: calc(var(--header-row-h) + var(--search-row-h)); }
 }
 
 /* Ordinateur : en-tête sur deux lignes (logo, recherche, compte / rubriques) */

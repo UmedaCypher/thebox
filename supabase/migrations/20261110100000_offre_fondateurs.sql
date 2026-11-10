@@ -15,14 +15,15 @@ create table if not exists public.founders_offer_claims (
 alter table public.founders_offer_claims enable row level security;
 
 insert into public.app_settings (key, value) values ('founders_offer_limit', '100'::jsonb) on conflict (key) do nothing;
-insert into public.app_settings (key, value) values ('founders_offer_open', 'true'::jsonb) on conflict (key) do nothing;
+-- Fermée par défaut : à ouvrir depuis le backoffice une fois les coupons Stripe créés (docs/stripe.md)
+insert into public.app_settings (key, value) values ('founders_offer_open', 'false'::jsonb) on conflict (key) do nothing;
 
 -- Places restantes, affichées sur la page Premium (visiteurs compris)
 create or replace function public.get_founders_offer()
 returns jsonb language sql stable security definer set search_path = '' as $$
   with s as (
     select coalesce((select (value)::text::int from public.app_settings where key = 'founders_offer_limit'), 100) as lim,
-           coalesce((select (value)::text::boolean from public.app_settings where key = 'founders_offer_open'), true) as is_open,
+           coalesce((select (value)::text::boolean from public.app_settings where key = 'founders_offer_open'), false) as is_open,
            (select count(*)::int from public.founders_offer_claims) as taken
   )
   select jsonb_build_object(

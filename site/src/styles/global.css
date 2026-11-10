@@ -67,8 +67,11 @@ a:hover { color: var(--brass-hover); }
 .visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 .hdr {
   position: sticky; top: 0; z-index: 50;
-  background: color-mix(in srgb, var(--bg) 62%, transparent);
-  backdrop-filter: saturate(1.5) blur(22px); -webkit-backdrop-filter: saturate(1.5) blur(22px);
+  /* Verre dépoli. Certains navigateurs mobiles floutent les images mais pas le texte qui passe dessous :
+     un fond plus couvrant garde ce texte illisible, et la couche dédiée (translateZ) aide le flou à tout capter. */
+  background: color-mix(in srgb, var(--bg) 82%, transparent);
+  backdrop-filter: saturate(1.5) blur(24px); -webkit-backdrop-filter: saturate(1.5) blur(24px);
+  transform: translateZ(0);
   border-bottom: 1px solid var(--glass-border);
   box-shadow: 0 1px 0 0 var(--glass-hi) inset;
   padding-top: env(safe-area-inset-top);

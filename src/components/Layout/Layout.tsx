@@ -11,6 +11,9 @@ import { defineStrings, useLang, useStrings } from '../../i18n';
 import type { LangChoice } from '../../i18n';
 import { COMMON } from '../../i18n/common';
 import { useLanguageSetting } from '../../i18n/useLanguageSetting';
+import { useMediaQuery } from '../../hooks/useMediaQuery';
+import { pageTitle } from './pageTitle';
+import PlayBanner from './PlayBanner';
 import s from './Layout.module.css';
 
 const S = defineStrings({
@@ -45,8 +48,9 @@ const MOBILE_TABS = [
 
 const badgeText = (n: number) => (n > 99 ? '99+' : String(n));
 
-function Header({ unread }: { unread: number }) {
+function Header({ unread, showSearch }: { unread: number; showSearch: boolean }) {
   const { user, profile, isPremium } = useAuth();
+  const { pathname } = useLocation();
   const { lang } = useLang();
   const initial = (profile?.username || user?.email || '?').charAt(0).toUpperCase();
   const t = useStrings(S);
@@ -56,6 +60,8 @@ function Header({ unread }: { unread: number }) {
     <header className={s.header}>
       <div className={s.headerInner}>
         <Link to={user ? '/accueil' : '/'} className={s.wordmark}>Arcora</Link>
+        {/* Téléphone : le nom de la page remplace le logo */}
+        <p className={s.pageTitle} aria-hidden="true">{pageTitle(pathname)}</p>
 
         <div className={s.searchSlot}><GlobalSearch /></div>
 
@@ -81,6 +87,9 @@ function Header({ unread }: { unread: number }) {
           )}
         </div>
       </div>
+
+      {/* Téléphone : la recherche sous l'en-tête */}
+      {showSearch && <div className={s.mobileSearch}><GlobalSearch /></div>}
 
       {/* Deuxième ligne (ordinateur) : les rubriques, avec les mêmes icônes que la barre mobile */}
       <nav className={s.subnav} aria-label={t.mainNav}>
@@ -194,6 +203,13 @@ export default function Layout() {
   const inThread = /^\/messages\/[^/]+/.test(pathname);
   const t = useStrings(S);
   useMotion();
+  // Recherche sous l'en-tête sur téléphone : pour les membres, hors conversation et hors accueil guidé
+  const phone = useMediaQuery('(max-width: 859px)');
+  const showSearch = phone && Boolean(user) && !inThread && !inOnboarding;
+  useEffect(() => {
+    if (showSearch) document.documentElement.dataset.headerSearch = '';
+    else delete document.documentElement.dataset.headerSearch;
+  }, [showSearch]);
 
   // La lumière de fond prend la couleur de la rubrique
   useEffect(() => {
@@ -211,12 +227,13 @@ export default function Layout() {
   return (
     <div className={s.shell}>
       <a href="#contenu" className="visually-hidden">{t.skip}</a>
-      <Header unread={unread} />
+      <Header unread={unread} showSearch={showSearch} />
       <main id="contenu" className={`${s.main} ${user && !inThread && !inOnboarding ? s.withTabbar : ''}`}>
         {/* Fondu léger à chaque changement de page (la messagerie garde sa liste en place) */}
         <div key={inMessages ? '/messages' : pathname} className={s.route}><Outlet /></div>
       </main>
       {!inMessages && !inOnboarding && <Footer loggedIn={Boolean(user)} />}
+      {!phone && <PlayBanner />}
       {user && !inOnboarding && <div className={inThread ? s.hideOnMobile : undefined}><TabBar /></div>}
     </div>
   );

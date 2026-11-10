@@ -5,14 +5,17 @@
 /* En-tête */
 .header {
   position: sticky; top: 0; z-index: 50;
-  background: color-mix(in srgb, var(--bg) 62%, transparent);
-  backdrop-filter: saturate(1.5) blur(22px); -webkit-backdrop-filter: saturate(1.5) blur(22px);
+  /* Verre dépoli. Certains navigateurs mobiles floutent les images mais pas le texte qui passe dessous :
+     un fond plus couvrant garde ce texte illisible, et la couche dédiée (translateZ) aide le flou à tout capter. */
+  background: color-mix(in srgb, var(--bg) 82%, transparent);
+  backdrop-filter: saturate(1.5) blur(24px); -webkit-backdrop-filter: saturate(1.5) blur(24px);
+  transform: translateZ(0);
   border-bottom: 1px solid var(--glass-border);
   box-shadow: 0 1px 0 0 var(--glass-hi) inset;
   padding-top: env(safe-area-inset-top);
 }
 .headerInner {
-  max-width: var(--page-max); margin: 0 auto; height: var(--header-h);
+  max-width: var(--page-max); margin: 0 auto; height: var(--header-row-h);
   padding: 0 var(--gutter); display: flex; align-items: center; gap: var(--sp-5);
 }
 .wordmark {
@@ -20,6 +23,15 @@
   text-decoration: none; color: var(--text); white-space: nowrap;
 }
 .wordmark:hover { color: var(--text); }
+/* Téléphone : le nom de la page à la place du logo */
+.pageTitle {
+  font-family: var(--font-display); font-size: 1.375rem; line-height: 1.1; color: var(--text);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0;
+}
+@media (max-width: 859px) { .wordmark { display: none; } }
+/* Recherche sous l'en-tête (téléphone) */
+.mobileSearch { padding: 0 var(--gutter) 10px; height: var(--search-row-h); }
+.mobileSearch > div { max-width: none; }
 /* Recherche (ordinateur) */
 .searchSlot { display: none; flex: 1; justify-content: center; }
 
@@ -66,6 +78,7 @@ a.avatar::after { content: ''; position: absolute; inset: -6px; border-radius: 5
   .wordmark { font-size: 1.625rem; }
   .avatar { width: 38px; height: 38px; }
   .searchSlot { display: flex; }
+  .pageTitle { display: none; }
   .subnav { display: block; }
   .desktopOnly { display: inline-flex; }
   .withTabbar { padding-bottom: 0; }
@@ -150,3 +163,4 @@ a.avatar::after { content: ''; position: absolute; inset: -6px; border-radius: 5
 .route { flex: 1; display: flex; flex-direction: column; min-width: 0; animation: routeIn var(--dur-slow) var(--ease-out) backwards; }
 @keyframes routeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) { .route { animation: none; } }
+.mobileSearch kbd { display: none; }
