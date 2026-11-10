@@ -1,0 +1,8 @@
+.nav { display: flex; gap: var(--sp-2); overflow-x: auto; scrollbar-width: none; margin-bottom: var(--sp-4); }
+.nav::-webkit-scrollbar { display: none; }
+.link {
+  flex: none; padding: 7px 14px; border-radius: var(--r-pill); font-size: var(--fs-sm); font-weight: 600; text-decoration: none;
+  color: var(--text-2); border: 1px solid var(--line-strong);
+}
+.link:hover { color: var(--text); }
+.link[aria-current='page'] { color: var(--brass-ink); background: var(--brass); border-color: transparent; }

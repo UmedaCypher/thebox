@@ -11,7 +11,7 @@ import { supabase } from '../../lib/supabaseClient';
 import { FREE_WATCH_LIMIT, PAYMENTS_ENABLED } from '../../lib/features';
 import { isAndroidApp } from '../../lib/platform';
 import { formatDate } from '../../lib/format';
-import { Button, Img, LinkButton, Notice, PageHeader, PremiumTag, Segmented, Sheet, TextField, Toggle } from '../../components/ui';
+import { Button, Img, LinkButton, Notice, PageHeader, PremiumTag, Segmented, Sheet, TextArea, TextField, Toggle } from '../../components/ui';
 import { useLanguageSetting } from '../../i18n/useLanguageSetting';
 import { defineStrings, tr, useStrings } from '../../i18n';
 import type { LangChoice } from '../../i18n';
@@ -42,6 +42,8 @@ const S = defineStrings({
   nameHint: 'Jamais affiché publiquement.',
   wrist: 'Tour de poignet',
   wristHint: 'Il accompagne vos photos dans la galerie pour aider les autres à se projeter.',
+  bio: 'Présentation',
+  bioHint: 'Quelques mots sur votre collection, affichés sur votre profil public.',
   publicLabel: 'Profil public',
   publicHint: 'Votre pseudo et les photos de vos montres deviennent visibles. Les prix, valeurs et lieux d\'achat restent toujours privés.',
   messagesLabel: 'Accepter les messages',
@@ -119,6 +121,8 @@ const S = defineStrings({
   nameHint: 'Never shown publicly.',
   wrist: 'Wrist size',
   wristHint: 'It appears with your photos in the gallery to help others picture the watch.',
+  bio: 'About you',
+  bioHint: 'A few words about your collection, shown on your public profile.',
   publicLabel: 'Public profile',
   publicHint: 'Your username and watch photos become visible. Prices, values and places of purchase always stay private.',
   messagesLabel: 'Accept messages',
@@ -188,7 +192,7 @@ export default function AccountPage() {
   const navigate = useNavigate();
   const uid = user!.id;
 
-  const [f, setF] = useState({ username: '', full_name: '', wrist: '', is_public: false, messages: true });
+  const [f, setF] = useState({ username: '', full_name: '', wrist: '', is_public: false, messages: true, bio: '' });
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState<{ tone: 'ok' | 'error'; text: string } | null>(null);
   const [avatarBusy, setAvatarBusy] = useState(false);
@@ -212,6 +216,7 @@ export default function AccountPage() {
       wrist: profile?.wrist_size_cm ? formatDecimal(profile.wrist_size_cm) : '',
       is_public: Boolean(profile?.is_public),
       messages: profile?.allow_private_messages !== false,
+      bio: profile?.bio ?? '',
     });
   }, [profile]);
 
@@ -234,7 +239,9 @@ export default function AccountPage() {
     }
     setSaving(true);
     try {
-      await saveProfile(uid, { username: username || null, full_name: f.full_name.trim() || null, wrist_size_cm: wrist, is_public: f.is_public, allow_private_messages: f.messages }, Boolean(profile));
+      // La présentation n'est envoyée que si elle change (colonne ajoutée par la migration sociale)
+      const bio = f.bio.trim() !== (profile?.bio ?? '') ? { bio: f.bio.trim() || null } : {};
+      await saveProfile(uid, { username: username || null, full_name: f.full_name.trim() || null, wrist_size_cm: wrist, is_public: f.is_public, allow_private_messages: f.messages, ...bio }, Boolean(profile));
       await refreshProfile();
       setMsg(null);
       toast(c.toast.profileSaved);
@@ -315,6 +322,7 @@ export default function AccountPage() {
         <TextField label={t.username} value={f.username} onChange={e => setF({ ...f, username: e.target.value })} hint={t.usernameHint} autoCapitalize="none" autoComplete="username" />
         <TextField label={t.name} optional value={f.full_name} onChange={e => setF({ ...f, full_name: e.target.value })} hint={t.nameHint} autoComplete="name" />
         <TextField label={t.wrist} optional inputMode="decimal" suffix="cm" value={f.wrist} onChange={e => setF({ ...f, wrist: e.target.value })} hint={t.wristHint} />
+        <TextArea label={t.bio} optional rows={2} value={f.bio} onChange={e => setF({ ...f, bio: e.target.value.slice(0, 300) })} hint={t.bioHint} />
         <Toggle
           label={t.publicLabel}
           description={t.publicHint}

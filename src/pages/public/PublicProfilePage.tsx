@@ -1,10 +1,13 @@
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useLoad } from '../../hooks/useLoad';
-import { getPublicCollection, thumbSrc } from '../../lib/api';
+import { getFeed, getProfileSocial, getPublicCollection, thumbSrc } from '../../lib/api';
+import type { FeedItem, ProfileSocial } from '../../lib/api';
+import { FeedCard, FollowButton } from '../../components/Feed/Feed';
 import { formatDate } from '../../lib/format';
 import { listingBadge, listingPrice } from '../../lib/listing';
-import { EmptyState, LinkButton, Notice, PageHeader } from '../../components/ui';
+import { EmptyState, LinkButton, Notice, PageHeader, Segmented } from '../../components/ui';
 import ContactButton from '../../components/ContactButton/ContactButton';
 import WatchCard, { WatchGrid } from '../../components/WatchCard/WatchCard';
 import { defineStrings, useStrings } from '../../i18n';
@@ -21,6 +24,11 @@ const S = defineStrings({
   privateTitle: 'Collection privée',
   privateText: 'Ce membre garde sa collection pour lui.',
   emptyTitle: 'Écrin vide pour l\'instant',
+  followers: (n: number) => `${n} abonné${n > 1 ? 's' : ''}`,
+  following: (n: number) => `${n} abonnement${n > 1 ? 's' : ''}`,
+  followsYou: 'Vous suit',
+  tabs: 'Rubriques', activity: 'Activité', collection: 'Collection',
+  noActivity: 'Pas encore de publication.',
 }, {
   notFoundTitle: 'Profile not found',
   notFoundText: 'No member goes by this username.',
@@ -31,13 +39,27 @@ const S = defineStrings({
   privateTitle: 'Private collection',
   privateText: 'This member keeps their collection to themselves.',
   emptyTitle: 'The watch box is empty for now',
+  followers: (n: number) => `${n} follower${n > 1 ? 's' : ''}`,
+  following: (n: number) => `${n} following`,
+  followsYou: 'Follows you',
+  tabs: 'Sections', activity: 'Activity', collection: 'Collection',
+  noActivity: 'No posts yet.',
 });
 
 export default function PublicProfilePage() {
   const t = useStrings(S);
   const { username } = useParams();
-  const { profile: me } = useAuth();
+  const { profile: me, user } = useAuth();
   const q = useLoad(() => getPublicCollection(username!), [username]);
+  const [social, setSocial] = useState<ProfileSocial | null>(null);
+  const [tab, setTab] = useState<'activity' | 'collection'>('collection');
+  const [items, setItems] = useState<FeedItem[] | null>(null);
+  useEffect(() => { getProfileSocial(username!).then(setSocial); }, [username]);
+  // L'activité (publications, wrist shots, annonces) est le premier onglet dès qu'il y en a
+  useEffect(() => {
+    if (!social?.user_id) return;
+    getFeed('all', null, social.user_id).then(list => { setItems(list); if (list.length) setTab('activity'); }).catch(() => setItems([]));
+  }, [social?.user_id]);
 
   if (q.loading) return <div className="page"><SkeletonHeader /><SkeletonGrid count={8} /></div>;
   if (q.error) return <div className="page"><Notice tone="error">{q.error}</Notice></div>;
@@ -56,11 +78,35 @@ export default function PublicProfilePage() {
           action={isMe ? <LinkButton to="/profil" variant="secondary" size="small">{t.edit}</LinkButton> : undefined}
         />
       </div>
-      {!isMe && p.is_public && p.accepts_messages && (
-        <div className={s.contact}><ContactButton username={p.username} label={t.writeTo(p.username)} variant="secondary" /></div>
+      {social && (
+        <div className={s.social}>
+          {social.bio && <p className={s.bio}>{social.bio}</p>}
+          <p className={s.counts}>
+            <strong>{t.followers(social.followers)}</strong> · <span>{t.following(social.following)}</span>
+            {social.follows_me && <span className={s.followsYou}>{t.followsYou}</span>}
+          </p>
+        </div>
       )}
+      {!isMe && p.is_public && (
+        <div className={s.contact}>
+          {user && social && <FollowButton uid={user.id} targetId={social.user_id} following={social.i_follow}
+            onChange={v => setSocial({ ...social, i_follow: v, followers: social.followers + (v ? 1 : -1) })} />}
+          {p.accepts_messages && <ContactButton username={p.username} label={t.writeTo(p.username)} variant="secondary" />}
+        </div>
+      )}
+      {p.is_public && social && (
+        <div className={s.tabs}>
+          <Segmented label={t.tabs} value={tab} onChange={setTab} options={[{ value: 'activity', label: t.activity }, { value: 'collection', label: t.collection }]} />
+        </div>
+      )}
+      {tab === 'activity' && p.is_public && social ? (
+        <div className={s.feed}>
+          {items && items.length === 0 && <p className={s.muted}>{t.noActivity}</p>}
+          {(items ?? []).map(it => <FeedCard key={`${it.kind}-${it.id}`} item={it} uid={user?.id ?? null} onRemoved={() => setItems(x => (x ?? []).filter(y => y !== it))} />)}
+        </div>
+      ) : null}
 
-      {!p.is_public ? (
+      {tab === 'activity' && p.is_public && social ? null : !p.is_public ? (
         <EmptyState title={t.privateTitle}>{t.privateText}</EmptyState>
       ) : p.watches.length === 0 ? (
         <EmptyState title={t.emptyTitle} />

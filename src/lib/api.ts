@@ -587,6 +587,96 @@ async function invokeForUrl(fn: 'create-checkout-session' | 'create-portal-sessi
 }
 
 /** Envoie vers la page de paiement Stripe, au mois ou à l'année (avec le code d'affilié éventuel). */
+/* ---------- Social : abonnements, publications, fil ---------- */
+
+export interface FeedItem {
+  kind: 'post' | 'wrist' | 'listing'; id: string; created_at: string; body: string | null; price: number | null;
+  photo_path: string | null; author: { id: string; username: string; avatar: string | null };
+  watch: { id: string; brand: string; model: string } | null;
+  likes: number | null; liked: boolean | null; comments: number | null; mine: boolean;
+}
+export interface ProfileSocial { user_id: string; bio: string | null; followers: number; following: number; posts: number; i_follow: boolean; follows_me: boolean; is_me: boolean }
+export interface PostComment { id: string; body: string; created_at: string; author: { username: string; avatar: string | null }; mine: boolean }
+export interface FollowSuggestion { username: string; avatar: string | null; watches: number; followers: number }
+
+export async function getFeed(mode: 'following' | 'all', before?: string | null, userId?: string): Promise<FeedItem[]> {
+  const { data, error } = await supabase.rpc('get_feed', { p_mode: mode, p_before: before ?? null, p_limit: 20, p_user: userId ?? null });
+  fail(error, 'Fil indisponible.');
+  return (data ?? []) as FeedItem[];
+}
+
+export async function getProfileSocial(username: string): Promise<ProfileSocial | null> {
+  const { data, error } = await supabase.rpc('get_profile_social', { p_username: username });
+  if (error) return null; // fonctions sociales pas encore installées
+  return (data as ProfileSocial) ?? null;
+}
+
+export async function setFollow(userId: string, followeeId: string, follow: boolean) {
+  const { error } = follow
+    ? await supabase.from('follows').insert({ follower_id: userId, followee_id: followeeId })
+    : await supabase.from('follows').delete().eq('follower_id', userId).eq('followee_id', followeeId);
+  fail(error, 'Abonnement impossible.');
+}
+
+export async function getFollowSuggestions(): Promise<FollowSuggestion[]> {
+  const { data, error } = await supabase.rpc('get_follow_suggestions', { p_limit: 8 });
+  if (error) return [];
+  return (data ?? []) as FollowSuggestion[];
+}
+
+export async function followByUsername(userId: string, username: string) {
+  const { data } = await supabase.rpc('get_profile_social', { p_username: username });
+  const target = (data as ProfileSocial | null)?.user_id;
+  if (!target) throw new Error(L('Membre introuvable.'));
+  await setFollow(userId, target, true);
+}
+
+/** Publication : texte, montre de la collection et photo facultatives. */
+export async function createPost(userId: string, body: string, watchId: string | null, file: File | null) {
+  let photo_path: string | null = null;
+  if (file) {
+    const { full, thumb } = await preparePhotoWithThumb(file);
+    photo_path = `${userId}/posts/${Date.now()}_${Math.random().toString(36).slice(2, 8)}.jpg`;
+    const opt = { contentType: 'image/jpeg', upsert: false };
+    const [a, b] = await Promise.all([
+      supabase.storage.from(WATCH_BUCKET).upload(photo_path, full, opt),
+      supabase.storage.from(WATCH_BUCKET).upload(thumbPath(photo_path), thumb, opt),
+    ]);
+    fail(a.error ?? b.error, 'Envoi de la photo impossible.');
+  }
+  const { error } = await supabase.from('posts').insert({ user_id: userId, body: body.trim(), watch_id: watchId, photo_path });
+  fail(error, 'Publication impossible.');
+}
+
+export async function deletePost(id: string, photoPath: string | null) {
+  const { error } = await supabase.from('posts').delete().eq('id', id);
+  fail(error, 'Suppression impossible.');
+  if (photoPath) await supabase.storage.from(WATCH_BUCKET).remove(withThumbs([photoPath]));
+}
+
+export async function togglePostLike(userId: string, postId: string, like: boolean) {
+  const { error } = like
+    ? await supabase.from('post_likes').insert({ post_id: postId, user_id: userId })
+    : await supabase.from('post_likes').delete().eq('post_id', postId).eq('user_id', userId);
+  fail(error, 'Action impossible.');
+}
+
+export async function getPostComments(postId: string): Promise<PostComment[]> {
+  const { data, error } = await supabase.rpc('get_post_comments', { p_post: postId });
+  fail(error, 'Commentaires indisponibles.');
+  return (data ?? []) as PostComment[];
+}
+
+export async function addPostComment(userId: string, postId: string, body: string) {
+  const { error } = await supabase.from('post_comments').insert({ post_id: postId, user_id: userId, body: body.trim() });
+  fail(error, 'Commentaire impossible.');
+}
+
+export async function deletePostComment(id: string) {
+  const { error } = await supabase.from('post_comments').delete().eq('id', id);
+  fail(error, 'Suppression impossible.');
+}
+
 /* ---------- Précision (timegrapher) ---------- */
 
 export type MeasurePosition = 'dial_up' | 'dial_down' | 'crown_up' | 'crown_down' | 'crown_left' | 'crown_right' | 'wrist';

@@ -12,6 +12,7 @@ import { Button, Cushion, EmptyState, IconButton, Img, LinkButton, Notice, PageH
 import { formatDecimal } from '../../lib/format';
 import { defineStrings, useStrings } from '../../i18n';
 import { COMMON } from '../../i18n/common';
+import CommunityNav from '../../components/CommunityNav/CommunityNav';
 import s from './GalleryPage.module.css';
 import { SkeletonGrid } from '../../components/Skeleton/Skeleton';
 
@@ -129,6 +130,7 @@ function GalleryView() {
         title={c.tabs.gallery}
         subtitle={t.subtitle}
       />
+      {user && <CommunityNav />}
 
       <div className={s.viewSwitch}>
         <Segmented label={t.view} value={view} onChange={setView} options={[{ value: 'photos', label: t.photos }, { value: 'ranking', label: t.ranking }]} />

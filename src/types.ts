@@ -12,6 +12,8 @@ export interface Profile {
   profile_picture_url: string | null;
   wrist_size_cm: number | null;
   is_public: boolean | null;
+  /** Présentation affichée sur le profil public (migration sociale du 10/11). */
+  bio?: string | null;
   allow_private_messages?: boolean | null;
   preferred_language?: string | null;
   time_zone?: string | null;

@@ -1,6 +1,6 @@
 import { scrollToElement, scrollToTop, useMotion } from '../../lib/motion';
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
-import { BookOpen, CalendarDays, Images, MessageCircle, Newspaper, Sparkles, Store, Watch, LayoutGrid } from 'lucide-react';
+import { BookOpen, CalendarDays, Images, MessageCircle, Newspaper, Sparkles, Store, Users, Watch, LayoutGrid } from 'lucide-react';
 import { useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { LinkButton } from '../ui';
@@ -33,16 +33,21 @@ const APP_TABS = [
   { to: '/accueil', key: 'home', icon: LayoutGrid },
   { to: '/collection', key: 'collection', icon: Watch },
   { to: '/portage', key: 'wear', icon: CalendarDays },
-  { to: '/galerie', key: 'gallery', icon: Images },
+  { to: '/fil', key: 'community', icon: Users },
   { to: '/marche', key: 'market', icon: Store },
 ] as const;
 
-/* Sur mobile : Messages est dans l'en-tête (à côté du profil), la Galerie dans la barre du bas. */
+/* La rubrique Communauté regroupe le fil, la galerie et les montres volées */
+const COMMUNITY = ['/fil', '/galerie', '/montres-volees'];
+/** Lien de l'onglet Communauté : la page courante si l'on y est déjà (l'onglet reste allumé), sinon le fil. */
+const COMMUNITY_TO = (pathname: string) => COMMUNITY.find(p => pathname.startsWith(p)) ?? '/fil';
+
+/* Sur mobile : Messages est dans l'en-tête (à côté du profil), la Communauté (fil, galerie) dans la barre du bas. */
 const MOBILE_TABS = [
   { to: '/accueil', key: 'home', icon: LayoutGrid },
   { to: '/collection', key: 'collection', icon: Watch },
   { to: '/portage', key: 'wear', icon: CalendarDays },
-  { to: '/galerie', key: 'gallery', icon: Images },
+  { to: '/fil', key: 'community', icon: Users },
   { to: '/marche', key: 'market', icon: Store },
 ] as const;
 
@@ -97,7 +102,8 @@ function Header({ unread, showSearch }: { unread: number; showSearch: boolean })
           <div className={s.subnavMain}>
             {user
               ? APP_TABS.map(({ to, key, icon: Icon }) => (
-                  <NavLink key={to} to={to} className={s.subLink}>
+                  // La Communauté reste active sur le fil, la galerie et les montres volées
+                  <NavLink key={to} to={key === 'community' ? COMMUNITY_TO(pathname) : to} className={s.subLink}>
                     <Icon size={18} strokeWidth={1.7} aria-hidden="true" />{c.tabs[key]}
                   </NavLink>
                 ))
@@ -124,10 +130,11 @@ function Header({ unread, showSearch }: { unread: number; showSearch: boolean })
 function TabBar() {
   const t = useStrings(S);
   const c = useStrings(COMMON);
+  const { pathname } = useLocation();
   return (
     <nav className={s.tabbar} aria-label={t.tabsNav}>
       {MOBILE_TABS.map(({ to, key, icon: Icon }) => (
-        <NavLink key={to} to={to} className={s.tab}>
+        <NavLink key={to} to={key === 'community' ? COMMUNITY_TO(pathname) : to} className={s.tab}>
           <span className={s.tabIcon}>
             <Icon size={26} strokeWidth={1.6} aria-hidden="true" />
           </span>

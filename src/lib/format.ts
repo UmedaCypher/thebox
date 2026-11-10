@@ -39,3 +39,17 @@ export const formatDecimal = (n: number | string) => (getLocale() === 'fr-FR' ? 
 
 export const formatMm = (n: number | null | undefined) =>
   n === null || n === undefined ? null : `${formatDecimal(n)} mm`;
+
+/** Date relative courte : « à l'instant », « il y a 5 min », « il y a 3 h », puis la date. */
+export const formatAgo = (iso: string) => {
+  const ms = Date.now() - new Date(iso).getTime();
+  const rtf = new Intl.RelativeTimeFormat(getLocale(), { numeric: 'auto', style: 'short' });
+  const min = Math.round(ms / 60000);
+  if (min < 1) return rtf.format(0, 'minute');
+  if (min < 60) return rtf.format(-min, 'minute');
+  const h = Math.round(min / 60);
+  if (h < 24) return rtf.format(-h, 'hour');
+  const d = Math.round(h / 24);
+  if (d < 7) return rtf.format(-d, 'day');
+  return formatDate(iso, { day: 'numeric', month: 'short' });
+};
