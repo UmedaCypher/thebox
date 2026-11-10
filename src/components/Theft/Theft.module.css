@@ -1,0 +1,20 @@
+.panel { display: flex; flex-direction: column; gap: var(--sp-2); }
+.open { align-self: flex-start; display: inline-flex; align-items: center; gap: 8px; font-size: var(--fs-sm); font-weight: 600; color: var(--text-3); padding: 6px 0; }
+.open:hover { color: var(--ruby); }
+.active {
+  display: flex; flex-direction: column; gap: var(--sp-3); padding: var(--sp-4) var(--sp-5); border-radius: var(--r-lg); margin: var(--sp-4) 0;
+  border: 1px solid color-mix(in srgb, var(--ruby) 55%, transparent); background: color-mix(in srgb, var(--ruby) 10%, var(--surface));
+}
+.activeHead { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; color: var(--ruby); }
+.label { font-size: var(--fs-sm); font-weight: 700; }
+.muted { font-size: var(--fs-sm); color: var(--text-2); }
+.proofs { list-style: none; display: flex; flex-direction: column; gap: 4px; margin-top: 4px; }
+.proofs button { display: inline-flex; align-items: center; gap: 6px; font-size: var(--fs-sm); color: var(--brass); text-decoration: underline; text-underline-offset: 2px; text-align: left; }
+.actions { display: flex; flex-wrap: wrap; gap: var(--sp-2); align-items: flex-end; }
+.actions > :first-child { flex: 1 1 180px; }
+.link { font-size: var(--fs-sm); color: var(--text-2); }
+.form { display: flex; flex-direction: column; gap: var(--sp-4); }
+.file { display: flex; flex-direction: column; gap: var(--sp-2); padding: var(--sp-3) var(--sp-4); border-radius: var(--r-md); background: var(--cushion); }
+.facts { list-style: none; display: flex; flex-direction: column; gap: 4px; font-size: var(--fs-sm); }
+.facts li::before { content: '○'; margin-right: 8px; color: var(--text-3); }
+.facts li[data-ok='true']::before { content: '●'; color: var(--lume); }

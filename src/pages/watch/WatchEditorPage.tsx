@@ -23,13 +23,13 @@ import { SkeletonHeader, SkeletonList } from '../../components/Skeleton/Skeleton
 import { useToast } from '../../components/Toast/Toast';
 
 type Form = Record<
-  'brand' | 'model' | 'reference_number' | 'year_of_production' | 'movement' | 'caliber' | 'case_diameter_mm' | 'lug_to_lug_mm' |
+  'brand' | 'model' | 'reference_number' | 'serial_number' | 'year_of_production' | 'movement' | 'caliber' | 'case_diameter_mm' | 'lug_to_lug_mm' |
   'lug_width_mm' | 'dial_color' | 'case_material' | 'bracelet_material' | 'bracelet_type' | 'condition' |
   'box_papers_status' | 'purchase_price' | 'purchase_date' | 'purchase_location' | 'current_estimated_value' |
   'last_service_date' | 'notes_history' | 'sale_price' | 'sale_city' | 'sale_note', string>;
 
 const EMPTY: Form = {
-  brand: '', model: '', reference_number: '', year_of_production: '', movement: '', caliber: '', case_diameter_mm: '', lug_to_lug_mm: '',
+  brand: '', model: '', reference_number: '', serial_number: '', year_of_production: '', movement: '', caliber: '', case_diameter_mm: '', lug_to_lug_mm: '',
   lug_width_mm: '', dial_color: '', case_material: '', bracelet_material: '', bracelet_type: '', condition: '',
   box_papers_status: '', purchase_price: '', purchase_date: '', purchase_location: '', current_estimated_value: '',
   last_service_date: '', notes_history: '', sale_price: '', sale_city: '', sale_note: '',
@@ -70,6 +70,8 @@ const S = defineStrings({
   modelPh: 'Ex. Submariner Date',
   reference: 'Référence',
   referencePh: 'Ex. 126610LN',
+  serial: 'Numéro de série',
+  serialHint: 'Privé, jamais affiché. Il sert pour l’assurance et, en cas de vol, à empêcher la revente de la montre sur Arcora.',
   year: 'Année',
   yearPh: 'Ex. 2021',
   specs: 'Caractéristiques',
@@ -165,6 +167,8 @@ const S = defineStrings({
   modelPh: 'e.g. Submariner Date',
   reference: 'Reference',
   referencePh: 'e.g. 126610LN',
+  serial: 'Serial number',
+  serialHint: 'Private, never shown. Used for insurance and, if the watch is stolen, to stop it being resold on Arcora.',
   year: 'Year',
   yearPh: 'e.g. 2021',
   specs: 'Specifications',
@@ -251,7 +255,7 @@ const num = (v: string) => {
 const txt = (v: string) => (v.trim() ? v.trim() : null);
 
 const toInput = (f: Form): Partial<WatchInput> => ({
-  brand: f.brand.trim(), model: f.model.trim(), reference_number: txt(f.reference_number),
+  brand: f.brand.trim(), model: f.model.trim(), reference_number: txt(f.reference_number), serial_number: txt(f.serial_number),
   year_of_production: num(f.year_of_production), movement: txt(f.movement), caliber: normalizeCaliber(f.caliber),
   case_diameter_mm: num(f.case_diameter_mm), lug_to_lug_mm: num(f.lug_to_lug_mm), lug_width_mm: num(f.lug_width_mm),
   dial_color: txt(f.dial_color), case_material: txt(f.case_material), bracelet_material: txt(f.bracelet_material),
@@ -385,6 +389,7 @@ export default function WatchEditorPage() {
           onBrand={v => setForm(f => ({ ...f, brand: v }))} onModel={v => setForm(f => ({ ...f, model: v }))}
           brandError={fieldErrors.brand} modelError={fieldErrors.model} modelPlaceholder={t.modelPh} />
         <TextField label={t.reference} optional value={form.reference_number} onChange={set('reference_number')} placeholder={t.referencePh} />
+        <TextField label={t.serial} optional value={form.serial_number} onChange={set('serial_number')} hint={t.serialHint} autoComplete="off" autoCapitalize="characters" />
         <TextField label={t.year} optional inputMode="numeric" value={form.year_of_production} onChange={set('year_of_production')} error={fieldErrors.year_of_production} placeholder={t.yearPh} />
       </div>
     </section>

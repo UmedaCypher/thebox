@@ -21,6 +21,7 @@ import {
 import WearStrip from '../../components/WearStrip/WearStrip';
 import Sparkline from '../../components/Sparkline/Sparkline';
 import PremiumSheet from '../../components/PremiumSheet/PremiumSheet';
+import TheftPanel from '../../components/Theft/TheftPanel';
 import { FREE_WATCH_LIMIT } from '../../lib/features';
 import s from './WatchPage.module.css';
 import { SkeletonDetail, SkeletonList } from '../../components/Skeleton/Skeleton';
@@ -411,8 +412,11 @@ function PassportTab({ watch, uid, onUpdate }: { watch: Watch; uid: string; onUp
             <Link to={`/passeport/${watch.id}`} className={s.subtle}>{t.seePublic}</Link>
           </div>
         )}
-        <Link to={`/comparer?a=${watch.id}`} className={s.subtle}>{t.compare}</Link>
       </section>
+      <div className={s.watchTools}>
+        <Link to={`/comparer?a=${watch.id}`} className={s.subtle}>{t.compare}</Link>
+        <TheftPanel watch={watch} uid={uid} onChange={() => { getWatch(uid, watch.id).then(w => { if (w) onUpdate(w); }); }} />
+      </div>
     </div>
   );
 }

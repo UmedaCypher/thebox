@@ -43,6 +43,8 @@ export interface Watch {
   movement: string | null;
   /** Calibre du mouvement (ex. NH35) */
   caliber: string | null;
+  /** Numéro de série : privé, jamais publié (assurance, déclaration de vol) */
+  serial_number?: string | null;
   year_of_production: number | null;
   case_diameter_mm: number | null;
   lug_to_lug_mm: number | null;

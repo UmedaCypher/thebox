@@ -113,7 +113,7 @@ export default function ComparePage() {
 
   const options = list.map(w => ({ value: w.id, label: `${w.brand} ${w.model}` }));
   const { a, b } = sides;
-  const mm = (n: number) => `${formatNumber(n, 1)} mm`;
+  const mm = (n: number) => `${formatNumber(n, 1)}\u00a0mm`;
   const rows: Row[] = [];
   if (a && b) {
     const P = (x: Side) => x.passport;
@@ -123,7 +123,7 @@ export default function ComparePage() {
     const r = t.rows;
     add(r.reference, P(a).reference_number, P(b).reference_number);
     add(r.year, P(a).year_of_production, P(b).year_of_production,
-      delta(P(a).year_of_production, P(b).year_of_production, n => `${n} ${lang === 'fr' ? (n > 1 ? 'ans' : 'an') : (n > 1 ? 'yrs' : 'yr')}`));
+      delta(P(a).year_of_production, P(b).year_of_production, n => `${n}\u00a0${lang === 'fr' ? (n > 1 ? 'ans' : 'an') : (n > 1 ? 'yrs' : 'yr')}`));
     const mv = (p: Passport) => [movementLabel(p.movement, lang), p.caliber].filter(Boolean).join(' · ') || null;
     add(r.movement, mv(P(a)), mv(P(b)));
     add(r.diameter, formatMm(P(a).case_diameter_mm), formatMm(P(b).case_diameter_mm), delta(P(a).case_diameter_mm, P(b).case_diameter_mm, mm));

@@ -59,6 +59,7 @@ const L = (fr: string) => (getLang() === 'en' ? EN_MESSAGES[fr] ?? fr : fr);
 
 /** Codes renvoyés par les fonctions de la base, traduits pour l'écran. */
 const DB_ERRORS_EN: Record<string, string> = {
+  STOLEN_WATCH: 'This watch is reported stolen: it cannot be offered on the Market.',
   USERNAME_REQUIRED: 'Choose a username in your profile first: it is what other members see.',
   MESSAGES_DISABLED: 'This member does not accept messages.',
   BLOCKED: 'Messages are not possible with this member.',
@@ -80,6 +81,7 @@ const DB_ERRORS_EN: Record<string, string> = {
 };
 
 const DB_ERRORS: Record<string, string> = {
+  STOLEN_WATCH: 'Cette montre est déclarée volée : elle ne peut pas être proposée sur le Marché.',
   USERNAME_REQUIRED: 'Choisissez d\'abord un pseudo dans votre profil : c\'est lui qui s\'affiche auprès des autres membres.',
   MESSAGES_DISABLED: 'Ce membre ne reçoit pas de messages.',
   BLOCKED: 'Les messages ne sont pas possibles avec ce membre.',
@@ -585,6 +587,64 @@ async function invokeForUrl(fn: 'create-checkout-session' | 'create-portal-sessi
 }
 
 /** Envoie vers la page de paiement Stripe, au mois ou à l'année (avec le code d'affilié éventuel). */
+/* ---------- Déclaration de vol ---------- */
+
+export const THEFT_BUCKET = 'theft-proofs';
+
+export interface StolenReport {
+  id: string; user_id: string; watch_id: string | null; brand: string; model: string; reference_number: string | null;
+  serial_number: string; stolen_on: string; city: string | null; police_report_ref: string | null; description: string | null;
+  is_public: boolean; status: 'stolen' | 'recovered'; proofs: { path: string; name: string; kind: string }[];
+  created_at: string; recovered_at: string | null;
+}
+export type StolenReportInput = Pick<StolenReport, 'watch_id' | 'brand' | 'model' | 'reference_number' | 'serial_number' | 'stolen_on' | 'city' | 'police_report_ref' | 'description' | 'is_public'>;
+
+export async function getStolenReport(userId: string, watchId: string): Promise<StolenReport | null> {
+  const { data, error } = await supabase.from('stolen_reports').select('*').eq('user_id', userId).eq('watch_id', watchId)
+    .order('created_at', { ascending: false }).limit(1).maybeSingle();
+  if (error) return null; // table pas encore installée
+  return data as StolenReport | null;
+}
+
+export async function createStolenReport(userId: string, input: StolenReportInput): Promise<StolenReport> {
+  const { data, error } = await supabase.from('stolen_reports').insert({ ...input, user_id: userId }).select().single();
+  fail(error, 'Déclaration impossible.');
+  return data as StolenReport;
+}
+
+export async function updateStolenReport(id: string, patch: Partial<StolenReport>) {
+  const { error } = await supabase.from('stolen_reports').update(patch).eq('id', id);
+  fail(error, 'Mise à jour impossible.');
+}
+
+/** Justificatif (facture, carte de garantie, plainte) dans le stockage privé du membre. */
+export async function uploadTheftProof(userId: string, reportId: string, file: File, kind: string) {
+  const safe = file.name.normalize('NFD').replace(/[^\w.-]+/g, '-').slice(-80);
+  const path = `${userId}/${reportId}/${Date.now()}-${safe}`;
+  const { error } = await supabase.storage.from(THEFT_BUCKET).upload(path, file, { contentType: file.type || undefined });
+  fail(error, 'Envoi du justificatif impossible.');
+  return { path, name: file.name, kind };
+}
+
+/** Lien temporaire (10 minutes) pour ouvrir un justificatif. */
+export async function theftProofUrl(path: string): Promise<string | null> {
+  const { data } = await supabase.storage.from(THEFT_BUCKET).createSignedUrl(path, 600);
+  return data?.signedUrl ?? null;
+}
+
+export async function checkStolenSerial(serial: string): Promise<{ stolen: boolean; invalid?: boolean; brand?: string; model?: string; reference_number?: string | null; stolen_on?: string; city?: string | null; owner_username?: string | null }> {
+  const { data, error } = await supabase.rpc('check_stolen_serial', { p_serial: serial });
+  fail(error, 'Vérification indisponible.');
+  return data;
+}
+
+export interface StolenWatch { id: string; brand: string; model: string; reference_number: string | null; stolen_on: string; city: string | null; description: string | null; photo_path: string | null; owner_username: string | null }
+export async function listStolenWatches(): Promise<StolenWatch[]> {
+  const { data, error } = await supabase.rpc('list_stolen_watches', { p_limit: 60 });
+  if (error) return [];
+  return (data ?? []) as StolenWatch[];
+}
+
 /* ---------- Offre membres fondateurs ---------- */
 
 export interface FoundersOffer { limit: number; taken: number; remaining: number; open: boolean; claimed: boolean }

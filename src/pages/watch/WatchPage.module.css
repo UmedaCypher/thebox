@@ -77,3 +77,5 @@
 .historyShots { display: flex; gap: 6px; flex-wrap: wrap; }
 .historyShot { width: 72px; height: 90px; border-radius: var(--r-sm); overflow: hidden; box-shadow: var(--shadow-sm); }
 .historyShot img { width: 100%; height: 100%; object-fit: cover; }
+
+.watchTools { display: flex; flex-direction: column; align-items: flex-start; gap: var(--sp-1); }
