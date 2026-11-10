@@ -5,6 +5,8 @@ import { ShieldAlert, ShieldCheck, Watch as WatchIcon } from 'lucide-react';
 import { checkStolenSerial, listStolenWatches, thumbSrc } from '../lib/api';
 import type { StolenWatch } from '../lib/api';
 import { Button, Img, Notice, PageHeader, TextField } from '../components/ui';
+import CommunityNav from '../components/CommunityNav/CommunityNav';
+import { useAuth } from '../contexts/AuthContext';
 import { formatDate } from '../lib/format';
 import { defineStrings, useStrings } from '../i18n';
 import s from './StolenPage.module.css';
@@ -56,6 +58,7 @@ const S = defineStrings({
 type Result = Awaited<ReturnType<typeof checkStolenSerial>>;
 
 export default function StolenPage() {
+  const { user } = useAuth();
   const t = useStrings(S);
   const [serial, setSerial] = useState('');
   const [busy, setBusy] = useState(false);
@@ -74,7 +77,8 @@ export default function StolenPage() {
 
   return (
     <div className="page">
-      <PageHeader title={t.title} subtitle={t.subtitle} />
+      {user && <CommunityNav />}
+      <PageHeader title={t.title} subtitle={t.subtitle} hideTitleOnMobile={Boolean(user)} />
       <form className={`panel ${s.check}`} data-tone="plain" onSubmit={submit}>
         <h2 className={s.h}>{t.check}</h2>
         <div className={s.row}>

@@ -248,3 +248,13 @@ select.control {
 @media (pointer: coarse) {
   .small, .segment { min-height: 44px; }
 }
+
+/* Titre déjà affiché dans la barre du haut sur téléphone : masqué à l'écran, gardé pour les lecteurs d'écran */
+@media (max-width: 859px) {
+  .mobileHiddenTitle {
+    position: absolute !important; width: 1px; height: 1px; margin: -1px; padding: 0;
+    overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; border: 0;
+  }
+  .pageHeader[data-mobile-title='hidden'] { margin-bottom: var(--sp-4); }
+  .pageHeader[data-mobile-title='hidden'] .pageSubtitle { margin-top: 0; }
+}

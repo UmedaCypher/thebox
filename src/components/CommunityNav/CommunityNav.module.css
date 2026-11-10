@@ -1,8 +1,17 @@
-.nav { display: flex; gap: var(--sp-2); overflow-x: auto; scrollbar-width: none; margin-bottom: var(--sp-4); }
+.nav {
+  display: flex; gap: var(--sp-5); overflow-x: auto; scrollbar-width: none;
+  margin-bottom: var(--sp-4); border-bottom: 1px solid var(--line);
+}
 .nav::-webkit-scrollbar { display: none; }
 .link {
-  flex: none; padding: 7px 14px; border-radius: var(--r-pill); font-size: var(--fs-sm); font-weight: 600; text-decoration: none;
-  color: var(--text-2); border: 1px solid var(--line-strong);
+  position: relative; flex: none; padding: 12px 2px 13px; font-size: var(--fs-md, 1rem); font-weight: 600;
+  text-decoration: none; color: var(--text-3); transition: color 160ms var(--ease-out);
 }
 .link:hover { color: var(--text); }
-.link[aria-current='page'] { color: var(--brass-ink); background: var(--brass); border-color: transparent; }
+.link::after {
+  content: ''; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; border-radius: 2px;
+  background: var(--brass); transform: scaleX(0); transition: transform 220ms var(--ease-out);
+}
+.link[aria-current='page'] { color: var(--text); }
+.link[aria-current='page']::after { transform: scaleX(1); }
+@media (prefers-reduced-motion: reduce) { .link, .link::after { transition: none; } }

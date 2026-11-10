@@ -65,8 +65,8 @@ export default function FeedPage() {
 
   return (
     <div className="page">
-      <PageHeader title={t.title} subtitle={t.subtitle} />
       <CommunityNav />
+      <PageHeader title={t.title} subtitle={t.subtitle} hideTitleOnMobile />
       <div className={s.layout}>
         <div className={s.main}>
           <Composer uid={uid} watches={watches.data ?? []} canPost={canPost} onPosted={() => { setMode('following'); load(); }} />

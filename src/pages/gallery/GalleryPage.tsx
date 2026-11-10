@@ -126,11 +126,12 @@ function GalleryView() {
 
   return (
     <div className="page">
+      {user && <CommunityNav />}
       <PageHeader
         title={c.tabs.gallery}
         subtitle={t.subtitle}
+        hideTitleOnMobile={Boolean(user)}
       />
-      {user && <CommunityNav />}
 
       <div className={s.viewSwitch}>
         <Segmented label={t.view} value={view} onChange={setView} options={[{ value: 'photos', label: t.photos }, { value: 'ranking', label: t.ranking }]} />

@@ -1,7 +1,8 @@
 import { lockScroll } from '../../lib/motion';
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import type { ButtonHTMLAttributes, InputHTMLAttributes, ReactNode, Ref, SelectHTMLAttributes, TextareaHTMLAttributes } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
+import { pageTitle } from '../Layout/pageTitle';
 import type { LinkProps } from 'react-router-dom';
 import { ChevronLeft, Watch as WatchIcon, X } from 'lucide-react';
 import { useStrings } from '../../i18n';
@@ -229,13 +230,21 @@ export function Sheet({ open, onClose, title, children }: { open: boolean; onClo
 
 /* ---------- Mise en page ---------- */
 
-export function PageHeader({ title, subtitle, action, back }:
-  { title: ReactNode; subtitle?: ReactNode; action?: ReactNode; back?: { to: string; label: string } }) {
+/**
+ * En-tête de page. Sur téléphone, le nom de la page est déjà dans la barre du haut :
+ * un titre identique n'est pas répété (il reste lu par les lecteurs d'écran et Google).
+ * `hideTitleOnMobile` force ce comportement quand la barre du haut affiche la rubrique (ex. « Social »).
+ */
+export function PageHeader({ title, subtitle, action, back, hideTitleOnMobile }:
+  { title: ReactNode; subtitle?: ReactNode; action?: ReactNode; back?: { to: string; label: string }; hideTitleOnMobile?: boolean }) {
+  const { pathname } = useLocation();
+  const same = hideTitleOnMobile
+    || (typeof title === 'string' && title.trim().toLocaleLowerCase() === pageTitle(pathname).toLocaleLowerCase());
   return (
-    <header className={s.pageHeader}>
+    <header className={s.pageHeader} data-mobile-title={same ? 'hidden' : undefined}>
       <div className={s.pageHeaderText}>
         {back && <Link to={back.to} className={s.back}><ChevronLeft size={16} strokeWidth={1.6} />{back.label}</Link>}
-        <h1>{title}</h1>
+        <h1 className={same ? s.mobileHiddenTitle : undefined}>{title}</h1>
         {subtitle && <p className={s.pageSubtitle}>{subtitle}</p>}
       </div>
       {action}

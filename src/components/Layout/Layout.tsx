@@ -66,7 +66,7 @@ function Header({ unread, showSearch }: { unread: number; showSearch: boolean })
       <div className={s.headerInner}>
         <Link to={user ? '/accueil' : '/'} className={s.wordmark}>Arcora</Link>
         {/* Téléphone : le nom de la page remplace le logo */}
-        <p className={s.pageTitle} aria-hidden="true">{pageTitle(pathname)}</p>
+        <p className={s.pageTitle} aria-hidden="true">{pageTitle(pathname, Boolean(user))}</p>
 
         <div className={s.searchSlot}><GlobalSearch /></div>
 
