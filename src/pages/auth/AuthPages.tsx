@@ -18,6 +18,8 @@ const S = defineStrings({
   email: 'Adresse e-mail',
   password: 'Mot de passe',
   passwordHint: 'Au moins 8 caractères.',
+  google: 'Continuer avec Google',
+  or: 'ou avec votre e-mail',
   login: {
     title: 'Se connecter',
     noAccount: 'Pas encore de compte ?',
@@ -66,6 +68,8 @@ const S = defineStrings({
   email: 'Email address',
   password: 'Password',
   passwordHint: 'At least 8 characters.',
+  google: 'Continue with Google',
+  or: 'or with your email',
   login: {
     title: 'Sign in',
     noAccount: 'No account yet?',
@@ -126,6 +130,38 @@ const translate = (m: string) => {
   return m;
 };
 
+/** Connexion Google : affichée une fois le fournisseur activé dans Supabase (variable de build VITE_GOOGLE_AUTH=true). */
+const GOOGLE_AUTH = import.meta.env.VITE_GOOGLE_AUTH === 'true';
+
+function GoogleButton({ next = '/accueil' }: { next?: string }) {
+  const t = useStrings(S);
+  const [error, setError] = useState<string | null>(null);
+  if (!GOOGLE_AUTH) return null;
+  const go = async () => {
+    setError(null);
+    const { error: err } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: `${window.location.origin}${next}`, queryParams: { prompt: 'select_account' } },
+    });
+    if (err) setError(translate(err.message));
+  };
+  return (
+    <>
+      <button type="button" className={s.google} onClick={go}>
+        <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true">
+          <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z" />
+          <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z" />
+          <path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z" />
+          <path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z" />
+        </svg>
+        {t.google}
+      </button>
+      {error && <Notice tone="error">{error}</Notice>}
+      <p className={s.or}><span>{t.or}</span></p>
+    </>
+  );
+}
+
 export function LoginPage() {
   const t = useStrings(S);
   const navigate = useNavigate();
@@ -148,6 +184,7 @@ export function LoginPage() {
   return (
     <AuthShell title={t.login.title} foot={<>{t.login.noAccount} <Link to="/signup">{t.login.createAccount}</Link></>}>
       <form onSubmit={submit} className={s.form}>
+        <GoogleButton next={from} />
         {error && <Notice tone="error">{error}</Notice>}
         <TextField label={t.email} type="email" autoComplete="email" value={email} onChange={e => setEmail(e.target.value)} required />
         <TextField label={t.password} type="password" autoComplete="current-password" value={password} onChange={e => setPassword(e.target.value)} required />
@@ -186,6 +223,7 @@ export function SignupPage() {
   return (
     <AuthShell title={t.signup.title} foot={<>{t.signup.already} <Link to="/login">{t.signup.login}</Link></>}>
       <form onSubmit={submit} className={s.form}>
+        <GoogleButton next="/bienvenue" />
         {error && <Notice tone="error">{error}</Notice>}
         <TextField label={t.email} type="email" autoComplete="email" value={email} onChange={e => setEmail(e.target.value)} required />
         <TextField label={t.password} type="password" autoComplete="new-password" value={password} onChange={e => setPassword(e.target.value)} hint={t.passwordHint} required />
