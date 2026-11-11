@@ -14,6 +14,7 @@ import { useLanguageSetting } from '../../i18n/useLanguageSetting';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { pageTitle } from './pageTitle';
 import PlayBanner from './PlayBanner';
+import JoinBanner, { joinBannerKind } from './JoinBanner';
 import s from './Layout.module.css';
 
 const S = defineStrings({
@@ -234,7 +235,7 @@ export default function Layout() {
   }, [pathname, hash]);
 
   return (
-    <div className={s.shell}>
+    <div className={s.shell} data-join-banner={!user && joinBannerKind(pathname) ? '' : undefined}>
       <a href="#contenu" className="visually-hidden">{t.skip}</a>
       <Header unread={unread} showSearch={showSearch} />
       <main id="contenu" className={`${s.main} ${user && !inThread && !inOnboarding ? s.withTabbar : ''}`}>
@@ -242,7 +243,8 @@ export default function Layout() {
         <div key={inMessages ? '/messages' : pathname} className={s.route}><Outlet /></div>
       </main>
       {!inMessages && !inOnboarding && <Footer loggedIn={Boolean(user)} />}
-      {!phone && <PlayBanner />}
+      {/* Visiteur sur une page publique : l'invitation à créer sa collection passe avant la bannière Play Store */}
+      {!user && joinBannerKind(pathname) ? <JoinBanner /> : !phone && <PlayBanner />}
       {user && !inOnboarding && <div className={inThread ? s.hideOnMobile : undefined}><TabBar /></div>}
     </div>
   );

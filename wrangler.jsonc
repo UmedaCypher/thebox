@@ -4,9 +4,14 @@
 {
   "name": "thebox",
   "compatibility_date": "2026-10-28",
+  // Petit Worker (worker/index.ts) : ajoute l'aperçu des liens partagés (titre, photo) aux passeports et profils.
+  "main": "worker/index.ts",
   "assets": {
     "directory": "./dist/",
+    "binding": "ASSETS",
     // Application d'une seule page : toute adresse inconnue (/collection, /montre/…) renvoie index.html.
-    "not_found_handling": "single-page-application"
+    "not_found_handling": "single-page-application",
+    // Seules ces pages passent par le Worker ; tout le reste est servi directement.
+    "run_worker_first": ["/passeport/*", "/profil/*"]
   }
 }

@@ -1,11 +1,31 @@
-import { defineConfig } from 'vite';
+import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
+import { writeFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+
+/**
+ * Écrit dist/app-config.json (adresse et clé publique Supabase, déjà présentes dans l'app) :
+ * le Worker s'en sert pour les aperçus de liens partagés.
+ */
+function appConfig() {
+  return {
+    name: 'arcora-app-config',
+    apply: 'build' as const,
+    closeBundle() {
+      const env = { ...loadEnv('production', process.cwd(), 'VITE_'), ...process.env };
+      const supabaseUrl = env.VITE_SUPABASE_URL, anonKey = env.VITE_SUPABASE_ANON_KEY;
+      if (!supabaseUrl || !anonKey) return;
+      writeFileSync(resolve(__dirname, 'dist/app-config.json'), JSON.stringify({ supabaseUrl, anonKey }));
+    },
+  };
+}
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
     react(),
+    appConfig(),
     VitePWA({
       registerType: 'autoUpdate',
       manifest: {
@@ -45,7 +65,7 @@ export default defineConfig({
         importScripts: ['push-sw.js'],
         // Le magazine (/magazine, /en/magazine) et les fichiers du référencement sont des pages statiques
         // servies à part : l'app installée ne doit pas les remplacer par son index.html.
-        navigateFallbackDenylist: [/^\/magazine/, /^\/en\//, /^\/sitemap/, /^\/robots\.txt$/],
+        navigateFallbackDenylist: [/^\/magazine/, /^\/au-poignet/, /^\/en\//, /^\/sitemap/, /^\/robots\.txt$/],
         globPatterns: ['**/*.{js,css,html,ico,png,svg,webmanifest}'],
         runtimeCaching: [
           {

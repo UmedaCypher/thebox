@@ -164,3 +164,7 @@ a.avatar::after { content: ''; position: absolute; inset: -6px; border-radius: 5
 @keyframes routeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) { .route { animation: none; } }
 .mobileSearch kbd { display: none; }
+
+/* Invitation des visiteurs en bas d'écran : le bas de page reste lisible au-dessus */
+.shell[data-join-banner] { padding-bottom: 120px; }
+@media (max-width: 640px) { .shell[data-join-banner] { padding-bottom: 190px; } }
