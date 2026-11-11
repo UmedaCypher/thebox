@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { FormEvent } from 'react';
 import { Pencil, Plus, Trash2 } from 'lucide-react';
-import { adminSetFoundersOfferOpen, deleteAdminOkr, getAdminKpis, getFoundersOffer, listAdminOkrs, saveAdminOkr } from '../../lib/api';
-import type { AdminKpis, AdminOkr, FoundersOffer, KpiKey } from '../../lib/api';
-import { Button, Notice, SelectField, TextField, Toggle } from '../../components/ui';
+import { adminSetFoundersOfferOpen, deleteAdminOkr, getAdminFunnel, getAdminKpis, getFoundersOffer, listAdminOkrs, saveAdminOkr } from '../../lib/api';
+import type { AdminFunnel, AdminKpis, AdminOkr, FoundersOffer, KpiKey } from '../../lib/api';
+import { Button, Notice, Segmented, SelectField, TextField, Toggle } from '../../components/ui';
 import { useToast } from '../../components/Toast/Toast';
 import { formatEuros, formatNumber } from '../../lib/format';
 import s from './AdminPage.module.css';
@@ -203,5 +203,50 @@ export function FoundersOfferSetting() {
         checked={offer.open} onChange={toggle}
         description="1 €/mois ou 9,99 €/an la première année. Créez d'abord les deux coupons Stripe (docs/stripe.md) : sans eux, Stripe facture le tarif normal. Se ferme seule à 100." />
     </div>
+  );
+}
+
+/* ---------- Entonnoir : où décrochent les nouveaux membres ---------- */
+export function Funnel() {
+  const [days, setDays] = useState<'7' | '30' | '90'>('30');
+  const [f, setF] = useState<AdminFunnel | null | undefined>(undefined);
+  useEffect(() => { setF(undefined); getAdminFunnel(Number(days)).then(setF); }, [days]);
+  const steps = f ? [
+    { label: 'Inscription', n: f.signups, of: f.signups, help: 'Comptes créés sur la période.' },
+    { label: '1re montre', n: f.with_watch, of: f.signups, help: 'Au moins une montre dans la collection.' },
+    { label: '1er Wrist Check', n: f.with_wear, of: f.signups, help: 'Au moins une montre notée comme portée.' },
+    { label: '1re photo au poignet', n: f.with_wrist_photo, of: f.signups, help: 'Au moins une photo au poignet.' },
+    { label: 'Revenu après 7 jours', n: f.returned_d7, of: f.eligible_d7, help: `Une action 7 jours ou plus après l’inscription (sur ${f.eligible_d7} inscrits depuis au moins 7 jours).` },
+  ] : [];
+  const pct = (n: number, of: number) => (of > 0 ? Math.round((100 * n) / of) : 0);
+  return (
+    <section className={s.section}>
+      <div className={s.sectionHead}>
+        <h2 className={s.h}>Entonnoir d’activation</h2>
+        <Segmented label="Période" value={days} onChange={setDays}
+          options={[{ value: '7', label: '7 j' }, { value: '30', label: '30 j' }, { value: '90', label: '90 j' }]} />
+      </div>
+      <p className={s.small}>Des inscrits de la période : combien franchissent chaque étape. La plus forte chute montre où améliorer l’app en premier.</p>
+      {f === undefined ? <p className={s.small}>Chargement…</p> : f === null ? (
+        <Notice>Lancez la mise à jour SQL « croissance » pour afficher l’entonnoir.</Notice>
+      ) : f.signups === 0 ? <p className={s.small}>Aucune inscription sur la période.</p> : (
+        <ol className={s.funnel}>
+          {steps.map((st, i) => {
+            const prev = i > 0 ? pct(steps[i - 1].n, steps[i - 1].of) : 100;
+            const p = pct(st.n, st.of);
+            return (
+              <li key={st.label} className={s.funnelStep}>
+                <span className={s.funnelLabel}><strong>{st.label}</strong><span className={s.small}>{st.help}</span></span>
+                <span className={s.funnelBar} aria-hidden="true"><i style={{ width: `${Math.max(p, 1)}%` }} /></span>
+                <span className={s.funnelValue}>
+                  <b className="num">{p}&nbsp;%</b>
+                  <span className={s.small}>{formatNumber(st.n)}{i > 0 && prev - p > 0 ? ` · −${prev - p} pts` : ''}</span>
+                </span>
+              </li>
+            );
+          })}
+        </ol>
+      )}
+    </section>
   );
 }

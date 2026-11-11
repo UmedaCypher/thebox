@@ -130,7 +130,8 @@ const S = defineStrings({
   continueNoPhoto: 'Continuer sans photo',
   continue: 'Continuer',
   adding: 'Ajout…',
-  addNow: 'Ajouter maintenant',
+  addNow: 'Ajouter à ma collection',
+  addDetails: 'Ajouter des détails',
   addToCollection: 'Ajouter à la collection',
   limitReason: (n: number) => `Votre collection gratuite est complète (${n} montres). Premium la rend illimitée.`,
   wristPhoto: 'Photo au poignet',
@@ -227,7 +228,8 @@ const S = defineStrings({
   continueNoPhoto: 'Continue without a photo',
   continue: 'Continue',
   adding: 'Adding…',
-  addNow: 'Add now',
+  addNow: 'Add to my collection',
+  addDetails: 'Add details',
   addToCollection: 'Add to collection',
   limitReason: n => `Your free collection is full (${n} watches). Premium makes it unlimited.`,
   wristPhoto: 'Wrist shot',
@@ -524,8 +526,17 @@ export default function WatchEditorPage() {
         <div className={s.actions}>
           {step < STEP_COUNT - 1 ? (
             <>
-              <Button onClick={next}>{step === 0 && !mainFile ? t.continueNoPhoto : t.continue}</Button>
-              {step === 1 && <Button variant="ghost" type="submit" disabled={saving}>{saving ? t.adding : t.addNow}</Button>}
+              {/* Étape identité : marque et modèle suffisent, les détails se complètent plus tard depuis la fiche */}
+              {step === 1 && !isEdit
+                ? <>
+                    <Button key="add-now" type="submit" disabled={saving}>{saving ? t.adding : t.addNow}</Button>
+                    <Button key="add-details" variant="ghost" onClick={next}>{t.addDetails}</Button>
+                  </>
+                : <>
+                    {/* Clés distinctes : le bouton cliqué ne doit pas devenir « envoyer » pendant le clic */}
+                    <Button key="continue" onClick={next}>{step === 0 && !mainFile ? t.continueNoPhoto : t.continue}</Button>
+                    {step === 1 && <Button variant="ghost" type="submit" disabled={saving}>{saving ? t.adding : t.addNow}</Button>}
+                  </>}
             </>
           ) : (
             <Button type="submit" disabled={saving}>{saving ? t.adding : t.addToCollection}</Button>

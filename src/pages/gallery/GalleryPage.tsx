@@ -7,7 +7,7 @@ import { useLoad } from '../../hooks/useLoad';
 import { getFitRanking, listGalleryBrands, listGalleryShots, photoUrl, thumbPath } from '../../lib/api';
 import type { GalleryShot } from '../../types';
 import FitScale, { FitBadge } from '../../components/WristCheck/FitScale';
-import { Cushion, EmptyState, IconButton, Img, LinkButton, Notice, PageHeader, Segmented } from '../../components/ui';
+import { Button, Cushion, EmptyState, IconButton, Img, LinkButton, Notice, PageHeader, Segmented } from '../../components/ui';
 import { formatDecimal } from '../../lib/format';
 import { defineStrings, useStrings } from '../../i18n';
 import { COMMON } from '../../i18n/common';
@@ -187,7 +187,8 @@ function GalleryView() {
       ) : shots.loading ? <SkeletonGrid count={8} /> : shots.error ? <Notice tone="error">{shots.error}</Notice> : !shots.data?.length ? (
         <EmptyState
           title={filtered ? t.noResultsTitle : t.emptyTitle}
-          action={user ? <LinkButton to="/collection" variant="secondary">{t.addShot}</LinkButton> : undefined}
+          action={filtered ? <Button variant="secondary" onClick={reset}>{t.showAll}</Button>
+            : user ? <LinkButton to="/collection" variant="secondary">{t.addShot}</LinkButton> : undefined}
         >
           {filtered ? t.noResultsText : t.emptyText}
         </EmptyState>

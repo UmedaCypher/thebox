@@ -15,7 +15,7 @@ import { Button, EmptyState, IconButton, LinkButton, Loading, Notice, PageHeader
 import { useToast } from '../../components/Toast/Toast';
 import { formatDate, formatEuros, formatNumber, todayISO } from '../../lib/format';
 import { Bars, Line } from './Charts';
-import { FoundersOfferSetting, Kpis, Okrs } from './AdminKpis';
+import { FoundersOfferSetting, Funnel, Kpis, Okrs } from './AdminKpis';
 import s from './AdminPage.module.css';
 
 /*
@@ -70,6 +70,7 @@ export default function AdminPage() {
         <>
           <Overview d={data} />
           <Kpis />
+          <Funnel />
           <Okrs />
           <Magazine />
           <Growth d={data} />

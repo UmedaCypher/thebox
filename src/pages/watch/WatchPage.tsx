@@ -77,6 +77,10 @@ const S = defineStrings({
   sharePassportHint: "Toute personne ayant le lien voit les photos et les caractéristiques. Jamais les prix, la valeur ni le lieu d'achat.",
   linkCopied: 'Lien copié',
   storyImage: 'Image pour story', preparing: 'Préparation…',
+  complete: (n: number) => `Fiche complète à ${n} %`,
+  completeHint: 'Ce qui manque, en quelques secondes :',
+  completeCta: 'Compléter',
+  missing: { photo: 'une photo', reference: 'la référence', year: 'l’année', diameter: 'le diamètre', lug: 'l’entre-cornes', caliber: 'le calibre', papers: 'boîte et papiers', serial: 'le n° de série', price: 'le prix d’achat' },
   shareLink: 'Partager le lien',
   seePublic: 'Voir la page publique',
   compare: 'Comparer avec une autre montre',
@@ -162,6 +166,10 @@ const S = defineStrings({
   sharePassportHint: 'Anyone with the link can see the photos and specs. Never the prices, the value or where you bought it.',
   linkCopied: 'Link copied',
   storyImage: 'Story image', preparing: 'Preparing…',
+  complete: (n: number) => `Card ${n}% complete`,
+  completeHint: 'What’s missing, in a few seconds:',
+  completeCta: 'Complete',
+  missing: { photo: 'a photo', reference: 'the reference', year: 'the year', diameter: 'the diameter', lug: 'lug-to-lug', caliber: 'the calibre', papers: 'box and papers', serial: 'the serial number', price: 'the purchase price' },
   shareLink: 'Share the link',
   seePublic: 'View the public page',
   compare: 'Compare with another watch',
@@ -297,6 +305,8 @@ export default function WatchPage() {
             </Button>
             <Link to={`/montre/${watch.id}/modifier`} className={s.edit}><Pencil size={16} strokeWidth={1.6} aria-hidden="true" />{t.edit}</Link>
           </div>
+
+          <Completeness watch={watch} hasPhoto={photos.length > 0} />
 
           {statusKind(watch.current_status) ? (
             <div className={s.listingBanner}>
@@ -620,5 +630,29 @@ function ValueTab({ watch, uid, isPremium, onPremium }: { watch: Watch; uid: str
         {history.data && history.data.length > 1 && t.estimates(history.data.length)}
       </p>
     </div>
+  );
+}
+
+/** Fiche à compléter : ce qui manque, pour qu'une montre ajoutée en 10 secondes devienne une vraie fiche. */
+function Completeness({ watch, hasPhoto }: { watch: Watch; hasPhoto: boolean }) {
+  const t = useStrings(S);
+  const checks: [keyof typeof t.missing, boolean][] = [
+    ['photo', hasPhoto], ['reference', Boolean(watch.reference_number)], ['year', Boolean(watch.year_of_production)],
+    ['diameter', Boolean(watch.case_diameter_mm)], ['lug', Boolean(watch.lug_to_lug_mm)],
+    ['caliber', Boolean(watch.caliber) || watch.movement === 'Quartz'], ['papers', Boolean(watch.box_papers_status)],
+    ['serial', Boolean(watch.serial_number)], ['price', watch.purchase_price != null],
+  ];
+  const missing = checks.filter(([, ok]) => !ok).map(([k]) => k);
+  const pct = Math.round((100 * (checks.length - missing.length)) / checks.length);
+  if (missing.length === 0) return null;
+  return (
+    <Link to={`/montre/${watch.id}/modifier`} className={s.complete}>
+      <span className={s.completeHead}>
+        <strong>{t.complete(pct)}</strong>
+        <span className={s.completeCta}>{t.completeCta}<Pencil size={14} aria-hidden="true" /></span>
+      </span>
+      <span className={s.completeBar} aria-hidden="true"><span style={{ width: `${pct}%` }} /></span>
+      <span className={s.completeList}>{t.completeHint} {missing.slice(0, 4).map(k => t.missing[k]).join(', ')}{missing.length > 4 ? '…' : '.'}</span>
+    </Link>
   );
 }

@@ -130,3 +130,13 @@
 .krActions { grid-column: 2; grid-row: 1 / span 2; display: flex; gap: 4px; }
 .krActions button { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; color: var(--text-3); }
 .krActions button:hover { color: var(--text); background: var(--cushion); }
+
+/* Entonnoir d'activation */
+.funnel { list-style: none; display: flex; flex-direction: column; gap: var(--sp-3); }
+.funnelStep { display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px; padding: var(--sp-3) var(--sp-4); border-radius: var(--r-control); background: color-mix(in srgb, var(--text) 3%, transparent); }
+@media (min-width: 760px) { .funnelStep { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.4fr) 110px; align-items: center; gap: var(--sp-4); } }
+.funnelLabel { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.funnelBar { height: 10px; border-radius: 5px; background: color-mix(in srgb, var(--text) 10%, transparent); overflow: hidden; }
+.funnelBar i { display: block; height: 100%; border-radius: 5px; background: linear-gradient(90deg, var(--brass), color-mix(in srgb, var(--brass) 70%, var(--lume))); }
+.funnelValue { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; text-align: right; }
+.funnelValue b { font-family: var(--font-display); font-size: var(--fs-xl); font-weight: 500; }

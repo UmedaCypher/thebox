@@ -20,6 +20,8 @@ const S = defineStrings({
   emptyFollowing: 'Votre feed est encore calme',
   emptyFollowingText: 'Suivez quelques collectionneurs : leurs publications, wrist shots et annonces apparaîtront ici.',
   emptyAll: 'Aucune publication pour le moment. Lancez la conversation !',
+  seeAll: 'Voir les publications de tous les membres',
+  writeFirst: 'Écrire le premier post',
   more: 'Voir plus',
   suggest: 'Collectionneurs à suivre',
   watches: (n: number) => `${n} montre${n > 1 ? 's' : ''}`,
@@ -32,6 +34,8 @@ const S = defineStrings({
   emptyFollowing: 'Your feed is quiet for now',
   emptyFollowingText: 'Follow a few collectors: their posts, wrist shots and listings will show up here.',
   emptyAll: 'No posts yet. Start the conversation!',
+  seeAll: 'See posts from all members',
+  writeFirst: 'Write the first post',
   more: 'Show more',
   suggest: 'Collectors to follow',
   watches: (n: number) => `${n} watch${n > 1 ? 'es' : ''}`,
@@ -86,8 +90,8 @@ export default function FeedPage() {
           {error && <Notice tone="error">{error}</Notice>}
           {!items ? <SkeletonList rows={3} /> : items.length === 0 ? (
             mode === 'following'
-              ? <EmptyState title={t.emptyFollowing}>{t.emptyFollowingText}</EmptyState>
-              : <EmptyState title={t.emptyAll} />
+              ? <EmptyState title={t.emptyFollowing} action={<Button variant="secondary" onClick={() => setMode('all')}>{t.seeAll}</Button>}>{t.emptyFollowingText}</EmptyState>
+              : <EmptyState title={t.emptyAll} action={<Button onClick={() => setWriting(true)}><PenLine size={16} aria-hidden="true" />{t.writeFirst}</Button>} />
           ) : (
             <div className={s.list}>
               {items.map(it => <FeedCard key={`${it.kind}-${it.id}`} item={it} uid={uid} onRemoved={() => setItems(x => (x ?? []).filter(y => y !== it))} />)}

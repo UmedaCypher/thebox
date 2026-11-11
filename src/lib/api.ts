@@ -1157,3 +1157,16 @@ export async function searchPublicWatches(query: string, limit = 20): Promise<Pu
   fail(error, 'Recherche impossible.');
   return (data as PublicWatchHit[]) ?? [];
 }
+
+/* ---------- Entonnoir d'activation (backoffice) ---------- */
+
+export interface AdminFunnel {
+  days: number; signups: number; with_watch: number; with_wear: number; with_wrist_photo: number;
+  eligible_d7: number; returned_d7: number;
+}
+
+export async function getAdminFunnel(days: number): Promise<AdminFunnel | null> {
+  const { data, error } = await supabase.rpc('admin_funnel', { p_days: days });
+  if (error) return null; // fonction pas encore installée
+  return data as AdminFunnel;
+}
