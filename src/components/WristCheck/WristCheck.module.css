@@ -136,3 +136,4 @@
 .trackLabels span[data-state='next'] { color: var(--lume); font-weight: 700; }
 .track[data-paused='true'] .trackFill { opacity: 0; }
 @media (prefers-reduced-motion: reduce) { .node[data-state='next'] { animation: none; } .trackFill { transition: none; } }
+.donePhoto { width: 100%; max-height: 46vh; object-fit: cover; border-radius: var(--r-cushion); }

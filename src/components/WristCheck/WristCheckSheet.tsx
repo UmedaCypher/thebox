@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { ChangeEvent } from 'react';
 import { createPortal } from 'react-dom';
-import { Camera, Check, Watch as WatchIcon, X } from 'lucide-react';
+import { Camera, Check, Share2, Watch as WatchIcon, X } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { addWatchPhoto, addWear, getMyWearStreak, mainPhoto, saveProfile, thumbSrc } from '../../lib/api';
 import type { Watch, WearStreak } from '../../types';
@@ -10,6 +10,7 @@ import { useToast } from '../Toast/Toast';
 import { defineStrings, useStrings } from '../../i18n';
 import { formatDate, toISODate } from '../../lib/format';
 import { PHOTO_MILESTONES, STREAK_MILESTONES, STREAK_STRINGS } from './streak';
+import { drawWristCheckStory, shareImage } from '../../lib/shareCard';
 import s from './WristCheck.module.css';
 
 const MAX_PHOTOS = 3;
@@ -36,6 +37,11 @@ const S = defineStrings({
   note: 'Note',
   notePlaceholder: 'Un mot sur la journée, l’occasion…',
   submit: 'Valider le Wrist Check',
+  doneTitle: 'C’est noté',
+  doneText: 'Partagez votre Wrist Check en story : vos abonnés verront la montre du jour.',
+  shareStory: 'Partager en story',
+  preparing: 'Préparation…',
+  finish: 'Terminer',
   saving: 'Enregistrement…',
   sendingPhoto: (i: number, n: number) => `Envoi de la photo ${i} sur ${n}…`,
   pickWatch: 'Choisissez une montre.',
@@ -61,6 +67,11 @@ const S = defineStrings({
   note: 'Note',
   notePlaceholder: 'A word about the day, the occasion…',
   submit: 'Save the Wrist Check',
+  doneTitle: 'Logged',
+  doneText: 'Share your Wrist Check as a story: your followers will see today’s watch.',
+  shareStory: 'Share as a story',
+  preparing: 'Preparing…',
+  finish: 'Done',
   saving: 'Saving…',
   sendingPhoto: (i: number, n: number) => `Uploading photo ${i} of ${n}…`,
   pickWatch: 'Choose a watch.',
@@ -97,13 +108,16 @@ export default function WristCheckSheet({ open, onClose, watches, watchId, day, 
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const input = useRef<HTMLInputElement>(null);
+  // Après validation avec photo : proposition de partage avant de fermer
+  const [done, setDone] = useState<{ streak: number } | null>(null);
+  const [sharing, setSharing] = useState(false);
 
   // Remise à zéro à chaque ouverture, avec la montre et le jour proposés
   useEffect(() => {
     if (!open) return;
     setSelDay(day && days.includes(day) ? day : days[0]);
     setSelWatch(watchId ?? (watches.length === 1 ? watches[0].id : null));
-    setFiles([]); setNote(''); setError(null); setBusy(null); setWrist('');
+    setFiles([]); setNote(''); setError(null); setBusy(null); setWrist(''); setDone(null);
   }, [open, watchId, day, days, watches]);
   useEffect(() => () => files.forEach(f => URL.revokeObjectURL(f.url)), [files]);
 
@@ -144,14 +158,42 @@ export default function WristCheckSheet({ open, onClose, watches, watchId, day, 
       const photoReached = PHOTO_MILESTONES.find(m => after && after.photos >= m && (before?.photos ?? 0) < m);
       toast(reached ? st.celebrate(reached, st.badge[reached]) : photoReached ? st.celebratePhoto(photoReached) : st.kept(Math.max(1, after?.current ?? 1)));
       onDone?.(after);
-      onClose();
+      if (files.length) { setBusy(null); setDone({ streak: after?.current ?? 1 }); }
+      else onClose();
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
       setBusy(null);
     }
   };
 
+  const shareStory = async () => {
+    const w = watches.find(x => x.id === selWatch);
+    if (!w || !done) return;
+    setSharing(true);
+    try {
+      const blob = await drawWristCheckStory({
+        photo: files[0]?.url ?? null, brand: w.brand, model: w.model,
+        dateLabel: formatDate(selDay, { day: 'numeric', month: 'long' }), streak: done.streak, username: profile?.username ?? null,
+      });
+      await shareImage(blob, `arcora-wrist-check-${selDay}.png`, `${w.brand} ${w.model} · Wrist Check`);
+    } catch (e) { toast(e instanceof Error ? e.message : String(e)); }
+    setSharing(false);
+  };
+
   if (!open) return null;
+  if (done) {
+    return createPortal(
+      <Sheet open={open} onClose={onClose} title={t.doneTitle}>
+        <div className={s.form}>
+          {files[0] && <img className={s.donePhoto} src={files[0].url} alt="" />}
+          <p className={s.hint}>{t.doneText}</p>
+          <Button onClick={shareStory} disabled={sharing} block><Share2 size={16} aria-hidden="true" />{sharing ? t.preparing : t.shareStory}</Button>
+          <Button variant="ghost" onClick={onClose} block>{t.finish}</Button>
+        </div>
+      </Sheet>,
+      document.body,
+    );
+  }
   return createPortal(
     <Sheet open={open} onClose={() => !busy && onClose()} title={t.title}>
       <div className={s.form}>

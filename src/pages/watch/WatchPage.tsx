@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import type { FormEvent, ReactNode } from 'react';
 import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { Check, Link2, Pencil, Plus, Trash2 } from 'lucide-react';
+import { Check, Image as ImageIcon, Link2, Pencil, Plus, Trash2 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useLoad } from '../../hooks/useLoad';
 import {
@@ -10,6 +10,7 @@ import {
   trackEvent,
 } from '../../lib/api';
 import { withRef } from '../../lib/source';
+import { drawPassportStory, shareImage } from '../../lib/shareCard';
 import { formatDate, formatEuros, formatMm, plural, todayISO } from '../../lib/format';
 import { defineStrings, getLocale, useStrings } from '../../i18n';
 import { COMMON } from '../../i18n/common';
@@ -75,6 +76,7 @@ const S = defineStrings({
   sharePassport: 'Partager le passeport',
   sharePassportHint: "Toute personne ayant le lien voit les photos et les caractéristiques. Jamais les prix, la valeur ni le lieu d'achat.",
   linkCopied: 'Lien copié',
+  storyImage: 'Image pour story', preparing: 'Préparation…',
   shareLink: 'Partager le lien',
   seePublic: 'Voir la page publique',
   compare: 'Comparer avec une autre montre',
@@ -159,6 +161,7 @@ const S = defineStrings({
   sharePassport: 'Share the passport',
   sharePassportHint: 'Anyone with the link can see the photos and specs. Never the prices, the value or where you bought it.',
   linkCopied: 'Link copied',
+  storyImage: 'Story image', preparing: 'Preparing…',
   shareLink: 'Share the link',
   seePublic: 'View the public page',
   compare: 'Compare with another watch',
@@ -387,6 +390,23 @@ function PassportTab({ watch, uid, onUpdate }: { watch: Watch; uid: string; onUp
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const [drawing, setDrawing] = useState(false);
+  const story = async () => {
+    setDrawing(true);
+    try {
+      const facts = [
+        watch.reference_number && `Réf. ${watch.reference_number}`,
+        [watch.year_of_production, watch.case_diameter_mm && formatMm(watch.case_diameter_mm)].filter(Boolean).join(' · '),
+        watch.caliber && `${t.specs.movement} ${watch.caliber}`,
+      ].filter(Boolean) as string[];
+      const blob = await drawPassportStory({
+        photo: photoUrl(mainPhoto(watch.photos)?.storage_path), brand: watch.brand, model: watch.model, facts, username: profile?.username ?? null,
+      });
+      await shareImage(blob, `arcora-${watch.brand}-${watch.model}.png`.toLowerCase().replace(/\s+/g, '-'), `${watch.brand} ${watch.model} · ${shareUrl}`);
+    } catch (e) { toast(e instanceof Error ? e.message : String(e)); }
+    setDrawing(false);
+  };
+
   const togglePublic = async (v: boolean) => {
     onUpdate({ ...watch, passport_public: v });
     try { await setPassportPublic(uid, watch.id, v); } catch { onUpdate({ ...watch, passport_public: !v }); }
@@ -412,6 +432,9 @@ function PassportTab({ watch, uid, onUpdate }: { watch: Watch; uid: string; onUp
           <div className={s.shareRow}>
             <Button variant="secondary" size="small" onClick={share}>
               {copied ? <><Check size={16} aria-hidden="true" />{t.linkCopied}</> : <><Link2 size={16} aria-hidden="true" />{t.shareLink}</>}
+            </Button>
+            <Button variant="ghost" size="small" onClick={story} disabled={drawing}>
+              <ImageIcon size={16} aria-hidden="true" />{drawing ? t.preparing : t.storyImage}
             </Button>
             <Link to={`/passeport/${watch.id}`} className={s.subtle}>{t.seePublic}</Link>
           </div>

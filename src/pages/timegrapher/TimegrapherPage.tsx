@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { Activity, Mic, Square } from 'lucide-react';
+import { Activity, Mic, Share2, Square } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useLoad } from '../../hooks/useLoad';
-import { addAccuracy, listWatches } from '../../lib/api';
+import { addAccuracy, listWatches, mainPhoto, photoUrl } from '../../lib/api';
+import { drawAccuracyStory, shareImage } from '../../lib/shareCard';
 import type { MeasurePosition } from '../../lib/api';
 import { analyze, BPH } from '../../lib/timegrapher';
 import type { TimegrapherResult } from '../../lib/timegrapher';
@@ -37,6 +38,7 @@ const S = defineStrings({
   ],
   rate: 'Marche', beatError: 'Défaut de repère', beats: 'Battements analysés', quality: 'Qualité du signal',
   save: 'Enregistrer sur la fiche de la montre', saved: 'Mesure enregistrée.',
+  share: 'Partager le résultat', preparing: 'Préparation…',
   pickWatch: 'Choisissez une montre pour enregistrer la mesure.',
   failed: 'Le tic-tac n’a pas été reconnu. Rapprochez la montre du micro, dans une pièce plus calme, et réessayez.',
   micDenied: 'Le micro n’est pas accessible. Autorisez-le pour arcorawatch.com dans les réglages du navigateur.',
@@ -62,6 +64,7 @@ const S = defineStrings({
   ],
   rate: 'Rate', beatError: 'Beat error', beats: 'Beats analysed', quality: 'Signal quality',
   save: 'Save to the watch’s page', saved: 'Measurement saved.',
+  share: 'Share the result', preparing: 'Preparing…',
   pickWatch: 'Choose a watch to save the measurement.',
   failed: 'The ticking wasn’t recognised. Bring the watch closer to the microphone, in a quieter room, and try again.',
   micDenied: 'The microphone is not accessible. Allow it for arcorawatch.com in your browser settings.',
@@ -77,7 +80,7 @@ export default function TimegrapherPage() {
   const t = useStrings(S);
   const a = useStrings(ACC_STRINGS);
   const toast = useToast();
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const uid = user!.id;
   const [params] = useSearchParams();
   const watches = useLoad(() => listWatches(uid), [uid]);
@@ -159,6 +162,21 @@ export default function TimegrapherPage() {
   };
 
   const busy = phase === 'listening' || phase === 'analysing';
+  const [sharing, setSharing] = useState(false);
+  const shareResult = async () => {
+    if (!result) return;
+    const w = (watches.data ?? []).find(x => x.id === watchId);
+    setSharing(true);
+    try {
+      const blob = await drawAccuracyStory({
+        rate: result.rate, beatError: result.beatError, bph: result.bph, verdict: a.verdict[verdictKey(result.rate)],
+        brand: w?.brand ?? null, model: w?.model ?? null, photo: photoUrl(mainPhoto(w?.photos)?.storage_path), username: profile?.username ?? null,
+      });
+      await shareImage(blob, 'arcora-timegrapher.png', w ? `${w.brand} ${w.model} : ${signed(result.rate)} ${a.perDay}` : `${signed(result.rate)} ${a.perDay}`);
+    } catch (e) { setError(e instanceof Error ? e.message : String(e)); }
+    setSharing(false);
+  };
+
   return (
     <div className="page">
       <PageHeader title={t.title} subtitle={t.subtitle} />
@@ -202,9 +220,14 @@ export default function TimegrapherPage() {
                 <div><dt>{t.quality}</dt><dd>{Math.round(result.quality * 100)}&nbsp;%</dd></div>
               </dl>
               {result.quality < 0.7 && <Notice>{t.lowQuality}</Notice>}
-              {saved
-                ? watchId !== 'none' && <Link to={`/montre/${watchId}?onglet=entretien`}>{t.seeWatch}</Link>
-                : <Button variant="secondary" onClick={save}>{t.save}</Button>}
+              <div className={s.resultActions}>
+                {saved
+                  ? watchId !== 'none' && <Link to={`/montre/${watchId}?onglet=entretien`}>{t.seeWatch}</Link>
+                  : <Button variant="secondary" onClick={save}>{t.save}</Button>}
+                <Button variant="ghost" onClick={shareResult} disabled={sharing}>
+                  <Share2 size={16} aria-hidden="true" />{sharing ? t.preparing : t.share}
+                </Button>
+              </div>
             </>
           )}
         </section>
