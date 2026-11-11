@@ -73,9 +73,9 @@ export default function FeedPage() {
       <PageHeader title={t.title} hideTitleOnMobile
         action={<Button className={s.writeDesktop} onClick={() => setWriting(true)}><PenLine size={16} aria-hidden="true" />{t.write}</Button>} />
       {/* Téléphone : bouton flottant au-dessus de la barre d'onglets */}
-      <button type="button" className={s.fab} onClick={() => setWriting(true)} aria-label={t.write}>
-        <PenLine size={22} aria-hidden="true" /><span>{t.write}</span>
-      </button>
+      <Button className={s.fab} onClick={() => setWriting(true)}>
+        <PenLine size={18} aria-hidden="true" />{t.write}
+      </Button>
       <Sheet open={writing} onClose={() => setWriting(false)} title={t.newPost}>
         {writing && <Composer uid={uid} watches={watches.data ?? []} canPost={canPost}
           onPosted={() => { setWriting(false); setMode('following'); load(); }} />}

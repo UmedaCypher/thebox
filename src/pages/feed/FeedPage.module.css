@@ -14,16 +14,12 @@
 
 /* Écrire un post : bouton dans l'en-tête sur ordinateur, bouton flottant sur téléphone */
 .fab {
-  position: fixed; right: max(var(--gutter), env(safe-area-inset-right)); z-index: 55;
+  position: fixed !important; right: max(var(--gutter), env(safe-area-inset-right)); z-index: 55;
   bottom: calc(var(--tabbar-h) + 18px + env(safe-area-inset-bottom));
-  display: inline-flex; align-items: center; gap: 8px; height: 52px; padding: 0 20px 0 16px; border: 0; border-radius: var(--r-pill);
-  font: inherit; font-weight: 700; font-size: var(--fs-sm); color: var(--brass-ink); background: var(--brass);
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45); cursor: pointer; transition: transform 160ms var(--ease-out);
+  min-height: 52px !important; box-shadow: inset 0 -6px 12px -6px rgba(0, 0, 0, 0.25), 0 14px 30px -10px rgba(0, 0, 0, 0.6) !important;
 }
-.fab:active { transform: scale(0.96); }
 .writeDesktop { display: none !important; }
 @media (min-width: 860px) {
-  .fab { display: none; }
+  .fab { display: none !important; }
   .writeDesktop { display: inline-flex !important; }
 }
-@media (prefers-reduced-motion: reduce) { .fab { transition: none; } }
