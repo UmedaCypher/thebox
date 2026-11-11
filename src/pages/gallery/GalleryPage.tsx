@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { ChevronDown, X } from 'lucide-react';
 import { Link, useLocation, useSearchParams } from 'react-router-dom';
@@ -16,16 +16,20 @@ import s from './GalleryPage.module.css';
 import { SkeletonGrid } from '../../components/Skeleton/Skeleton';
 
 const S = defineStrings({
-  subtitle: 'Des montres photographiées au poignet. Choisissez un tour de poignet pour voir comment elles tombent.',
+  subtitle: 'Des montres photographiées au poignet. Réglez le tour de poignet pour voir comment elles tombent.',
   brand: 'Marque',
   allBrands: 'Toutes',
   wristTitle: 'Quel tour de poignet ?',
   wristHint: 'Mesurez le tour de votre poignet juste sous l’os, avec un mètre ruban ou une ficelle.',
-  allWrists: 'Tous',
+  allWrists: 'Tous les poignets',
   mine: 'Le mien',
   setMine: 'Indiquer le mien',
-  bands: ['Fin', 'Moyen', 'Moyen +', 'Large', 'Très large'],
-  custom: 'Sur mesure',
+  upTo: (v: string) => `Jusqu’à ${v} cm`,
+  from: (v: string) => `${v} cm et plus`,
+  wristMinLabel: 'Tour de poignet minimum',
+  wristMaxLabel: 'Tour de poignet maximum',
+  noMin: 'pas de minimum',
+  noMax: 'pas de maximum',
   showAll: 'Tout effacer',
   noResultsTitle: 'Aucune photo pour ces filtres',
   emptyTitle: 'La galerie attend ses premières photos',
@@ -50,16 +54,20 @@ const S = defineStrings({
   close: 'Fermer',
   open: (watch: string) => `Voir ${watch} en grand`,
 }, {
-  subtitle: 'Watches photographed on the wrist. Pick a wrist size to see how they sit.',
+  subtitle: 'Watches photographed on the wrist. Set a wrist size to see how they sit.',
   brand: 'Brand',
   allBrands: 'All',
   wristTitle: 'Which wrist size?',
   wristHint: 'Measure around your wrist just below the bone, with a tape measure or a piece of string.',
-  allWrists: 'All',
+  allWrists: 'All wrists',
   mine: 'Mine',
   setMine: 'Add mine',
-  bands: ['Slim', 'Medium', 'Medium +', 'Large', 'Extra large'],
-  custom: 'Custom',
+  upTo: (v: string) => `Up to ${v} cm`,
+  from: (v: string) => `${v} cm and up`,
+  wristMinLabel: 'Minimum wrist size',
+  wristMaxLabel: 'Maximum wrist size',
+  noMin: 'no minimum',
+  noMax: 'no maximum',
   showAll: 'Clear all',
   noResultsTitle: 'No photos match these filters',
   emptyTitle: 'The gallery is waiting for its first photos',
@@ -222,21 +230,12 @@ function GalleryView() {
   );
 }
 
-/* ---------- Filtre par tour de poignet : des tailles à toucher, appliquées tout de suite ---------- */
+/* ---------- Filtre par tour de poignet : un curseur à deux poignées, de 15 à 22+ cm, au demi-centimètre ---------- */
 
-const BANDS: [number | null, number | null][] = [[null, 16], [16, 17], [17, 18], [18, 19], [19, null]];
-const bandRange = (lo: number | null, hi: number | null) =>
-  lo === null ? `< ${formatDecimal(hi!)}` : hi === null ? `${formatDecimal(lo)} +` : `${formatDecimal(lo)}–${formatDecimal(hi)}`;
-
-/** Coupe du poignet : une ellipse plus ou moins large selon la taille, pour lire la taille d'un coup d'œil. */
-function WristGlyph({ size }: { size: number }) {
-  const rx = 6 + size * 2; // 0 : fin, 4 : très large
-  return (
-    <svg className={s.glyph} width="32" height="20" viewBox="0 0 32 20" aria-hidden="true">
-      <ellipse cx="16" cy="10" rx={rx} ry={Math.min(9, rx * 0.6)} />
-    </svg>
-  );
-}
+const W_MIN = 15, W_MAX = 22, W_STEP = 0.5;
+const clampStep = (v: number) => Math.min(W_MAX, Math.max(W_MIN, Math.round(v / W_STEP) * W_STEP));
+/** Aux extrémités, pas de borne : 15 veut dire « 15 cm et moins », 22 « 22 cm et plus ». */
+const toFilter = (lo: number, hi: number): [number | null, number | null] => [lo <= W_MIN ? null : lo, hi >= W_MAX ? null : hi];
 
 function WristFilter({ min, max, mine, loggedIn, onWrist, brand, brands, onBrand, onReset }: {
   min: number | null; max: number | null; mine: number | null; loggedIn: boolean;
@@ -244,11 +243,29 @@ function WristFilter({ min, max, mine, loggedIn, onWrist, brand, brands, onBrand
   brand: string | null; brands: string[]; onBrand: (b: string) => void; onReset?: () => void;
 }) {
   const t = useStrings(S);
-  const mineLo = mine !== null ? Math.round((mine - 0.5) * 10) / 10 : null;
-  const mineHi = mine !== null ? Math.round((mine + 0.5) * 10) / 10 : null;
-  const is = (lo: number | null, hi: number | null) => min === lo && max === hi;
-  const known = is(null, null) || BANDS.some(([lo, hi]) => is(lo, hi)) || (mine !== null && is(mineLo, mineHi));
-  const brandLabel = brand ?? t.allBrands;
+  const [lo, setLo] = useState(() => clampStep(min ?? W_MIN));
+  const [hi, setHi] = useState(() => clampStep(max ?? W_MAX));
+  // Les filtres suivent les changements venus d'ailleurs (« Le mien », « Tout effacer »)
+  useEffect(() => { setLo(clampStep(min ?? W_MIN)); setHi(clampStep(max ?? W_MAX)); }, [min, max]);
+  // La galerie se recharge quand on lâche le curseur, ou 350 ms après le dernier mouvement au clavier
+  const commitTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const commit = (l: number, h: number, delay = 350) => {
+    if (commitTimer.current) clearTimeout(commitTimer.current);
+    commitTimer.current = setTimeout(() => {
+      const [a, b] = toFilter(l, h);
+      if (a !== min || b !== max) onWrist(a, b);
+    }, delay);
+  };
+  useEffect(() => () => { if (commitTimer.current) clearTimeout(commitTimer.current); }, []);
+
+  const fmt = (v: number) => formatDecimal(v);
+  const label = lo <= W_MIN && hi >= W_MAX ? t.allWrists
+    : lo <= W_MIN ? t.upTo(fmt(hi)) : hi >= W_MAX ? t.from(fmt(lo)) : `${fmt(lo)} – ${fmt(hi)} cm`;
+  const pct = (v: number) => ((v - W_MIN) / (W_MAX - W_MIN)) * 100;
+  const mineLo = mine !== null ? clampStep(mine - 0.5) : null;
+  const mineHi = mine !== null ? clampStep(mine + 0.5) : null;
+  const isMine = mine !== null && lo === mineLo && hi === mineHi;
+  const ticks = Array.from({ length: W_MAX - W_MIN + 1 }, (_, i) => W_MIN + i);
 
   return (
     <section className={s.wristFilter} aria-labelledby="wrist-filter-title">
@@ -256,40 +273,35 @@ function WristFilter({ min, max, mine, loggedIn, onWrist, brand, brands, onBrand
         <h2 id="wrist-filter-title" className={s.wfTitle}>{t.wristTitle}</h2>
         {onReset && <button type="button" className={s.wfReset} onClick={onReset}>{t.showAll}</button>}
       </div>
-      <div className={s.chips} role="group" aria-labelledby="wrist-filter-title">
-        <button type="button" className={s.chip} aria-pressed={is(null, null)} onClick={() => onWrist(null, null)}>
-          <span className={s.chipMain}>{t.allWrists}</span>
-        </button>
+      <div className={s.rangeValue}>
+        <output className={`${s.rangeLabel} num`} aria-live="polite">{label}</output>
         {mine !== null ? (
-          <button type="button" className={s.chip} data-mine aria-pressed={is(mineLo, mineHi)} onClick={() => onWrist(mineLo, mineHi)}>
-            <span className={s.chipMain}>{t.mine}</span>
-            <span className={s.chipSub}>{formatDecimal(mine)} cm</span>
+          <button type="button" className={s.mineBtn} aria-pressed={isMine} onClick={() => onWrist(mineLo, mineHi)}>
+            {t.mine} · {fmt(mine)} cm
           </button>
-        ) : loggedIn && (
-          <Link to="/profil" className={s.chip} data-mine>
-            <span className={s.chipMain}>{t.setMine}</span>
-            <span className={s.chipSub}>cm</span>
-          </Link>
-        )}
-        {BANDS.map(([lo, hi], i) => (
-          <button key={i} type="button" className={s.chip} aria-pressed={is(lo, hi)} onClick={() => onWrist(lo, hi)}
-            aria-label={`${t.bands[i]}, ${bandRange(lo, hi)} cm`}>
-            <WristGlyph size={i} />
-            <span className={s.chipMain}>{bandRange(lo, hi)}</span>
-            <span className={s.chipSub}>{t.bands[i]}</span>
-          </button>
-        ))}
-        {!known && (
-          <span className={s.chip} data-static aria-current="true">
-            <span className={s.chipMain}>{bandRange(min, max)}</span>
-            <span className={s.chipSub}>{t.custom}</span>
-          </span>
-        )}
+        ) : loggedIn && <Link to="/profil" className={s.mineBtn}>{t.setMine}</Link>}
+      </div>
+
+      <div className={s.range} style={{ ['--lo' as string]: `${pct(lo)}%`, ['--hi' as string]: `${pct(hi)}%` }}>
+        <span className={s.rangeTrack} aria-hidden="true"><span className={s.rangeFill} /></span>
+        {mine !== null && <span className={s.rangeMine} style={{ left: `${pct(clampStep(mine))}%` }} aria-hidden="true" />}
+        <input type="range" min={W_MIN} max={W_MAX} step={W_STEP} value={lo} aria-label={t.wristMinLabel}
+          aria-valuetext={lo <= W_MIN ? t.noMin : `${fmt(lo)} cm`}
+          onChange={e => { const v = Math.min(Number(e.target.value), hi - W_STEP); setLo(v); commit(v, hi); }}
+          onPointerUp={() => commit(lo, hi, 0)} />
+        <input type="range" min={W_MIN} max={W_MAX} step={W_STEP} value={hi} aria-label={t.wristMaxLabel}
+          aria-valuetext={hi >= W_MAX ? t.noMax : `${fmt(hi)} cm`}
+          onChange={e => { const v = Math.max(Number(e.target.value), lo + W_STEP); setHi(v); commit(lo, v); }}
+          onPointerUp={() => commit(lo, hi, 0)} />
+      </div>
+      <div className={s.rangeScale} aria-hidden="true">
+        {ticks.map(v => <span key={v} style={{ left: `${pct(v)}%` }}>{v === W_MAX ? `${v}+` : v}</span>)}
       </div>
       <p className={s.wfHint}>{t.wristHint}</p>
+
       <label className={s.brandPill} data-active={Boolean(brand)}>
         <span className={s.brandKey}>{t.brand}</span>
-        <span className={s.brandValue}>{brandLabel}</span>
+        <span className={s.brandValue}>{brand ?? t.allBrands}</span>
         <ChevronDown size={16} aria-hidden="true" />
         <select value={brand ?? ''} onChange={e => onBrand(e.target.value)} aria-label={t.brand}>
           <option value="">{t.allBrands}</option>
