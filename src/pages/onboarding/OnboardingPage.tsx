@@ -72,7 +72,7 @@ const S = defineStrings({
   wristHint: 'Il aide les autres à se projeter quand vous partagez une photo au poignet.',
   wristInvalid: 'Le tour de poignet doit être compris entre 12 et 26 cm.',
   publicLabel: 'Profil public',
-  publicHint: 'Votre pseudo et les photos de vos montres deviennent visibles, et vous pouvez publier dans le fil. Les prix restent toujours privés.',
+  publicHint: 'Votre pseudo et les photos de vos montres deviennent visibles, et vous pouvez publier dans le feed. Les prix restent toujours privés.',
   messagesLabel: 'Accepter les messages',
   messagesHint: 'Les membres peuvent vous écrire depuis vos annonces et votre profil public.',
   premiumTitle: 'Et quand la collection grandit\u00a0?',

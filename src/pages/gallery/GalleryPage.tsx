@@ -1,14 +1,13 @@
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
-import { X } from 'lucide-react';
-import type { FormEvent } from 'react';
+import { ChevronDown, X } from 'lucide-react';
 import { Link, useLocation, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useLoad } from '../../hooks/useLoad';
 import { getFitRanking, listGalleryBrands, listGalleryShots, photoUrl, thumbPath } from '../../lib/api';
 import type { GalleryShot } from '../../types';
 import FitScale, { FitBadge } from '../../components/WristCheck/FitScale';
-import { Button, Cushion, EmptyState, IconButton, Img, LinkButton, Notice, PageHeader, Segmented, SelectField, TextField } from '../../components/ui';
+import { Cushion, EmptyState, IconButton, Img, LinkButton, Notice, PageHeader, Segmented } from '../../components/ui';
 import { formatDecimal } from '../../lib/format';
 import { defineStrings, useStrings } from '../../i18n';
 import { COMMON } from '../../i18n/common';
@@ -17,14 +16,17 @@ import s from './GalleryPage.module.css';
 import { SkeletonGrid } from '../../components/Skeleton/Skeleton';
 
 const S = defineStrings({
-  subtitle: 'Des montres photographiées au poignet. Filtrez par tour de poignet pour voir comment une pièce tombe sur un poignet comme le vôtre.',
+  subtitle: 'Des montres photographiées au poignet. Choisissez un tour de poignet pour voir comment elles tombent.',
   brand: 'Marque',
-  allBrands: 'Toutes les marques',
-  wristMin: 'Poignet min.',
-  wristMax: 'Poignet max.',
-  filter: 'Filtrer',
-  likeMine: 'Poignets comme le mien',
-  showAll: 'Tout afficher',
+  allBrands: 'Toutes',
+  wristTitle: 'Quel tour de poignet ?',
+  wristHint: 'Mesurez le tour de votre poignet juste sous l’os, avec un mètre ruban ou une ficelle.',
+  allWrists: 'Tous',
+  mine: 'Le mien',
+  setMine: 'Indiquer le mien',
+  bands: ['Fin', 'Moyen', 'Moyen +', 'Large', 'Très large'],
+  custom: 'Sur mesure',
+  showAll: 'Tout effacer',
   noResultsTitle: 'Aucune photo pour ces filtres',
   emptyTitle: 'La galerie attend ses premières photos',
   addShot: 'Ajouter une photo au poignet',
@@ -48,14 +50,17 @@ const S = defineStrings({
   close: 'Fermer',
   open: (watch: string) => `Voir ${watch} en grand`,
 }, {
-  subtitle: 'Watches photographed on the wrist. Filter by wrist size to see how a piece sits on a wrist like yours.',
+  subtitle: 'Watches photographed on the wrist. Pick a wrist size to see how they sit.',
   brand: 'Brand',
-  allBrands: 'All brands',
-  wristMin: 'Min. wrist',
-  wristMax: 'Max. wrist',
-  filter: 'Filter',
-  likeMine: 'Wrists like mine',
-  showAll: 'Show all',
+  allBrands: 'All',
+  wristTitle: 'Which wrist size?',
+  wristHint: 'Measure around your wrist just below the bone, with a tape measure or a piece of string.',
+  allWrists: 'All',
+  mine: 'Mine',
+  setMine: 'Add mine',
+  bands: ['Slim', 'Medium', 'Medium +', 'Large', 'Extra large'],
+  custom: 'Custom',
+  showAll: 'Clear all',
   noResultsTitle: 'No photos match these filters',
   emptyTitle: 'The gallery is waiting for its first photos',
   addShot: 'Add a wrist shot',
@@ -94,9 +99,6 @@ function GalleryView() {
   const { user, profile } = useAuth();
   const [params] = useSearchParams();
   // Filtres initiaux possibles depuis l'accueil : /galerie?min=16.5&max=17.5
-  const [brand, setBrand] = useState(params.get('marque') ?? '');
-  const [min, setMin] = useState((params.get('min') ? formatDecimal(params.get('min')!) : ''));
-  const [max, setMax] = useState((params.get('max') ? formatDecimal(params.get('max')!) : ''));
   const [filters, setFilters] = useState({ brand: (params.get('marque') || null) as string | null, minWrist: parse(params.get('min') ?? ''), maxWrist: parse(params.get('max') ?? '') });
 
   const [view, setView] = useState<'photos' | 'ranking'>(params.get('vue') === 'classement' ? 'ranking' : 'photos');
@@ -108,20 +110,9 @@ function GalleryView() {
   const rangeLabel = filters.minWrist && filters.maxWrist ? t.rankRange(formatDecimal(filters.minWrist), formatDecimal(filters.maxWrist))
     : filters.minWrist ? t.rankFrom(formatDecimal(filters.minWrist)) : filters.maxWrist ? t.rankTo(formatDecimal(filters.maxWrist)) : t.rankAll;
 
-  const apply = (e?: FormEvent) => {
-    e?.preventDefault();
-    setFilters({ brand: brand || null, minWrist: parse(min), maxWrist: parse(max) });
-  };
-
-  const aroundMine = () => {
-    if (!profile?.wrist_size_cm) return;
-    const w = Number(profile.wrist_size_cm);
-    const lo = formatDecimal(w - 0.5), hi = formatDecimal(w + 0.5);
-    setMin(lo); setMax(hi);
-    setFilters({ brand: brand || null, minWrist: w - 0.5, maxWrist: w + 0.5 });
-  };
-
-  const reset = () => { setBrand(''); setMin(''); setMax(''); setFilters({ brand: null, minWrist: null, maxWrist: null }); };
+  // Les filtres s'appliquent dès qu'on touche une taille ou une marque : pas de bouton « Filtrer »
+  const setWrist = (minWrist: number | null, maxWrist: number | null) => setFilters(f => ({ ...f, minWrist, maxWrist }));
+  const reset = () => setFilters({ brand: null, minWrist: null, maxWrist: null });
   const filtered = filters.brand || filters.minWrist || filters.maxWrist;
 
   return (
@@ -153,16 +144,10 @@ function GalleryView() {
         </section>
       )}
 
-      <form className={s.filters} onSubmit={apply}>
-        <SelectField label={t.brand} placeholder={t.allBrands} options={brands.data ?? []} value={brand} onChange={e => setBrand(e.target.value)} />
-        <TextField label={t.wristMin} inputMode="decimal" suffix="cm" value={min} onChange={e => setMin(e.target.value)} placeholder="16" />
-        <TextField label={t.wristMax} inputMode="decimal" suffix="cm" value={max} onChange={e => setMax(e.target.value)} placeholder="18" />
-        <div className={s.filterActions}>
-          <Button type="submit">{t.filter}</Button>
-          {profile?.wrist_size_cm && <Button variant="ghost" onClick={aroundMine}>{t.likeMine}</Button>}
-          {filtered && <Button variant="ghost" onClick={reset}>{t.showAll}</Button>}
-        </div>
-      </form>
+      <WristFilter min={filters.minWrist} max={filters.maxWrist} mine={profile?.wrist_size_cm ? Number(profile.wrist_size_cm) : null}
+        loggedIn={Boolean(user)} onWrist={setWrist}
+        brand={filters.brand} brands={brands.data ?? []} onBrand={b => setFilters(f => ({ ...f, brand: b || null }))}
+        onReset={filtered ? reset : undefined} />
 
       {view === 'ranking' ? (
         <section className={s.ranking}>
@@ -234,5 +219,83 @@ function GalleryView() {
         document.body,
       )}
     </div>
+  );
+}
+
+/* ---------- Filtre par tour de poignet : des tailles à toucher, appliquées tout de suite ---------- */
+
+const BANDS: [number | null, number | null][] = [[null, 16], [16, 17], [17, 18], [18, 19], [19, null]];
+const bandRange = (lo: number | null, hi: number | null) =>
+  lo === null ? `< ${formatDecimal(hi!)}` : hi === null ? `${formatDecimal(lo)} +` : `${formatDecimal(lo)}–${formatDecimal(hi)}`;
+
+/** Coupe du poignet : une ellipse plus ou moins large selon la taille, pour lire la taille d'un coup d'œil. */
+function WristGlyph({ size }: { size: number }) {
+  const rx = 6 + size * 2; // 0 : fin, 4 : très large
+  return (
+    <svg className={s.glyph} width="32" height="20" viewBox="0 0 32 20" aria-hidden="true">
+      <ellipse cx="16" cy="10" rx={rx} ry={Math.min(9, rx * 0.6)} />
+    </svg>
+  );
+}
+
+function WristFilter({ min, max, mine, loggedIn, onWrist, brand, brands, onBrand, onReset }: {
+  min: number | null; max: number | null; mine: number | null; loggedIn: boolean;
+  onWrist: (min: number | null, max: number | null) => void;
+  brand: string | null; brands: string[]; onBrand: (b: string) => void; onReset?: () => void;
+}) {
+  const t = useStrings(S);
+  const mineLo = mine !== null ? Math.round((mine - 0.5) * 10) / 10 : null;
+  const mineHi = mine !== null ? Math.round((mine + 0.5) * 10) / 10 : null;
+  const is = (lo: number | null, hi: number | null) => min === lo && max === hi;
+  const known = is(null, null) || BANDS.some(([lo, hi]) => is(lo, hi)) || (mine !== null && is(mineLo, mineHi));
+  const brandLabel = brand ?? t.allBrands;
+
+  return (
+    <section className={s.wristFilter} aria-labelledby="wrist-filter-title">
+      <div className={s.wfHead}>
+        <h2 id="wrist-filter-title" className={s.wfTitle}>{t.wristTitle}</h2>
+        {onReset && <button type="button" className={s.wfReset} onClick={onReset}>{t.showAll}</button>}
+      </div>
+      <div className={s.chips} role="group" aria-labelledby="wrist-filter-title">
+        <button type="button" className={s.chip} aria-pressed={is(null, null)} onClick={() => onWrist(null, null)}>
+          <span className={s.chipMain}>{t.allWrists}</span>
+        </button>
+        {mine !== null ? (
+          <button type="button" className={s.chip} data-mine aria-pressed={is(mineLo, mineHi)} onClick={() => onWrist(mineLo, mineHi)}>
+            <span className={s.chipMain}>{t.mine}</span>
+            <span className={s.chipSub}>{formatDecimal(mine)} cm</span>
+          </button>
+        ) : loggedIn && (
+          <Link to="/profil" className={s.chip} data-mine>
+            <span className={s.chipMain}>{t.setMine}</span>
+            <span className={s.chipSub}>cm</span>
+          </Link>
+        )}
+        {BANDS.map(([lo, hi], i) => (
+          <button key={i} type="button" className={s.chip} aria-pressed={is(lo, hi)} onClick={() => onWrist(lo, hi)}
+            aria-label={`${t.bands[i]}, ${bandRange(lo, hi)} cm`}>
+            <WristGlyph size={i} />
+            <span className={s.chipMain}>{bandRange(lo, hi)}</span>
+            <span className={s.chipSub}>{t.bands[i]}</span>
+          </button>
+        ))}
+        {!known && (
+          <span className={s.chip} data-static aria-current="true">
+            <span className={s.chipMain}>{bandRange(min, max)}</span>
+            <span className={s.chipSub}>{t.custom}</span>
+          </span>
+        )}
+      </div>
+      <p className={s.wfHint}>{t.wristHint}</p>
+      <label className={s.brandPill} data-active={Boolean(brand)}>
+        <span className={s.brandKey}>{t.brand}</span>
+        <span className={s.brandValue}>{brandLabel}</span>
+        <ChevronDown size={16} aria-hidden="true" />
+        <select value={brand ?? ''} onChange={e => onBrand(e.target.value)} aria-label={t.brand}>
+          <option value="">{t.allBrands}</option>
+          {brands.map(b => <option key={b} value={b}>{b}</option>)}
+        </select>
+      </label>
+    </section>
   );
 }

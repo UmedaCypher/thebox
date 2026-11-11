@@ -4,7 +4,8 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useLoad } from '../../hooks/useLoad';
 import { followByUsername, getFeed, getFollowSuggestions, listWatches } from '../../lib/api';
 import type { FeedItem, FollowSuggestion } from '../../lib/api';
-import { Button, EmptyState, Notice, PageHeader, Segmented } from '../../components/ui';
+import { PenLine } from 'lucide-react';
+import { Button, EmptyState, Notice, PageHeader, Segmented, Sheet } from '../../components/ui';
 import CommunityNav from '../../components/CommunityNav/CommunityNav';
 import { Composer, FeedCard } from '../../components/Feed/Feed';
 import { SkeletonList } from '../../components/Skeleton/Skeleton';
@@ -12,10 +13,11 @@ import { defineStrings, useStrings } from '../../i18n';
 import s from './FeedPage.module.css';
 
 const S = defineStrings({
-  title: 'Fil',
-  subtitle: 'Les nouvelles pièces, les wrist shots et les annonces des collectionneurs que vous suivez.',
+  title: 'Feed',
+  write: 'Écrire un post',
+  newPost: 'Nouveau post',
   following: 'Abonnements', all: 'Tous les membres', mode: 'Afficher',
-  emptyFollowing: 'Votre fil est encore calme',
+  emptyFollowing: 'Votre feed est encore calme',
   emptyFollowingText: 'Suivez quelques collectionneurs : leurs publications, wrist shots et annonces apparaîtront ici.',
   emptyAll: 'Aucune publication pour le moment. Lancez la conversation !',
   more: 'Voir plus',
@@ -24,7 +26,8 @@ const S = defineStrings({
   follow: 'Suivre',
 }, {
   title: 'Feed',
-  subtitle: 'New pieces, wrist shots and listings from the collectors you follow.',
+  write: 'Write a post',
+  newPost: 'New post',
   following: 'Following', all: 'All members', mode: 'Show',
   emptyFollowing: 'Your feed is quiet for now',
   emptyFollowingText: 'Follow a few collectors: their posts, wrist shots and listings will show up here.',
@@ -44,6 +47,7 @@ export default function FeedPage() {
   const [items, setItems] = useState<FeedItem[] | null>(null);
   const [more, setMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [writing, setWriting] = useState(false);
   const [suggestions, setSuggestions] = useState<FollowSuggestion[]>([]);
 
   const load = useCallback(async (append = false, before?: string) => {
@@ -66,10 +70,18 @@ export default function FeedPage() {
   return (
     <div className="page">
       <CommunityNav />
-      <PageHeader title={t.title} subtitle={t.subtitle} hideTitleOnMobile />
+      <PageHeader title={t.title} hideTitleOnMobile
+        action={<Button className={s.writeDesktop} onClick={() => setWriting(true)}><PenLine size={16} aria-hidden="true" />{t.write}</Button>} />
+      {/* Téléphone : bouton flottant au-dessus de la barre d'onglets */}
+      <button type="button" className={s.fab} onClick={() => setWriting(true)} aria-label={t.write}>
+        <PenLine size={22} aria-hidden="true" /><span>{t.write}</span>
+      </button>
+      <Sheet open={writing} onClose={() => setWriting(false)} title={t.newPost}>
+        {writing && <Composer uid={uid} watches={watches.data ?? []} canPost={canPost}
+          onPosted={() => { setWriting(false); setMode('following'); load(); }} />}
+      </Sheet>
       <div className={s.layout}>
         <div className={s.main}>
-          <Composer uid={uid} watches={watches.data ?? []} canPost={canPost} onPosted={() => { setMode('following'); load(); }} />
           <Segmented label={t.mode} value={mode} onChange={setMode} options={[{ value: 'following', label: t.following }, { value: 'all', label: t.all }]} />
           {error && <Notice tone="error">{error}</Notice>}
           {!items ? <SkeletonList rows={3} /> : items.length === 0 ? (

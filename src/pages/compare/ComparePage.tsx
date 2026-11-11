@@ -1,12 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { ArrowLeftRight, Watch as WatchIcon } from 'lucide-react';
+import { ArrowLeftRight, Search, Watch as WatchIcon } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useLoad } from '../../hooks/useLoad';
-import { getPassport, listWatches, listWearLogs, mainPhoto, thumbSrc } from '../../lib/api';
+import { getPassport, listWatches, listWearLogs, mainPhoto, searchPublicWatches, thumbSrc } from '../../lib/api';
+import type { PublicWatchHit } from '../../lib/api';
 import type { Passport, Watch } from '../../types';
-import { EmptyState, Img, LinkButton, Loading, PageHeader, SelectField } from '../../components/ui';
+import { Button, Img, Loading, PageHeader, Segmented, Sheet } from '../../components/ui';
 import { defineStrings, useLang, useStrings } from '../../i18n';
 import { movementLabel } from '../../i18n/common';
 import { formatDate, formatEuros, formatMm, formatNumber } from '../../lib/format';
@@ -20,8 +21,15 @@ const S = defineStrings({
   slotA: 'Montre A', slotB: 'Montre B',
   swap: 'Inverser',
   fromMarket: 'Montre du Marché',
-  empty: 'Ajoutez au moins deux montres à votre collection pour les comparer.',
-  add: 'Ajouter une montre',
+  change: 'Changer',
+  mine: 'Ma collection', everyone: 'Toutes les montres',
+  searchLabel: 'Rechercher une montre',
+  searchPlaceholder: 'Marque, modèle ou référence',
+  noMine: 'Aucune montre de votre collection ne correspond.',
+  noPublic: 'Aucune montre publique ne correspond.',
+  market: 'Marché',
+  pickBoth: 'Choisissez deux montres : les vôtres, ou n’importe quelle montre publique d’Arcora.',
+  member: (u: string) => `@${u}`,
   diff: 'Différence',
   same: 'identique',
   rows: {
@@ -39,8 +47,15 @@ const S = defineStrings({
   slotA: 'Watch A', slotB: 'Watch B',
   swap: 'Swap',
   fromMarket: 'Market watch',
-  empty: 'Add at least two watches to your collection to compare them.',
-  add: 'Add a watch',
+  change: 'Change',
+  mine: 'My collection', everyone: 'All watches',
+  searchLabel: 'Search for a watch',
+  searchPlaceholder: 'Brand, model or reference',
+  noMine: 'No watch in your collection matches.',
+  noPublic: 'No public watch matches.',
+  market: 'Market',
+  pickBoth: 'Choose two watches: your own, or any public watch on Arcora.',
+  member: (u: string) => `@${u}`,
   diff: 'Difference',
   same: 'same',
   rows: {
@@ -85,6 +100,7 @@ export default function ComparePage() {
   };
   const swap = () => { if (aId && bId) setParams({ a: bId, b: aId }, { replace: true }); };
 
+  const [picking, setPicking] = useState<'a' | 'b' | null>(null);
   const [sides, setSides] = useState<{ a: Side | null; b: Side | null }>({ a: null, b: null });
   useEffect(() => {
     let alive = true;
@@ -101,17 +117,6 @@ export default function ComparePage() {
   }, [aId, bId, list, wears.data, watches.loading]);
 
   if (watches.loading) return <div className="page"><Loading /></div>;
-  const external = bId && !list.some(w => w.id === bId);
-  if (list.length + (external ? 1 : 0) < 2) {
-    return (
-      <div className="page">
-        <PageHeader title={t.title} subtitle={t.subtitle} />
-        <EmptyState title={t.title} action={<LinkButton to="/ajouter-montre">{t.add}</LinkButton>}>{t.empty}</EmptyState>
-      </div>
-    );
-  }
-
-  const options = list.map(w => ({ value: w.id, label: `${w.brand} ${w.model}` }));
   const { a, b } = sides;
   const mm = (n: number) => `${formatNumber(n, 1)}\u00a0mm`;
   const rows: Row[] = [];
@@ -153,20 +158,21 @@ export default function ComparePage() {
 
   const head = (side: Side | null, key: 'a' | 'b') => {
     const ph = side ? thumbSrc(mainPhoto(side.passport.photos)?.storage_path) : null;
-    const isExternal = side && !side.own;
+    const id = key === 'a' ? aId : bId;
     return (
       <div className={s.slot}>
-        <div className={s.photo}>{ph?.src ? <Img src={ph.src} fallback={ph.fallback} alt="" /> : <WatchIcon size={28} strokeWidth={1.3} aria-hidden="true" />}</div>
-        {side && (
+        <button type="button" className={s.photo} onClick={() => setPicking(key)}
+          aria-label={`${key === 'a' ? t.slotA : t.slotB} : ${side ? `${side.passport.brand} ${side.passport.model}, ${t.change.toLowerCase()}` : t.pick}`}>
+          {ph?.src ? <Img src={ph.src} fallback={ph.fallback} alt="" /> : <WatchIcon size={28} strokeWidth={1.3} aria-hidden="true" />}
+        </button>
+        {side ? (
           <p className={s.name}>
             <span>{side.passport.brand}</span>
             <Link to={side.own ? `/montre/${side.passport.id}` : `/passeport/${side.passport.id}`}>{side.passport.model}</Link>
           </p>
-        )}
-        {isExternal
-          ? <p className={s.tag}>{t.fromMarket}</p>
-          : <SelectField label={key === 'a' ? t.slotA : t.slotB} value={(key === 'a' ? aId : bId) ?? ''}
-              onChange={e => set(key, e.target.value)} options={options} placeholder={t.pick} />}
+        ) : id ? null : <p className={s.slotLabel}>{key === 'a' ? t.slotA : t.slotB}</p>}
+        {side && !side.own && side.passport.listing && <p className={s.tag}>{t.fromMarket}</p>}
+        <Button variant="secondary" size="small" onClick={() => setPicking(key)}>{side ? t.change : t.pick}</Button>
       </div>
     );
   };
@@ -179,7 +185,7 @@ export default function ComparePage() {
         <button type="button" className={s.swap} onClick={swap} aria-label={t.swap} title={t.swap}><ArrowLeftRight size={18} /></button>
         {head(b, 'b')}
       </div>
-      {!a || !b ? <Loading /> : (
+      {!aId || !bId ? <p className={s.note}>{t.pickBoth}</p> : !a || !b ? <Loading /> : (
         <table className={s.table}>
           <thead className="visually-hidden">
             <tr><th scope="col">—</th><th scope="col">{a.passport.model}</th><th scope="col">{b.passport.model}</th></tr>
@@ -196,6 +202,77 @@ export default function ComparePage() {
         </table>
       )}
       {(a?.own || b?.own) && <p className={s.note}>{t.privateNote}</p>}
+      <WatchPicker open={picking !== null} onClose={() => setPicking(null)} title={picking === 'b' ? t.slotB : t.slotA}
+        mine={list} exclude={picking === 'a' ? bId : aId}
+        onPick={id => { if (picking) set(picking, id); setPicking(null); }} />
     </div>
+  );
+}
+
+/* ---------- Choix d'une montre : la sienne ou n'importe quelle montre publique ---------- */
+
+function WatchPicker({ open, onClose, title, mine, exclude, onPick }: {
+  open: boolean; onClose: () => void; title: string; mine: Watch[]; exclude: string | null; onPick: (id: string) => void;
+}) {
+  const t = useStrings(S);
+  const [tab, setTab] = useState<'mine' | 'everyone'>(mine.length ? 'mine' : 'everyone');
+  const [query, setQuery] = useState('');
+  const [hits, setHits] = useState<PublicWatchHit[] | null>(null);
+
+  useEffect(() => {
+    if (!open || tab !== 'everyone') return;
+    let alive = true;
+    const timer = setTimeout(() => {
+      searchPublicWatches(query, 30).then(r => { if (alive) setHits(r); }).catch(() => { if (alive) setHits([]); });
+    }, query ? 250 : 0);
+    return () => { alive = false; clearTimeout(timer); };
+  }, [open, tab, query]);
+
+  const words = query.trim().toLowerCase().split(/\s+/).filter(Boolean);
+  const match = (text: string) => words.every(w => text.toLowerCase().includes(w));
+  const own = mine.filter(w => w.id !== exclude && match(`${w.brand} ${w.model} ${w.reference_number ?? ''}`));
+  const pub = (hits ?? []).filter(h => h.id !== exclude);
+
+  return (
+    <Sheet open={open} onClose={onClose} title={title}>
+      <div className={s.picker}>
+        <Segmented label={title} value={tab} onChange={v => { setTab(v); setHits(null); }}
+          options={[{ value: 'mine', label: t.mine }, { value: 'everyone', label: t.everyone }]} />
+        <label className={s.search}>
+          <Search size={18} aria-hidden="true" />
+          <span className="visually-hidden">{t.searchLabel}</span>
+          <input type="search" value={query} onChange={e => setQuery(e.target.value)} placeholder={t.searchPlaceholder} autoComplete="off" />
+        </label>
+        <ul className={s.results}>
+          {tab === 'mine' ? (
+            own.length ? own.map(w => {
+              const ph = thumbSrc(mainPhoto(w.photos)?.storage_path);
+              return (
+                <li key={w.id}>
+                  <button type="button" className={s.result} onClick={() => onPick(w.id)}>
+                    <span className={s.thumb}>{ph?.src ? <Img src={ph.src} fallback={ph.fallback} alt="" /> : <WatchIcon size={20} strokeWidth={1.4} aria-hidden="true" />}</span>
+                    <span className={s.resultText}><strong>{w.brand} {w.model}</strong>{w.reference_number && <span>{w.reference_number}</span>}</span>
+                  </button>
+                </li>
+              );
+            }) : <li className={s.none}>{t.noMine}</li>
+          ) : hits === null ? <li><Loading /></li> : pub.length ? pub.map(h => {
+            const ph = thumbSrc(h.photo_path);
+            return (
+              <li key={h.id}>
+                <button type="button" className={s.result} onClick={() => onPick(h.id)}>
+                  <span className={s.thumb}>{ph?.src ? <Img src={ph.src} fallback={ph.fallback} alt="" /> : <WatchIcon size={20} strokeWidth={1.4} aria-hidden="true" />}</span>
+                  <span className={s.resultText}>
+                    <strong>{h.brand} {h.model}</strong>
+                    <span>{[h.reference_number, h.owner_username && t.member(h.owner_username)].filter(Boolean).join(' · ')}</span>
+                  </span>
+                  {h.on_market && <span className={s.marketTag}>{t.market}</span>}
+                </button>
+              </li>
+            );
+          }) : <li className={s.none}>{t.noPublic}</li>}
+        </ul>
+      </div>
+    </Sheet>
   );
 }

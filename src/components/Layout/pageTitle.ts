@@ -9,7 +9,7 @@ const S = defineStrings({
   wear: 'Portage', gallery: 'Galerie', market: 'Marché', messages: 'Messages', profile: 'Profil', stats: 'Statistiques',
   wishlist: 'Wishlist', premium: 'Premium', admin: 'Backoffice', affiliate: 'Parrainage', insurance: 'Inventaire',
   welcome: 'Bienvenue', news: 'Actualités', faq: 'Questions', about: 'À propos', contact: 'Contact', press: 'Presse',
-  legal: 'Informations légales', passport: 'Passeport', compare: 'Comparateur', timegrapher: 'Timegrapher', feed: 'Fil', social: 'Social',
+  legal: 'Informations légales', passport: 'Passeport', compare: 'Comparateur', timegrapher: 'Timegrapher', feed: 'Feed', social: 'Social',
   vs: 'Comparatif', stolen: 'Montres volées', login: 'Connexion', signup: 'Inscription', password: 'Mot de passe',
 }, {
   home: 'Home', collection: 'Collection', add: 'Add a watch', watch: 'Watch', edit: 'Edit watch',

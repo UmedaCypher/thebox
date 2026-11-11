@@ -1143,3 +1143,17 @@ export async function uploadMagazineImage(file: File): Promise<string> {
   fail(error, "Envoi de l'image impossible.");
   return path;
 }
+
+/* ---------- Comparateur ---------- */
+
+export interface PublicWatchHit {
+  id: string; brand: string; model: string; reference_number: string | null;
+  owner_username: string | null; photo_path: string | null; on_market: boolean;
+}
+
+/** Montres visibles publiquement (passeport partagé, collection publique, Marché), hors les siennes. */
+export async function searchPublicWatches(query: string, limit = 20): Promise<PublicWatchHit[]> {
+  const { data, error } = await supabase.rpc('search_public_watches', { p_query: query.trim() || null, p_limit: limit });
+  fail(error, 'Recherche impossible.');
+  return (data as PublicWatchHit[]) ?? [];
+}

@@ -3,7 +3,7 @@ import { defineStrings, useStrings } from '../../i18n';
 import s from './CommunityNav.module.css';
 
 const S = defineStrings(
-  { label: 'Communauté', feed: 'Fil', gallery: 'Galerie au poignet', stolen: 'Montres volées' },
+  { label: 'Communauté', feed: 'Feed', gallery: 'Galerie au poignet', stolen: 'Montres volées' },
   { label: 'Community', feed: 'Feed', gallery: 'On-wrist gallery', stolen: 'Stolen watches' },
 );
 

@@ -39,6 +39,7 @@ const Avatar = ({ src, name }: { src: string | null; name: string }) => (
 );
 
 /** Rédaction d'une publication. */
+/** Rédaction d'un post, dans la fenêtre « Écrire un post ». */
 export function Composer({ uid, watches, canPost, onPosted }: { uid: string; watches: Watch[]; canPost: boolean; onPosted: () => void }) {
   const t = useStrings(S);
   const [body, setBody] = useState('');
@@ -59,22 +60,21 @@ export function Composer({ uid, watches, canPost, onPosted }: { uid: string; wat
     setBusy(false);
   };
   return (
-    <form className={`panel ${s.composer}`} data-tone="plain" onSubmit={submit}>
-      <TextArea label={t.placeholder} className={s.bodyField} rows={2} value={body} placeholder={t.placeholder}
-        onChange={e => setBody(e.target.value.slice(0, 1000))} />
+    <form className={s.composer} onSubmit={submit}>
+      <TextArea label={t.placeholder} className={s.bodyField} rows={5} value={body} placeholder={t.placeholder} autoFocus
+        onChange={e => setBody(e.target.value.slice(0, 1000))} hint={`${body.length} / 1000`} />
       {file && (
         <span className={s.preview}><img src={file.url} alt="" />
           <button type="button" onClick={() => { URL.revokeObjectURL(file.url); setFile(null); }} aria-label={t.removePhoto}><X size={14} /></button>
         </span>
       )}
-      {/* Montre et photo apparaissent dès que l'on écrit : le fil reste léger */}
-      {(body.trim() || file) && <div className={s.composerRow}>
+      <div className={s.composerRow}>
         <SelectField label={t.watch} value={watchId} onChange={e => setWatchId(e.target.value)}
           options={[{ value: 'none', label: t.noWatch }, ...watches.map(w => ({ value: w.id, label: `${w.brand} ${w.model}` }))]} />
         <Button variant="secondary" size="small" onClick={() => input.current?.click()}><Camera size={16} aria-hidden="true" />{t.photo}</Button>
         <input ref={input} type="file" accept="image/*" hidden onChange={e => { const f = e.target.files?.[0]; e.target.value = ''; if (f) setFile({ file: f, url: URL.createObjectURL(f) }); }} />
         <Button type="submit" size="small" disabled={busy || !body.trim()}>{busy ? t.publishing : t.publish}</Button>
-      </div>}
+      </div>
       {error && <Notice tone="error">{error}</Notice>}
     </form>
   );

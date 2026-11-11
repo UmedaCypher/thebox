@@ -1,4 +1,4 @@
-.composer { gap: var(--sp-3); }
+.composer { display: flex; flex-direction: column; gap: var(--sp-3); }
 .bodyField label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
 .composerRow { display: flex; flex-wrap: wrap; gap: var(--sp-2); align-items: flex-end; }
 .composerRow > :first-child { flex: 1 1 100%; }

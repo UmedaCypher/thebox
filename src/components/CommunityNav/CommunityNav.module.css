@@ -1,5 +1,5 @@
 .nav {
-  display: flex; gap: var(--sp-5); overflow-x: auto; scrollbar-width: none;
+  display: flex; justify-content: safe center; gap: var(--sp-5); overflow-x: auto; scrollbar-width: none;
   margin-bottom: var(--sp-4); border-bottom: 1px solid var(--line);
 }
 .nav::-webkit-scrollbar { display: none; }
