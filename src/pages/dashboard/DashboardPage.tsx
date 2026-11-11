@@ -4,15 +4,16 @@ import { Link } from 'react-router-dom';
 import {
   ArrowUpRight, Award, BarChart3, CalendarDays, Camera, Check, Info, HandCoins, Heart, Images, MessageCircle, Newspaper, Plus,
   ShieldCheck, Sparkles, Store, Tag, Watch as WatchIcon,
-  Activity, GitCompareArrows, ShieldAlert,
+  Activity, GitCompareArrows, ShieldAlert, Users,
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useLoad } from '../../hooks/useLoad';
 import {
-  addWear, getMyWearStreak, listConversations, listGalleryShots, listWatches, listWearLogs, mainPhoto, photoUrl, searchMarket, thumbSrc,
+  addWear, getFeed, getMyWearStreak, listAccuracy, listConversations, listGalleryShots, listWatches, listWearLogs, mainPhoto, photoUrl, searchMarket, thumbSrc,
 } from '../../lib/api';
 import { analyseCosts } from '../../lib/costPerWear';
-import { formatDate, formatEuros, toISODate, todayISO } from '../../lib/format';
+import { ACC_STRINGS, signed, verdictKey } from '../../components/Accuracy/accuracy';
+import { formatAgo, formatDate, formatEuros, toISODate, todayISO } from '../../lib/format';
 import { listingPrice } from '../../lib/listing';
 import { latestNews } from '../../components/NewsTeaser/NewsTeaser';
 import { Img, LinkButton } from '../../components/ui';
@@ -23,6 +24,7 @@ import { useStreakMessage } from '../../components/WristCheck/StreakPanel';
 import { STREAK_STRINGS } from '../../components/WristCheck/streak';
 import { defineStrings, getLocale, useStrings } from '../../i18n';
 import type { Watch } from '../../types';
+import type { AccuracyMeasurement } from '../../lib/api';
 import s from './DashboardPage.module.css';
 
 const S = defineStrings({
@@ -50,6 +52,14 @@ const S = defineStrings({
   market: 'Marché',
   listings: (n: number) => `${n} annonce${n > 1 ? 's' : ''} récente${n > 1 ? 's' : ''}`,
   gallery: 'Galerie',
+  feed: 'Feed',
+  feedEmpty: 'Suivez des collectionneurs pour voir leurs pièces et leurs wrist shots ici.',
+  feedWrist: 'a porté', feedListing: 'vend',
+  accuracy: 'Précision',
+  accuracyEmpty: 'Mesurez l’avance ou le retard de vos montres mécaniques, au micro du téléphone.',
+  accuracyTry: 'Essayer le timegrapher',
+  perDay: 'secondes par jour',
+  measures: (n: number) => `${n} mesure${n > 1 ? 's' : ''}`,
   costTitle: 'Coût par port',
   perWear: 'par port',
   premium: 'Premium',
@@ -92,6 +102,14 @@ const S = defineStrings({
   market: 'Market',
   listings: n => `${n} recent listing${n === 1 ? '' : 's'}`,
   gallery: 'Gallery',
+  feed: 'Feed',
+  feedEmpty: 'Follow collectors to see their pieces and wrist shots here.',
+  feedWrist: 'wore', feedListing: 'is selling',
+  accuracy: 'Accuracy',
+  accuracyEmpty: 'Measure how fast or slow your mechanical watches run, with your phone’s microphone.',
+  accuracyTry: 'Try the timegrapher',
+  perDay: 'seconds a day',
+  measures: (n: number) => `${n} measurement${n > 1 ? 's' : ''}`,
   costTitle: 'Cost per wear',
   perWear: 'per wear',
   premium: 'Premium',
@@ -177,6 +195,12 @@ export default function DashboardPage() {
   const market = useLoad(() => searchMarket({ query: '', brand: '', kind: '', minPrice: '', maxPrice: '', condition: '', boxPapers: '', size: '', sort: 'recent' }).catch(() => []), []);
   const shots = useLoad(() => listGalleryShots({ brand: null, minWrist: null, maxWrist: null }).catch(() => []), []);
   const news = useLoad(() => latestNews(2).catch(() => []), []);
+  // Feed : d'abord les abonnements, sinon toute la communauté
+  const feed = useLoad(async () => {
+    const mineFeed = await getFeed('following').catch(() => []);
+    return mineFeed.length ? mineFeed : getFeed('all').catch(() => []);
+  }, []);
+  const accuracy = useLoad(() => listAccuracy(uid), [uid]);
 
   const streak = useLoad(() => getMyWearStreak(), [uid]);
   const [check, setCheck] = useState<{ watchId?: string | null; day?: string | null } | null>(null);
@@ -417,6 +441,27 @@ export default function DashboardPage() {
           </span>
         </Tile>
 
+        {/* ---------- Précision : la dernière mesure du timegrapher et la tendance ---------- */}
+        <AccuracyTile measures={accuracy.data ?? []} watchName={id => { const w = byId.get(id); return w ? `${w.brand} ${w.model}` : null; }} />
+
+        {/* ---------- Feed : les dernières publications ---------- */}
+        <Tile to="/fil" icon={<Users size={18} strokeWidth={1.7} />} title={t.feed} tone="ruby" className={s.wide}>
+          {(feed.data ?? []).length === 0 ? <span className={s.quiet}>{t.feedEmpty}</span> : (
+            <span className={s.feedList}>
+              {(feed.data ?? []).slice(0, 2).map(it => (
+                <span key={`${it.kind}-${it.id}`} className={s.feedItem}>
+                  <span className={s.face}>{it.author.avatar ? <img src={it.author.avatar} alt="" /> : it.author.username.charAt(0).toUpperCase()}</span>
+                  <span className={s.feedText}>
+                    <small><b>@{it.author.username}</b>{it.kind === 'wrist' ? ` ${t.feedWrist}` : it.kind === 'listing' ? ` ${t.feedListing}` : ''} · {formatAgo(it.created_at)}</small>
+                    <span>{it.body || (it.watch ? `${it.watch.brand} ${it.watch.model}` : '')}</span>
+                  </span>
+                  {it.photo_path && (() => { const th = it.kind === 'post' ? { src: photoUrl(it.photo_path), fallback: null } : thumbSrc(it.photo_path); return th.src ? <span className={s.feedThumb}><Img src={th.src} fallback={th.fallback} alt="" /></span> : null; })()}
+                </span>
+              ))}
+            </span>
+          )}
+        </Tile>
+
         {/* ---------- À lire ---------- */}
         {(news.data ?? []).length > 0 && (
           <Tile to="/actualites" icon={<Newspaper size={18} strokeWidth={1.7} />} title={t.news} className={s.wide}>
@@ -450,5 +495,41 @@ export default function DashboardPage() {
         watchId={check?.watchId} day={check?.day}
         onDone={() => { streak.reload(); mine.reload(); setJustLogged(null); }} />
     </div>
+  );
+}
+
+/** Tuile Précision : dernière marche mesurée, son verdict, et une petite courbe des dernières mesures. */
+function AccuracyTile({ measures, watchName }: { measures: AccuracyMeasurement[]; watchName: (id: string) => string | null }) {
+  const t = useStrings(S);
+  const a = useStrings(ACC_STRINGS);
+  const last = measures[measures.length - 1];
+  const recent = measures.slice(-8).map(m => m.rate_s_day);
+  const points = (() => {
+    if (recent.length < 2) return null;
+    const lo = Math.min(...recent, 0), hi = Math.max(...recent, 0), span = hi - lo || 1;
+    return recent.map((v, i) => `${(i / (recent.length - 1)) * 100},${28 - ((v - lo) / span) * 24 - 2}`).join(' ');
+  })();
+  return (
+    <Tile to="/timegrapher" icon={<Activity size={18} strokeWidth={1.7} />} title={t.accuracy} tone="lume" className={s.accuracyTile}>
+      {last ? (
+        <>
+          <span className={s.metric}><b className="num">{signed(last.rate_s_day)}</b><span>{t.perDay}</span></span>
+          <span className={s.small}>
+            {last.watch_id && watchName(last.watch_id) ? <><b>{watchName(last.watch_id)}</b> · </> : null}
+            {a.verdict[verdictKey(last.rate_s_day)]}
+          </span>
+          {points && (
+            <svg className={s.spark} viewBox="0 0 100 28" preserveAspectRatio="none" aria-hidden="true">
+              <polyline points={points} />
+            </svg>
+          )}
+        </>
+      ) : (
+        <>
+          <span className={s.quiet}>{t.accuracyEmpty}</span>
+          <span className={s.chip}>{t.accuracyTry}</span>
+        </>
+      )}
+    </Tile>
   );
 }
