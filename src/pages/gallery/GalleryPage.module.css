@@ -156,3 +156,5 @@
 .rankMeter { display: flex; gap: 3px; height: 6px; max-width: 240px; }
 .rankMeter i { display: block; min-width: 0; border-radius: 3px; background: color-mix(in srgb, var(--text) 18%, transparent); }
 .rankMeter i[data-mid] { background: var(--lume); }
+.byModel { align-self: flex-start; font-size: var(--fs-sm); font-weight: 600; color: var(--brass); text-decoration: none; }
+.byModel:hover { text-decoration: underline; }

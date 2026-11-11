@@ -8,7 +8,7 @@
     "build": "tsc -b && vite build && npm run build:magazine",
     "lint": "eslint .",
     "preview": "vite preview",
-    "build:magazine": "npm ci --prefix site && node site/scripts/sync-articles.mjs && npm run build --prefix site && node -e \"require('fs').cpSync('site/dist','dist',{recursive:true})\"",
+    "build:magazine": "npm ci --prefix site && node site/scripts/sync-articles.mjs && node site/scripts/sync-models.mjs && npm run build --prefix site && node -e \"require('fs').cpSync('site/dist','dist',{recursive:true})\"",
     "dev:magazine": "npm run dev --prefix site"
   },
   "dependencies": {

@@ -31,6 +31,7 @@ const S = defineStrings({
   noMin: 'pas de minimum',
   noMax: 'pas de maximum',
   showAll: 'Tout effacer',
+  byModel: 'Parcourir les montres par modèle →',
   noResultsTitle: 'Aucune photo pour ces filtres',
   emptyTitle: 'La galerie attend ses premières photos',
   addShot: 'Ajouter une photo au poignet',
@@ -69,6 +70,7 @@ const S = defineStrings({
   noMin: 'no minimum',
   noMax: 'no maximum',
   showAll: 'Clear all',
+  byModel: 'Browse watches by model →',
   noResultsTitle: 'No photos match these filters',
   emptyTitle: 'The gallery is waiting for its first photos',
   addShot: 'Add a wrist shot',
@@ -298,6 +300,8 @@ function WristFilter({ min, max, mine, loggedIn, onWrist, brand, brands, onBrand
         {ticks.map(v => <span key={v} style={{ left: `${pct(v)}%` }}>{v === W_MAX ? `${v}+` : v}</span>)}
       </div>
       <p className={s.wfHint}>{t.wristHint}</p>
+      {/* Pages statiques par modèle (site/) : lien classique */}
+      <a className={s.byModel} href="/au-poignet/">{t.byModel}</a>
 
       <label className={s.brandPill} data-active={Boolean(brand)}>
         <span className={s.brandKey}>{t.brand}</span>

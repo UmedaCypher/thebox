@@ -1,0 +1,135 @@
+---
+// Une montre au poignet : toutes les photos publiques d'un modèle, classées par tour de poignet.
+import Base from '../../layouts/Base.astro';
+import { SITE } from '../../lib/i18n';
+import { getWristModels, cm, wristRange, MIN_INDEXED_PHOTOS, type WristModel } from '../../lib/wristModels';
+
+export function getStaticPaths() {
+  return getWristModels().map(m => ({ params: { slug: m.slug }, props: { m } }));
+}
+
+const { m } = Astro.props as { m: WristModel };
+const name = `${m.brand} ${m.model}`;
+const path = `/au-poignet/${m.slug}/`;
+const range = wristRange(m);
+const votes = m.fit_small + m.fit_perfect + m.fit_large;
+const pct = (n: number) => Math.round((100 * n) / Math.max(votes, 1));
+const title = `${name} au poignet : ${m.photo_count} photos${range ? ` (poignets ${range.replace(' à ', '–')})` : ''}`;
+const description = `${m.photo_count} photos de la ${name} portée par des collectionneurs${range ? `, sur des poignets de ${range}` : ''}. Voyez comment elle tombe sur un poignet comme le vôtre.`;
+const others = getWristModels().filter(o => o.slug !== m.slug && o.brand === m.brand).slice(0, 6);
+const popular = others.length < 3 ? getWristModels().filter(o => o.slug !== m.slug && o.brand !== m.brand).slice(0, 6 - others.length) : [];
+const related = [...others, ...popular];
+const bands: [string, number, number][] = [['Tous', 0, 99], ['< 16 cm', 0, 15.99], ['16–17', 16, 17], ['17–18', 17, 18], ['18–19', 18, 19], ['19 cm +', 19, 99]];
+const usedBands = bands.filter(([, lo, hi], i) => i === 0 || m.photos.some(p => p.wrist != null && p.wrist >= lo && p.wrist <= hi));
+const fitWord = (p: WristModel['photos'][number]) => {
+  const n = p.fit_small + p.fit_perfect + p.fit_large;
+  if (n < 2) return null;
+  const top = Math.max(p.fit_small, p.fit_perfect, p.fit_large);
+  return top === p.fit_perfect ? 'parfaite' : top === p.fit_small ? 'un peu petite' : 'un peu grande';
+};
+const jsonLd = [
+  {
+    '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Au poignet', item: `${SITE}/au-poignet/` },
+      { '@type': 'ListItem', position: 2, name, item: SITE + path },
+    ],
+  },
+  {
+    '@context': 'https://schema.org', '@type': 'ImageGallery', name: `${name} au poignet`, description, url: SITE + path, inLanguage: 'fr',
+    image: m.photos.slice(0, 20).map(p => ({
+      '@type': 'ImageObject', contentUrl: p.full,
+      caption: `${name}${p.wrist ? ` sur un poignet de ${cm(p.wrist)} cm` : ''}${p.username ? `, photo de @${p.username}` : ''}`,
+      ...(p.username ? { creator: { '@type': 'Person', name: `@${p.username}` } } : {}),
+    })),
+  },
+];
+---
+<Base lang="fr" title={title} description={description} path={path} alternates={[{ lang: 'fr', path }]} jsonLd={jsonLd}
+  image={m.photos[0]?.full} imageAlt={`${name} au poignet`} imageSized={false} noindex={m.photo_count < MIN_INDEXED_PHOTOS}>
+  <article class="wrap wp-page">
+    <p class="crumbs"><a href="/au-poignet/">Au poignet</a> › {m.brand}</p>
+    <h1>{name} <span>au poignet</span></h1>
+    <p class="lede">{description}</p>
+
+    <dl class="wp-facts">
+      {m.reference_number && <div><dt>Référence</dt><dd>{m.reference_number}</dd></div>}
+      {m.case_diameter_mm && <div><dt>Diamètre</dt><dd>{cm(m.case_diameter_mm)} mm</dd></div>}
+      {m.lug_to_lug_mm && <div><dt>Entre-cornes</dt><dd>{cm(m.lug_to_lug_mm)} mm</dd></div>}
+      {range && <div><dt>Poignets</dt><dd>{range}</dd></div>}
+    </dl>
+
+    {votes >= 3 && (
+      <section class="wp-fit" aria-label="Avis des membres">
+        <p><strong>Au poignet ?</strong> L’avis de {votes} membres sur ces photos</p>
+        <div class="wp-fit-bar" role="img" aria-label={`Petite ${pct(m.fit_small)} %, parfaite ${pct(m.fit_perfect)} %, grande ${pct(m.fit_large)} %`}>
+          <span style={`flex:${m.fit_small}`} data-k="small"></span>
+          <span style={`flex:${m.fit_perfect}`} data-k="perfect"></span>
+          <span style={`flex:${m.fit_large}`} data-k="large"></span>
+        </div>
+        <p class="wp-fit-legend"><span data-k="small">Petite {pct(m.fit_small)} %</span><span data-k="perfect">Parfaite {pct(m.fit_perfect)} %</span><span data-k="large">Grande {pct(m.fit_large)} %</span></p>
+      </section>
+    )}
+
+    {usedBands.length > 2 && (
+      <div class="wp-filters" role="group" aria-label="Tour de poignet">
+        {usedBands.map(([label, lo, hi], i) => (
+          <button type="button" data-lo={lo} data-hi={hi} aria-pressed={i === 0 ? 'true' : 'false'}>{label}</button>
+        ))}
+      </div>
+    )}
+
+    <ul class="wp-photos">
+      {m.photos.map(p => (
+        <li data-wrist={p.wrist ?? ''}>
+          <figure>
+            <a href={p.full} target="_blank" rel="noopener">
+              <img src={p.src} alt={`${name}${p.wrist ? ` sur un poignet de ${cm(p.wrist)} cm` : ''}`} loading="lazy" decoding="async"
+                onerror={`this.onerror=null;this.src='${p.full}'`} />
+            </a>
+            <figcaption>
+              {p.wrist ? <strong>Poignet {cm(p.wrist)} cm</strong> : <strong>Poignet non précisé</strong>}
+              {fitWord(p) && <span class="wp-tag">{fitWord(p)}</span>}
+              {p.username && <a class="wp-user" href={`/profil/${encodeURIComponent(p.username)}`}>@{p.username}</a>}
+            </figcaption>
+          </figure>
+        </li>
+      ))}
+    </ul>
+
+    <div class="cta wp-cta">
+      <h2>Vous portez une {m.model} ?</h2>
+      <p>Ajoutez-la à votre collection et partagez votre photo au poignet : elle aidera les prochains acheteurs à choisir.</p>
+      <a class="btn" data-liquid href="/signup?src=au-poignet">Partager la mienne</a>
+      <a class="text-link" href={`/galerie?marque=${encodeURIComponent(m.brand)}`}>Toute la galerie {m.brand}</a>
+    </div>
+
+    {related.length > 0 && (
+      <section class="wp-related" aria-labelledby="wp-related-h">
+        <h2 id="wp-related-h">{others.length ? `Autres ${m.brand} au poignet` : 'D’autres montres au poignet'}</h2>
+        <ul class="wp-grid">
+          {related.map(o => (
+            <li>
+              <a class="wp-card" href={`/au-poignet/${o.slug}/`}>
+                <span class="wp-cover"><img src={o.photos[0]?.src} alt="" loading="lazy" decoding="async" onerror={`this.onerror=null;this.src='${o.photos[0]?.full}'`} /></span>
+                <span class="wp-card-text"><strong>{o.brand} {o.model}</strong><span>{o.photo_count} photos</span></span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )}
+  </article>
+
+  <script>
+    // Filtre par tour de poignet (la page reste complète sans JavaScript)
+    const buttons = document.querySelectorAll<HTMLButtonElement>('.wp-filters button');
+    buttons.forEach(b => b.addEventListener('click', () => {
+      const lo = Number(b.dataset.lo), hi = Number(b.dataset.hi);
+      buttons.forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+      document.querySelectorAll<HTMLElement>('.wp-photos li').forEach(li => {
+        const w = li.dataset.wrist ? Number(li.dataset.wrist) : NaN;
+        li.hidden = !(lo === 0 && hi === 99) && !(w >= lo && w <= hi);
+      });
+    }));
+  </script>
+</Base>

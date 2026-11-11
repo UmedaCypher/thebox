@@ -1,3 +1,5 @@
 node_modules/
 dist/
 .astro/
+# Données générées à la construction (pages « au poignet »)
+src/data/*.generated.json

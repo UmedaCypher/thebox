@@ -66,6 +66,15 @@ function compose(row: Row, lang: Lang): Msg | null {
             url: '/accueil', tag: 'daily',
           };
     }
+    case 'streak': {
+      // 20 h, rien de noté aujourd'hui : la série s'arrête à minuit
+      const streak = Number(d.streak ?? 0);
+      return {
+        title: en ? `Keep your ${streak}-day streak alive` : `Gardez votre série de ${streak} jours`,
+        body: en ? 'No Wrist Check yet today. One tap before midnight.' : 'Pas encore de Wrist Check aujourd’hui. Un geste avant minuit.',
+        url: '/accueil', tag: 'streak',
+      };
+    }
     case 'maintenance':
       return d.today
         ? { title: en ? 'Service due today' : 'Entretien prévu aujourd\'hui',

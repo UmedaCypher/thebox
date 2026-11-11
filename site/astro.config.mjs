@@ -4,6 +4,7 @@
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 import rehypeFigure, { rehypeFrenchTypo } from './src/lib/rehype-figure.mjs';
+import { existsSync, readFileSync } from 'node:fs';
 
 const SITE = 'https://arcorawatch.com';
 
@@ -11,6 +12,13 @@ const SITE = 'https://arcorawatch.com';
 const APP_PUBLIC_PAGES = [
   '/', '/galerie', '/marche', '/premium', '/faq', '/a-propos', '/contact', '/presse', '/arcora-vs', '/montres-volees',
 ];
+
+// Pages « au poignet » trop minces (moins de 3 photos) : en ligne pour les membres, hors du sitemap (noindex).
+const MODELS_FILE = new URL('./src/data/wrist-models.generated.json', import.meta.url);
+const thinModelPages = new Set(
+  (existsSync(MODELS_FILE) ? JSON.parse(readFileSync(MODELS_FILE, 'utf8')) : [])
+    .filter((m) => m.photo_count < 3).map((m) => `${SITE}/au-poignet/${m.slug}/`),
+);
 
 export default defineConfig({
   site: SITE,
@@ -22,6 +30,7 @@ export default defineConfig({
   integrations: [
     sitemap({
       customPages: APP_PUBLIC_PAGES.map((p) => SITE + p),
+      filter: (page) => !thinModelPages.has(page),
       i18n: { defaultLocale: 'fr', locales: { fr: 'fr-FR', en: 'en-US' } },
     }),
   ],

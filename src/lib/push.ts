@@ -87,6 +87,8 @@ export interface NotificationPrefs {
   maintenance: boolean;
   monthly_recap: boolean;
   wishlist: boolean;
+  /** Rappel du soir quand la série est en jeu (absent tant que la colonne n'existe pas en base). */
+  streak_reminder?: boolean;
 }
 export const DEFAULT_PREFS: NotificationPrefs = {
   messages: true, daily_reminder: false, reminder_hour: 9, maintenance: true, monthly_recap: true, wishlist: true,
@@ -94,9 +96,18 @@ export const DEFAULT_PREFS: NotificationPrefs = {
 
 export async function getNotificationPrefs(userId: string): Promise<NotificationPrefs> {
   const { data } = await supabase.from('notification_prefs')
-    .select('messages, daily_reminder, reminder_hour, maintenance, monthly_recap, wishlist')
+    .select('*')
     .eq('user_id', userId).maybeSingle();
-  return { ...DEFAULT_PREFS, ...(data ?? {}) };
+  const row = (data ?? {}) as Partial<NotificationPrefs> & Record<string, unknown>;
+  return {
+    messages: row.messages ?? DEFAULT_PREFS.messages,
+    daily_reminder: row.daily_reminder ?? DEFAULT_PREFS.daily_reminder,
+    reminder_hour: row.reminder_hour ?? DEFAULT_PREFS.reminder_hour,
+    maintenance: row.maintenance ?? DEFAULT_PREFS.maintenance,
+    monthly_recap: row.monthly_recap ?? DEFAULT_PREFS.monthly_recap,
+    wishlist: row.wishlist ?? DEFAULT_PREFS.wishlist,
+    ...(typeof row.streak_reminder === 'boolean' ? { streak_reminder: row.streak_reminder } : {}),
+  };
 }
 
 export async function saveNotificationPrefs(userId: string, prefs: NotificationPrefs) {

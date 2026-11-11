@@ -78,6 +78,7 @@ const mag = magazinePath(lang);
         <span class="only-visitor subnav-main">
           <a href="/marche" class="sub-link"><Fragment set:html={icon(Icons.Store)} />{L.market}</a>
           <a href="/galerie" class="sub-link"><Fragment set:html={icon(Icons.Images)} />{L.gallery}</a>
+          <a href="/au-poignet/" class="sub-link" aria-current={Astro.url.pathname.startsWith('/au-poignet') ? 'page' : undefined}>{lang === 'fr' ? 'Au poignet' : 'On the wrist'}</a>
           <a href="/faq" class="sub-link">{L.questions}</a>
         </span>
         <span class="only-member subnav-main">
@@ -85,7 +86,7 @@ const mag = magazinePath(lang);
         </span>
       </div>
       <div class="subnav-aside">
-        <a href={mag} class="sub-link" aria-current="page"><Fragment set:html={icon(Icons.BookOpen)} />{L.magazine}</a>
+        <a href={mag} class="sub-link" aria-current={Astro.url.pathname.includes('/magazine') ? 'page' : undefined}><Fragment set:html={icon(Icons.BookOpen)} />{L.magazine}</a>
         <a href="/actualites" class="sub-link"><Fragment set:html={icon(Icons.Newspaper)} />{L.news}</a>
         <a href="/premium" class="sub-link premium-link"><Fragment set:html={icon(Icons.Sparkles, 16, 1.8)} />Premium</a>
       </div>

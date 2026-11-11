@@ -24,6 +24,8 @@ export const NOTIF = defineStrings({
   denied: "Les notifications sont bloquées pour ce site. Autorisez-les dans les réglages du navigateur, puis revenez ici.",
   messages: 'Nouveaux messages',
   messagesHint: 'Quand un membre vous écrit.',
+  streak: 'Série en jeu',
+  streakHint: 'À 20 h, si votre série est en cours et que rien n’est noté aujourd’hui.',
   daily: 'Rappel du jour',
   dailyHint: "« Quelle montre aujourd'hui ? », seulement si vous n'avez encore rien noté.",
   hour: 'Heure du rappel',
@@ -49,6 +51,8 @@ export const NOTIF = defineStrings({
   denied: 'Notifications are blocked for this site. Allow them in your browser settings, then come back here.',
   messages: 'New messages',
   messagesHint: 'When a member writes to you.',
+  streak: 'Streak at stake',
+  streakHint: 'At 8 pm, if your streak is running and nothing is logged today.',
   daily: 'Daily reminder',
   dailyHint: '“Which watch today?”, only if you have not logged one yet.',
   hour: 'Reminder time',
@@ -120,6 +124,7 @@ export default function NotificationSettings() {
       {state === 'on' && (
         <div className={s.prefs}>
           <Toggle label={t.messages} description={t.messagesHint} checked={prefs.messages} onChange={v => update({ messages: v })} />
+          <Toggle label={t.streak} description={t.streakHint} checked={prefs.streak_reminder ?? true} onChange={v => update({ streak_reminder: v })} />
           <Toggle label={t.daily} description={t.dailyHint} checked={prefs.daily_reminder} onChange={v => update({ daily_reminder: v })} />
           {prefs.daily_reminder && (
             <SelectField label={t.hour} value={String(prefs.reminder_hour)} placeholder={t.hourLabel(prefs.reminder_hour)}

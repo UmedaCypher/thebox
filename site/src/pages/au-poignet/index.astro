@@ -1,0 +1,69 @@
+---
+// Toutes les montres photographiées au poignet par les membres, par marque.
+import Base from '../../layouts/Base.astro';
+import { SITE } from '../../lib/i18n';
+import { getWristModels, wristRange, MIN_INDEXED_PHOTOS } from '../../lib/wristModels';
+import { modelSlug } from '../../lib/slug.mjs';
+const brandId = (b: string) => `marque-${modelSlug(b, '') || 'autre'}`;
+
+const models = getWristModels();
+const byBrand = new Map<string, typeof models>();
+for (const m of models) byBrand.set(m.brand, [...(byBrand.get(m.brand) ?? []), m]);
+const brands = [...byBrand.entries()].sort((a, b) => a[0].localeCompare(b[0], 'fr'));
+const photos = models.reduce((n, m) => n + m.photo_count, 0);
+const title = 'Montres au poignet : photos réelles par modèle et tour de poignet';
+const description = `${photos > 0 ? `${photos} photos de collectionneurs, ` : ''}classées par modèle et par tour de poignet : voyez comment une montre tombe avant de l’acheter.`;
+const jsonLd = [{
+  '@context': 'https://schema.org', '@type': 'CollectionPage', name: title, description, url: `${SITE}/au-poignet/`, inLanguage: 'fr',
+  hasPart: models.filter(m => m.photo_count >= MIN_INDEXED_PHOTOS).slice(0, 100).map(m => ({ '@type': 'WebPage', name: `${m.brand} ${m.model} au poignet`, url: `${SITE}/au-poignet/${m.slug}/` })),
+}];
+---
+<Base lang="fr" title={title} description={description} path="/au-poignet/" alternates={[{ lang: 'fr', path: '/au-poignet/' }]} jsonLd={jsonLd}>
+  <section class="wrap mag-hero wp-hero">
+    <p class="eyebrow">Galerie au poignet</p>
+    <h1>Les montres, au poignet</h1>
+    <p>Des photos prises par des collectionneurs, avec leur tour de poignet. Pour savoir comment une montre tombe vraiment, avant de l’acheter.</p>
+  </section>
+
+  {models.length === 0 ? (
+    <section class="wrap wp-empty">
+      <p class="muted">Les premières photos arrivent. Partagez la vôtre dans la galerie d’Arcora.</p>
+      <a class="btn" data-liquid href="/signup?src=au-poignet">Créer ma collection</a>
+    </section>
+  ) : (
+    <div class="wrap wp-brands">
+      <nav class="wp-jump" aria-label="Marques">
+        {brands.map(([b]) => <a href={`#${brandId(b)}`}>{b}</a>)}
+      </nav>
+      {brands.map(([brand, list]) => (
+        <section class="wp-brand" id={brandId(brand)}>
+          <h2>{brand}</h2>
+          <ul class="wp-grid">
+            {list.map(m => (
+              <li>
+                <a class="wp-card" href={`/au-poignet/${m.slug}/`}>
+                  <span class="wp-cover">
+                    <img src={m.photos[0]?.src} alt={`${m.brand} ${m.model} au poignet`} loading="lazy" decoding="async"
+                      onerror={`this.onerror=null;this.src='${m.photos[0]?.full}'`} />
+                  </span>
+                  <span class="wp-card-text">
+                    <strong>{m.model}</strong>
+                    <span>{m.photo_count} photo{m.photo_count > 1 ? 's' : ''}{wristRange(m) ? ` · poignets ${wristRange(m)}` : ''}</span>
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))}
+    </div>
+  )}
+
+  <section class="wrap">
+    <div class="cta wp-cta">
+      <h2>Votre montre n’y est pas encore ?</h2>
+      <p>Ajoutez-la à votre collection et partagez votre Wrist Check : elle aidera les prochains acheteurs.</p>
+      <a class="btn" data-liquid href="/signup?src=au-poignet">Créer ma collection, gratuitement</a>
+    </div>
+  </section>
+</Base>
