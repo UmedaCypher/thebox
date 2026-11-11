@@ -14,7 +14,8 @@ import { useLanguageSetting } from '../../i18n/useLanguageSetting';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { pageTitle } from './pageTitle';
 import PlayBanner from './PlayBanner';
-import JoinBanner, { joinBannerKind } from './JoinBanner';
+import JoinBanner from './JoinBanner';
+import { joinBannerKind } from './joinBannerKind';
 import s from './Layout.module.css';
 
 const S = defineStrings({

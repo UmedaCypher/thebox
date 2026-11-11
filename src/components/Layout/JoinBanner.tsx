@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { X } from 'lucide-react';
 import { defineStrings, useStrings } from '../../i18n';
+import { joinBannerKind } from './joinBannerKind';
 import s from './JoinBanner.module.css';
 
 /*
@@ -34,20 +35,6 @@ const S = defineStrings({
   login: 'Log in',
   close: 'Hide',
 });
-
-/** Pages publiques où l'invitation a du sens (pas l'accueil, déjà une invitation, ni les pages légales). */
-export function joinBannerKind(pathname: string): 'passport' | 'profile' | 'gallery' | 'market' | 'stolen' | 'other' | null {
-  const seg = pathname.split('/')[1];
-  switch (seg) {
-    case 'passeport': return 'passport';
-    case 'profil': return pathname.split('/').length > 2 ? 'profile' : null;
-    case 'galerie': return 'gallery';
-    case 'marche': return 'market';
-    case 'montres-volees': return 'stolen';
-    case 'arcora-vs': case 'actualites': return 'other';
-    default: return null;
-  }
-}
 
 const closed = () => { try { return sessionStorage.getItem(KEY) === '1'; } catch { return false; } };
 

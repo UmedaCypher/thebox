@@ -50,7 +50,7 @@ async function rpc<T>(cfg: AppConfig, fn: string, body: Record<string, unknown>)
 const publicPhoto = (cfg: AppConfig, path: string | null | undefined) =>
   path ? `${cfg.supabaseUrl}/storage/v1/object/public/${BUCKET}/${path.split('/').map(encodeURIComponent).join('/')}` : null;
 const uuidRe = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-const eur = (n: number) => `${Math.round(n).toLocaleString('fr-FR').replace(/ | /g, ' ')} €`;
+const eur = (n: number) => `${Math.round(n).toLocaleString('fr-FR').replace(/[\u202f\u00a0]/g, ' ')} €`;
 
 interface Passport {
   brand: string; model: string; reference_number: string | null; year_of_production: number | null;
