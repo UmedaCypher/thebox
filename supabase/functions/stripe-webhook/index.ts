@@ -209,11 +209,15 @@ Deno.serve(async (req) => {
       case 'customer.subscription.deleted':
         await syncSubscription(event.data.object as Stripe.Subscription);
         break;
-      case 'invoice.paid':
-        await recordPayment(event.data.object as Stripe.Invoice);
-        await recordCommission(event.data.object as Stripe.Invoice);
-        await recordFoundersClaim(event.data.object as Stripe.Invoice);
+      case 'invoice.paid': {
+        // La facture du webhook suit la version d'API de la destination Stripe (le format des factures a changé
+        // en 2025 : abonnement et paiement déplacés). On la relit avec la version de ce code pour lire toujours le même format.
+        const invoice = await stripe.invoices.retrieve((event.data.object as { id: string }).id);
+        await recordPayment(invoice);
+        await recordCommission(invoice);
+        await recordFoundersClaim(invoice);
         break;
+      }
       case 'charge.refunded': {
         const charge = event.data.object as Stripe.Charge;
         await admin.from('stripe_payments').update({ refunded_cents: charge.amount_refunded }).eq('charge_id', charge.id);
