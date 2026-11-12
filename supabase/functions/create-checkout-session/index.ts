@@ -73,6 +73,16 @@ Deno.serve(async (req) => {
       .from('subscriptions').select('stripe_customer_id').eq('user_id', user.id).maybeSingle();
 
     let customerId = existing?.stripe_customer_id as string | undefined;
+    // Client créé avec l'autre clé (mode test ↔ mode réel) ou supprimé dans Stripe : on en recrée un.
+    if (customerId) {
+      try {
+        const c = await stripe.customers.retrieve(customerId);
+        if ((c as { deleted?: boolean }).deleted) customerId = undefined;
+      } catch (e) {
+        if ((e as { code?: string }).code === 'resource_missing') customerId = undefined;
+        else throw e;
+      }
+    }
     if (!customerId) {
       const customer = await stripe.customers.create({
         email: user.email ?? undefined,
