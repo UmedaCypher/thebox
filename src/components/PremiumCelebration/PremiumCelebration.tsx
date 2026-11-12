@@ -36,6 +36,7 @@ const S = defineStrings({
   addWatch: 'Ajouter une montre',
   explore: 'Voir ma collection',
   close: 'Fermer',
+  reload: 'Recharger la page',
 }, {
   waitingEyebrow: 'Payment received',
   waitingTitle: 'Activating Premium…',
@@ -56,6 +57,7 @@ const S = defineStrings({
   addWatch: 'Add a watch',
   explore: 'See my collection',
   close: 'Close',
+  reload: 'Reload the page',
 });
 
 export type CelebrationStatus = 'waiting' | 'done' | 'slow';
@@ -129,7 +131,15 @@ export default function PremiumCelebration({ status, onClose }: { status: Celebr
               </div>
             </>
           ) : (
-            <p className={s.thanks}>{status === 'slow' ? t.slowText : t.waitingText}</p>
+            <>
+              <p className={s.thanks}>{status === 'slow' ? t.slowText : t.waitingText}</p>
+              {status === 'slow' && (
+                <div className={s.actions}>
+                  <Button onClick={() => window.location.reload()}>{t.reload}</Button>
+                  <Button variant="ghost" onClick={onClose}>{t.close}</Button>
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>
