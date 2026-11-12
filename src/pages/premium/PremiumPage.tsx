@@ -9,6 +9,7 @@ import { premiumFeatures, premiumHighlights } from '../../lib/premium';
 import { openBillingPortal, startCheckout } from '../../lib/api';
 import { Button, LinkButton, Notice, PageHeader, Segmented } from '../../components/ui';
 import WaitlistForm from '../../components/Waitlist/WaitlistForm';
+import PremiumCelebration from '../../components/PremiumCelebration/PremiumCelebration';
 import { defineStrings, useStrings } from '../../i18n';
 import { COMMON } from '../../i18n/common';
 import { formatEuros } from '../../lib/format';
@@ -170,6 +171,10 @@ export default function PremiumPage() {
     <div className="page">
       <PageHeader title="Premium" subtitle={t.subtitle} />
 
+      {/* Retour de Stripe : le moment de bienvenue, en plein écran */}
+      {result === 'ok' && (
+        <PremiumCelebration status={isPremium ? 'done' : waiting ? 'waiting' : 'slow'} onClose={() => setParams({}, { replace: true })} />
+      )}
       {result === 'ok' && (
         <Notice tone={isPremium ? 'ok' : 'info'}>
           {isPremium ? t.welcome : waiting ? t.activating : t.slow}
