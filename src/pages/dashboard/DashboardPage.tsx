@@ -245,12 +245,24 @@ export default function DashboardPage() {
   const todayShot = todayWatch?.photos?.filter(p => p.worn_on === today && p.photo_type === 'wrist_shot')
     .sort((a, b) => (b.created_at ?? '').localeCompare(a.created_at ?? ''))[0];
 
+  // Photo de fond de l'accueil sur téléphone : la montre du jour, sinon la dernière portée (floutée, en attente du choix)
+  const lastWornId = [...wornByDay.entries()].filter(([d]) => d < today).sort((x, y) => y[0].localeCompare(x[0]))[0]?.[1];
+  const stageWatch = todayWatch ?? (lastWornId ? byId.get(lastWornId) : undefined) ?? watches[0];
+  const stageSrc = todayWatch
+    ? photoUrl((todayShot ?? mainPhoto(todayWatch.photos))?.storage_path) ?? thumbFor(todayWatch).src
+    : stageWatch ? thumbFor(stageWatch).src : null;
+
   const hour = new Date().getHours();
   const name = profile?.username;
   const dateLabel = new Date().toLocaleDateString(getLocale(), { weekday: 'long', day: 'numeric', month: 'long' });
 
   return (
-    <div className={`page ${s.page}`}>
+    <div className={`page ${s.page}`} data-stage={stageSrc ? (todayWatch ? 'worn' : 'pick') : undefined}>
+      {stageSrc && (
+        <div className={s.stage} aria-hidden="true">
+          <Img key={stageSrc} src={stageSrc} fallback={stageWatch ? thumbFor(stageWatch).fallback : undefined} alt="" />
+        </div>
+      )}
       <header className={s.greet}>
         <h1>{t.hello(hour)}{name ? `, ${name}` : ''}</h1>
         <p className={s.date}>{dateLabel}<span className={s.dateSep} aria-hidden="true">·</span><LiveClock /></p>

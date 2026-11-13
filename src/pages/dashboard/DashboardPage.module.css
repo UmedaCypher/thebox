@@ -4,10 +4,10 @@
 .page::before {
   content: ''; position: absolute; z-index: -1; inset: 0 calc(-1 * var(--gutter)); pointer-events: none;
   background:
-    radial-gradient(48% 340px at 92% 360px, color-mix(in srgb, var(--lume) 20%, transparent), transparent 72%),
-    radial-gradient(56% 380px at 0% 1150px, color-mix(in srgb, var(--ruby) 22%, transparent), transparent 72%),
-    radial-gradient(60% 420px at 100% 2000px, color-mix(in srgb, var(--brass) 20%, transparent), transparent 72%),
-    radial-gradient(54% 380px at 10% 2800px, color-mix(in srgb, var(--lume) 14%, transparent), transparent 72%);
+    radial-gradient(48% 340px at 92% 360px, color-mix(in srgb, var(--lume) 30%, transparent), transparent 72%),
+    radial-gradient(56% 380px at 0% 1150px, color-mix(in srgb, var(--ruby) 34%, transparent), transparent 72%),
+    radial-gradient(60% 420px at 100% 2000px, color-mix(in srgb, var(--brass) 32%, transparent), transparent 72%),
+    radial-gradient(54% 380px at 10% 2800px, color-mix(in srgb, var(--lume) 22%, transparent), transparent 72%);
 }
 @media (min-width: 760px) { .page::before { opacity: 0.6; } }
 .greet { display: flex; flex-direction: column; gap: 2px; margin-bottom: var(--sp-5); }
@@ -305,3 +305,52 @@ a.tile:active { transform: scale(0.985); }
 .tile[data-fill] .tileIcon { color: var(--ink); background: color-mix(in srgb, var(--ink) 12%, transparent); }
 .tile[data-fill] .metric b { font-size: clamp(var(--fs-3xl), 12vw, var(--fs-4xl)); }
 .streakTile[data-fill] .todayChip[data-done='true'] { box-shadow: none; }
+
+/* ---------- Scène : la montre du jour en fond de page (téléphone) ----------
+   La photo n'est plus enfermée dans une carte : elle remplit le haut de l'écran, passe sous l'en-tête
+   et se fond dans la lumière. Montre portée = nette ; pas encore choisie = la dernière portée, floutée. */
+.stage { display: none; }
+@media (max-width: 759px) {
+  .stage {
+    display: block; position: absolute; z-index: -1; pointer-events: none; overflow: hidden;
+    top: calc(-1 * var(--header-h) - env(safe-area-inset-top)); left: 0; right: 0; height: calc(600px + var(--header-h));
+    -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 52%, rgba(0, 0, 0, 0.5) 74%, transparent 100%);
+    mask-image: linear-gradient(to bottom, #000 0%, #000 52%, rgba(0, 0, 0, 0.5) 74%, transparent 100%);
+  }
+  .stage img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 45%; animation: stageIn 1.4s var(--ease-out) both; }
+  /* Voile du haut pour lire le salut, voile chaud du bas pour que les cartes se posent sur la lumière */
+  .stage::after {
+    content: ''; position: absolute; inset: 0;
+    background:
+      linear-gradient(to bottom, rgba(20, 8, 10, 0.7) 0%, rgba(20, 8, 10, 0.45) 22%, rgba(20, 8, 10, 0) 48%, color-mix(in srgb, var(--bg) 70%, transparent) 100%),
+      radial-gradient(80% 50% at 50% 100%, color-mix(in srgb, var(--brass) 26%, transparent), transparent 70%);
+  }
+  .page[data-stage='pick'] .stage img { filter: blur(26px) saturate(1.4) brightness(0.75); transform: scale(1.25); }
+  @keyframes stageIn { from { opacity: 0; transform: scale(1.06); } }
+  .page[data-stage='pick'] .stage img { animation-name: stageInBlur; }
+  @keyframes stageInBlur { from { opacity: 0; transform: scale(1.35); } }
+
+  /* Plus d'air en haut */
+  .page[data-stage] { padding-top: var(--sp-7); }
+  .page[data-stage] .greet { margin-bottom: var(--sp-6); text-shadow: 0 1px 12px rgba(0, 0, 0, 0.5), 0 0 2px rgba(0, 0, 0, 0.4); }
+  .page[data-stage] .date { color: rgba(251, 246, 238, 0.86); }
+  .page[data-stage] .greet h1 { font-size: clamp(2.4rem, 11vw, 3.2rem); line-height: 1.02; }
+  :root[data-theme='soie'] .page[data-stage] .greet :is(h1, .date, .clock) { color: #fbf6ee; }
+
+  /* Montre portée : la tuile devient une fenêtre transparente sur la photo de fond */
+  .page[data-stage='worn'] .hero { min-height: 300px; }
+  .page[data-stage='worn'] .heroWorn { box-shadow: none; background: none; min-height: 300px; }
+  .page[data-stage='worn'] .heroWorn::after, .page[data-stage='worn'] .heroPhoto { display: none; }
+  .page[data-stage='worn'] .heroWrap .heroCaption {
+    top: auto; bottom: 64px; left: 0; max-width: 100%; padding: 0; background: none;
+    -webkit-backdrop-filter: none; backdrop-filter: none; text-shadow: 0 2px 16px rgba(0, 0, 0, 0.5);
+  }
+  .page[data-stage='worn'] .heroWrap .heroModel { font-size: clamp(2rem, 9vw, 2.6rem); }
+  .page[data-stage='worn'] .heroChange { top: auto; bottom: 6px; right: 0; padding: 9px 16px; font-size: var(--fs-sm); background: rgba(20, 8, 10, 0.35); }
+  .page[data-stage='worn'] .shotCta { left: 0; bottom: 0; }
+  .page[data-stage='worn'] .heroWrap:not([data-cta='true']) .heroCaption { bottom: 4px; }
+
+  /* Pas encore choisie : le choix flotte en verre sur la photo floutée */
+  .page[data-stage='pick'] .heroPick { background: color-mix(in srgb, var(--glass-bg) 60%, transparent); }
+}
+@media (prefers-reduced-motion: reduce) { .stage img { animation: none !important; } }

@@ -201,7 +201,7 @@ body { isolation: isolate; }
       radial-gradient(70vmax 46vmax at 0% -4%, var(--aura-1), transparent 66%),
       radial-gradient(56vmax 40vmax at 108% 30%, var(--aura-2), transparent 68%),
       radial-gradient(80vmax 52vmax at 40% 112%, var(--aura-3), transparent 70%);
-    filter: saturate(1.35) brightness(1.15);
+    filter: saturate(1.6) brightness(1.35);
   }
 }
 
