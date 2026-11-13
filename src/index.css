@@ -341,3 +341,10 @@ html.lenis, html.lenis body { height: auto; }
 .chips[data-tone='lume'] { --tone: var(--lume); }
 .chips[data-tone='ruby'] { --tone: var(--ruby); }
 .panel .chips:not([data-tone]) { --tone: inherit; }
+
+/* Changement d'onglet par balayage (rubrique Social) : la page arrive du côté du geste */
+.page[data-swipe-in='left'] > :not(nav) { animation: swipe-in-left 320ms var(--ease-out) both; }
+.page[data-swipe-in='right'] > :not(nav) { animation: swipe-in-right 320ms var(--ease-out) both; }
+/* (les enfants bougent, pas la page : un bouton flottant à l'intérieur reste bien fixé à l'écran) */
+@keyframes swipe-in-left { from { opacity: 0.4; transform: translateX(36px); } }
+@keyframes swipe-in-right { from { opacity: 0.4; transform: translateX(-36px); } }

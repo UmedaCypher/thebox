@@ -116,12 +116,16 @@ export function FeedCard({ item, uid, onRemoved }: { item: FeedItem; uid: string
   };
 
   return (
-    <article className={`panel ${s.card}`} data-tone="plain" data-kind={item.kind}>
-      <header className={s.cardHead}>
-        <Link to={`/profil/${item.author.username}`} className={s.author}>
-          <Avatar src={item.author.avatar} name={item.author.username} />
-          <span><strong>@{item.author.username}</strong>{item.kind !== 'post' && <span className={s.action}> {item.kind === 'wrist' ? t.wrist : t.listing}</span>}</span>
-        </Link>
+    // Publication à plat, comme un fil d'actualité : avatar à gauche, contenu à droite, un filet entre deux publications
+    <article className={s.item} data-kind={item.kind}>
+      <Link to={`/profil/${item.author.username}`} className={s.avatarCol} aria-hidden="true" tabIndex={-1}>
+        <Avatar src={item.author.avatar} name={item.author.username} />
+      </Link>
+      <div className={s.main}>
+      <header className={s.line}>
+        <Link to={`/profil/${item.author.username}`} className={s.name}>@{item.author.username}</Link>
+        {item.kind !== 'post' && <span className={s.action}>{item.kind === 'wrist' ? t.wrist : t.listing}</span>}
+        <span className={s.dot} aria-hidden="true">·</span>
         <time className={s.time} dateTime={item.created_at}>{formatAgo(item.created_at)}</time>
       </header>
       {item.body && <p className={s.body}>{item.body}</p>}
@@ -164,6 +168,7 @@ export function FeedCard({ item, uid, onRemoved }: { item: FeedItem; uid: string
           )}
         </div>
       )}
+      </div>
     </article>
   );
 }

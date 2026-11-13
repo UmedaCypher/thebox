@@ -57,3 +57,20 @@
 /* Les choix de filtres passent à la ligne dans la colonne étroite plutôt que d'être coupés. */
 .fields [role='tablist'] { flex-wrap: wrap; border-radius: var(--r-lg); overflow: visible; }
 .fields [role='tab'] { flex: 1 0 auto; }
+
+/* ---------- Téléphone : page épurée ---------- */
+.queryChip { display: none; }
+.fab { display: none !important; }
+@media (max-width: 859px) {
+  .head { display: none; }
+  .toolbar > .search { display: none; }
+  .toolbar > * { flex: 1 1 0; }
+  .queryChip { display: flex; }
+  /* « Vendre une montre » : bouton flottant, à la même place que « Écrire un post » */
+  .fab {
+    display: inline-flex !important; position: fixed !important; z-index: 55;
+    right: max(var(--gutter), env(safe-area-inset-right));
+    bottom: calc(var(--tabbar-h) + 18px + env(safe-area-inset-bottom));
+    min-height: 52px !important; box-shadow: inset 0 -6px 12px -6px rgba(0, 0, 0, 0.25), 0 14px 30px -10px rgba(0, 0, 0, 0.6) !important;
+  }
+}

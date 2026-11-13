@@ -37,3 +37,24 @@
   flex: 1; min-width: 0; height: 40px; padding: 0 var(--sp-3); border-radius: var(--r-control); border: 1px solid var(--line-strong);
   background: var(--surface); color: var(--text); font: inherit; font-size: var(--fs-sm);
 }
+
+/* ---------- Publication à plat (fil d'actualité) ---------- */
+.item {
+  display: grid; grid-template-columns: 40px minmax(0, 1fr); column-gap: 12px;
+  padding: 14px 0; border-bottom: 1px solid var(--line);
+}
+.avatarCol { display: block; padding-top: 2px; text-decoration: none; }
+.avatarCol .avatar { width: 40px; height: 40px; }
+.main { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.line { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 6px; font-size: var(--fs-sm); line-height: 1.35; }
+.name { font-weight: 700; color: var(--text); text-decoration: none; }
+.name:hover { text-decoration: underline; }
+.dot { color: var(--text-3); }
+.item .time { font-size: var(--fs-sm); }
+.item .body { font-size: var(--fs-md); line-height: 1.45; margin-top: -4px; }
+.item .photo { border-radius: 16px; border: 1px solid var(--line); max-height: 440px; }
+.item .photo img { max-height: 440px; }
+.item .watchChip { background: transparent; border: 1px solid var(--line); padding: 4px 12px; }
+.item .cardFoot { gap: var(--sp-5); margin-top: -2px; }
+.item .react { min-height: 32px; color: var(--text-3); }
+.item .comments { border-top: 0; padding-top: 0; }

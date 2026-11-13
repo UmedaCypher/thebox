@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Search, SlidersHorizontal, X } from 'lucide-react';
+import { Plus, Search, SlidersHorizontal, X } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useLoad } from '../../hooks/useLoad';
 import { getMarketFilterOptions, MARKET_PAGE, searchMarket, thumbSrc } from '../../lib/api';
@@ -180,11 +180,17 @@ export default function MarketPage() {
 
   return (
     <div className="page">
-      <PageHeader
-        title={c.tabs.market}
-        subtitle={total ? t.subtitleCount(watches(total)) : t.subtitle}
-        action={user ? <LinkButton to="/collection" variant="secondary" size="small">{t.sellWatch}</LinkButton> : undefined}
-      />
+      {/* Téléphone : le titre est dans la barre du haut et la recherche juste dessous, on ne garde que les filtres */}
+      <div className={s.head}>
+        <PageHeader
+          title={c.tabs.market}
+          subtitle={total ? t.subtitleCount(watches(total)) : t.subtitle}
+          action={user ? <LinkButton to="/collection" variant="secondary" size="small" className={s.sellDesktop}>{t.sellWatch}</LinkButton> : undefined}
+        />
+      </div>
+      {user && (
+        <LinkButton to="/collection" className={s.fab}><Plus size={18} aria-hidden="true" />{t.sellWatch}</LinkButton>
+      )}
 
       <div className={s.toolbar}>
         <label className={s.search}>
@@ -199,6 +205,13 @@ export default function MarketPage() {
         </select>
       </div>
 
+      {filters.query && (
+        <div className={`${s.chips} ${s.queryChip}`}>
+          <button className={s.chip} onClick={() => { setQuery(''); update({ query: '' }); }} aria-label={t.removeFilter(`« ${filters.query} »`)}>
+            « {filters.query} »<X size={14} strokeWidth={2} aria-hidden="true" />
+          </button>
+        </div>
+      )}
       {chips.length > 0 && (
         <div className={s.chips}>
           {chips.map(ch => (
