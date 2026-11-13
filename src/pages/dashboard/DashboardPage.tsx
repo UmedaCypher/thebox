@@ -252,6 +252,18 @@ export default function DashboardPage() {
     ? photoUrl((todayShot ?? mainPhoto(todayWatch.photos))?.storage_path) ?? thumbFor(todayWatch).src
     : stageWatch ? thumbFor(stageWatch).src : null;
 
+  // En-tête discret tant que la photo de fond est visible : il se remet en verre dès qu'on fait défiler
+  const hasStage = Boolean(stageSrc);
+  useEffect(() => {
+    if (!hasStage) return;
+    const root = document.documentElement;
+    root.dataset.homeStage = '';
+    const onScroll = () => { root.toggleAttribute('data-home-scrolled', window.scrollY > 120); };
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => { window.removeEventListener('scroll', onScroll); delete root.dataset.homeStage; root.removeAttribute('data-home-scrolled'); };
+  }, [hasStage]);
+
   const hour = new Date().getHours();
   const name = profile?.username;
   const dateLabel = new Date().toLocaleDateString(getLocale(), { weekday: 'long', day: 'numeric', month: 'long' });

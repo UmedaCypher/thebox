@@ -168,3 +168,17 @@ a.avatar::after { content: ''; position: absolute; inset: -6px; border-radius: 5
 /* Invitation des visiteurs en bas d'écran : le bas de page reste lisible au-dessus */
 .shell[data-join-banner] { padding-bottom: 120px; }
 @media (max-width: 640px) { .shell[data-join-banner] { padding-bottom: 190px; } }
+
+/* ---------- Accueil sur téléphone : en-tête discret au-dessus de la photo du jour ----------
+   Transparent tant qu'on est en haut de page ; le verre revient dès qu'on fait défiler. */
+@media (max-width: 759px) {
+  .header { transition: background var(--dur-slow) var(--ease), border-color var(--dur-slow), box-shadow var(--dur-slow), backdrop-filter var(--dur-slow); }
+  :global(:root[data-home-stage]:not([data-home-scrolled])) .header {
+    background: transparent; border-bottom-color: transparent; box-shadow: none;
+    backdrop-filter: none; -webkit-backdrop-filter: none;
+  }
+  .pageTitle { transition: opacity var(--dur-slow) var(--ease), transform var(--dur-slow) var(--ease-out); }
+  /* Le salut fait office de titre : « Accueil » n'apparaît qu'une fois le salut passé */
+  :global(:root[data-home-stage]:not([data-home-scrolled])) .pageTitle { opacity: 0; transform: translateY(4px); }
+  :global(:root[data-home-stage]:not([data-home-scrolled])) .mobileSearch :global(input) { color: #fbf6ee; }
+}

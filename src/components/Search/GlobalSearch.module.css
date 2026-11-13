@@ -57,3 +57,13 @@
 .sub { font-size: var(--fs-xs); color: var(--text-3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .footer .title { color: var(--brass); font-weight: 600; }
 .arrow { flex: none; color: var(--brass); }
+
+/* Accueil sur téléphone, en haut de page : champ en verre clair posé sur la photo du jour */
+@media (max-width: 759px) {
+  :global(:root[data-home-stage]:not([data-home-scrolled])) .field:not(:focus-within) {
+    border-radius: var(--r-pill); color: rgba(251, 246, 238, 0.82);
+    background: rgba(20, 8, 10, 0.26); border-color: rgba(255, 245, 230, 0.2); box-shadow: inset 0 1px 0 rgba(255, 245, 230, 0.14);
+    -webkit-backdrop-filter: blur(16px) saturate(1.4); backdrop-filter: blur(16px) saturate(1.4);
+  }
+  :global(:root[data-home-stage]:not([data-home-scrolled])) .field:not(:focus-within) input::placeholder { color: rgba(251, 246, 238, 0.78); }
+}
