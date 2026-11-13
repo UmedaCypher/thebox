@@ -251,7 +251,7 @@ export default function WearPage() {
           })}
         </div>
 
-        <div className={`panel ${s.monthFoot}`} data-tone="lume">
+        <div className={`panel ${s.monthFoot}`} data-tone="lume" data-surface="bare">
           <div className={s.monthStats}>
             <Stat value={<span className="num">{monthStats.daysWorn}</span>} label={t.daysLogged(monthStats.daysWorn)} />
             <Stat value={<span className="num">{monthStats.distinct}</span>} label={t.watchesWorn(monthStats.distinct)} />

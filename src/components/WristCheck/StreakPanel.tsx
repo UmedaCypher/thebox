@@ -57,7 +57,7 @@ export default function StreakPanel({ streak, onCheck, showBadges = true, showBu
   const alive = streak.status === 'done' || streak.status === 'open';
 
   return (
-    <section className={`panel ${s.panel}`} data-tone="lume">
+    <section className={`panel ${s.panel}`} data-tone="lume" data-fill="lume">
       <div className={s.head}>
         <div>
           <p className="panel-kicker">Wrist Check</p>

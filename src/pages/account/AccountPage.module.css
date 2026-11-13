@@ -55,3 +55,17 @@
 .danger { color: var(--ruby) !important; }
 .dangerFill { background: var(--ruby) !important; color: var(--ruby-ink) !important; border-color: transparent !important; }
 .deleteSheet { display: flex; flex-direction: column; gap: var(--sp-4); }
+
+/* ---------- Téléphone : réglages posés sur le fond, séparés d'un filet ----------
+   Les encadrés restent pour ce qui compte (profil, offre, série, parrainage) : la page respire. */
+@media (max-width: 759px) {
+  section.section:not(:global(.panel)) {
+    background: none; border: 0; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none;
+    border-radius: 0; padding: var(--sp-6) 2px var(--sp-2); margin-top: var(--sp-3);
+    border-top: 1px solid var(--line);
+  }
+  section.section:not(:global(.panel)) .h { font-size: var(--fs-2xl); }
+}
+/* Parrainage en aplat rubis : le bouton passe en encre sombre */
+.section[data-fill='ruby'] :global(a) { background: #2a0910; color: #ffd9e0; border-color: transparent; box-shadow: none; }
+:root[data-theme='soie'] .section[data-fill='ruby'] :global(a) { background: #fbf1f3; color: #a3304a; }

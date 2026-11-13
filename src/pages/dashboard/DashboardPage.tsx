@@ -1,3 +1,4 @@
+import { useStageHeader } from '../../lib/useStageHeader';
 import { useEffect, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
@@ -253,16 +254,7 @@ export default function DashboardPage() {
     : stageWatch ? thumbFor(stageWatch).src : null;
 
   // En-tête discret tant que la photo de fond est visible : il se remet en verre dès qu'on fait défiler
-  const hasStage = Boolean(stageSrc);
-  useEffect(() => {
-    if (!hasStage) return;
-    const root = document.documentElement;
-    root.dataset.homeStage = '';
-    const onScroll = () => { root.toggleAttribute('data-home-scrolled', window.scrollY > 120); };
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => { window.removeEventListener('scroll', onScroll); delete root.dataset.homeStage; root.removeAttribute('data-home-scrolled'); };
-  }, [hasStage]);
+  useStageHeader(Boolean(stageSrc));
 
   const hour = new Date().getHours();
   const name = profile?.username;

@@ -1,3 +1,4 @@
+import { useStageHeader } from '../../lib/useStageHeader';
 import { useMemo, useState } from 'react';
 import type { FormEvent, ReactNode } from 'react';
 import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
@@ -242,6 +243,9 @@ export default function WatchPage() {
   const wornDays = useMemo(() => new Set((wears.data ?? []).map(w => w.worn_on)), [wears.data]);
   const wornToday = wornDays.has(todayISO());
 
+  // Téléphone : la photo occupe le haut de l'écran, l'en-tête reste discret au-dessus
+  useStageHeader(Boolean(watch));
+
   if (loading) return <div className="page"><SkeletonDetail /></div>;
   if (error || !watch) return <div className="page"><Notice tone="error">{error ?? t.notFound}</Notice></div>;
 
@@ -264,7 +268,7 @@ export default function WatchPage() {
   };
 
   return (
-    <div className="page">
+    <div className={`page ${s.page}`}>
       <div className={s.layout}>
         <div className={s.media}>
           <Glow src={thumbSrc(current?.storage_path).src}>

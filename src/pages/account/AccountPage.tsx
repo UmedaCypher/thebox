@@ -391,7 +391,7 @@ export default function AccountPage() {
         </div>
       )}
 
-      <section className={`panel ${s.section}`} data-tone="ruby">
+      <section className={`panel ${s.section}`} data-tone="ruby" data-fill="ruby">
         <h2 className={s.h}>{t.affiliate}</h2>
         <p className={s.muted}>{t.affiliateText}</p>
         <div><LinkButton to="/affiliation" variant="secondary">{t.affiliateOpen}</LinkButton></div>
