@@ -70,9 +70,13 @@ function Header({ unread, showSearch }: { unread: number; showSearch: boolean })
       <div className={s.headerInner}>
         <Link to={user ? '/accueil' : '/'} className={s.wordmark}>Arcora</Link>
         {/* Téléphone : le nom de la page remplace le logo */}
-        <p className={s.pageTitle} aria-hidden="true">{pageTitle(pathname, Boolean(user))}</p>
+        {!showSearch && <p className={s.pageTitle} aria-hidden="true">{pageTitle(pathname, Boolean(user))}</p>}
 
-        <div className={s.searchSlot}><GlobalSearch /></div>
+        {/* Ordinateur : au centre de l'en-tête. Téléphone : dans la même ligne que les messages et le profil ;
+            au toucher, elle prend toute la largeur et déploie les raccourcis. */}
+        {showSearch
+          ? <div className={s.inlineSearch}><GlobalSearch expandable /></div>
+          : <div className={s.searchSlot}><GlobalSearch /></div>}
 
         <div className={s.headerEnd}>
           {user ? (
@@ -96,9 +100,6 @@ function Header({ unread, showSearch }: { unread: number; showSearch: boolean })
           )}
         </div>
       </div>
-
-      {/* Téléphone : la recherche sous l'en-tête */}
-      {showSearch && <div className={s.mobileSearch}><GlobalSearch /></div>}
 
       {/* Deuxième ligne (ordinateur) : les rubriques, avec les mêmes icônes que la barre mobile */}
       <nav className={s.subnav} aria-label={t.mainNav}>

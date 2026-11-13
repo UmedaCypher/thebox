@@ -67,3 +67,51 @@
   }
   :global(:root[data-home-stage]:not([data-home-scrolled])) .field:not(:focus-within) input::placeholder { color: rgba(251, 246, 238, 0.78); }
 }
+
+/* ---------- Téléphone : recherche dans la ligne de l'en-tête, qui s'ouvre en plein écran ---------- */
+.search[data-expandable] { display: flex; align-items: center; gap: var(--sp-2); max-width: none; }
+.search[data-expandable] .field { flex: 1; min-width: 0; height: 40px; border-radius: var(--r-pill); gap: var(--sp-2); padding-left: 14px; font-size: var(--fs-sm); }
+.search[data-expandable] .field input { min-width: 0; }
+.search[data-expandable] .kbd { display: none; }
+.cancel {
+  flex: none; padding: 8px 2px 8px 4px; font-size: var(--fs-sm); font-weight: 600; color: var(--brass);
+  animation: cancelIn var(--dur) var(--ease-out) both;
+}
+@keyframes cancelIn { from { opacity: 0; transform: translateX(8px); } }
+
+.sheet {
+  position: fixed; z-index: 45; left: 0; right: 0; bottom: 0; top: calc(var(--header-h) + env(safe-area-inset-top));
+  overflow-y: auto; overscroll-behavior: contain;
+  padding: var(--sp-5) var(--gutter) calc(var(--tabbar-h) + 32px + env(safe-area-inset-bottom));
+  background:
+    radial-gradient(70% 40% at 100% 0%, color-mix(in srgb, var(--brass) 18%, transparent), transparent 70%),
+    radial-gradient(70% 40% at 0% 100%, color-mix(in srgb, var(--ruby) 14%, transparent), transparent 70%),
+    color-mix(in srgb, var(--bg) 94%, transparent);
+  -webkit-backdrop-filter: blur(24px); backdrop-filter: blur(24px);
+  animation: sheetIn 260ms var(--ease-out) both;
+}
+@keyframes sheetIn { from { opacity: 0; } }
+.browseTitle { font-family: var(--font-display); font-size: var(--fs-2xl); font-weight: 500; margin-bottom: var(--sp-4); }
+.tiles { list-style: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.tiles li { animation: tileIn 420ms var(--ease-out) both; }
+@keyframes tileIn { from { opacity: 0; transform: translateY(10px) scale(0.98); } }
+.tile {
+  position: relative; display: block; aspect-ratio: 3 / 2; border-radius: var(--r-lg); overflow: hidden; isolation: isolate;
+  color: #fbf6ee; text-decoration: none; background: var(--cushion); box-shadow: var(--shadow-md);
+  transition: transform var(--dur) var(--ease-out);
+}
+.tile:hover { color: #fbf6ee; }
+.tile:active { transform: scale(0.97); }
+.tile img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -1; transition: transform 600ms var(--ease-out); }
+.tile::after {
+  content: ''; position: absolute; inset: 0; z-index: -1;
+  background: linear-gradient(to top, rgba(14, 6, 8, 0.78) 0%, rgba(14, 6, 8, 0.25) 50%, rgba(14, 6, 8, 0) 75%);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08); border-radius: inherit;
+}
+.tile span { position: absolute; left: 14px; bottom: 11px; right: 10px; font-family: var(--font-display); font-size: 1.3rem; line-height: 1.1; text-shadow: 0 1px 8px rgba(0, 0, 0, 0.5); }
+/* La Grand Seiko détourée sur un fond laiton */
+.tile[data-kind='compare'] { background: radial-gradient(circle at 60% 40%, #6b4f2e, #2a1418 75%); }
+.tile[data-kind='compare'] img { object-fit: contain; inset: 8% -10% 8% 30%; width: 80%; height: 84%; }
+/* Résultats de recherche dans la feuille */
+.sheetResults { display: flex; flex-direction: column; }
+@media (prefers-reduced-motion: reduce) { .sheet, .tiles li, .cancel { animation: none; } }

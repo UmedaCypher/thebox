@@ -322,7 +322,7 @@ a.tile:active { transform: scale(0.985); }
   .stage::after {
     content: ''; position: absolute; inset: 0;
     background:
-      linear-gradient(to bottom, rgba(20, 8, 10, 0.7) 0%, rgba(20, 8, 10, 0.45) 22%, rgba(20, 8, 10, 0) 48%, color-mix(in srgb, var(--bg) 70%, transparent) 100%),
+      linear-gradient(to bottom, rgba(20, 8, 10, 0.78) 0%, rgba(20, 8, 10, 0.62) 16%, rgba(20, 8, 10, 0.3) 28%, rgba(20, 8, 10, 0) 42%, color-mix(in srgb, var(--bg) 70%, transparent) 100%),
       radial-gradient(80% 50% at 50% 100%, color-mix(in srgb, var(--brass) 26%, transparent), transparent 70%);
   }
   .page[data-stage='pick'] .stage img { filter: blur(26px) saturate(1.4) brightness(0.75); transform: scale(1.25); }
@@ -331,15 +331,15 @@ a.tile:active { transform: scale(0.985); }
   @keyframes stageInBlur { from { opacity: 0; transform: scale(1.35); } }
 
   /* Plus d'air en haut */
-  .page[data-stage] { padding-top: var(--sp-7); }
+  .page[data-stage] { padding-top: var(--sp-3); }
   .page[data-stage] .greet { margin-bottom: var(--sp-6); text-shadow: 0 1px 12px rgba(0, 0, 0, 0.5), 0 0 2px rgba(0, 0, 0, 0.4); }
   .page[data-stage] .date { color: rgba(251, 246, 238, 0.86); }
   .page[data-stage] .greet h1 { font-size: clamp(2.4rem, 11vw, 3.2rem); line-height: 1.02; }
   :root[data-theme='soie'] .page[data-stage] .greet :is(h1, .date, .clock) { color: #fbf6ee; }
 
   /* Montre portée : la tuile devient une fenêtre transparente sur la photo de fond */
-  .page[data-stage='worn'] .hero { min-height: 300px; }
-  .page[data-stage='worn'] .heroWorn { box-shadow: none; background: none; min-height: 300px; }
+  .page[data-stage='worn'] .hero { min-height: 340px; }
+  .page[data-stage='worn'] .heroWorn { box-shadow: none; background: none; min-height: 340px; }
   .page[data-stage='worn'] .heroWorn::after, .page[data-stage='worn'] .heroPhoto { display: none; }
   .page[data-stage='worn'] .heroWrap .heroCaption {
     top: auto; bottom: 64px; left: 0; max-width: 100%; padding: 0; background: none;

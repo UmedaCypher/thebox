@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import type { KeyboardEvent } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { ArrowRight, Images, Search, Store, Watch as WatchIcon, X } from 'lucide-react';
@@ -25,6 +26,10 @@ const S = defineStrings({
   none: (q: string) => `Aucune montre ne correspond à « ${q} ».`,
   hint: 'Tapez au moins deux lettres',
   shortcut: 'Raccourci : /',
+  short: 'Rechercher une montre',
+  cancel: 'Annuler',
+  browse: 'Parcourir',
+  tiles: { market: 'Marché', collection: 'Ma collection', gallery: 'Galerie', wear: 'Portage', feed: 'Fil', news: 'À lire', timegrapher: 'Timegrapher', compare: 'Comparer', wishlist: 'Wishlist', stolen: 'Montres volées' },
 }, {
   placeholder: 'Search a brand, a model, a reference',
   placeholderCount: n => `Search ${n} watches on the Market`,
@@ -39,7 +44,25 @@ const S = defineStrings({
   none: q => `No watch matches "${q}".`,
   hint: 'Type at least two letters',
   shortcut: 'Shortcut: /',
+  short: 'Search a watch',
+  cancel: 'Cancel',
+  browse: 'Browse',
+  tiles: { market: 'Market', collection: 'My collection', gallery: 'Gallery', wear: 'Wear log', feed: 'Feed', news: 'Reading', timegrapher: 'Timegrapher', compare: 'Compare', wishlist: 'Wishlist', stolen: 'Stolen watches' },
 });
+
+/** Raccourcis affichés quand on ouvre la recherche sur téléphone, chacun avec sa photo. */
+const TILES = [
+  { key: 'market', to: '/marche', img: '/landing/yachtmaster.webp' },
+  { key: 'collection', to: '/collection', img: '/landing/ecrin-ouvert.webp' },
+  { key: 'gallery', to: '/galerie', img: '/landing/tudor.webp' },
+  { key: 'wear', to: '/portage', img: '/landing/speedmaster.webp' },
+  { key: 'feed', to: '/fil', img: '/landing/leuba.webp' },
+  { key: 'news', to: '/actualites', img: '/landing/zenith.webp' },
+  { key: 'timegrapher', to: '/timegrapher', img: '/landing/zenith-face.webp' },
+  { key: 'compare', to: '/comparer', img: '/landing/grandseiko-cut.webp' },
+  { key: 'wishlist', to: '/wishlist', img: '/landing/speedmaster-face.webp' },
+  { key: 'stolen', to: '/montres-volees', img: '/landing/ecrin-ferme.webp' },
+] as const;
 
 const MARKET_DEFAULTS: MarketFilters = { query: '', brand: '', kind: '', minPrice: '', maxPrice: '', condition: '', boxPapers: '', size: '', sort: 'recent' };
 
@@ -56,7 +79,7 @@ interface Item { key: string; to: string; title: string; sub?: string | null; th
  * Recherche de l'en-tête (ordinateur) : la collection du membre, le Marché et la Galerie, au fil de la frappe.
  * Clavier : « / » pour y aller, flèches pour choisir, Entrée pour ouvrir, Échap pour fermer.
  */
-export default function GlobalSearch() {
+export default function GlobalSearch({ expandable = false }: { expandable?: boolean }) {
   const t = useStrings(S);
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -64,6 +87,7 @@ export default function GlobalSearch() {
   const listId = useId();
   const input = useRef<HTMLInputElement>(null);
   const box = useRef<HTMLDivElement>(null);
+  const sheet = useRef<HTMLDivElement>(null);
   const [q, setQ] = useState('');
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(0);
@@ -112,7 +136,7 @@ export default function GlobalSearch() {
   // Clic en dehors : fermer.
   useEffect(() => {
     if (!open) return;
-    const onDown = (e: MouseEvent) => { if (!box.current?.contains(e.target as Node)) setOpen(false); };
+    const onDown = (e: MouseEvent) => { const n = e.target as Node; if (!box.current?.contains(n) && !sheet.current?.contains(n)) setOpen(false); };
     document.addEventListener('mousedown', onDown);
     return () => document.removeEventListener('mousedown', onDown);
   }, [open]);
@@ -165,18 +189,29 @@ export default function GlobalSearch() {
   };
 
   const showPanel = open && query.length >= 2;
+  // Téléphone : la recherche ouverte occupe l'écran (raccourcis, puis résultats dès deux lettres)
+  const expanded = expandable && open;
+  useEffect(() => {
+    if (!expanded) return;
+    const root = document.documentElement;
+    root.dataset.searchOpen = '';
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => { delete root.dataset.searchOpen; document.body.style.overflow = prev; };
+  }, [expanded]);
+  const close = () => { setQ(''); setOpen(false); input.current?.blur(); };
   let index = -1;
 
   return (
-    <div className={s.search} ref={box}>
-      <label className={s.field} data-open={showPanel}>
+    <div className={s.search} ref={box} data-expandable={expandable || undefined} data-expanded={expanded || undefined}>
+      <label className={s.field} data-open={showPanel && !expandable}>
         <Search size={18} strokeWidth={1.7} aria-hidden="true" className={s.icon} />
         <span className="visually-hidden">{t.label}</span>
         <input
           ref={input}
           type="search"
           value={q}
-          placeholder={count ? t.placeholderCount(formatNumber(count)) : t.placeholder}
+          placeholder={expandable ? (open ? t.placeholder : t.short) : count ? t.placeholderCount(formatNumber(count)) : t.placeholder}
           onChange={e => { setQ(e.target.value); setOpen(true); setActive(0); }}
           onFocus={() => { warm(); setOpen(true); }}
           onKeyDown={onKeyDown}
@@ -194,9 +229,36 @@ export default function GlobalSearch() {
           <kbd className={s.kbd} title={t.shortcut}>/</kbd>
         )}
       </label>
+      {expanded && <button type="button" className={s.cancel} onClick={close}>{t.cancel}</button>}
 
-      {showPanel && (
-        <div className={s.panel} id={listId} role="listbox" aria-label={t.label}>
+      {expanded && createPortal(
+        <div className={s.sheet} ref={sheet}>
+          {showPanel ? results(s.sheetResults) : (
+            <nav className={s.browse} aria-label={t.browse}>
+              <h2 className={s.browseTitle}>{t.browse}</h2>
+              <ul className={s.tiles}>
+                {TILES.map((tile, i) => (
+                  <li key={tile.key} style={{ animationDelay: `${i * 35}ms` }}>
+                    <Link to={tile.to} className={s.tile} data-kind={tile.key} onClick={() => { setOpen(false); input.current?.blur(); }}>
+                      <img src={tile.img} alt="" loading="lazy" />
+                      <span>{t.tiles[tile.key]}</span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          )}
+        </div>,
+        document.body,
+      )}
+      {!expandable && showPanel && results(s.panel)}
+    </div>
+  );
+
+  function results(cls: string) {
+    index = -1;
+    return (
+        <div className={cls} id={listId} role="listbox" aria-label={t.label}>
           {loading && !hasHits && <p className={s.status}>{t.searching}</p>}
           {!loading && !hasHits && <p className={s.status}>{t.none(query)}</p>}
           {sections.map(sec => (
@@ -232,7 +294,6 @@ export default function GlobalSearch() {
             </div>
           ))}
         </div>
-      )}
-    </div>
-  );
+    );
+  }
 }

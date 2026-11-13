@@ -113,9 +113,9 @@
   color-scheme: dark;
 }
 
-/* Téléphone, membre connecté : une ligne de recherche sous l'en-tête (posée par Layout) */
+/* Téléphone, membre connecté : la recherche est dans la ligne de l'en-tête, à côté des messages et du profil (posée par Layout) */
 @media (max-width: 859px) {
-  :root[data-header-search] { --search-row-h: 54px; --header-h: calc(var(--header-row-h) + var(--search-row-h)); }
+  :root[data-header-search] { --search-row-h: 0px; --header-h: var(--header-row-h); }
 }
 
 /* Ordinateur : en-tête sur deux lignes (logo, recherche, compte / rubriques) */
