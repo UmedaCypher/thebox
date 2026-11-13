@@ -1,5 +1,15 @@
 /* ---------- Accueil du membre : un portail en tuiles ---------- */
-.page { padding-top: var(--sp-5); }
+.page { padding-top: var(--sp-5); position: relative; isolation: isolate; }
+/* Lumières qui défilent avec la page : un halo derrière chaque temps fort, pour le relief et le rythme */
+.page::before {
+  content: ''; position: absolute; z-index: -1; inset: 0 calc(-1 * var(--gutter)); pointer-events: none;
+  background:
+    radial-gradient(48% 340px at 92% 360px, color-mix(in srgb, var(--lume) 20%, transparent), transparent 72%),
+    radial-gradient(56% 380px at 0% 1150px, color-mix(in srgb, var(--ruby) 22%, transparent), transparent 72%),
+    radial-gradient(60% 420px at 100% 2000px, color-mix(in srgb, var(--brass) 20%, transparent), transparent 72%),
+    radial-gradient(54% 380px at 10% 2800px, color-mix(in srgb, var(--lume) 14%, transparent), transparent 72%);
+}
+@media (min-width: 760px) { .page::before { opacity: 0.6; } }
 .greet { display: flex; flex-direction: column; gap: 2px; margin-bottom: var(--sp-5); }
 .greet h1 { font-size: clamp(var(--fs-2xl), 6vw, var(--fs-4xl)); animation: rise 900ms var(--ease-out) backwards; }
 .date { color: var(--text-2); font-size: var(--fs-sm); }
@@ -282,3 +292,16 @@ a.tile:active { transform: scale(0.985); }
 .feedText > span { font-size: var(--fs-sm); color: var(--text); overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; }
 .feedThumb { flex: none; width: 48px; height: 48px; border-radius: 12px; overflow: hidden; background: var(--cushion); }
 .feedThumb img { width: 100%; height: 100%; object-fit: cover; }
+
+/* ---------- Profondeur : tuiles à même le fond ---------- */
+.tile[data-surface='bare'] { min-height: 0; padding-top: var(--sp-3); padding-bottom: var(--sp-3); }
+.tile[data-surface='bare'] .tileIcon { background: none; width: 22px; height: 22px; }
+.tile[data-surface='bare'] .tileTitle { font-family: var(--font-display); font-size: var(--fs-xl); font-weight: 500; }
+@media (hover: hover) { a.tile[data-surface='bare']:hover { transform: none; box-shadow: none; } }
+.tile[data-surface='bare'] .collage { min-height: 150px; }
+.tile[data-surface='bare'] .dayDot { max-width: 40px; }
+
+/* ---------- Aplats ---------- */
+.tile[data-fill] .tileIcon { color: var(--ink); background: color-mix(in srgb, var(--ink) 12%, transparent); }
+.tile[data-fill] .metric b { font-size: clamp(var(--fs-3xl), 12vw, var(--fs-4xl)); }
+.streakTile[data-fill] .todayChip[data-done='true'] { box-shadow: none; }

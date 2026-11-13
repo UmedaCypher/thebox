@@ -139,8 +139,8 @@ function currentWeek(): string[] {
 }
 
 /** Une tuile du tableau de bord : un titre court avec son icône, un aperçu, et toute la tuile mène à la page. */
-function Tile({ to, icon, title, tone = 'plain', className, children, external }:
-  { to: string; icon: ReactNode; title: string; tone?: 'plain' | 'lume' | 'brass' | 'ruby'; className?: string; children: ReactNode; external?: boolean }) {
+function Tile({ to, icon, title, tone = 'plain', fill, bare, className, children, external }:
+  { to: string; icon: ReactNode; title: string; tone?: 'plain' | 'lume' | 'brass' | 'ruby'; fill?: 'lume' | 'brass' | 'ruby'; bare?: boolean; className?: string; children: ReactNode; external?: boolean }) {
   const inner = (
     <>
       <span className={s.tileHead}>
@@ -152,9 +152,10 @@ function Tile({ to, icon, title, tone = 'plain', className, children, external }
     </>
   );
   const cls = `panel ${s.tile} ${className ?? ''}`;
+  const look = { 'data-tone': tone, 'data-fill': fill, 'data-surface': bare ? 'bare' : undefined };
   return external
-    ? <a href={to} className={cls} data-tone={tone} data-reveal target="_blank" rel="noreferrer">{inner}</a>
-    : <Link to={to} className={cls} data-tone={tone} data-reveal>{inner}</Link>;
+    ? <a href={to} className={cls} {...look} data-reveal target="_blank" rel="noreferrer">{inner}</a>
+    : <Link to={to} className={cls} {...look} data-reveal>{inner}</Link>;
 }
 
 /** Heure à la seconde près, pour régler ses montres. Recalée sur chaque changement de seconde. */
@@ -311,7 +312,7 @@ export default function DashboardPage() {
 
         {/* ---------- Série de portage ---------- */}
         {streak.data && (
-          <section className={`panel ${s.tile} ${s.wide} ${s.streakTile}`} data-tone="lume" data-reveal aria-label={st.tileTitle}>
+          <section className={`panel ${s.tile} ${s.wide} ${s.streakTile}`} data-tone="lume" data-fill="lume" data-reveal aria-label={st.tileTitle}>
             <div className={s.tileHead}>
               <span className={s.tileIcon}><Award size={18} strokeWidth={1.7} /></span>
               <span className={s.tileTitle}>
@@ -364,7 +365,7 @@ export default function DashboardPage() {
         </Tile>
 
         {/* ---------- Portage de la semaine ---------- */}
-        <Tile to="/portage" icon={<CalendarDays size={18} strokeWidth={1.7} />} title={t.week} tone="lume" className={s.weekTile}>
+        <Tile to="/portage" icon={<CalendarDays size={18} strokeWidth={1.7} />} title={t.week} tone="lume" bare className={s.weekTile}>
           <span className={s.week}>
             {week.map((d, i) => {
               const w = byId.get(wornByDay.get(d) ?? '');
@@ -381,7 +382,7 @@ export default function DashboardPage() {
         </Tile>
 
         {/* ---------- Messages ---------- */}
-        <Tile to="/messages" icon={<MessageCircle size={18} strokeWidth={1.7} />} title={t.messages} tone="ruby">
+        <Tile to="/messages" icon={<MessageCircle size={18} strokeWidth={1.7} />} title={t.messages} tone="ruby" fill="ruby">
           <span className={s.metric}>
             {unread > 0
               ? <><b className="num">{unread}</b><span>{t.unread(unread)}</span></>
@@ -433,7 +434,7 @@ export default function DashboardPage() {
         </Tile>
 
         {/* ---------- Galerie ---------- */}
-        <Tile to="/galerie" icon={<Images size={18} strokeWidth={1.7} />} title={t.gallery} className={s.galleryTile}>
+        <Tile to="/galerie" icon={<Images size={18} strokeWidth={1.7} />} title={t.gallery} bare className={s.galleryTile}>
           <span className={s.collage}>
             {(shots.data ?? []).slice(0, 3).map(g => (
               <span key={g.id} className={s.shot}><Img src={g.thumb} fallback={g.url} alt="" /></span>
@@ -445,7 +446,7 @@ export default function DashboardPage() {
         <AccuracyTile measures={accuracy.data ?? []} watchName={id => { const w = byId.get(id); return w ? `${w.brand} ${w.model}` : null; }} />
 
         {/* ---------- Feed : les dernières publications ---------- */}
-        <Tile to="/fil" icon={<Users size={18} strokeWidth={1.7} />} title={t.feed} tone="ruby" className={s.wide}>
+        <Tile to="/fil" icon={<Users size={18} strokeWidth={1.7} />} title={t.feed} tone="ruby" bare className={s.wide}>
           {(feed.data ?? []).length === 0 ? <span className={s.quiet}>{t.feedEmpty}</span> : (
             <span className={s.feedList}>
               {(feed.data ?? []).slice(0, 2).map(it => (
@@ -464,7 +465,7 @@ export default function DashboardPage() {
 
         {/* ---------- À lire ---------- */}
         {(news.data ?? []).length > 0 && (
-          <Tile to="/actualites" icon={<Newspaper size={18} strokeWidth={1.7} />} title={t.news} className={s.wide}>
+          <Tile to="/actualites" icon={<Newspaper size={18} strokeWidth={1.7} />} title={t.news} bare className={s.wide}>
             <span className={s.news}>
               {(news.data ?? []).map(n => (
                 <span key={n.link} className={s.newsItem}>
@@ -477,7 +478,7 @@ export default function DashboardPage() {
         )}
 
         {/* ---------- Outils ---------- */}
-        <section className={`panel ${s.tile} ${s.wide} ${s.shortcutsTile}`} data-tone="plain" data-reveal aria-label={t.shortcuts}>
+        <section className={`panel ${s.tile} ${s.wide} ${s.shortcutsTile}`} data-tone="plain" data-surface="bare" data-reveal aria-label={t.shortcuts}>
           <span className={s.tileHead}><span className={s.tileTitle}>{t.shortcuts}</span></span>
           <nav className={s.shortcuts}>
             <Link to="/ajouter-montre"><Plus size={20} strokeWidth={1.7} aria-hidden="true" />{t.add}</Link>
