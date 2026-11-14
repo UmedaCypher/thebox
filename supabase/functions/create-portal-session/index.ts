@@ -49,6 +49,16 @@ Deno.serve(async (req) => {
     return json({ url: portal.url });
   } catch (e) {
     console.error('create-portal-session', e);
-    return json({ error: "L'espace abonnement est indisponible pour le moment." }, 500);
+    const err = e as { type?: string; code?: string; message?: string };
+    const msg = err.message ?? '';
+    // Client Stripe introuvable : abonnement créé avec l'autre clé (mode test ↔ production) ou client supprimé
+    if (err.code === 'resource_missing' && /customer/i.test(msg)) {
+      return json({ error: "Cet abonnement n'est pas retrouvé chez Stripe (créé en mode test ?). Écrivez-nous pour le rattacher.", code: 'customer_missing' }, 409);
+    }
+    // Espace client jamais enregistré dans le tableau de bord Stripe (mode production)
+    if (/configuration/i.test(msg) && /portal|default/i.test(msg)) {
+      return json({ error: "L'espace abonnement n'est pas encore activé. Réessayez un peu plus tard.", code: 'portal_not_configured' }, 503);
+    }
+    return json({ error: "L'espace abonnement est indisponible pour le moment.", code: 'unknown' }, 500);
   }
 });
