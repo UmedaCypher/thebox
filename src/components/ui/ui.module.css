@@ -258,3 +258,9 @@ select.control {
   .pageHeader[data-mobile-title='hidden'] { margin-bottom: var(--sp-4); }
   .pageHeader[data-mobile-title='hidden'] .pageSubtitle { margin-top: 0; }
 }
+
+/* Bouton secondaire dans un aplat : pastille d'encre mate, sans verre ni lueur */
+:global(.panel[data-fill]) .secondary, :global(.panel[data-fill]) .secondary:hover:not(:disabled) {
+  color: var(--fill); background: var(--ink); box-shadow: none;
+  -webkit-backdrop-filter: none; backdrop-filter: none;
+}

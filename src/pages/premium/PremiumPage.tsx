@@ -188,13 +188,13 @@ export default function PremiumPage() {
       {!isPremium && <div className={s.founders}><FoundersOffer /></div>}
 
       <div className={s.plans}>
-        <section className={`panel ${s.plan}`} data-tone="lume">
+        <section className={`panel ${s.plan}`} data-tone="lume" data-surface="bare">
           <h2>{t.freePlan}</h2>
           <p className={s.price}>{formatEuros(0)}</p>
           <ul className="chips">{FREE.map(f => <li key={f}>{f}</li>)}</ul>
         </section>
 
-        <section className={`panel ${s.plan}`} data-tone="brass">
+        <section className={`panel ${s.plan}`} data-tone="brass" data-fill="brass">
           <h2>Premium</h2>
           {!isAndroidApp() && (
             <Segmented label={t.billing} value={interval} onChange={setInterval_}

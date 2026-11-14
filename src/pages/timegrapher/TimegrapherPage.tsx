@@ -232,7 +232,7 @@ export default function TimegrapherPage() {
           )}
         </section>
 
-        <aside className={`panel ${s.tips}`} data-tone="plain">
+        <aside className={`panel ${s.tips}`} data-tone="plain" data-surface="bare">
           <h2 className={s.tipsTitle}>{t.tipsTitle}</h2>
           <ol>{t.tips.map(x => <li key={x}>{x}</li>)}</ol>
           <p className={s.small}>{t.limits}</p>

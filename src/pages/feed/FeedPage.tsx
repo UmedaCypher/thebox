@@ -100,7 +100,7 @@ export default function FeedPage() {
           )}
         </div>
         {suggestions.length > 0 && (
-          <aside className={`panel ${s.aside}`} data-tone="plain">
+          <aside className={`panel ${s.aside}`} data-tone="plain" data-surface="bare">
             <h2 className={s.h}>{t.suggest}</h2>
             <ul className={s.suggest}>
               {suggestions.map(sg => (

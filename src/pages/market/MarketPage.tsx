@@ -264,7 +264,7 @@ export default function MarketPage() {
             </>
           )}
 
-          <aside className={`panel ${s.safety}`} data-tone="ruby">
+          <aside className={`panel ${s.safety}`} data-tone="ruby" data-surface="bare">
             <h2>{t.safetyTitle}</h2>
             <p>{t.safetyText}</p>
           </aside>

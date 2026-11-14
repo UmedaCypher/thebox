@@ -261,6 +261,18 @@ button { cursor: pointer; background: none; border: 0; }
   padding: var(--sp-5) var(--gutter) var(--sp-8);
 }
 .page--narrow { max-width: 720px; }
+/* Téléphone : des halos de couleur qui défilent avec chaque page, peints sur la page elle-même
+   (pas de calque en plus, sinon l'en-tête et la barre d'onglets en verre clignotent au défilement) */
+@media (max-width: 759px) {
+  .page {
+    background:
+      radial-gradient(60% 300px at 100% 140px, color-mix(in srgb, var(--brass) 18%, transparent), transparent 72%),
+      radial-gradient(60% 340px at 0% 900px, color-mix(in srgb, var(--ruby) 22%, transparent), transparent 72%),
+      radial-gradient(60% 380px at 100% 1700px, color-mix(in srgb, var(--lume) 13%, transparent), transparent 72%),
+      radial-gradient(60% 380px at 0% 2500px, color-mix(in srgb, var(--brass) 16%, transparent), transparent 72%);
+    background-repeat: no-repeat;
+  }
+}
 
 /* Couture : séparateur en points de piqûre, la signature des coutures d'un écrin */
 .seam {
@@ -359,7 +371,10 @@ html.lenis, html.lenis body { height: auto; }
   --glass-border: color-mix(in srgb, var(--ink) 18%, transparent);
   --surface: var(--fill); --cushion: color-mix(in srgb, var(--ink) 16%, var(--fill)); --bg: var(--fill);
   --tone: var(--ink);
+  /* Encadrés et champs imbriqués : un voile d'encre au lieu du verre sombre */
+  --glass-bg: color-mix(in srgb, var(--ink) 7%, transparent); --glass-shadow: none; --seam: color-mix(in srgb, var(--ink) 16%, transparent);
 }
+.panel[data-fill] .panel-kicker { color: var(--ink); opacity: 0.8; }
 .panel[data-fill] :is(h1, h2, h3) { color: var(--ink); }
 .panel[data-fill='lume'] { --fill: #c9e7a7; --fill-hi: #ecf8d9; --ink: #16210c; --lume: #16210c; --lume-ink: #c9e7a7; }
 .panel[data-fill='ruby'] { --fill: #ee6f86; --fill-hi: #ffb3c0; --ink: #2a0910; --ruby: #2a0910; --ruby-ink: #ee6f86; }

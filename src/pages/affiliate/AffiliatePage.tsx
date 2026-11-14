@@ -240,7 +240,7 @@ function LinkBox({ link, kicker, tone, children, qr }: { link: string; kicker: s
   };
 
   return (
-    <section className="panel" data-tone={tone} data-reveal>
+    <section className="panel" data-tone={tone} data-fill={tone} data-reveal>
       <p className="panel-kicker">{kicker}</p>
       <div className={s.linkRow}>
         <input className={s.link} data-tone={tone} value={link} readOnly onFocus={e => e.currentTarget.select()} aria-label={kicker} />

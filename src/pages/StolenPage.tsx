@@ -79,7 +79,7 @@ export default function StolenPage() {
     <div className="page">
       {user && <CommunityNav />}
       <PageHeader title={t.title} subtitle={t.subtitle} hideTitleOnMobile={Boolean(user)} />
-      <form className={`panel ${s.check}`} data-tone="plain" onSubmit={submit}>
+      <form className={`panel ${s.check}`} data-tone="ruby" data-fill="ruby" onSubmit={submit}>
         <h2 className={s.h}>{t.check}</h2>
         <div className={s.row}>
           <TextField label={t.serial} value={serial} onChange={e => setSerial(e.target.value)} placeholder={t.serialPh} autoCapitalize="characters" autoComplete="off" />
