@@ -259,8 +259,27 @@ select.control {
   .pageHeader[data-mobile-title='hidden'] .pageSubtitle { margin-top: 0; }
 }
 
-/* Bouton secondaire dans un aplat : pastille d'encre mate, sans verre ni lueur */
-:global(.panel[data-fill]) .secondary, :global(.panel[data-fill]) .secondary:hover:not(:disabled) {
-  color: var(--fill); background: var(--ink); box-shadow: none;
+/* ---------- Boutons dans un aplat (carte lume, rubis ou laiton) ----------
+   Charte : sur fond sombre, principal = laiton, secondaire = verre rubis.
+   Sur une carte peinte, quelle que soit sa couleur (lume, rubis, laiton), le bouton passe à l'encre de la carte :
+   pastille d'encre pleine, texte couleur de la carte (principal comme secondaire) ; discret = texte encre.
+   Jamais de laiton sur laiton ni de rubis sur rubis, jamais de lueur sur l'encre. */
+:global(.panel[data-fill]) :is(.primary, .secondary) {
   -webkit-backdrop-filter: none; backdrop-filter: none;
+}
+:global(.panel[data-fill]) :is(.primary, .secondary)::before,
+:global(.panel[data-fill]) :is(.primary, .secondary)::after { display: none; }
+:global(.panel[data-fill]) :is(.primary, .secondary),
+:global(.panel[data-fill]) :is(.primary, .secondary):hover:not(:disabled) {
+  color: var(--fill); background: var(--ink);
+  box-shadow: 0 8px 18px -10px color-mix(in srgb, var(--ink) 70%, transparent);
+}
+:global(.panel[data-fill]) :is(.primary, .secondary):hover:not(:disabled) { background: color-mix(in srgb, var(--ink) 86%, var(--fill)); }
+:global(.panel[data-fill]) .primary > svg:first-child { background: color-mix(in srgb, var(--fill) 16%, transparent); }
+
+:global(.panel[data-fill]) .ghost, :global(.panel[data-fill]) .ghost:hover:not(:disabled) { color: var(--ink); }
+/* Désactivé : l'encre s'estompe, le texte reste lisible */
+:global(.panel[data-fill]) .btn:disabled, :global(.panel[data-fill]) .btn[aria-disabled='true'] {
+  opacity: 1; color: color-mix(in srgb, var(--ink) 55%, transparent);
+  background: color-mix(in srgb, var(--ink) 10%, transparent); box-shadow: none;
 }

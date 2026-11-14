@@ -66,6 +66,3 @@
   }
   section.section:not(:global(.panel)) .h { font-size: var(--fs-2xl); }
 }
-/* Parrainage en aplat rubis : le bouton passe en encre sombre */
-.section[data-fill='ruby'] :global(a) { background: #2a0910; color: #ffd9e0; border-color: transparent; box-shadow: none; }
-:root[data-theme='soie'] .section[data-fill='ruby'] :global(a) { background: #fbf1f3; color: #a3304a; }
