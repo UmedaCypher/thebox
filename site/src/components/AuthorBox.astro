@@ -7,7 +7,9 @@ const { author, lang } = Astro.props;
 const initials = author.name.split(/\s+/).map((w) => w[0]).join('').slice(0, 2);
 ---
 <aside class="author-box" aria-label={lang === 'fr' ? "À propos de l'auteur" : 'About the author'}>
-  <div class="author-avatar" aria-hidden="true">{initials}</div>
+  {author.photo
+      ? <img class="author-avatar" src={author.photo.small} alt={author.name} width="48" height="48" loading="lazy" decoding="async" />
+      : <div class="author-avatar" aria-hidden="true">{initials}</div>}
   <div>
     <p class="eyebrow">{lang === 'fr' ? "À propos de l'auteur" : 'About the author'}</p>
     <p class="author-name"><a href={authorPath(author, lang)} rel="author">{author.name}</a> · <span>{author.jobTitle[lang]}</span></p>

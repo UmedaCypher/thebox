@@ -6,6 +6,8 @@ import { shareImage } from '../lib/images';
 import Base from '../layouts/Base.astro';
 import ArticleCard from './ArticleCard.astro';
 import AuthorBox from './AuthorBox.astro';
+import VideoEmbed from './VideoEmbed.astro';
+import { VIDEOS, videoSchema } from '../lib/videos';
 import { authorFor, authorPath, personId, personSchema } from '../lib/authors';
 import { ORG_ID, blogId, blogName, faqFromMarkdown, faqSchema, pageTitle, wordCount } from '../lib/seo';
 import {
@@ -33,6 +35,7 @@ const related = [
 const ogImage = data.cover ? await shareImage(data.cover) : undefined;
 const faq = faqFromMarkdown(article.body);
 const author = authorFor(data.author);
+const video = VIDEOS[data.translationKey];
 
 const jsonLd = [
   {
@@ -53,6 +56,7 @@ const jsonLd = [
     ...(ogImage ? { image: [new URL(ogImage, SITE).href] } : {}),
   },
   ...(faq.length ? [faqSchema(faq, lang)] : []),
+  ...(video ? [videoSchema(video)] : []),
   {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
@@ -105,6 +109,12 @@ const jsonLd = [
     <div class="prose">
       <Content />
     </div>
+    {video && (
+      <section class="article-video">
+        <h2>{lang === 'fr' ? 'En vidéo' : 'On video'}</h2>
+        <VideoEmbed video={video} lang={lang} />
+      </section>
+    )}
     <AuthorBox author={author} lang={lang} />
   </article>
 

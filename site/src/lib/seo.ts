@@ -38,6 +38,7 @@ export function siteGraph(lang: Lang) {
         name: DEFAULT_AUTHOR.name,
         url: `${SITE}/magazine/auteur/${DEFAULT_AUTHOR.slug}/`,
         sameAs: DEFAULT_AUTHOR.sameAs,
+        ...(DEFAULT_AUTHOR.photo ? { image: `${SITE}${DEFAULT_AUTHOR.photo.jpg}` } : {}),
       },
       {
         '@type': 'WebSite',

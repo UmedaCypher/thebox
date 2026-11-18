@@ -12,6 +12,8 @@ export interface Author {
   jobTitle: Record<Lang, string>;
   bio: Record<Lang, string>;
   links: { label: string; url: string }[];
+  /** Portrait : fichiers dans site/public/magazine/auteurs/ (webp 192 et 512 px, jpg 512 px pour Google). */
+  photo?: { small: string; large: string; jpg: string };
   /** Profils qui identifient la même personne (LinkedIn, YouTube, registre des entreprises, sites). */
   sameAs: string[];
 }
@@ -20,6 +22,11 @@ export const AUTHORS: Record<string, Author> = {
   'Quentin Mahé': {
     name: 'Quentin Mahé',
     slug: 'quentin-mahe',
+    photo: {
+      small: '/magazine/auteurs/quentin-mahe-192.webp',
+      large: '/magazine/auteurs/quentin-mahe-512.webp',
+      jpg: '/magazine/auteurs/quentin-mahe.jpg',
+    },
     jobTitle: {
       fr: "Fondateur d'Arcora",
       en: 'Founder of Arcora',
@@ -63,6 +70,7 @@ export function personSchema(a: Author, lang: Lang) {
     description: a.bio[lang],
     url: SITE + authorPath(a, 'fr'),
     sameAs: a.sameAs,
+    ...(a.photo ? { image: { '@type': 'ImageObject', url: SITE + a.photo.jpg, width: 512, height: 512 } } : {}),
     worksFor: { '@id': `${SITE}/#organization` },
     knowsAbout: lang === 'fr'
       ? ['Horlogerie', 'Montres mécaniques', 'Collection de montres', 'Bracelets de montre']
