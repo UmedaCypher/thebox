@@ -322,3 +322,20 @@ h1, h2, h3 { font-family: var(--font-display); font-weight: 500; line-height: 1.
 /* Présentation du magazine, sous les articles */
 .mag-about { padding-block: 0 64px; }
 .mag-about p { max-width: 68ch; margin: 0; color: var(--text-2); font-size: 0.98rem; }
+
+/* Auteur : encadré sous l'article et page auteur */
+.author-box { display: flex; gap: 16px; align-items: flex-start; margin-top: 40px; padding: 20px; border: 1px solid var(--line); border-radius: var(--r-xl); background: rgba(42, 20, 24, 0.5); }
+.author-box .eyebrow { margin-bottom: 4px; }
+.author-avatar { flex: none; width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; background: var(--cushion); border: 1px solid rgba(194, 160, 114, 0.38); color: var(--brass); font-family: var(--font-display); font-size: 1.1rem; }
+.author-avatar-lg { width: 72px; height: 72px; font-size: 1.6rem; }
+.author-name { margin: 0 0 6px; font-weight: 600; }
+.author-name a { color: var(--text); text-decoration: none; }
+.author-name a:hover { color: var(--brass); }
+.author-name span { color: var(--text-3); font-weight: 400; font-size: 0.9rem; }
+.author-bio { margin: 0 0 8px; color: var(--text-2); font-size: 0.95rem; }
+.author-links { display: flex; flex-wrap: wrap; gap: 6px 16px; margin: 0; font-size: 0.875rem; }
+.byline a { color: var(--text-2); }
+.author-head { display: flex; gap: 20px; align-items: center; margin-bottom: 16px; }
+.author-head h1 { margin: 0 0 4px; }
+.author-head .lede { margin: 0; }
+.author-link-list { padding-left: 18px; }

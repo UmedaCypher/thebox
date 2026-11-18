@@ -1,0 +1,19 @@
+---
+import type { Lang } from '../lib/i18n';
+import { authorPath, type Author } from '../lib/authors';
+
+interface Props { author: Author; lang: Lang }
+const { author, lang } = Astro.props;
+const initials = author.name.split(/\s+/).map((w) => w[0]).join('').slice(0, 2);
+---
+<aside class="author-box" aria-label={lang === 'fr' ? "À propos de l'auteur" : 'About the author'}>
+  <div class="author-avatar" aria-hidden="true">{initials}</div>
+  <div>
+    <p class="eyebrow">{lang === 'fr' ? "À propos de l'auteur" : 'About the author'}</p>
+    <p class="author-name"><a href={authorPath(author, lang)} rel="author">{author.name}</a> · <span>{author.jobTitle[lang]}</span></p>
+    <p class="author-bio">{author.bio[lang]}</p>
+    <p class="author-links">
+      {author.links.slice(0, 3).map((l) => <a href={l.url} rel="me noopener" target="_blank">{l.label}</a>)}
+    </p>
+  </div>
+</aside>

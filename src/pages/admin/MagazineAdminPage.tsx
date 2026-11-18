@@ -107,7 +107,7 @@ function ArticleList() {
 /* ---------- Éditeur ---------- */
 
 const EMPTY: MagazineArticleInput = {
-  lang: 'fr', slug: '', translation_key: '', title: '', description: '', category: '', author: 'Arcora',
+  lang: 'fr', slug: '', translation_key: '', title: '', description: '', category: '', author: 'Quentin Mahé',
   body_md: '', cover_path: null, cover_alt: '', cover_caption: '', status: 'draft', published_at: todayISO(),
 };
 
@@ -200,7 +200,7 @@ function Editor({ id }: { id: string | null }) {
       const input: MagazineArticleInput = {
         ...form, status,
         title: form.title.trim(), description: form.description.trim(), category: form.category.trim(),
-        translation_key: form.translation_key.trim(), author: form.author.trim() || 'Arcora',
+        translation_key: form.translation_key.trim(), author: form.author.trim() || 'Quentin Mahé',
         cover_alt: form.cover_path ? form.cover_alt?.trim() || null : null,
         cover_caption: form.cover_path ? form.cover_caption?.trim() || null : null,
       };

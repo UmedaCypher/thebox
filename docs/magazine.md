@@ -126,3 +126,9 @@ La typographie française (espace insécable avant « ? ! : ; ») est appliquée
 - Chaque article apporte un avis ou une expérience réelle ; une IA peut rédiger le brouillon, mais un humain relit avant publication.
 - La version anglaise est adaptée, pas traduite mot à mot (unités, mots-clés : « lug-to-lug », « full set »…).
 - Les actualités des autres sites restent dans l'app (page Actualités), jamais sur le site public.
+
+## Auteurs
+
+Les auteurs sont déclarés dans `site/src/lib/authors.ts` (nom, fonction, biographie, profils). Le champ « Auteur » du
+backoffice doit contenir le nom exact. Un auteur connu reçoit une page (`/magazine/auteur/<slug>/`), un encadré sous
+ses articles et un schéma Person relié à ses profils (sameAs). Les articles signés « Arcora » sont attribués à Quentin Mahé.

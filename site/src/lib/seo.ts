@@ -1,4 +1,5 @@
 import { SITE, T, magazinePath, type Lang } from './i18n';
+import { DEFAULT_AUTHOR, personId } from './authors';
 
 /**
  * Référencement du magazine : identité de la marque (Organization, WebSite), titres de page,
@@ -28,7 +29,15 @@ export function siteGraph(lang: Lang) {
         description: lang === 'fr'
           ? "Arcora est l'app des collectionneurs de montres : catalogue de collection, carnet de portage, entretien, galerie au poignet et marché entre particuliers."
           : 'Arcora is the app for watch collectors: collection catalogue, wear log, servicing, wrist gallery and a marketplace between collectors.',
+        founder: { '@id': personId(DEFAULT_AUTHOR) },
         ...(SAME_AS.length ? { sameAs: SAME_AS } : {}),
+      },
+      {
+        '@type': 'Person',
+        '@id': personId(DEFAULT_AUTHOR),
+        name: DEFAULT_AUTHOR.name,
+        url: `${SITE}/magazine/auteur/${DEFAULT_AUTHOR.slug}/`,
+        sameAs: DEFAULT_AUTHOR.sameAs,
       },
       {
         '@type': 'WebSite',

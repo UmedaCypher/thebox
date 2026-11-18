@@ -5,6 +5,8 @@ import { Picture } from 'astro:assets';
 import { shareImage } from '../lib/images';
 import Base from '../layouts/Base.astro';
 import ArticleCard from './ArticleCard.astro';
+import AuthorBox from './AuthorBox.astro';
+import { authorFor, authorPath, personId, personSchema } from '../lib/authors';
 import { ORG_ID, blogId, blogName, faqFromMarkdown, faqSchema, pageTitle, wordCount } from '../lib/seo';
 import {
   SITE, T, articlePath, formatDate, getArticles, getTranslations, magazinePath, readingMinutes, type Article,
@@ -30,6 +32,7 @@ const related = [
 
 const ogImage = data.cover ? await shareImage(data.cover) : undefined;
 const faq = faqFromMarkdown(article.body);
+const author = authorFor(data.author);
 
 const jsonLd = [
   {
@@ -43,9 +46,7 @@ const jsonLd = [
     wordCount: wordCount(article.body),
     datePublished: data.publishedAt.toISOString(),
     dateModified: (data.updatedAt ?? data.publishedAt).toISOString(),
-    author: data.author === 'Arcora'
-      ? { '@id': ORG_ID }
-      : { '@type': 'Person', name: data.author },
+    author: personSchema(author, lang),
     publisher: { '@id': ORG_ID },
     isPartOf: { '@type': 'Blog', '@id': blogId(lang), name: blogName(lang), url: SITE + magazinePath(lang) },
     mainEntityOfPage: { '@type': 'WebPage', '@id': SITE + path },
@@ -81,7 +82,7 @@ const jsonLd = [
     <h1>{typo(data.title, lang)}</h1>
     <p class="lede">{typo(data.description, lang)}</p>
     <p class="byline">
-      <span>{t.by} {data.author}</span>
+      <span>{t.by} <a href={authorPath(author, lang)} rel="author">{author.name}</a></span>
       <time datetime={data.publishedAt.toISOString()}>{formatDate(data.publishedAt, lang)}</time>
       {data.updatedAt && <span>{t.updated} <time datetime={data.updatedAt.toISOString()}>{formatDate(data.updatedAt, lang)}</time></span>}
       <span>{t.readingTime(readingMinutes(article.body))}</span>
@@ -104,6 +105,7 @@ const jsonLd = [
     <div class="prose">
       <Content />
     </div>
+    <AuthorBox author={author} lang={lang} />
   </article>
 
   <aside class="wrap">

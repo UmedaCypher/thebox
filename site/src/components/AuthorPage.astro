@@ -1,0 +1,65 @@
+---
+import Base from '../layouts/Base.astro';
+import ArticleCard from './ArticleCard.astro';
+import { SITE, T, getArticles, magazinePath, type Lang } from '../lib/i18n';
+import { authorFor, authorPath, personId, personSchema, type Author } from '../lib/authors';
+
+interface Props { author: Author; lang: Lang }
+const { author, lang } = Astro.props;
+const t = T[lang];
+const path = authorPath(author, lang);
+const articles = (await getArticles(lang)).filter((a) => authorFor(a.data.author).slug === author.slug);
+const initials = author.name.split(/\s+/).map((w) => w[0]).join('').slice(0, 2);
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'ProfilePage',
+    url: SITE + path,
+    inLanguage: lang,
+    mainEntity: personSchema(author, lang),
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Arcora', item: SITE + '/' },
+      { '@type': 'ListItem', position: 2, name: t.magazine, item: SITE + magazinePath(lang) },
+      { '@type': 'ListItem', position: 3, name: author.name, item: SITE + path },
+    ],
+  },
+];
+const job = author.jobTitle[lang];
+const title = `${author.name}, ${job.charAt(0).toLowerCase()}${job.slice(1)}`;
+---
+<Base
+  lang={lang}
+  title={title}
+  description={author.bio[lang].slice(0, 158).replace(/\s+\S*$/, '') + '…'}
+  path={path}
+  alternates={[{ lang: 'fr', path: authorPath(author, 'fr') }, { lang: 'en', path: authorPath(author, 'en') }]}
+  jsonLd={jsonLd}
+>
+  <section class="article author-page" data-person={personId(author)}>
+    <nav class="crumbs" aria-label={lang === 'fr' ? "Fil d'Ariane" : 'Breadcrumb'}>
+      <a href="/">Arcora</a> › <a href={magazinePath(lang)}>{t.magazine}</a> › {author.name}
+    </nav>
+    <div class="author-head">
+      <div class="author-avatar author-avatar-lg" aria-hidden="true">{initials}</div>
+      <div>
+        <h1>{author.name}</h1>
+        <p class="lede">{author.jobTitle[lang]}</p>
+      </div>
+    </div>
+    <p>{author.bio[lang]}</p>
+    <ul class="author-link-list">
+      {author.links.map((l) => <li><a href={l.url} rel="me noopener" target="_blank">{l.label}</a></li>)}
+    </ul>
+  </section>
+  {articles.length > 0 && (
+    <section class="related">
+      <h2>{lang === 'fr' ? `Les guides de ${author.name}` : `Guides by ${author.name}`}</h2>
+      <div class="cards">{articles.map((a) => <ArticleCard article={a} headingLevel="h3" />)}</div>
+    </section>
+  )}
+</Base>
