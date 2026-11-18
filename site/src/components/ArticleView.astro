@@ -5,6 +5,7 @@ import { Picture } from 'astro:assets';
 import { shareImage } from '../lib/images';
 import Base from '../layouts/Base.astro';
 import ArticleCard from './ArticleCard.astro';
+import { ORG_ID, blogId, blogName, faqFromMarkdown, faqSchema, pageTitle, wordCount } from '../lib/seo';
 import {
   SITE, T, articlePath, formatDate, getArticles, getTranslations, magazinePath, readingMinutes, type Article,
 } from '../lib/i18n';
@@ -28,21 +29,29 @@ const related = [
 ].slice(0, 3);
 
 const ogImage = data.cover ? await shareImage(data.cover) : undefined;
+const faq = faqFromMarkdown(article.body);
 
 const jsonLd = [
   {
     '@context': 'https://schema.org',
-    '@type': 'Article',
+    '@type': 'BlogPosting',
+    '@id': `${SITE + path}#article`,
     headline: data.title,
     description: data.description,
     inLanguage: lang,
+    articleSection: data.category,
+    wordCount: wordCount(article.body),
     datePublished: data.publishedAt.toISOString(),
     dateModified: (data.updatedAt ?? data.publishedAt).toISOString(),
-    author: { '@type': data.author === 'Arcora' ? 'Organization' : 'Person', name: data.author },
-    publisher: { '@type': 'Organization', name: 'Arcora', url: SITE, logo: { '@type': 'ImageObject', url: SITE + '/icons/icon-512x512.png' } },
-    mainEntityOfPage: SITE + path,
+    author: data.author === 'Arcora'
+      ? { '@id': ORG_ID }
+      : { '@type': 'Person', name: data.author },
+    publisher: { '@id': ORG_ID },
+    isPartOf: { '@type': 'Blog', '@id': blogId(lang), name: blogName(lang), url: SITE + magazinePath(lang) },
+    mainEntityOfPage: { '@type': 'WebPage', '@id': SITE + path },
     ...(ogImage ? { image: [new URL(ogImage, SITE).href] } : {}),
   },
+  ...(faq.length ? [faqSchema(faq, lang)] : []),
   {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
@@ -56,7 +65,7 @@ const jsonLd = [
 ---
 <Base
   lang={lang}
-  title={`${data.title} | Arcora`}
+  title={pageTitle(data.title)}
   description={data.description}
   path={path}
   alternates={alternates}

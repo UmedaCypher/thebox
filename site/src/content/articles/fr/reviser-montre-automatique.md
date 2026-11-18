@@ -52,3 +52,17 @@ Dans Arcora, chaque montre a son onglet **Entretien** : vous y notez révisions,
 - Contrôle d'étanchéité tous les **1 à 2 ans** si vous portez votre montre dans l'eau.
 - Une montre qui dérive, s'arrête vite ou montre de la buée doit être vue sans attendre.
 - Gardez une trace de chaque intervention : c'est de la valeur pour plus tard.
+
+## Questions fréquentes
+
+### Combien coûte la révision d'une montre automatique ?
+
+Le prix dépend surtout de la marque, du calibre et des pièces à remplacer : il va de quelques centaines d'euros chez un horloger indépendant pour un mouvement simple, à bien plus dans le service après-vente d'une grande marque ou pour un chronographe. Demandez toujours un devis détaillé avant d'accepter.
+
+### Peut-on porter une montre automatique sans la faire réviser ?
+
+Oui, tant qu'elle fonctionne bien, mais les huiles sèchent avec le temps et l'usure s'accélère. Attendre trop longtemps peut transformer une révision simple en réparation plus coûteuse. Surveillez la précision et la réserve de marche : une dérive est souvent le premier signe, et un [timegrapher](/magazine/timegrapher-lire-mesure-montre/) aide à la repérer.
+
+### Faut-il faire réviser sa montre chez la marque ou chez un horloger indépendant ?
+
+Les deux sont possibles. La marque garantit des pièces d'origine et conserve parfois la garantie ; un bon horloger indépendant est souvent plus rapide et moins cher. Pour une montre de collection, précisez dans tous les cas si vous refusez le polissage du boîtier.

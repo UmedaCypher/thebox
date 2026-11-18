@@ -59,3 +59,17 @@ In Arcora, each watch has a **Box & papers** field: log what you have today. On 
 - "Box and papers" = box, warranty card, receipt, booklets, tags and spare links.
 - They reassure buyers about origin, document the watch's history and support resale value.
 - Store them somewhere dry, photograph them and never publish the serial number.
+
+## Frequently asked questions
+
+### What does "full set" mean for a watch?
+
+"Full set" means the watch comes with everything it was originally sold with: original box, warranty card, receipt, booklets, tags and spare links. "Watch only" means none of these are included.
+
+### Is a watch without papers worth less?
+
+Often, yes, especially for recent, sought-after models from major brands, where buyers expect a full set. The gap is usually smaller on vintage watches, whose papers have often gone missing, and on more affordable pieces.
+
+### Should I post the serial number in a listing?
+
+No, never post it in full: it can be used to fake papers. Share it privately with a serious buyer, who can check it on Arcora's [Stolen watches](/montres-volees) page.

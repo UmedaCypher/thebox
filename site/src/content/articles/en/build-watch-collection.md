@@ -89,3 +89,17 @@ In Arcora, Wrist Check lets you log the watch you're wearing each day, with stre
 - Before buying, ask in which situation the new watch will replace the others.
 - Put the budget into the watch you wear most.
 - Track what you really wear, then sell what never comes out.
+
+## Frequently asked questions
+
+### How many watches make a collection?
+
+There's no right number. Three well-chosen watches (one for every day, one dress watch, one with character) already cover almost every situation. Beyond that, each new watch should play a role the others don't.
+
+### What watch should I start a collection with?
+
+A daily wearer: versatile, legible, water-resistant to at least 100 m, on a steel bracelet, sized for your wrist. It's the one you'll wear most, and it will teach you what you really like. Our guide to [watch size](/en/magazine/watch-size-for-wrist/) helps you choose.
+
+### How do I decide which watch to sell?
+
+Look at what you actually wear: a watch that has stayed in its box for months is the first candidate. Arcora's wear log shows it at a glance, and the sale often funds a piece that suits you better.

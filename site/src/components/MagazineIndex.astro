@@ -1,7 +1,8 @@
 ---
 import Base from '../layouts/Base.astro';
 import ArticleCard from './ArticleCard.astro';
-import { SITE, T, getArticles, magazinePath, type Lang } from '../lib/i18n';
+import { SITE, T, articlePath, getArticles, magazinePath, type Lang } from '../lib/i18n';
+import { ORG_ID, blogId, blogName } from '../lib/seo';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
@@ -12,11 +13,20 @@ const path = magazinePath(lang);
 const jsonLd = [{
   '@context': 'https://schema.org',
   '@type': 'Blog',
-  name: `Arcora — ${t.magazine}`,
+  '@id': blogId(lang),
+  name: blogName(lang),
   description: t.magazineDescription,
   url: SITE + path,
   inLanguage: lang,
-  publisher: { '@type': 'Organization', name: 'Arcora', url: SITE, logo: SITE + '/icons/icon-512x512.png' },
+  publisher: { '@id': ORG_ID },
+  blogPost: articles.map((a) => ({
+    '@type': 'BlogPosting',
+    '@id': `${SITE + articlePath(a)}#article`,
+    headline: a.data.title,
+    url: SITE + articlePath(a),
+    datePublished: a.data.publishedAt.toISOString(),
+    articleSection: a.data.category,
+  })),
 }];
 ---
 <Base
@@ -38,4 +48,7 @@ const jsonLd = [{
         {articles.map((a, i) => <ArticleCard article={a} featured={i === 0} />)}
       </section>
     )}
+  <section class="wrap mag-about">
+    <p>{t.about}</p>
+  </section>
 </Base>

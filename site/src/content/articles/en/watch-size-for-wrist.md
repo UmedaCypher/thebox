@@ -69,3 +69,17 @@ That's exactly what the Arcora wrist gallery is for: every photo shows the owner
 2. Check that lug-to-lug doesn't exceed that width.
 3. Use the chart as a starting point, then factor in bezel, dial and thickness.
 4. Look at photos on wrists your size before you decide.
+
+## Frequently asked questions
+
+### What watch size fits a 6.5-inch wrist?
+
+For a wrist of about 6.5 in (16.5 cm), a 38 to 40 mm case usually works, with a lug-to-lug of up to roughly 47 mm. Above all, check that the lugs don't hang over the top of your wrist: that's what decides whether a watch fits.
+
+### Is a 40 mm watch too big for a small wrist?
+
+Not necessarily. A 40 mm watch with short lugs and a wide bezel can wear well on a 6–6.5 in wrist. Look at lug-to-lug and thickness rather than diameter alone, and compare photos on wrists your size in the [wrist gallery](/galerie).
+
+### How do I measure my wrist without a tape measure?
+
+Wrap a strip of paper just above your wrist bone, mark where it overlaps, then lay it flat against a ruler. Also measure the width of the top of your wrist: that's the limit your watch's lug-to-lug shouldn't exceed.

@@ -59,3 +59,17 @@ Dans Arcora, chaque montre réunit déjà ses photos, sa référence, sa valeur 
 2. Réunissez facture, garantie, photos et factures d'entretien pour chaque montre.
 3. Gardez une copie du dossier hors de chez vous.
 4. Mettez les valeurs à jour au moins une fois par an.
+
+## Questions fréquentes
+
+### Mes montres sont-elles couvertes par mon assurance habitation ?
+
+Souvent en partie seulement. Les contrats habitation couvrent les objets de valeur jusqu'à un plafond global et parfois un plafond par objet, et beaucoup ne couvrent pas les montres portées hors du domicile. Relisez vos conditions et, si besoin, déclarez vos montres ou souscrivez un contrat spécialisé.
+
+### Quels justificatifs garder pour assurer une montre ?
+
+La facture d'achat, la carte de garantie avec le numéro de série, des photos récentes (cadran, fond, profil, au poignet) et les factures d'entretien. Gardez-en une copie hors de chez vous : un dossier volé avec la montre ne sert à rien.
+
+### Quel délai pour déclarer le vol d'une montre à son assureur ?
+
+En France, la loi prévoit en général deux jours ouvrés pour déclarer un vol, sauf délai plus long prévu par le contrat. Portez plainte rapidement et suivez les étapes de notre guide [Montre volée : que faire](/magazine/montre-volee-que-faire/).

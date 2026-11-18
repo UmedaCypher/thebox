@@ -59,3 +59,17 @@ In Arcora, each watch already brings together its photos, reference, estimated v
 2. Gather the receipt, warranty, photos and service invoices for each watch.
 3. Keep a copy of the file outside your home.
 4. Update values at least once a year.
+
+## Frequently asked questions
+
+### Are my watches covered by my home insurance?
+
+Often only partly. Home policies cover valuables up to an overall limit, sometimes with a single-item limit, and many don't cover watches worn away from home. Re-read your policy and, if needed, declare your watches or take out a specialist valuables policy.
+
+### What documents should I keep to insure a watch?
+
+The purchase receipt, the warranty card with the serial number, recent photos (dial, caseback, profile, on the wrist) and service invoices. Keep a copy outside your home: a file stolen along with the watch is no use.
+
+### How quickly must I report a stolen watch to my insurer?
+
+Deadlines are short and vary by country and policy, sometimes just a couple of working days. Report it to the police quickly and follow the steps in our guide [Stolen watch: what to do](/en/magazine/stolen-watch-what-to-do/).

@@ -89,3 +89,17 @@ Dans Arcora, le Wrist Check vous permet de noter chaque jour la montre que vous 
 - Avant d'acheter, demandez-vous dans quelle situation la nouvelle montre remplacera les autres.
 - Mettez le budget dans la montre que vous portez le plus.
 - Notez ce que vous portez vraiment, puis vendez ce qui ne sort jamais.
+
+## Questions fréquentes
+
+### Combien de montres faut-il pour une collection ?
+
+Il n'y a pas de bon chiffre. Trois montres bien choisies (une pour tous les jours, une habillée, une de caractère) couvrent déjà presque toutes les situations. Au-delà, chaque nouvelle montre devrait avoir un rôle que les autres ne remplissent pas.
+
+### Par quelle montre commencer une collection ?
+
+Par une montre du quotidien : polyvalente, lisible, étanche à au moins 100 m, sur bracelet acier, d'une taille adaptée à votre poignet. C'est celle que vous porterez le plus, et elle vous apprendra ce que vous aimez vraiment. Notre guide sur [la taille de montre](/magazine/taille-montre-poignet/) aide à choisir.
+
+### Comment savoir quelle montre vendre ?
+
+Regardez ce que vous portez vraiment : une montre restée dans la boîte depuis des mois est la première candidate. Le carnet de portage d'Arcora le montre en un coup d'œil, et la vente finance souvent une pièce qui vous correspond mieux.

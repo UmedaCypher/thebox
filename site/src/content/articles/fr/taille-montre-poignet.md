@@ -69,3 +69,17 @@ C'est exactement ce que permet la galerie au poignet d'Arcora : chaque photo ind
 2. Vérifiez que l'entre-cornes ne dépasse pas cette largeur.
 3. Servez-vous du tableau comme point de départ, puis tenez compte de la lunette, du cadran et de l'épaisseur.
 4. Regardez des photos sur des poignets de votre taille avant de vous décider.
+
+## Questions fréquentes
+
+### Quelle taille de montre pour un poignet de 16 cm ?
+
+Pour un poignet d'environ 16 cm, un diamètre de 36 à 39 mm convient en général, avec un entre-cornes qui ne dépasse pas 46 mm environ. Vérifiez surtout que les cornes ne débordent pas du dessus du poignet : c'est ce qui décide si la montre tombe bien.
+
+### Une montre de 40 mm est-elle trop grande pour un petit poignet ?
+
+Pas forcément. Une montre de 40 mm aux cornes courtes et à la lunette large peut très bien aller sur un poignet de 15 à 16 cm. Regardez l'entre-cornes et l'épaisseur plutôt que le seul diamètre, et comparez sur des photos de poignets de votre taille dans la [galerie au poignet](/galerie).
+
+### Comment mesurer son tour de poignet sans mètre ?
+
+Enroulez une bande de papier juste au-dessus de l'os du poignet, marquez le point de jonction au stylo, puis posez la bande à plat sur une règle. Mesurez aussi la largeur du dessus du poignet : c'est la limite à ne pas dépasser pour l'entre-cornes.

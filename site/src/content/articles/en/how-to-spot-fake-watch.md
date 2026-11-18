@@ -102,3 +102,17 @@ On Arcora's Market, sales happen between members with no commission, and you tal
 - Check that reference, serial number, papers and calibre all match.
 - Papers don't prove everything: only a watchmaker can confirm the movement.
 - No remote payment before you've seen the watch.
+
+## Frequently asked questions
+
+### How can I tell if a watch is genuine?
+
+No single sign is enough: compare the dial, engravings and bracelet with official photos of the same reference, check that the reference, serial number and papers match, and have a watchmaker examine the movement. It's all these checks together that build confidence.
+
+### Is a seconds hand that ticks once per second a sign of a fake?
+
+On a watch sold as mechanical, yes, that's a deal-breaker: a seconds hand that jumps once a second means a quartz movement. A smooth sweep doesn't prove authenticity either, since many fakes use mechanical movements.
+
+### Do papers prove a watch is authentic?
+
+No. Papers get faked too, and genuine papers can come with a fake watch. Check that the serial number on the papers matches the one on the watch, then run that number through the [Stolen watches](/montres-volees) page.

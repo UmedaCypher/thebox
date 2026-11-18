@@ -59,3 +59,17 @@ Dans Arcora, la fiche de chaque montre a un champ **Boîte et papiers** : notez 
 - « Boîte et papiers » = boîte, garantie, facture, livrets, étiquettes et maillons.
 - Ils rassurent sur l'origine, documentent l'histoire et soutiennent le prix de revente.
 - Rangez-les au sec, photographiez-les et ne publiez jamais le numéro de série.
+
+## Questions fréquentes
+
+### Que veut dire « full set » pour une montre ?
+
+« Full set » signifie que la montre est vendue avec tout ce qui l'accompagnait à l'achat : boîte d'origine, carte de garantie, facture, livrets, étiquettes et maillons supplémentaires. À l'inverse, « montre seule » signifie qu'aucun de ces éléments n'est fourni.
+
+### Une montre sans papiers vaut-elle moins cher ?
+
+Souvent, oui, surtout pour les modèles récents et recherchés des grandes marques, pour lesquels les acheteurs attendent un full set. L'écart est en général plus faible sur les montres anciennes, dont les papiers ont souvent disparu, et sur les montres abordables.
+
+### Peut-on publier le numéro de série dans une annonce ?
+
+Non, ne le publiez jamais en entier : il peut servir à fabriquer de faux papiers. Communiquez-le en privé à un acheteur sérieux, qui pourra le vérifier sur la page [Montres volées](/montres-volees) d'Arcora.

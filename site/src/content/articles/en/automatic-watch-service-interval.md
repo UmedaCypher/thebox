@@ -52,3 +52,17 @@ In Arcora, every watch has a **Service** tab: log full services, pressure tests 
 - Water-resistance check every **1 to 2 years** if you wear the watch in water.
 - A watch that drifts, stops early or fogs up should be seen right away.
 - Keep a record of every service: it's value for later.
+
+## Frequently asked questions
+
+### How much does it cost to service an automatic watch?
+
+It depends mainly on the brand, the movement and the parts that need replacing: from a few hundred euros or dollars at an independent watchmaker for a simple movement, to much more at a major brand's service centre or for a chronograph. Always ask for a detailed quote first.
+
+### Can I keep wearing an automatic watch without servicing it?
+
+Yes, as long as it runs well, but the oils dry out over time and wear speeds up. Waiting too long can turn a routine service into a costlier repair. Keep an eye on accuracy and power reserve: drift is often the first sign, and a [timegrapher](/en/magazine/how-to-read-timegrapher/) helps you spot it.
+
+### Should I service my watch with the brand or an independent watchmaker?
+
+Both work. The brand guarantees original parts and sometimes a warranty on the work; a good independent is often faster and cheaper. For a collector's piece, say clearly in either case if you don't want the case polished.

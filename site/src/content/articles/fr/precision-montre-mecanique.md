@@ -90,3 +90,17 @@ Dans Arcora, vous pouvez noter vos mesures de précision sur la fiche de chaque 
 - Position, température, réserve de marche et magnétisme influencent la marche.
 - Mesurez sur une semaine en comparant à une heure de référence.
 - Ce qui compte, c'est l'évolution : une dérive nouvelle mérite une visite chez l'horloger.
+
+## Questions fréquentes
+
+### Combien de secondes par jour est normal pour une montre automatique ?
+
+Cela dépend du mouvement : quelques secondes par jour pour une montre bien réglée ou certifiée, jusqu'à une vingtaine de secondes, voire plus, pour certains mouvements d'entrée de gamme selon leur fabricant. Ce qui compte surtout, c'est que la marche reste stable dans le temps.
+
+### Qu'est-ce qu'un chronomètre COSC ?
+
+C'est une montre dont le mouvement a été testé par le Contrôle officiel suisse des chronomètres, dans plusieurs positions et températures. Pour obtenir la certification, sa marche moyenne doit rester entre −4 et +6 secondes par jour.
+
+### Pourquoi ma montre se met-elle soudain à avancer beaucoup ?
+
+La cause la plus fréquente est le magnétisme : haut-parleur, fermoir aimanté, coque de téléphone. Une montre aimantée avance souvent de plusieurs minutes par jour. Un horloger la démagnétise en quelques secondes ; mesurez-la avant et après avec le [timegrapher](/magazine/timegrapher-lire-mesure-montre/).

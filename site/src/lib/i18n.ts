@@ -11,8 +11,10 @@ export const T = {
     magazine: 'Magazine',
     magazineTitle: 'Le magazine Arcora : guides pour collectionneurs de montres',
     magazineDescription:
-      "Guides pratiques pour bien choisir, entretenir et suivre votre collection de montres : tailles, valeur, révision, photo.",
+      "Guides pratiques pour collectionneurs de montres : choisir la bonne taille, réviser, mesurer la précision, assurer, acheter d'occasion sans risque.",
     intro: 'Guides pratiques pour choisir, porter et entretenir vos montres.',
+    about:
+      "Le magazine d'Arcora répond aux questions concrètes des collectionneurs : quelle taille de montre pour son poignet, quand faire réviser une automatique, comment repérer une fausse montre ou vérifier un numéro de série, comment assurer sa collection. Chaque guide s'appuie sur les outils de l'app Arcora, qui sert à cataloguer sa collection, noter ce que l'on porte et suivre l'entretien de ses montres.",
     openApp: "Ouvrir l'app",
     readingTime: (m: number) => `${m} min de lecture`,
     updated: 'Mis à jour le',
@@ -38,8 +40,10 @@ export const T = {
     magazine: 'Magazine',
     magazineTitle: 'The Arcora magazine: guides for watch collectors',
     magazineDescription:
-      'Practical guides to choose, service and keep track of your watch collection: sizing, value, servicing, photography.',
+      'Practical guides for watch collectors: finding the right size, servicing, measuring accuracy, insurance and buying pre-owned without the risks.',
     intro: 'Practical guides to choosing, wearing and caring for your watches.',
+    about:
+      "The Arcora magazine answers the real questions watch collectors ask: what size fits your wrist, when to service an automatic, how to spot a fake or check a serial number, how to insure a collection. Every guide builds on the Arcora app, which collectors use to catalogue their watches, log what they wear and keep track of servicing.",
     openApp: 'Open the app',
     readingTime: (m: number) => `${m} min read`,
     updated: 'Updated',

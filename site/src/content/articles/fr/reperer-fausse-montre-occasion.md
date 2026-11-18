@@ -102,3 +102,17 @@ Sur le Marché d'Arcora, les ventes se font entre membres, sans commission, et v
 - Vérifiez la cohérence entre référence, numéro de série, papiers et calibre.
 - Les papiers ne prouvent pas tout : seul un horloger peut confirmer le mouvement.
 - Pas de paiement à distance avant d'avoir vu la montre.
+
+## Questions fréquentes
+
+### Comment savoir si une montre est vraie ?
+
+Aucun signe isolé ne suffit : comparez le cadran, les gravures et le bracelet avec des photos officielles de la même référence, vérifiez la cohérence entre référence, numéro de série et papiers, et faites examiner le calibre par un horloger. C'est l'ensemble de ces vérifications qui rassure.
+
+### Une trotteuse qui « saute » chaque seconde, est-ce une fausse montre ?
+
+Sur une montre vendue comme mécanique, oui, c'est éliminatoire : une trotteuse qui avance par sauts d'une seconde indique un mouvement à quartz. Une trotteuse fluide ne prouve pas pour autant l'authenticité, car de nombreuses copies ont un mouvement mécanique.
+
+### Les papiers prouvent-ils qu'une montre est authentique ?
+
+Non. Les papiers aussi se falsifient, et de vrais papiers peuvent accompagner une fausse montre. Vérifiez que le numéro de série des papiers correspond à celui de la montre, puis contrôlez ce numéro sur la page [Montres volées](/montres-volees).

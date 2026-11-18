@@ -70,3 +70,17 @@ Once you have a shot you like, add it to your watch in Arcora and post it to the
 3. Clean crystal and bracelet, well-chosen time.
 4. Focus on the dial, exposure slightly down.
 5. Light editing, true colours.
+
+## Frequently asked questions
+
+### What's the best light for photographing a watch?
+
+Soft, indirect daylight: near a window out of direct sun, or outdoors in the shade. It limits reflections on the crystal and keeps dial colours true. Avoid the flash and ceiling spotlights, which create harsh reflections.
+
+### Why does my watch look bigger in photos?
+
+Because your phone's wide-angle lens enlarges whatever is close to it. Use the 2× or 3× lens and step back a little, holding the phone parallel to the dial. The photo will be truer to the watch's real size, which helps other collectors judge how it wears.
+
+### Why set a watch to 10:10 for photos?
+
+Hands in a V shape keep the logo and sub-dials clear and frame the dial evenly. It's a convention from brand photography, not a rule: just pick a time that doesn't hide any important detail.

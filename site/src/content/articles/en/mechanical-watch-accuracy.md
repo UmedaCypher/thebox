@@ -90,3 +90,17 @@ In Arcora you can log accuracy measurements on each watch's page and follow how 
 - Position, temperature, power reserve and magnetism all affect the rate.
 - Measure over a week by comparing with a reference time.
 - What matters is the trend: new drift deserves a visit to the watchmaker.
+
+## Frequently asked questions
+
+### How many seconds a day is normal for an automatic watch?
+
+It depends on the movement: a few seconds a day for a well-regulated or certified watch, up to around twenty seconds or more for some entry-level movements, according to their makers. What matters most is that the rate stays stable over time.
+
+### What is a COSC chronometer?
+
+It's a watch whose movement has been tested by the Swiss Official Chronometer Testing Institute, in several positions and temperatures. To be certified, its average rate must stay between −4 and +6 seconds a day.
+
+### Why has my watch suddenly started running fast?
+
+The most common cause is magnetism: speakers, magnetic clasps, phone cases. A magnetised watch often gains several minutes a day. A watchmaker can demagnetise it in seconds; measure it before and after with a [timegrapher](/en/magazine/how-to-read-timegrapher/).

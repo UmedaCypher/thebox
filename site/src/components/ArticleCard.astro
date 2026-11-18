@@ -12,7 +12,7 @@ const Heading = headingLevel;
   {article.data.cover && (
     <Image
       src={article.data.cover}
-      alt=""
+      alt={article.data.coverAlt ?? ''}
       width={featured ? 960 : 640}
       height={featured ? 600 : 400}
       fit="cover"

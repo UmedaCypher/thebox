@@ -70,3 +70,17 @@ Une fois la photo réussie, ajoutez-la à votre montre dans Arcora et publiez-la
 3. Verre et bracelet propres, heure bien choisie.
 4. Mise au point sur le cadran, exposition un peu baissée.
 5. Retouche légère, couleurs fidèles.
+
+## Questions fréquentes
+
+### Quelle est la meilleure lumière pour photographier une montre ?
+
+Une lumière du jour douce et indirecte : près d'une fenêtre sans soleil direct, ou dehors à l'ombre. Elle limite les reflets sur le verre et rend les couleurs du cadran fidèles. Évitez le flash et les spots du plafond, qui créent des reflets durs.
+
+### Pourquoi ma montre paraît plus grosse en photo ?
+
+Parce que l'objectif grand-angle du téléphone grossit ce qui est proche de lui. Utilisez le zoom 2× ou 3× en reculant un peu, et tenez le téléphone parallèle au cadran. La photo sera plus fidèle à la vraie taille de la montre, ce qui aide les autres collectionneurs à juger comment elle tombe.
+
+### Pourquoi régler sa montre sur 10 h 10 pour la photo ?
+
+Les aiguilles en V dégagent le logo et les compteurs, et encadrent le cadran de façon équilibrée. C'est une convention des photos de marque, mais rien n'oblige à la suivre : choisissez simplement une heure qui ne cache aucun détail important.
