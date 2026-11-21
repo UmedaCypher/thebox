@@ -1,14 +1,85 @@
 ---
+/**
+ * Accueil du magazine, mise en page éditoriale :
+ * grand titre, rubriques, « À la une » en trois colonnes (articles secondaires, article principal,
+ * liste numérotée), sections par rubrique, rédacteur, vidéos, appel à l'app.
+ */
+import { Image, getImage } from 'astro:assets';
 import Base from '../layouts/Base.astro';
-import ArticleCard from './ArticleCard.astro';
-import { SITE, T, articlePath, getArticles, magazinePath, type Lang } from '../lib/i18n';
+import { SITE, T, articlePath, formatDate, getArticles, magazinePath, readingMinutes, type Article, type Lang } from '../lib/i18n';
 import { ORG_ID, blogId, blogName } from '../lib/seo';
+import { DEFAULT_AUTHOR, authorFor, authorPath } from '../lib/authors';
+import { VIDEOS, videoThumb } from '../lib/videos';
+import { typo } from '../lib/typo';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const t = T[lang];
 const articles = await getArticles(lang);
 const path = magazinePath(lang);
+
+const L = {
+  fr: {
+    tagline: 'Le magazine des collectionneurs de montres',
+    guides: (n: number) => `${n} guide${n > 1 ? 's' : ''}`,
+    updated: 'Mis à jour le',
+    sections: 'Rubriques',
+    lead: 'À la une',
+    essentials: 'Les essentiels',
+    by: 'Par',
+    editor: 'Le rédacteur',
+    editorLink: 'Sa page',
+    video: 'En vidéo',
+    videoNote: 'Sur la chaîne YouTube MAHEwatches',
+    ctaEyebrow: "L'app Arcora",
+  },
+  en: {
+    tagline: 'The magazine for watch collectors',
+    guides: (n: number) => `${n} guide${n > 1 ? 's' : ''}`,
+    updated: 'Updated',
+    sections: 'Sections',
+    lead: 'Top story',
+    essentials: 'The essentials',
+    by: 'By',
+    editor: 'The editor',
+    editorLink: 'Profile',
+    video: 'On video',
+    videoNote: 'On the MAHEwatches YouTube channel',
+    ctaEyebrow: 'The Arcora app',
+  },
+}[lang];
+
+const slug = (s: string) => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+
+// Rubriques, dans l'ordre de leur article le plus récent
+const categories: { name: string; slug: string; items: Article[] }[] = [];
+for (const a of articles) {
+  let c = categories.find((x) => x.name === a.data.category);
+  if (!c) categories.push((c = { name: a.data.category, slug: slug(a.data.category), items: [] }));
+  c.items.push(a);
+}
+
+const [leadStory, ...rest] = articles;
+const secondary = rest.slice(0, 2);
+const essentials = rest.slice(2, 7);
+const newest = articles.reduce<Date | undefined>((d, a) => {
+  const x = a.data.updatedAt ?? a.data.publishedAt;
+  return !d || x > d ? x : d;
+}, undefined);
+
+const videoItems = articles
+  .filter((a) => VIDEOS[a.data.translationKey])
+  .map((a) => ({ article: a, video: VIDEOS[a.data.translationKey] }))
+  .slice(0, 4);
+
+const previews = await Promise.all(essentials.map(async (a) =>
+  a.data.cover ? (await getImage({ src: a.data.cover, width: 420, height: 300, fit: 'cover', format: 'webp', quality: 72 })).src : ''));
+const edition = (newest ?? new Date()).toLocaleDateString(t.locale, { month: 'long', year: 'numeric' });
+const letters = [...t.magazine];
+
+const editor = DEFAULT_AUTHOR;
+const minutes = (a: Article) => t.readingTime(readingMinutes(a.body));
+const title = (a: Article) => typo(a.data.title, lang);
 
 const jsonLd = [{
   '@context': 'https://schema.org',
@@ -37,18 +108,208 @@ const jsonLd = [{
   alternates={[{ lang: 'fr', path: magazinePath('fr') }, { lang: 'en', path: magazinePath('en') }]}
   jsonLd={jsonLd}
 >
-  <section class="wrap mag-hero">
-    <h1>{t.magazine}</h1>
-    <p>{t.intro}</p>
-  </section>
-  {articles.length === 0
-    ? <p class="wrap empty">{t.empty}</p>
-    : (
-      <section class="wrap cards">
-        {articles.map((a, i) => <ArticleCard article={a} featured={i === 0} />)}
+  <div class="wrap mag">
+    <script is:inline>document.documentElement.classList.add('mag-js');</script>
+    <header class="mast">
+      <div class="mast-top">
+        <span class="mast-edition">{lang === 'fr' ? 'Édition' : 'Edition'} · <span class="cap">{edition}</span></span>
+        <svg class="dial" viewBox="0 0 100 100" role="img" aria-label={lang === 'fr' ? 'Heure actuelle' : 'Current time'}>
+          <circle cx="50" cy="50" r="47" class="dial-ring" />
+          {Array.from({ length: 12 }, (_, i) => <line x1="50" y1="6" x2="50" y2={i % 3 === 0 ? 15 : 11} transform={`rotate(${i * 30} 50 50)`} class="dial-tick" />)}
+          <line x1="50" y1="50" x2="50" y2="28" class="dial-h" data-hand="h" />
+          <line x1="50" y1="50" x2="50" y2="16" class="dial-m" data-hand="m" />
+          <line x1="50" y1="58" x2="50" y2="12" class="dial-s" data-hand="s" />
+          <circle cx="50" cy="50" r="2.6" class="dial-pin" />
+        </svg>
+      </div>
+      <h1 class="mast-title"><span class="visually-hidden">{t.magazine}</span><span aria-hidden="true">{letters.map((ch, i) => <span class="ltr" style={`--i:${i}`}>{ch}</span>)}</span></h1>
+      <div class="mast-line">
+        <span>{L.tagline}</span>
+        <span>{L.guides(articles.length)} · <a href={magazinePath(lang === 'fr' ? 'en' : 'fr')} hreflang={lang === 'fr' ? 'en' : 'fr'}>{lang === 'fr' ? 'English' : 'Français'}</a></span>
+        {newest && <span>{L.updated} <time datetime={newest.toISOString()}>{formatDate(newest, lang)}</time></span>}
+      </div>
+      {categories.length > 1 && (
+        <nav class="mast-sections" aria-label={L.sections}>
+          {categories.map((c) => <a href={`#${c.slug}`}>{c.name}<sup>{c.items.length}</sup></a>)}
+        </nav>
+      )}
+    </header>
+
+    {articles.length === 0 && <p class="empty">{t.empty}</p>}
+
+    {leadStory && (
+      <section class="une" aria-label={L.lead}>
+        <article class="une-lead">
+          <a href={articlePath(leadStory)}>
+            {leadStory.data.cover && (
+              <span class="media"><Image src={leadStory.data.cover} alt={leadStory.data.coverAlt ?? ''} width={1200} height={800} fit="cover"
+                layout="constrained" sizes="(max-width: 1040px) 100vw, 620px" loading="eager" fetchpriority="high" /></span>
+            )}
+            <p class="kicker"><span class="kicker-tag">{L.lead}</span>{leadStory.data.category}</p>
+            <h2>{title(leadStory)}</h2>
+            <p class="deck">{typo(leadStory.data.description, lang)}</p>
+            <p class="byline-sm">{L.by} {authorFor(leadStory.data.author).name} · {minutes(leadStory)}</p>
+          </a>
+        </article>
+
+        {secondary.length > 0 && (
+          <div class="une-side">
+            {secondary.map((a) => (
+              <article class="story-sm">
+                <a href={articlePath(a)}>
+                  {a.data.cover && (
+                    <span class="media"><Image src={a.data.cover} alt={a.data.coverAlt ?? ''} width={560} height={420} fit="cover"
+                      layout="constrained" sizes="(max-width: 1040px) 50vw, 260px" /></span>
+                  )}
+                  <p class="kicker">{a.data.category}</p>
+                  <h3>{title(a)}</h3>
+                  <p class="date"><time datetime={a.data.publishedAt.toISOString()}>{formatDate(a.data.publishedAt, lang)}</time></p>
+                </a>
+              </article>
+            ))}
+          </div>
+        )}
+
+        {essentials.length > 0 && (
+          <aside class="une-list" aria-labelledby="essentials-title">
+            <h2 id="essentials-title" class="label">{L.essentials}</h2>
+            <ol>
+              {essentials.map((a, i) => (
+                <li>
+                  <a href={articlePath(a)} data-preview={previews[i] || undefined}>
+                    <span class="num">{String(i + 1).padStart(2, '0')}</span>
+                    <span>
+                      <span class="kicker">{a.data.category}</span>
+                      <span class="li-title">{title(a)}</span>
+                    </span>
+                  </a>
+                </li>
+              ))}
+            </ol>
+          </aside>
+        )}
       </section>
     )}
-  <section class="wrap mag-about">
-    <p>{t.about}</p>
-  </section>
+
+    {categories.map((c) => (
+      <section class="rubric" id={c.slug} aria-labelledby={`r-${c.slug}`}>
+        <header class="rubric-head">
+          <h2 id={`r-${c.slug}`}>{c.name}</h2>
+          <span class="rubric-count">{L.guides(c.items.length)}</span>
+        </header>
+        <div class="rubric-grid" data-n={Math.min(c.items.length, 3)}>
+          {c.items.map((a, i) => (
+            <article class:list={['story', { 'story-wide': i === 0 && c.items.length !== 2 }]}>
+              <a href={articlePath(a)}>
+                {a.data.cover && (
+                  <span class="media"><Image src={a.data.cover} alt={a.data.coverAlt ?? ''} width={i === 0 ? 960 : 640} height={i === 0 ? 640 : 427} fit="cover"
+                    layout="constrained" sizes={i === 0 ? '(max-width: 720px) 100vw, 560px' : '(max-width: 720px) 100vw, 360px'} /></span>
+                )}
+                <span class="story-text">
+                  <span class="date"><time datetime={a.data.publishedAt.toISOString()}>{formatDate(a.data.publishedAt, lang)}</time> · {minutes(a)}</span>
+                  <h3>{title(a)}</h3>
+                  <span class="story-deck">{typo(a.data.description, lang)}</span>
+                </span>
+              </a>
+            </article>
+          ))}
+        </div>
+      </section>
+    ))}
+
+    <section class="band">
+      <div class="band-editor">
+        {editor.photo && <img src={editor.photo.large} alt={editor.name} width="120" height="120" loading="lazy" decoding="async" />}
+        <div>
+          <p class="label">{L.editor}</p>
+          <p class="band-name"><a href={authorPath(editor, lang)} rel="author">{editor.name}</a></p>
+          <p class="band-role">{editor.jobTitle[lang]}</p>
+          <p class="band-bio">{editor.bio[lang]}</p>
+          <p class="band-links">
+            <a href={authorPath(editor, lang)}>{L.editorLink}</a>
+            {editor.links.slice(0, 3).map((l) => <a href={l.url} rel="me noopener" target="_blank">{l.label}</a>)}
+          </p>
+        </div>
+      </div>
+      <div class="cta band-cta">
+        <p class="label">{L.ctaEyebrow}</p>
+        <h2>{t.ctaTitle}</h2>
+        <p>{t.ctaText}</p>
+        <a class="btn" data-liquid href={`/signup?src=magazine-home-${lang}`}>{t.ctaButton}</a>
+      </div>
+    </section>
+
+    {videoItems.length > 0 && (
+      <section class="videos" aria-labelledby="videos-title">
+        <header class="rubric-head">
+          <h2 id="videos-title">{L.video}</h2>
+          <a class="rubric-count" href="https://www.youtube.com/@MAHEwatches" rel="noopener" target="_blank">{L.videoNote} →</a>
+        </header>
+        <div class="video-row">
+          {videoItems.map(({ article, video }) => (
+            <a class="video-card" href={`${articlePath(article)}#video`}>
+              <span class="video-thumb media">
+                <img src={videoThumb(video)} alt="" width="480" height="360" loading="lazy" decoding="async" />
+                <span class="video-badge" aria-hidden="true">▶</span>
+              </span>
+              <span class="kicker">{article.data.category}</span>
+              <span class="video-title">{video.title}</span>
+            </a>
+          ))}
+        </div>
+      </section>
+    )}
+
+    <section class="mag-about">
+      <p>{t.about}</p>
+    </section>
+  </div>
+  <div class="peek" aria-hidden="true"><img alt="" /></div>
 </Base>
+
+<script>
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Cadran : heure locale du lecteur, trotteuse en balayage continu
+  const hands = Object.fromEntries([...document.querySelectorAll<SVGLineElement>('.dial [data-hand]')].map((el) => [el.dataset.hand, el]));
+  const tick = () => {
+    const d = new Date();
+    const s = d.getSeconds() + d.getMilliseconds() / 1000;
+    const m = d.getMinutes() + s / 60;
+    const h = (d.getHours() % 12) + m / 60;
+    hands.h?.setAttribute('transform', `rotate(${h * 30} 50 50)`);
+    hands.m?.setAttribute('transform', `rotate(${m * 6} 50 50)`);
+    hands.s?.setAttribute('transform', `rotate(${(reduce ? Math.floor(s) : s) * 6} 50 50)`);
+    requestAnimationFrame(tick);
+  };
+  if (hands.s) tick();
+
+  // Apparition au défilement
+  const targets = document.querySelectorAll('.une > *, .rubric-head, .story, .band > *, .video-card, .mag-about');
+  targets.forEach((el, i) => { el.setAttribute('data-reveal', ''); (el as HTMLElement).style.setProperty('--d', `${(i % 3) * 80}ms`); });
+  const io = new IntersectionObserver((entries) => entries.forEach((e) => {
+    if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); }
+  }), { rootMargin: '0px 0px -8% 0px', threshold: 0.08 });
+  targets.forEach((el) => io.observe(el));
+
+  // Rubrique active dans la barre collante
+  const links = [...document.querySelectorAll<HTMLAnchorElement>('.mast-sections a')];
+  const spy = new IntersectionObserver((entries) => entries.forEach((e) => {
+    if (!e.isIntersecting) return;
+    links.forEach((l) => l.classList.toggle('is-active', l.hash === `#${e.target.id}`));
+  }), { rootMargin: '-45% 0px -50% 0px' });
+  document.querySelectorAll('.rubric').forEach((r) => spy.observe(r));
+
+  // Aperçu flottant de la couverture sur la liste numérotée (souris uniquement)
+  const peek = document.querySelector<HTMLDivElement>('.peek');
+  const peekImg = peek?.querySelector('img');
+  if (peek && peekImg && matchMedia('(hover: hover) and (pointer: fine)').matches) {
+    let x = 0, y = 0, raf = 0;
+    const place = () => { peek.style.transform = `translate3d(${x + 24}px, ${y - 90}px, 0)`; raf = 0; };
+    document.querySelectorAll<HTMLAnchorElement>('.une-list a[data-preview]').forEach((a) => {
+      a.addEventListener('pointerenter', () => { peekImg.src = a.dataset.preview!; peek.classList.add('is-on'); });
+      a.addEventListener('pointerleave', () => peek.classList.remove('is-on'));
+      a.addEventListener('pointermove', (e) => { x = e.clientX; y = e.clientY; if (!raf) raf = requestAnimationFrame(place); });
+    });
+  }
+</script>
