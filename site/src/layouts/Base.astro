@@ -32,6 +32,8 @@ const other = alternates.find((a) => a.lang !== lang);
 <html lang={lang}>
   <head>
     <meta charset="utf-8" />
+    <!-- Mesure d'audience (Google Tag Manager), chargée seulement après consentement : /public/consent.js de l'app -->
+    <script is:inline src="/consent.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
@@ -102,6 +104,7 @@ const other = alternates.find((a) => a.lang !== lang);
           <p class="foot-title">Arcora</p>
           <a href="/mentions-legales">{t.legal}</a>
           <a href="/confidentialite">{t.privacy}</a>
+          <a href="#cookies-settings">{lang === 'fr' ? 'Gérer les cookies' : 'Cookie settings'}</a>
         </nav>
       </div>
       <p class="wrap muted small">© {new Date().getFullYear()} Arcora</p>

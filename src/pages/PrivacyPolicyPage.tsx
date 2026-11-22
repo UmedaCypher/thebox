@@ -95,11 +95,25 @@ export default function PrivacyPolicyPage() {
         </tbody>
       </table>
 
-      <h2>Cookies et stockage local</h2>
+      <h2 id="cookies">Cookies et stockage local</h2>
       <p>
-        {L.appName} n'utilise ni cookie publicitaire ni traceur tiers. L'app enregistre sur votre appareil uniquement ce qui est nécessaire
-        à son fonctionnement : votre session de connexion, votre langue, votre thème et quelques préférences d'affichage.
-        Ce stockage étant strictement nécessaire, il ne requiert pas de consentement.
+        {L.appName} enregistre sur votre appareil ce qui est nécessaire à son fonctionnement : votre session de connexion, votre langue,
+        votre thème, quelques préférences d'affichage et votre choix concernant les cookies. Ce stockage étant strictement nécessaire,
+        il ne requiert pas de consentement. {L.appName} n'utilise aucun cookie publicitaire.
+      </p>
+      <h3>Mesure d'audience</h3>
+      <p>
+        Avec votre accord seulement, nous utilisons Google Analytics, par l'intermédiaire de Google Tag Manager (Google Ireland Limited),
+        pour mesurer la fréquentation du site, du magazine et de l'app (pages vues, provenance des visites, type d'appareil) et les améliorer.
+        Ces cookies ne sont déposés qu'après un clic sur « Accepter » dans le bandeau ; les refuser n'a aucune conséquence sur l'utilisation
+        du Service. Votre choix est conservé six mois, puis vous est redemandé.
+      </p>
+      <p>
+        Les cookies de mesure ont une durée de vie de 13 mois au plus, et les données de mesure sont conservées 14 mois au plus. Elles peuvent
+        être transférées aux États-Unis ; Google adhère au cadre de protection des données UE-États-Unis (Data Privacy Framework).
+      </p>
+      <p>
+        Vous pouvez changer d'avis à tout moment : <a href="#cookies-settings">gérer les cookies</a>.
       </p>
 
       <h2>Vos droits</h2>

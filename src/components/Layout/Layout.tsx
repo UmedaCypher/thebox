@@ -23,13 +23,13 @@ const S = defineStrings({
   byModel: 'Montres au poignet',
   login: 'Se connecter', joinList: 'Rejoindre la liste', signup: 'Créer un compte', skip: 'Aller au contenu',
   info: 'Informations', legal: 'Légal', about: 'À propos', versus: 'Comparatif des apps', stolen: 'Montres volées', faq: 'Questions fréquentes', news: 'Actualités', press: 'Presse',
-  contact: 'Contact', affiliate: 'Parrainage', cgu: 'Conditions d’utilisation', cgv: 'CGV', privacy: 'Confidentialité', mentions: 'Mentions légales', language: 'Langue',
+  contact: 'Contact', affiliate: 'Parrainage', cgu: 'Conditions d’utilisation', cgv: 'CGV', privacy: 'Confidentialité', cookies: 'Gérer les cookies', mentions: 'Mentions légales', language: 'Langue',
 }, {
   mainNav: 'Main navigation', tabsNav: 'Tabs', questions: 'FAQ', myProfile: 'My profile',
   byModel: 'Watches on the wrist',
   login: 'Log in', joinList: 'Join the waitlist', signup: 'Create an account', skip: 'Skip to content',
   info: 'Information', legal: 'Legal', about: 'About', versus: 'App comparison', stolen: 'Stolen watches', faq: 'FAQ', news: 'News', press: 'Press',
-  contact: 'Contact', affiliate: 'Referrals', cgu: 'Terms of use', cgv: 'Terms of sale', privacy: 'Privacy', mentions: 'Legal notice', language: 'Language',
+  contact: 'Contact', affiliate: 'Referrals', cgu: 'Terms of use', cgv: 'Terms of sale', privacy: 'Privacy', cookies: 'Cookie settings', mentions: 'Legal notice', language: 'Language',
 });
 
 /* Navigation du membre sur ordinateur, avec les mêmes icônes que la barre mobile. Messages et profil sont à droite. */
@@ -189,6 +189,7 @@ function Footer({ loggedIn }: { loggedIn: boolean }) {
           <Link to="/cgu">{t.cgu}</Link>
           <Link to="/cgv">{t.cgv}</Link>
           <Link to="/confidentialite">{t.privacy}</Link>
+          <a href="#cookies-settings">{t.cookies}</a>
           <Link to="/mentions-legales">{t.mentions}</Link>
         </nav>
         <div className={s.footerBottom}>
@@ -200,6 +201,7 @@ function Footer({ loggedIn }: { loggedIn: boolean }) {
       <nav className={s.footerCompact} aria-label={t.legal}>
         <Link to="/cgu">{t.cgu}</Link>
         <Link to="/confidentialite">{t.privacy}</Link>
+        <a href="#cookies-settings">{t.cookies}</a>
         <Link to="/mentions-legales">{t.mentions}</Link>
         <Link to="/contact">{t.contact}</Link>
         <LanguageSwitch />

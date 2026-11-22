@@ -33,7 +33,7 @@ export const LEGAL = {
   emailProvider: 'Brevo',
 
   /** Date de dernière mise à jour des documents (à changer à chaque modification). */
-  updatedAt: '28 octobre 2026',
+  updatedAt: '22 novembre 2026',
   /** Date de mise à jour des conditions d'utilisation (CGU). */
   cguUpdatedAt: '6 novembre 2026',
   /** Âge minimum pour créer un compte. */
