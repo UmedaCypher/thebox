@@ -45,6 +45,14 @@ export const VIDEOS: Record<string, Video> = {
     duration: 'PT3M28S',
     lang: 'fr',
   },
+  'watch-strap-guide': {
+    id: 'jSrQRWZN_so',
+    title: "On vous MENT sur le Cuir : Le test d'un artisan pour ne plus se faire avoir",
+    description: 'Cuir véritable, simili, PU, « bonded leather » : comment reconnaître un vrai cuir de qualité pour un bracelet de montre qui dure et vieillit bien.',
+    uploadDate: '2025-05-25',
+    duration: 'PT4M49S',
+    lang: 'fr',
+  },
 };
 
 /** Vidéos de la page auteur. */
