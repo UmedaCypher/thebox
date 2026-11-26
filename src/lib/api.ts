@@ -195,10 +195,11 @@ export async function updateWatch(userId: string, id: string, input: Partial<Wat
 
 export async function deleteWatch(userId: string, watch: Watch) {
   const paths = withThumbs((watch.photos ?? []).map(p => p.storage_path));
-  if (paths.length) await supabase.storage.from(WATCH_BUCKET).remove(paths);
+  // La fiche d'abord : si la base refuse, les photos restent intactes.
   // Les tables liées sont supprimées en cascade par la base (migration du 20/10/2026).
   const { error } = await supabase.from('watches').delete().eq('id', watch.id).eq('user_id', userId);
   fail(error, 'Suppression impossible.');
+  if (paths.length) await supabase.storage.from(WATCH_BUCKET).remove(paths);
 }
 
 export async function addWatchPhoto(
@@ -231,9 +232,10 @@ export async function addWatchPhoto(
 }
 
 export async function deletePhoto(userId: string, photo: Photo) {
-  await supabase.storage.from(WATCH_BUCKET).remove(withThumbs([photo.storage_path]));
+  // La ligne d'abord : si la base refuse, le fichier reste en place et la photo reste visible.
   const { error } = await supabase.from('photos').delete().eq('id', photo.id).eq('user_id', userId);
   fail(error, 'Suppression de la photo impossible.');
+  await supabase.storage.from(WATCH_BUCKET).remove(withThumbs([photo.storage_path]));
 }
 
 export async function setPhotoInGallery(userId: string, photoId: string, inGallery: boolean) {
@@ -1063,6 +1065,13 @@ export async function deleteMyAccount(userId: string) {
   const { data: sub } = await supabase.from('subscriptions').select('status, cancel_at_period_end').eq('user_id', userId).maybeSingle();
   if (sub && ['active', 'trialing', 'past_due'].includes(sub.status) && !sub.cancel_at_period_end) {
     fail({ message: 'ACTIVE_SUBSCRIPTION' }, 'Suppression impossible.');
+  }
+  // Même règle que la base : des commissions de parrainage en attente bloquent la suppression.
+  // Vérifié ici aussi, sinon les photos seraient effacées avant que la base ne refuse.
+  const { data: aff } = await supabase.rpc('get_my_affiliate');
+  const balance = aff as { pending_cents?: number; due_cents?: number } | null;
+  if (balance && ((balance.pending_cents ?? 0) + (balance.due_cents ?? 0)) > 0) {
+    fail({ message: 'AFFILIATE_BALANCE' }, 'Suppression impossible.');
   }
   const { data: photos } = await supabase.from('photos').select('storage_path').eq('user_id', userId);
   const paths = withThumbs((photos ?? []).map(p => p.storage_path as string).filter(Boolean));

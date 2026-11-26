@@ -47,7 +47,7 @@ export default defineConfig({
   integrations: [
     sitemap({
       customPages: APP_PUBLIC_PAGES.map((p) => SITE + p),
-      filter: (page) => !thinModelPages.has(page),
+      filter: (page) => !thinModelPages.has(page) && !page.endsWith('/magazine/404/'),
       serialize: (item) => {
         const date = articleDates.get(item.url)
           ?? (/\/magazine\/$/.test(item.url) ? newest : undefined);

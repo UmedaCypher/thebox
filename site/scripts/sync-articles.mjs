@@ -9,6 +9,15 @@ import { basename, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', 'src', 'content', 'articles');
+
+// En local, lit le .env de l'app (les scripts ne passent pas par Vite)
+for (const f of ['.env.local', '.env']) {
+  const file = join(dirname(fileURLToPath(import.meta.url)), '..', '..', f);
+  if (existsSync(file)) { try { process.loadEnvFile(file); } catch { /* fichier illisible : ignoré */ } }
+}
+// Retirer du dépôt les articles absents de la base n'a lieu que sur le serveur de build (Cloudflare)
+// ou sur demande explicite : un build local ne doit jamais effacer des fichiers suivis par git.
+const PRUNE = process.env.MAGAZINE_PRUNE === '1' || Boolean(process.env.WORKERS_CI || process.env.CI);
 const IMAGES = join(ROOT, 'images');
 const url = (process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || '').replace(/\/$/, '');
 const key = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY || '';
@@ -58,7 +67,10 @@ async function main() {
   for (const lang of ['fr', 'en']) {
     const dir = join(ROOT, lang);
     mkdirSync(dir, { recursive: true });
-    for (const f of readdirSync(dir)) if (f.endsWith('.md') && !keep.has(`${lang}/${f}`)) rmSync(join(dir, f));
+    const stale = readdirSync(dir).filter((f) => f.endsWith('.md') && !keep.has(`${lang}/${f}`));
+    if (!stale.length) continue;
+    if (PRUNE) for (const f of stale) rmSync(join(dir, f));
+    else console.log(`[magazine] ${stale.length} article(s) ${lang} absents de la base, conservés (build local) : ${stale.join(', ')}`);
   }
 
   for (const r of rows) {

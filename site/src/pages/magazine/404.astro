@@ -1,0 +1,14 @@
+---
+// Page introuvable du magazine et des pages « au poignet ». Servie avec un statut 404 par le Worker
+// (worker/index.ts) pour toute adresse inconnue sous /magazine/, /en/magazine/ et /au-poignet/.
+import Base from '../../layouts/Base.astro';
+---
+<Base lang="fr" title="Page introuvable" description="Cette page n’existe pas ou plus." path="/magazine/404/" noindex>
+  <section class="wrap mag-hero">
+    <p class="eyebrow">Erreur 404</p>
+    <h1>Cette page n’existe pas ou plus</h1>
+    <p>L’article a peut-être été renommé ou retiré. Les guides restent tous accessibles depuis le sommaire.</p>
+    <p><a class="btn" data-liquid href="/magazine/">Retour au magazine</a></p>
+    <p class="muted"><a href="/en/magazine/">English magazine</a> · <a href="/au-poignet/">Montres au poignet</a></p>
+  </section>
+</Base>
