@@ -1,12 +1,18 @@
 // Pages « au poignet » : avant la construction, récupère les photos au poignet publiques regroupées par modèle
 // (fonction get_wrist_models, clé publique) et les écrit dans src/data/wrist-models.generated.json.
 // Sans connexion à la base, le fichier est vide : le site se construit sans ces pages.
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { modelSlug } from '../src/lib/slug.mjs';
 
 const OUT = join(dirname(fileURLToPath(import.meta.url)), '..', 'src', 'data', 'wrist-models.generated.json');
+
+// En local, lit le .env de l'app (les scripts ne passent pas par Vite)
+for (const f of ['.env.local', '.env']) {
+  const file = join(dirname(fileURLToPath(import.meta.url)), '..', '..', f);
+  if (existsSync(file)) { try { process.loadEnvFile(file); } catch { /* fichier illisible : ignoré */ } }
+}
 const url = (process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || '').replace(/\/$/, '');
 const key = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY || '';
 const BUCKET = 'watch.images';

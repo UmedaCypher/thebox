@@ -1,6 +1,7 @@
 {
   "name": "client",
   "private": true,
+  "engines": { "node": ">=22.23.4" },
   "version": "0.0.0",
   "type": "module",
   "scripts": {
@@ -8,7 +9,7 @@
     "build": "tsc -b && vite build && npm run build:magazine",
     "lint": "eslint .",
     "preview": "vite preview",
-    "build:magazine": "npm ci --prefix site && node site/scripts/sync-articles.mjs && node site/scripts/sync-models.mjs && npm run build --prefix site && node -e \"require('fs').cpSync('site/dist','dist',{recursive:true})\"",
+    "build:magazine": "npm ci --prefix site --prefer-offline --no-audit --no-fund && node site/scripts/sync-articles.mjs && node site/scripts/sync-models.mjs && npm run build --prefix site && node -e \"require('fs').cpSync('site/dist','dist',{recursive:true})\"",
     "dev:magazine": "npm run dev --prefix site"
   },
   "dependencies": {

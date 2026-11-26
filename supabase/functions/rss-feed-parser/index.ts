@@ -1,93 +1,124 @@
 // supabase/functions/rss-feed-parser/index.ts
-    
-import { serve } from 'https://deno.land/std@0.177.0/http/server.ts'
+// Lit un des flux d'actualités horlogères affichés dans l'app (liste fixe, src/lib/news.ts)
+// et renvoie ses 20 derniers articles. Aucune autre adresse n'est acceptée : la fonction
+// est publique et ne doit pas servir de relais vers des adresses arbitraires.
+
+import { serve } from 'https://deno.land/std@0.177.0/http/server.ts';
 import Parser from 'https://esm.sh/rss-parser@3.13.0';
 
+// Même liste que src/lib/news.ts : à tenir à jour ensemble
+const FEEDS = new Set([
+  'https://www.lecalibre.com/feed/',
+  'https://www.lesrhabilleurs.com/feed/',
+  'https://thewatchobserver.ouest-france.fr/feed/',
+  'https://www.mrmontre.com/feed',
+  'https://www.watches-news.com/fr/feed/',
+]);
+
+const ORIGINS = new Set([
+  'https://arcorawatch.com',
+  'https://www.arcorawatch.com',
+  'http://localhost:5173',
+  'http://localhost:4173',
+]);
+
+const TIMEOUT_MS = 8000;
+const MAX_BYTES = 2 * 1024 * 1024;
+
 const parser = new Parser({
-  customFields: { 
-    item: [ 
+  customFields: {
+    item: [
       ['media:content', 'mediaContent', { keepArray: false }],
       ['media:thumbnail', 'mediaThumbnail', { keepArray: false }],
-      ['image', 'image'], 
+      ['image', 'image'],
     ],
-  }
+  },
 });
-    
-serve(async (req: Request) => { 
-    
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { 
+
+function cors(req: Request): Record<string, string> {
+  const origin = req.headers.get('origin') ?? '';
+  return {
+    'Access-Control-Allow-Origin': ORIGINS.has(origin) ? origin : 'https://arcorawatch.com',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+    Vary: 'Origin',
+  };
+}
+
+function json(req: Request, body: unknown, status = 200) {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { 'Content-Type': 'application/json', ...cors(req) },
+  });
+}
+
+/** Lit la réponse en s'arrêtant à MAX_BYTES : un flux anormalement lourd est refusé. */
+async function readLimited(res: Response): Promise<string> {
+  const declared = Number(res.headers.get('content-length') ?? 0);
+  if (declared > MAX_BYTES) throw new Error('FEED_TOO_LARGE');
+  const reader = res.body?.getReader();
+  if (!reader) return '';
+  const chunks: Uint8Array[] = [];
+  let total = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    total += value.byteLength;
+    if (total > MAX_BYTES) { await reader.cancel(); throw new Error('FEED_TOO_LARGE'); }
+    chunks.push(value);
+  }
+  const all = new Uint8Array(total);
+  let offset = 0;
+  for (const c of chunks) { all.set(c, offset); offset += c.byteLength; }
+  return new TextDecoder().decode(all);
+}
+
+serve(async (req: Request) => {
+  if (req.method === 'OPTIONS') return new Response('ok', { headers: cors(req) });
+  if (req.method !== 'POST') return json(req, { error: 'Méthode non autorisée.' }, 405);
+
+  let feedUrl: unknown;
+  try {
+    ({ feedUrl } = await req.json());
+  } catch {
+    return json(req, { error: 'Requête invalide.' }, 400);
+  }
+  if (typeof feedUrl !== 'string' || !FEEDS.has(feedUrl)) {
+    return json(req, { error: 'Flux non pris en charge.' }, 400);
+  }
+
+  try {
+    const response = await fetch(feedUrl, {
+      signal: AbortSignal.timeout(TIMEOUT_MS),
       headers: {
-        'Access-Control-Allow-Origin': '*', 
-        'Access-Control-Allow-Methods': 'POST, OPTIONS', 
-        'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type', 
+        'User-Agent': 'Arcora/1.0 (RSS; +https://arcorawatch.com)',
+        Accept: 'application/rss+xml, application/xml, text/xml',
       },
     });
-  }
-    
-  try {
-    const { feedUrl } = await req.json(); 
-    
-    if (!feedUrl) { 
-      return new Response(JSON.stringify({ error: 'feedUrl est requis' }), {
-        status: 400, 
-        headers: { 
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*', 
-        },
-      });
-    }
-    
-    console.log(`Edge Function: Récupération du contenu XML depuis : ${feedUrl}`);
-    // Étape 1: Récupérer le contenu XML du flux en utilisant fetch de Deno
-    const response = await fetch(feedUrl, {
-      headers: {
-        'User-Agent': 'SupabaseEdgeFunction/1.0 (RSS Parser)', // Certains serveurs RSS requièrent un User-Agent
-        'Accept': 'application/rss+xml, application/xml, text/xml',
-      }
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+    const feed = await parser.parseString(await readLimited(response));
+    const items = (feed.items ?? []).slice(0, 20).map((item) => {
+      const snippet = item.contentSnippet ?? item.summary;
+      return {
+        title: item.title,
+        link: item.link,
+        pubDate: item.pubDate,
+        isoDate: item.isoDate,
+        creator: item.creator || item['dc:creator'],
+        contentSnippet: snippet ? `${snippet.substring(0, 200)}...` : undefined,
+        imageUrl: item.mediaContent?.$?.url || item.mediaThumbnail?.$?.url || item.enclosure?.url || item.image?.url || null,
+        sourceTitle: feed.title,
+      };
     });
 
-    if (!response.ok) {
-      throw new Error(`Échec de la récupération du flux RSS: ${response.status} ${response.statusText}`);
-    }
-
-    const xmlString = await response.text();
-    console.log(`Edge Function: Contenu XML récupéré. Analyse en cours...`);
-
-    // Étape 2: Analyser la chaîne XML avec rss-parser
-    const feed = await parser.parseString(xmlString);
-    console.log(`Edge Function: Flux RSS analysé avec succès : ${feed.title}`);
-    
-    const items = feed.items.map(item => ({
-      title: item.title,
-      link: item.link,
-      pubDate: item.pubDate, 
-      isoDate: item.isoDate, 
-      creator: item.creator || item['dc:creator'], 
-      contentSnippet: item.contentSnippet?.substring(0, 200) + '...' || item.summary?.substring(0, 200) + '...', 
-      imageUrl: item.mediaContent?.$?.url ||       
-                item.mediaThumbnail?.$?.url ||  
-                item.enclosure?.url ||          
-                item.image?.url ||              
-                null,                           
-      sourceTitle: feed.title, 
-    })).slice(0, 20); 
-    
     return new Response(JSON.stringify({ items }), {
       status: 200,
-      headers: { 
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-      },
+      headers: { 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=900', ...cors(req) },
     });
   } catch (error) {
-    console.error('Erreur dans la fonction Edge rss-feed-parser:', error);
-    return new Response(JSON.stringify({ error: error.message || 'Erreur lors de la récupération ou de l\'analyse du flux RSS.' }), {
-      status: 500, 
-      headers: { 
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-      },
-    });
+    // Le détail reste dans les journaux de la fonction ; le client reçoit un message générique
+    console.error('rss-feed-parser', feedUrl, error);
+    return json(req, { error: 'Flux momentanément indisponible.' }, 502);
   }
 });

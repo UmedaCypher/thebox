@@ -4,6 +4,7 @@ import App from './App';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { LangProvider } from './i18n';
 import { ToastProvider } from './components/Toast/Toast';
+import ErrorBoundary from './components/ErrorBoundary/ErrorBoundary';
 import { captureRef, captureSource } from './lib/source';
 import { detectAndroidApp } from './lib/platform';
 import './index.css';
@@ -20,8 +21,10 @@ function WithLang() {
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <AuthProvider>
-      <WithLang />
-    </AuthProvider>
+    <ErrorBoundary>
+      <AuthProvider>
+        <WithLang />
+      </AuthProvider>
+    </ErrorBoundary>
   </StrictMode>,
 );

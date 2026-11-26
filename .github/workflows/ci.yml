@@ -1,0 +1,30 @@
+# Vérifie chaque pull request et chaque push sur main : lint, types, build de l'app et du magazine.
+# Le déploiement reste fait par Cloudflare ; cette vérification sert de garde-fou avant le merge.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            site/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      # Sans variables Supabase, le magazine se construit avec les articles du dépôt
+      - run: npm run build

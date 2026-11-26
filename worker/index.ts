@@ -134,12 +134,29 @@ function withMeta(res: Response, m: Meta): Response {
   return new Response(out.body, { status: out.status, headers });
 }
 
+const MAGAZINE = /^\/(?:en\/)?magazine(?:\/|$)|^\/au-poignet(?:\/|$)/;
+
+/** Le repli de la SPA se reconnaît à la racine de l'app React, absente des pages Astro. */
+async function magazinePage(page: Response, request: Request, env: Env): Promise<Response> {
+  const html = await page.text();
+  if (!html.includes('id="root"')) return new Response(html, page);
+  const notFound = await env.ASSETS.fetch(new Request(new URL('/magazine/404/', request.url)));
+  const body = await notFound.text();
+  if (body.includes('id="root"')) return new Response(html, { status: 404, headers: page.headers });
+  const headers = new Headers(notFound.headers);
+  headers.set('Cache-Control', 'public, max-age=0, s-maxage=300');
+  return new Response(body, { status: 404, headers });
+}
+
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
     const page = await env.ASSETS.fetch(request);
     const isHtml = request.method === 'GET' && (page.headers.get('content-type') ?? '').includes('text/html');
     if (!isHtml) return page;
+    // Magazine et « au poignet » : une adresse inconnue renvoie l'app (repli de la SPA) avec un statut 200,
+    // que Google indexerait. On sert à la place la page 404 du magazine, avec le bon statut.
+    if (MAGAZINE.test(url.pathname)) return magazinePage(page, request, env);
     try {
       const cfg = await getConfig(env, url.origin);
       if (!cfg) return page;
